@@ -1,12 +1,12 @@
-# Shipin
+﻿# Shipin
 
-> A Flutter video platform client built with Riverpod and Serverpod.
+> A full-stack Flutter + Serverpod video platform monorepo built with Riverpod.
 
-**Shipin** 是一个使用 Flutter 开发的视频平台项目。
+**Shipin** æ˜¯ä¸€ä¸ªä½¿ç”¨ Flutter å¼€å‘çš„è§†é¢‘å¹³å°é¡¹ç›®ã€‚
 
-项目正在实现从用户认证、视频浏览、搜索、播放、投稿，到点赞、评论、关注、观看历史、通知和个人主页等完整的视频平台功能。
+é¡¹ç›®æ­£åœ¨å®žçŽ°ä»Žç”¨æˆ·è®¤è¯ã€è§†é¢‘æµè§ˆã€æœç´¢ã€æ’­æ”¾ã€æŠ•ç¨¿ï¼Œåˆ°ç‚¹èµžã€è¯„è®ºã€å…³æ³¨ã€è§‚çœ‹åŽ†å²ã€é€šçŸ¥å’Œä¸ªäººä¸»é¡µç­‰å®Œæ•´çš„è§†é¢‘å¹³å°åŠŸèƒ½ã€‚
 
-客户端使用 **Riverpod** 管理状态，并通过 **Serverpod** 与后端服务通信。
+å®¢æˆ·ç«¯ä½¿ç”¨ **Riverpod** ç®¡ç†çŠ¶æ€ï¼Œå¹¶é€šè¿‡ **Serverpod** ä¸ŽåŽç«¯æœåŠ¡é€šä¿¡ã€‚
 
 ---
 
@@ -14,43 +14,43 @@
 
 ### Video
 
-* 视频首页
-* 视频列表
-* 视频详情
-* 视频播放
-* 视频搜索
-* 视频投稿
-* 本地视频选择
-* 视频时长读取
-* 视频处理
-* 视频分享
+* è§†é¢‘é¦–é¡µ
+* è§†é¢‘åˆ—è¡¨
+* è§†é¢‘è¯¦æƒ…
+* è§†é¢‘æ’­æ”¾
+* è§†é¢‘æœç´¢
+* è§†é¢‘æŠ•ç¨¿
+* æœ¬åœ°è§†é¢‘é€‰æ‹©
+* è§†é¢‘æ—¶é•¿è¯»å–
+* è§†é¢‘å¤„ç†
+* è§†é¢‘åˆ†äº«
 
 ### Creator
 
-* 创作者主页
-* 关注创作者
-* 已关注创作者列表
+* åˆ›ä½œè€…ä¸»é¡µ
+* å…³æ³¨åˆ›ä½œè€…
+* å·²å…³æ³¨åˆ›ä½œè€…åˆ—è¡¨
 
 ### Interaction
 
-* 点赞
-* 评论
-* 视频互动状态
-* 分享
+* ç‚¹èµž
+* è¯„è®º
+* è§†é¢‘äº’åŠ¨çŠ¶æ€
+* åˆ†äº«
 
 ### User
 
-* 用户认证
+* ç”¨æˆ·è®¤è¯
 * Auth Gate
-* 个人主页
-* 观看历史
-* 通知
+* ä¸ªäººä¸»é¡µ
+* è§‚çœ‹åŽ†å²
+* é€šçŸ¥
 
 ### Discovery
 
-* 首页推荐
-* 发现页面
-* 视频搜索
+* é¦–é¡µæŽ¨è
+* å‘çŽ°é¡µé¢
+* è§†é¢‘æœç´¢
 
 ---
 
@@ -91,60 +91,60 @@
 
 # Architecture
 
-客户端采用以 Feature 为单位的模块化结构。
+å®¢æˆ·ç«¯é‡‡ç”¨ä»¥ Feature ä¸ºå•ä½çš„æ¨¡å—åŒ–ç»“æž„ã€‚
 
 ```text
 lib/
-│
-├── core/
-│   └── serverpod/
-│
-├── features/
-│   ├── auth/
-│   ├── comments/
-│   ├── creator/
-│   ├── history/
-│   ├── home/
-│   ├── notifications/
-│   ├── profile/
-│   ├── video/
-│   └── video_interactions/
-│
-└── main.dart
+â”‚
+â”œâ”€â”€ core/
+â”‚   â””â”€â”€ serverpod/
+â”‚
+â”œâ”€â”€ features/
+â”‚   â”œâ”€â”€ auth/
+â”‚   â”œâ”€â”€ comments/
+â”‚   â”œâ”€â”€ creator/
+â”‚   â”œâ”€â”€ history/
+â”‚   â”œâ”€â”€ home/
+â”‚   â”œâ”€â”€ notifications/
+â”‚   â”œâ”€â”€ profile/
+â”‚   â”œâ”€â”€ video/
+â”‚   â””â”€â”€ video_interactions/
+â”‚
+â””â”€â”€ main.dart
 ```
 
-每个 Feature 根据需要继续拆分：
+æ¯ä¸ª Feature æ ¹æ®éœ€è¦ç»§ç»­æ‹†åˆ†ï¼š
 
 ```text
 feature/
-├── data/
-│   ├── models/
-│   └── repositories/
-│
-└── presentation/
-    ├── pages/
-    ├── providers/
-    └── widgets/
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ models/
+â”‚   â””â”€â”€ repositories/
+â”‚
+â””â”€â”€ presentation/
+    â”œâ”€â”€ pages/
+    â”œâ”€â”€ providers/
+    â””â”€â”€ widgets/
 ```
 
-整体数据流可以理解为：
+æ•´ä½“æ•°æ®æµå¯ä»¥ç†è§£ä¸ºï¼š
 
 ```text
 UI
- │
- ▼
+ â”‚
+ â–¼
 Riverpod Provider
- │
- ▼
+ â”‚
+ â–¼
 Repository
- │
- ▼
+ â”‚
+ â–¼
 Serverpod Client
- │
- ▼
+ â”‚
+ â–¼
 Backend
- │
- ▼
+ â”‚
+ â–¼
 Database / Video Storage
 ```
 
@@ -158,15 +158,15 @@ Database / Video Storage
 features/auth/
 ```
 
-负责用户登录状态以及应用入口认证流程。
+è´Ÿè´£ç”¨æˆ·ç™»å½•çŠ¶æ€ä»¥åŠåº”ç”¨å…¥å£è®¤è¯æµç¨‹ã€‚
 
-应用启动后由：
+åº”ç”¨å¯åŠ¨åŽç”±ï¼š
 
 ```text
 AuthGate
 ```
 
-决定用户应该进入认证流程还是主应用。
+å†³å®šç”¨æˆ·åº”è¯¥è¿›å…¥è®¤è¯æµç¨‹è¿˜æ˜¯ä¸»åº”ç”¨ã€‚
 
 ---
 
@@ -176,7 +176,7 @@ AuthGate
 features/home/
 ```
 
-首页模块包含：
+é¦–é¡µæ¨¡å—åŒ…å«ï¼š
 
 ```text
 home_page.dart
@@ -185,12 +185,12 @@ main_page.dart
 video_search_page.dart
 ```
 
-负责：
+è´Ÿè´£ï¼š
 
-* 主导航
-* 首页视频内容
-* 发现内容
-* 视频搜索
+* ä¸»å¯¼èˆª
+* é¦–é¡µè§†é¢‘å†…å®¹
+* å‘çŽ°å†…å®¹
+* è§†é¢‘æœç´¢
 
 ---
 
@@ -200,105 +200,105 @@ video_search_page.dart
 features/video/
 ```
 
-视频模块负责平台的核心视频功能。
+è§†é¢‘æ¨¡å—è´Ÿè´£å¹³å°çš„æ ¸å¿ƒè§†é¢‘åŠŸèƒ½ã€‚
 
-主要页面：
+ä¸»è¦é¡µé¢ï¼š
 
 ```text
 create_video_page.dart
 video_detail_page.dart
 ```
 
-包括：
+åŒ…æ‹¬ï¼š
 
 ```text
-视频选择
-   ↓
-视频处理
-   ↓
-投稿
-   ↓
-上传
-   ↓
-后端创建视频记录
-   ↓
-首页 / 搜索
-   ↓
-视频详情
-   ↓
-视频播放
+è§†é¢‘é€‰æ‹©
+   â†“
+è§†é¢‘å¤„ç†
+   â†“
+æŠ•ç¨¿
+   â†“
+ä¸Šä¼ 
+   â†“
+åŽç«¯åˆ›å»ºè§†é¢‘è®°å½•
+   â†“
+é¦–é¡µ / æœç´¢
+   â†“
+è§†é¢‘è¯¦æƒ…
+   â†“
+è§†é¢‘æ’­æ”¾
 ```
 
 ---
 
 # Video Upload Flow
 
-投稿不只是简单上传一个文件。
+æŠ•ç¨¿ä¸åªæ˜¯ç®€å•ä¸Šä¼ ä¸€ä¸ªæ–‡ä»¶ã€‚
 
-当前客户端已经引入：
+å½“å‰å®¢æˆ·ç«¯å·²ç»å¼•å…¥ï¼š
 
 * `image_picker`
 * `video_duration_native`
 * FFmpeg
 
-用于媒体选择与视频处理。
+ç”¨äºŽåª’ä½“é€‰æ‹©ä¸Žè§†é¢‘å¤„ç†ã€‚
 
-整体流程设计为：
+æ•´ä½“æµç¨‹è®¾è®¡ä¸ºï¼š
 
 ```text
-选择视频
-   │
-   ▼
-读取视频信息
-   │
-   ▼
-准备投稿资料
-   │
-   ▼
-视频处理
-   │
-   ▼
-上传
-   │
-   ▼
+é€‰æ‹©è§†é¢‘
+   â”‚
+   â–¼
+è¯»å–è§†é¢‘ä¿¡æ¯
+   â”‚
+   â–¼
+å‡†å¤‡æŠ•ç¨¿èµ„æ–™
+   â”‚
+   â–¼
+è§†é¢‘å¤„ç†
+   â”‚
+   â–¼
+ä¸Šä¼ 
+   â”‚
+   â–¼
 Serverpod Backend
-   │
-   ▼
-保存视频数据
-   │
-   ▼
-视频发布
+   â”‚
+   â–¼
+ä¿å­˜è§†é¢‘æ•°æ®
+   â”‚
+   â–¼
+è§†é¢‘å‘å¸ƒ
 ```
 
-对于较大的视频文件，上传属于独立的任务流程，而不是要求用户一直停留在投稿页面。
+å¯¹äºŽè¾ƒå¤§çš„è§†é¢‘æ–‡ä»¶ï¼Œä¸Šä¼ å±žäºŽç‹¬ç«‹çš„ä»»åŠ¡æµç¨‹ï¼Œè€Œä¸æ˜¯è¦æ±‚ç”¨æˆ·ä¸€ç›´åœç•™åœ¨æŠ•ç¨¿é¡µé¢ã€‚
 
 ---
 
 # Video Playback
 
-项目使用：
+é¡¹ç›®ä½¿ç”¨ï¼š
 
 ```text
 video_player
 ```
 
-处理客户端视频播放。
+å¤„ç†å®¢æˆ·ç«¯è§†é¢‘æ’­æ”¾ã€‚
 
-视频详情页负责整合：
+è§†é¢‘è¯¦æƒ…é¡µè´Ÿè´£æ•´åˆï¼š
 
 ```text
-视频播放
+è§†é¢‘æ’­æ”¾
 +
-视频信息
+è§†é¢‘ä¿¡æ¯
 +
-作者信息
+ä½œè€…ä¿¡æ¯
 +
-互动状态
+äº’åŠ¨çŠ¶æ€
 +
-评论
+è¯„è®º
 ```
 
-形成完整的视频观看页面。
+å½¢æˆå®Œæ•´çš„è§†é¢‘è§‚çœ‹é¡µé¢ã€‚
 
 ---
 
@@ -308,16 +308,16 @@ video_player
 features/comments/
 ```
 
-评论作为独立 Feature 管理。
+è¯„è®ºä½œä¸ºç‹¬ç«‹ Feature ç®¡ç†ã€‚
 
-结构包含：
+ç»“æž„åŒ…å«ï¼š
 
 ```text
 data/
 presentation/
 ```
 
-使评论的数据请求、状态和界面与视频主体模块保持解耦。
+ä½¿è¯„è®ºçš„æ•°æ®è¯·æ±‚ã€çŠ¶æ€å’Œç•Œé¢ä¸Žè§†é¢‘ä¸»ä½“æ¨¡å—ä¿æŒè§£è€¦ã€‚
 
 ---
 
@@ -327,9 +327,9 @@ presentation/
 features/video_interactions/
 ```
 
-互动逻辑与视频内容本身分离。
+äº’åŠ¨é€»è¾‘ä¸Žè§†é¢‘å†…å®¹æœ¬èº«åˆ†ç¦»ã€‚
 
-该模块用于管理视频相关用户行为，例如：
+è¯¥æ¨¡å—ç”¨äºŽç®¡ç†è§†é¢‘ç›¸å…³ç”¨æˆ·è¡Œä¸ºï¼Œä¾‹å¦‚ï¼š
 
 ```text
 Like
@@ -337,7 +337,7 @@ Follow
 Interaction State
 ```
 
-这种拆分可以避免把所有逻辑集中在 `video_detail_page.dart` 中。
+è¿™ç§æ‹†åˆ†å¯ä»¥é¿å…æŠŠæ‰€æœ‰é€»è¾‘é›†ä¸­åœ¨ `video_detail_page.dart` ä¸­ã€‚
 
 ---
 
@@ -347,14 +347,14 @@ Interaction State
 features/creator/
 ```
 
-创作者模块包含：
+åˆ›ä½œè€…æ¨¡å—åŒ…å«ï¼š
 
 ```text
 creator_profile_page.dart
 following_creators_page.dart
 ```
 
-用于展示创作者资料以及用户已经关注的创作者。
+ç”¨äºŽå±•ç¤ºåˆ›ä½œè€…èµ„æ–™ä»¥åŠç”¨æˆ·å·²ç»å…³æ³¨çš„åˆ›ä½œè€…ã€‚
 
 ---
 
@@ -364,7 +364,7 @@ following_creators_page.dart
 features/history/
 ```
 
-负责保存和展示用户的视频观看历史。
+è´Ÿè´£ä¿å­˜å’Œå±•ç¤ºç”¨æˆ·çš„è§†é¢‘è§‚çœ‹åŽ†å²ã€‚
 
 ---
 
@@ -374,9 +374,9 @@ features/history/
 features/notifications/
 ```
 
-用于集中处理平台通知相关功能。
+ç”¨äºŽé›†ä¸­å¤„ç†å¹³å°é€šçŸ¥ç›¸å…³åŠŸèƒ½ã€‚
 
-未来可以继续扩展：
+æœªæ¥å¯ä»¥ç»§ç»­æ‰©å±•ï¼š
 
 ```text
 Like Notification
@@ -394,13 +394,13 @@ System Notification
 features/profile/
 ```
 
-负责用户自己的资料及相关个人功能。
+è´Ÿè´£ç”¨æˆ·è‡ªå·±çš„èµ„æ–™åŠç›¸å…³ä¸ªäººåŠŸèƒ½ã€‚
 
 ---
 
 # Serverpod
 
-客户端通过：
+å®¢æˆ·ç«¯é€šè¿‡ï¼š
 
 ```text
 serverpod_client
@@ -408,45 +408,46 @@ serverpod_flutter
 serverpod_auth_idp_flutter
 ```
 
-连接后端。
+è¿žæŽ¥åŽç«¯ã€‚
 
-Serverpod Client Provider 位于：
+Serverpod Client Provider ä½äºŽï¼š
 
 ```text
 lib/core/serverpod/serverpod_client_provider.dart
 ```
 
-因此业务模块不需要自行创建后端 Client，而是通过统一 Provider 获取连接。
+å› æ­¤ä¸šåŠ¡æ¨¡å—ä¸éœ€è¦è‡ªè¡Œåˆ›å»ºåŽç«¯ Clientï¼Œè€Œæ˜¯é€šè¿‡ç»Ÿä¸€ Provider èŽ·å–è¿žæŽ¥ã€‚
 
 ---
 
-# Backend Dependency
+# Monorepo
 
-当前仓库主要包含 **Flutter 客户端**。
-
-`pubspec.yaml` 中使用本地路径引用生成的 Serverpod Client：
-
-```yaml
-glyphora_backend_client:
-  path: ../glyphora_backend/glyphora_backend_client
-```
-
-因此当前项目目录预期类似：
+Shipin now uses a single-repository Flutter + Serverpod architecture.
 
 ```text
-workspace/
-│
-├── shipin/
-│
-└── glyphora_backend/
-    ├── glyphora_backend_server/
-    └── glyphora_backend_client/
+shipin/
+|-- apps/
+|   `-- shipin_app/
+|-- packages/
+|   `-- shipin_backend_client/
+|-- server/
+|   `-- shipin_backend_server/
+|-- pubspec.yaml
+`-- pubspec.lock
 ```
 
-如果只单独 Clone `shipin`，需要另外准备对应的 Serverpod backend/client，或者修改 `pubspec.yaml` 中的依赖路径。
+The Flutter app, generated Serverpod client, and Serverpod backend are managed by one Dart workspace:
+
+```yaml
+workspace:
+  - apps/shipin_app
+  - packages/shipin_backend_client
+  - server/shipin_backend_server
+```
+
+The backend and generated client no longer need to be cloned as separate repositories.
 
 ---
-
 # Getting Started
 
 ## 1. Clone
@@ -456,132 +457,149 @@ git clone https://github.com/chengyang1017/shipin.git
 cd shipin
 ```
 
----
+## 2. Install Workspace Dependencies
 
-## 2. Prepare Backend Client
-
-确保项目能够找到：
-
-```text
-../glyphora_backend/glyphora_backend_client
-```
-
-或者修改：
-
-```yaml
-glyphora_backend_client:
-  path: ...
-```
-
-使其指向你本地实际的 Serverpod Client。
-
----
-
-## 3. Install Dependencies
+From the repository root:
 
 ```bash
-flutter pub get
+dart pub get
 ```
 
----
-
-## 4. Run
-
-启动对应的 Serverpod 后端之后：
+## 3. Generate Serverpod Code
 
 ```bash
+cd server/shipin_backend_server
+serverpod generate
+cd ../..
+```
+
+## 4. Run Backend
+
+```bash
+cd server/shipin_backend_server
+dart run bin/main.dart --apply-migrations
+```
+
+## 5. Run Flutter App
+
+In another terminal:
+
+```bash
+cd apps/shipin_app
 flutter run
 ```
 
-选择 Android、iOS、Windows 或其他 Flutter 支持的平台运行。
+## 6. Validate
+
+Flutter app:
+
+```bash
+cd apps/shipin_app
+flutter test
+flutter analyze
+```
+
+Generated client:
+
+```bash
+cd packages/shipin_backend_client
+dart analyze
+```
+
+Backend:
+
+```bash
+cd server/shipin_backend_server
+dart analyze
+dart test
+```
 
 ---
-
 # Project Structure
 
 ```text
 shipin/
-│
-├── lib/
-│   │
-│   ├── core/
-│   │   └── serverpod/
-│   │       └── serverpod_client_provider.dart
-│   │
-│   ├── features/
-│   │   │
-│   │   ├── auth/
-│   │   │   ├── data/
-│   │   │   └── presentation/
-│   │   │
-│   │   ├── comments/
-│   │   │   ├── data/
-│   │   │   └── presentation/
-│   │   │
-│   │   ├── creator/
-│   │   │   ├── data/
-│   │   │   └── presentation/
-│   │   │
-│   │   ├── history/
-│   │   │   ├── data/
-│   │   │   └── presentation/
-│   │   │
-│   │   ├── home/
-│   │   │   └── presentation/
-│   │   │       ├── pages/
-│   │   │       ├── providers/
-│   │   │       └── widgets/
-│   │   │
-│   │   ├── notifications/
-│   │   │
-│   │   ├── profile/
-│   │   │
-│   │   ├── video/
-│   │   │   ├── data/
-│   │   │   └── presentation/
-│   │   │
-│   │   └── video_interactions/
-│   │       ├── data/
-│   │       └── presentation/
-│   │
-│   └── main.dart
-│
-├── android/
-├── ios/
-├── linux/
-├── macos/
-├── web/
-├── windows/
-│
-└── pubspec.yaml
+â”‚
+â”œâ”€â”€ lib/
+â”‚   â”‚
+â”‚   â”œâ”€â”€ core/
+â”‚   â”‚   â””â”€â”€ serverpod/
+â”‚   â”‚       â””â”€â”€ serverpod_client_provider.dart
+â”‚   â”‚
+â”‚   â”œâ”€â”€ features/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ auth/
+â”‚   â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ comments/
+â”‚   â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ creator/
+â”‚   â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ history/
+â”‚   â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ home/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚       â”œâ”€â”€ pages/
+â”‚   â”‚   â”‚       â”œâ”€â”€ providers/
+â”‚   â”‚   â”‚       â””â”€â”€ widgets/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ notifications/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ profile/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â”œâ”€â”€ video/
+â”‚   â”‚   â”‚   â”œâ”€â”€ data/
+â”‚   â”‚   â”‚   â””â”€â”€ presentation/
+â”‚   â”‚   â”‚
+â”‚   â”‚   â””â”€â”€ video_interactions/
+â”‚   â”‚       â”œâ”€â”€ data/
+â”‚   â”‚       â””â”€â”€ presentation/
+â”‚   â”‚
+â”‚   â””â”€â”€ main.dart
+â”‚
+â”œâ”€â”€ android/
+â”œâ”€â”€ ios/
+â”œâ”€â”€ linux/
+â”œâ”€â”€ macos/
+â”œâ”€â”€ web/
+â”œâ”€â”€ windows/
+â”‚
+â””â”€â”€ pubspec.yaml
 ```
 
 ---
 
 # State Management
 
-应用入口使用：
+åº”ç”¨å…¥å£ä½¿ç”¨ï¼š
 
 ```dart
 ProviderScope
 ```
 
-包装整个应用：
+åŒ…è£…æ•´ä¸ªåº”ç”¨ï¼š
 
 ```text
 ProviderScope
-     │
-     ▼
+     â”‚
+     â–¼
 VideoApp
-     │
-     ▼
+     â”‚
+     â–¼
 AuthGate
-     │
-     ▼
+     â”‚
+     â–¼
 Application
 ```
 
-各个 Feature 可以拥有自己的 Provider，并通过 Riverpod 管理：
+å„ä¸ª Feature å¯ä»¥æ‹¥æœ‰è‡ªå·±çš„ Providerï¼Œå¹¶é€šè¿‡ Riverpod ç®¡ç†ï¼š
 
 ```text
 Loading
@@ -590,71 +608,71 @@ Error
 User Actions
 ```
 
-避免让页面 Widget 直接承担数据请求和业务状态。
+é¿å…è®©é¡µé¢ Widget ç›´æŽ¥æ‰¿æ‹…æ•°æ®è¯·æ±‚å’Œä¸šåŠ¡çŠ¶æ€ã€‚
 
 ---
 
 # Design Direction
 
-这个项目不是单独实现一个：
+è¿™ä¸ªé¡¹ç›®ä¸æ˜¯å•ç‹¬å®žçŽ°ä¸€ä¸ªï¼š
 
 ```text
 VideoPlayer
 ```
 
-而是在逐步实现完整的视频平台结构：
+è€Œæ˜¯åœ¨é€æ­¥å®žçŽ°å®Œæ•´çš„è§†é¢‘å¹³å°ç»“æž„ï¼š
 
 ```text
 Authentication
-      │
-      ▼
+      â”‚
+      â–¼
 Video Feed
-      │
- ┌────┼─────┐
- ▼    ▼     ▼
+      â”‚
+ â”Œâ”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”
+ â–¼    â–¼     â–¼
 Search Video Creator
-      │
-      ▼
+      â”‚
+      â–¼
 Video Detail
-      │
- ┌────┼────────┐
- ▼    ▼        ▼
+      â”‚
+ â”Œâ”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â–¼    â–¼        â–¼
 Like Comment Follow
-      │
-      ▼
+      â”‚
+      â–¼
 History / Notifications / Profile
 ```
 
-前端功能按照业务领域拆分，使后续继续增加功能时能够保持代码结构清晰。
+å‰ç«¯åŠŸèƒ½æŒ‰ç…§ä¸šåŠ¡é¢†åŸŸæ‹†åˆ†ï¼Œä½¿åŽç»­ç»§ç»­å¢žåŠ åŠŸèƒ½æ—¶èƒ½å¤Ÿä¿æŒä»£ç ç»“æž„æ¸…æ™°ã€‚
 
 ---
 
 # Roadmap
 
-* [x] Flutter 客户端基础结构
-* [x] Riverpod 状态管理
-* [x] Serverpod Client 集成
-* [x] 用户认证入口
-* [x] 首页结构
-* [x] 发现页面
-* [x] 视频搜索
-* [x] 视频详情
-* [x] 视频播放
-* [x] 视频投稿基础流程
-* [x] 评论模块
-* [x] 创作者模块
-* [x] 视频互动模块
-* [x] 历史模块
-* [x] 通知模块
-* [x] 个人资料模块
-* [ ] 完善大型视频上传流程
-* [ ] 完善投稿任务管理
-* [ ] 完善视频处理与封面流程
-* [ ] 完善推荐系统
-* [ ] 完善通知系统
-* [ ] 完善播放体验
-* [ ] 完善错误恢复与网络状态处理
-* [ ] 完善生产环境部署
+* [x] Flutter å®¢æˆ·ç«¯åŸºç¡€ç»“æž„
+* [x] Riverpod çŠ¶æ€ç®¡ç†
+* [x] Serverpod Client é›†æˆ
+* [x] ç”¨æˆ·è®¤è¯å…¥å£
+* [x] é¦–é¡µç»“æž„
+* [x] å‘çŽ°é¡µé¢
+* [x] è§†é¢‘æœç´¢
+* [x] è§†é¢‘è¯¦æƒ…
+* [x] è§†é¢‘æ’­æ”¾
+* [x] è§†é¢‘æŠ•ç¨¿åŸºç¡€æµç¨‹
+* [x] è¯„è®ºæ¨¡å—
+* [x] åˆ›ä½œè€…æ¨¡å—
+* [x] è§†é¢‘äº’åŠ¨æ¨¡å—
+* [x] åŽ†å²æ¨¡å—
+* [x] é€šçŸ¥æ¨¡å—
+* [x] ä¸ªäººèµ„æ–™æ¨¡å—
+* [ ] å®Œå–„å¤§åž‹è§†é¢‘ä¸Šä¼ æµç¨‹
+* [ ] å®Œå–„æŠ•ç¨¿ä»»åŠ¡ç®¡ç†
+* [ ] å®Œå–„è§†é¢‘å¤„ç†ä¸Žå°é¢æµç¨‹
+* [ ] å®Œå–„æŽ¨èç³»ç»Ÿ
+* [ ] å®Œå–„é€šçŸ¥ç³»ç»Ÿ
+* [ ] å®Œå–„æ’­æ”¾ä½“éªŒ
+* [ ] å®Œå–„é”™è¯¯æ¢å¤ä¸Žç½‘ç»œçŠ¶æ€å¤„ç†
+* [ ] å®Œå–„ç”Ÿäº§çŽ¯å¢ƒéƒ¨ç½²
 
 ---
 
@@ -662,9 +680,9 @@ History / Notifications / Profile
 
 This project is currently under active development.
 
-现阶段重点是建立视频平台的完整客户端架构与 Serverpod 后端通信流程。
+çŽ°é˜¶æ®µé‡ç‚¹æ˜¯å»ºç«‹è§†é¢‘å¹³å°çš„å®Œæ•´å®¢æˆ·ç«¯æž¶æž„ä¸Ž Serverpod åŽç«¯é€šä¿¡æµç¨‹ã€‚
 
-部分功能仍处于开发和完善阶段，不代表生产环境最终实现。
+éƒ¨åˆ†åŠŸèƒ½ä»å¤„äºŽå¼€å‘å’Œå®Œå–„é˜¶æ®µï¼Œä¸ä»£è¡¨ç”Ÿäº§çŽ¯å¢ƒæœ€ç»ˆå®žçŽ°ã€‚
 
 ---
 
