@@ -1,10 +1,10 @@
-name: shipin_workspace
+name: clyven_workspace
 publish_to: none
 
 environment:
   sdk: ^3.12.2
 
 workspace:
-  - apps/shipin_app
-  - packages/shipin_backend_client
-  - server/shipin_backend_server
+  - apps/clyven_app
+  - packages/clyven_backend_client
+  - server/clyven_backend_server

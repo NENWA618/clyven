@@ -1,8 +1,8 @@
-﻿# Shipin
+﻿# Clyven
 
 > A full-stack Flutter + Serverpod video platform monorepo built with Riverpod.
 
-**Shipin** æ˜¯ä¸€ä¸ªä½¿ç”¨ Flutter å¼€å‘çš„è§†é¢‘å¹³å°é¡¹ç›®ã€‚
+**Clyven** æ˜¯ä¸€ä¸ªä½¿ç”¨ Flutter å¼€å‘çš„è§†é¢‘å¹³å°é¡¹ç›®ã€‚
 
 é¡¹ç›®æ­£åœ¨å®žçŽ°ä»Žç”¨æˆ·è®¤è¯ã€è§†é¢‘æµè§ˆã€æœç´¢ã€æ’­æ”¾ã€æŠ•ç¨¿ï¼Œåˆ°ç‚¹èµžã€è¯„è®ºã€å…³æ³¨ã€è§‚çœ‹åŽ†å²ã€é€šçŸ¥å’Œä¸ªäººä¸»é¡µç­‰å®Œæ•´çš„è§†é¢‘å¹³å°åŠŸèƒ½ã€‚
 
@@ -422,16 +422,16 @@ lib/core/serverpod/serverpod_client_provider.dart
 
 # Monorepo
 
-Shipin now uses a single-repository Flutter + Serverpod architecture.
+Clyven now uses a single-repository Flutter + Serverpod architecture.
 
 ```text
-shipin/
+clyven/
 |-- apps/
-|   `-- shipin_app/
+|   `-- clyven_app/
 |-- packages/
-|   `-- shipin_backend_client/
+|   `-- clyven_backend_client/
 |-- server/
-|   `-- shipin_backend_server/
+|   `-- clyven_backend_server/
 |-- pubspec.yaml
 `-- pubspec.lock
 ```
@@ -440,9 +440,9 @@ The Flutter app, generated Serverpod client, and Serverpod backend are managed b
 
 ```yaml
 workspace:
-  - apps/shipin_app
-  - packages/shipin_backend_client
-  - server/shipin_backend_server
+  - apps/clyven_app
+  - packages/clyven_backend_client
+  - server/clyven_backend_server
 ```
 
 The backend and generated client no longer need to be cloned as separate repositories.
@@ -453,8 +453,8 @@ The backend and generated client no longer need to be cloned as separate reposit
 ## 1. Clone
 
 ```bash
-git clone https://github.com/chengyang1017/shipin.git
-cd shipin
+git clone https://github.com/chengyang1017/clyven.git
+cd clyven
 ```
 
 ## 2. Install Workspace Dependencies
@@ -468,7 +468,7 @@ dart pub get
 ## 3. Generate Serverpod Code
 
 ```bash
-cd server/shipin_backend_server
+cd server/clyven_backend_server
 serverpod generate
 cd ../..
 ```
@@ -476,7 +476,7 @@ cd ../..
 ## 4. Run Backend
 
 ```bash
-cd server/shipin_backend_server
+cd server/clyven_backend_server
 dart run bin/main.dart --apply-migrations
 ```
 
@@ -485,7 +485,7 @@ dart run bin/main.dart --apply-migrations
 In another terminal:
 
 ```bash
-cd apps/shipin_app
+cd apps/clyven_app
 flutter run
 ```
 
@@ -494,7 +494,7 @@ flutter run
 Flutter app:
 
 ```bash
-cd apps/shipin_app
+cd apps/clyven_app
 flutter test
 flutter analyze
 ```
@@ -502,14 +502,14 @@ flutter analyze
 Generated client:
 
 ```bash
-cd packages/shipin_backend_client
+cd packages/clyven_backend_client
 dart analyze
 ```
 
 Backend:
 
 ```bash
-cd server/shipin_backend_server
+cd server/clyven_backend_server
 dart analyze
 dart test
 ```
@@ -518,7 +518,7 @@ dart test
 # Project Structure
 
 ```text
-shipin/
+clyven/
 â”‚
 â”œâ”€â”€ lib/
 â”‚   â”‚
@@ -590,7 +590,7 @@ ProviderScope
 ProviderScope
      â”‚
      â–¼
-VideoApp
+ClyvenApp
      â”‚
      â–¼
 AuthGate
