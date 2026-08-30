@@ -1,10 +1,10 @@
-name: Shipin CI
+name: Clyven CI
 
 on:
   push:
     branches:
       - main
-      - refactor/shipin-monorepo
+      - refactor/clyven-branding
   pull_request:
     branches:
       - main
@@ -28,42 +28,42 @@ jobs:
         run: dart pub get
 
       - name: Check Serverpod formatting
-        working-directory: server/shipin_backend_server
+        working-directory: server/clyven_backend_server
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze Flutter
-        working-directory: apps/shipin_app
+        working-directory: apps/clyven_app
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
       - name: Test Flutter
-        working-directory: apps/shipin_app
+        working-directory: apps/clyven_app
         run: flutter test
 
       - name: Analyze Serverpod client
-        working-directory: packages/shipin_backend_client
+        working-directory: packages/clyven_backend_client
         run: dart analyze
 
       - name: Analyze Serverpod backend
-        working-directory: server/shipin_backend_server
+        working-directory: server/clyven_backend_server
         run: dart analyze
 
       - name: Install Serverpod CLI
         run: dart pub global activate serverpod_cli 3.4.11
 
       - name: Regenerate Serverpod code
-        working-directory: server/shipin_backend_server
+        working-directory: server/clyven_backend_server
         run: serverpod generate
 
       - name: Verify generated protocol consistency
         run: |
           git diff --exit-code --ignore-blank-lines -- \
-            packages/shipin_backend_client/lib/src/protocol \
-            server/shipin_backend_server/lib/src/generated
+            packages/clyven_backend_client/lib/src/protocol \
+            server/clyven_backend_server/lib/src/generated
 
       - name: Analyze regenerated Serverpod client
-        working-directory: packages/shipin_backend_client
+        working-directory: packages/clyven_backend_client
         run: dart analyze
 
       - name: Analyze regenerated Serverpod backend
-        working-directory: server/shipin_backend_server
+        working-directory: server/clyven_backend_server
         run: dart analyze
