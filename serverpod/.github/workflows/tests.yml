@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: '3.4.11'
+      SERVERPOD_PASSWORD_database: '720sE5_QxWR4hb9Q9-FgI7lgbUnFu9A2'
+      SERVERPOD_PASSWORD_redis: 'ASatXm1iYIhjQz5OHDrwy5TPzL2rIGOC'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+
+      - name: Start containers
+        working-directory: glyphora_backend_server
+        run: docker compose up --quiet-pull --build -d
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install Serverpod CLI
+        run: dart pub global activate serverpod_cli $VERSION
+
+      - name: Run Serverpod generator
+        working-directory: glyphora_backend_server
+        run: serverpod generate
+
+      - name: Run tests
+        working-directory: glyphora_backend_server
+        run: dart test
+
+      - name: Stop containers
+        if: always()
+        working-directory: glyphora_backend_server
+        run: docker compose down -v

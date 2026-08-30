@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "glyphora_backend_flutter",
+            "cwd": "${workspaceFolder}/glyphora_backend_flutter",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "glyphora_backend_server",
+            "cwd": "${workspaceFolder}/glyphora_backend_server",
+            "request": "launch",
+            "type": "dart",
+            "preLaunchTask": "docker_compose_up",
+            "program": "bin/main.dart",
+            "env": {
+                "SERVERPOD_PASSWORD_database": "Gw7q59-uj8NxLrcWluMFsOGamW0Hx0Mj"
+            },
+            "args": [
+                "--apply-migrations"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "glyphora_backend (full stack)",
+            "configurations": [
+                "glyphora_backend_server",
+                "glyphora_backend_flutter"
+            ],
+            "presentation": {
+                "order": 1
+            }
+        }
+    ]
+}

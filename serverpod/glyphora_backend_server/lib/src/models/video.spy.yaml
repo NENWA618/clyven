@@ -1,0 +1,28 @@
+class: Video
+table: video
+
+fields:
+  authorId: String
+  authorName: String
+
+  title: String
+  description: String
+  category: String
+
+  tags: List<String>
+
+  videoStorageKey: String
+  coverStorageKey: String?
+
+  durationSeconds: int
+
+  viewCount: int, default=0
+  likeCount: int, default=0
+  favoriteCount: int, default=0
+  commentCount: int, default=0
+
+  status: VideoStatus, default=uploading
+
+  publishedAt: DateTime?
+  createdAt: DateTime
+  updatedAt: DateTime

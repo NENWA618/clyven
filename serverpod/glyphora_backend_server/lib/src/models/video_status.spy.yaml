@@ -1,0 +1,8 @@
+enum: VideoStatus
+serialized: byName
+
+values:
+  - uploading
+  - processing
+  - published
+  - failed

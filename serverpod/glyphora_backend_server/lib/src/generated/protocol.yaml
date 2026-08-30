@@ -1,0 +1,26 @@
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+  - hasAccount:
+jwtRefresh:
+  - refreshAccessToken:
+userProfileEdit:
+  - removeUserImage:
+  - setUserImage:
+  - changeUserName:
+  - changeFullName:
+  - get:
+video:
+  - create:
+  - getVideos:
+  - getVideo:
+  - createUploadDescription:
+  - verifyUpload:
+  - getVideoUrl:
+greeting:
+  - hello:

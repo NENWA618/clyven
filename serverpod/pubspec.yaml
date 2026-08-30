@@ -1,0 +1,11 @@
+name: _
+publish_to: none
+
+environment:
+  sdk: '^3.8.0'
+
+workspace:
+  - glyphora_backend_client
+  - glyphora_backend_server
+  - glyphora_backend_flutter
+
