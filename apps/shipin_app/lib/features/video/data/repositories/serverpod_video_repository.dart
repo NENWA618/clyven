@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:glyphora_backend_client/glyphora_backend_client.dart'
+import 'package:shipin_backend_client/shipin_backend_client.dart'
     as serverpod;
 import 'package:serverpod_client/serverpod_client.dart';
 

@@ -1,9 +1,0 @@
-# Files and directories created by pub
-.dart_tool/
-.packages
-
-# Pubspec overrides
-pubspec_overrides.yaml
-
-# Database dumps
-*.dump

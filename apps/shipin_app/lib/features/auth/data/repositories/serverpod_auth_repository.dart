@@ -1,4 +1,4 @@
-import 'package:glyphora_backend_client/glyphora_backend_client.dart';
+import 'package:shipin_backend_client/shipin_backend_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../models/app_user.dart';

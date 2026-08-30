@@ -427,8 +427,8 @@ lib/core/serverpod/serverpod_client_provider.dart
 `pubspec.yaml` 中使用本地路径引用生成的 Serverpod Client：
 
 ```yaml
-glyphora_backend_client:
-  path: ../glyphora_backend/glyphora_backend_client
+shipin_backend_client:
+  path: ../shipin_backend/shipin_backend_client
 ```
 
 因此当前项目目录预期类似：
@@ -438,9 +438,9 @@ workspace/
 │
 ├── shipin/
 │
-└── glyphora_backend/
-    ├── glyphora_backend_server/
-    └── glyphora_backend_client/
+└── shipin_backend/
+    ├── shipin_backend_server/
+    └── shipin_backend_client/
 ```
 
 如果只单独 Clone `shipin`，需要另外准备对应的 Serverpod backend/client，或者修改 `pubspec.yaml` 中的依赖路径。
@@ -463,13 +463,13 @@ cd shipin
 确保项目能够找到：
 
 ```text
-../glyphora_backend/glyphora_backend_client
+../shipin_backend/shipin_backend_client
 ```
 
 或者修改：
 
 ```yaml
-glyphora_backend_client:
+shipin_backend_client:
   path: ...
 ```
 
