@@ -27,6 +27,10 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
+      - name: Check Serverpod formatting
+        working-directory: server/shipin_backend_server
+        run: dart format --output=none --set-exit-if-changed .
+
       - name: Analyze Flutter
         working-directory: apps/shipin_app
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
