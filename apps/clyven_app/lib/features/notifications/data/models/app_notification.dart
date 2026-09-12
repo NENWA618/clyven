@@ -7,8 +7,8 @@ enum AppNotificationType {
 class AppNotification {
   final String id;
   final AppNotificationType type;
-  final String title;
-  final String message;
+  final String actorName;
+  final String? contentPreview;
   final DateTime createdAt;
   final bool isRead;
   final String? videoId;
@@ -16,10 +16,10 @@ class AppNotification {
   const AppNotification({
     required this.id,
     required this.type,
-    required this.title,
-    required this.message,
+    required this.actorName,
     required this.createdAt,
     required this.isRead,
+    this.contentPreview,
     this.videoId,
   });
 
@@ -29,8 +29,8 @@ class AppNotification {
     return AppNotification(
       id: id,
       type: type,
-      title: title,
-      message: message,
+      actorName: actorName,
+      contentPreview: contentPreview,
       createdAt: createdAt,
       isRead: isRead ?? this.isRead,
       videoId: videoId,
