@@ -121,5 +121,7 @@
   "followingStat": "Following",
   "submissionsStat": "Posts",
   "viewsCount": "{count} views",
-  "@viewsCount": {"placeholders": {"count": {"type": "String"}}}
+  "@viewsCount": {"placeholders": {"count": {"type": "String"}}},
+  "frameNumber": "FRAME {number}",
+  "@frameNumber": {"placeholders": {"number": {"type": "String"}}}
 }
