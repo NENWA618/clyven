@@ -16,8 +16,8 @@ class MockNotificationRepository
     AppNotification(
       id: 'notification-001',
       type: AppNotificationType.comment,
-      title: '有人回复了你的投稿',
-      message: '「这个角度很有意思。」',
+      actorName: '远岸信号',
+      contentPreview: '这个角度很有意思。',
       createdAt: DateTime(
         2026,
         8,
@@ -31,8 +31,7 @@ class MockNotificationRepository
     AppNotification(
       id: 'notification-002',
       type: AppNotificationType.like,
-      title: '你的影像获得了喜欢',
-      message: '语言群岛喜欢了你的投稿。',
+      actorName: '语言群岛',
       createdAt: DateTime(
         2026,
         8,
@@ -46,8 +45,7 @@ class MockNotificationRepository
     AppNotification(
       id: 'notification-003',
       type: AppNotificationType.follow,
-      title: '新的关注',
-      message: '边界记录室开始关注你。',
+      actorName: '边界记录室',
       createdAt: DateTime(
         2026,
         8,
