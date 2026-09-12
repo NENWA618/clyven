@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/localization/localized_error_message.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -91,12 +92,16 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
         return;
       }
 
-      final user = ref.read(authProvider).value;
+      final authState = ref.read(authProvider);
+      final user = authState.value;
 
       if (user == null) {
         setState(() {
           _isSubmitting = false;
-          _errorMessage = l10n.invalidAccountOrPassword;
+          _errorMessage = localizedErrorMessage(
+            l10n,
+            authState.error,
+          );
         });
         return;
       }
@@ -112,7 +117,10 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
 
       setState(() {
         _isSubmitting = false;
-        _errorMessage = error.toString();
+        _errorMessage = localizedErrorMessage(
+          l10n,
+          error,
+        );
       });
     }
   }
