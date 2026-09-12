@@ -62,5 +62,57 @@
   "topicGaming": "Gaming",
   "topicMusic": "Music",
   "topicCity": "City",
-  "topicDocumentary": "Documentary"
+  "topicDocumentary": "Documentary",
+  "tracesEyebrow": "TRACES",
+  "watchHistory": "Watch history",
+  "clear": "Clear",
+  "noWatchHistory": "No watch history yet",
+  "followingEyebrow": "ORBIT",
+  "followingTitle": "Following",
+  "noFollowingCreators": "You aren't following any creators yet",
+  "followers": "followers",
+  "videos": "videos",
+  "echoesEyebrow": "ECHOES",
+  "notificationsLoadFailed": "Failed to load echoes",
+  "justNow": "Just now",
+  "minutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsEyebrow": "SETTINGS",
+  "accountSectionEyebrow": "ACCOUNT",
+  "accountSectionTitle": "Account",
+  "accountAndProfile": "Account & profile",
+  "accountAndProfileSubtitle": "Display name, avatar and bio",
+  "privacy": "Privacy",
+  "privacySubtitle": "Privacy and content visibility",
+  "appSectionEyebrow": "APP",
+  "appSectionTitle": "App",
+  "notifications": "Notifications",
+  "notificationsSettingsSubtitle": "Manage echoes and push notifications",
+  "about": "About",
+  "aboutSubtitle": "Version and app information",
+  "identitySectionEyebrow": "IDENTITY",
+  "currentIdentity": "Current identity",
+  "logoutCurrentIdentity": "Log out of this identity"
 }
