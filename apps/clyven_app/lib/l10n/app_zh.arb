@@ -123,5 +123,18 @@
   "viewsCount": "{count} 次观看",
   "@viewsCount": {"placeholders": {"count": {"type": "String"}}},
   "frameNumber": "FRAME {number}",
-  "@frameNumber": {"placeholders": {"number": {"type": "String"}}}
+  "@frameNumber": {"placeholders": {"number": {"type": "String"}}},
+  "mySubmissionsTitle": "我的投稿",
+  "noSubmissions": "还没有投稿",
+  "publishFirstVideo": "从主页中间的 + 发布第一个视频",
+  "submissionsLoadFailed": "投稿加载失败",
+  "uploadWaiting": "等待上传",
+  "uploadPreparing": "正在处理视频",
+  "uploadUploading": "正在上传",
+  "uploadFailed": "上传失败",
+  "uploadComplete": "上传完成",
+  "archiveEyebrow": "ARCHIVE",
+  "myFavorites": "我的收藏",
+  "savedFrame": "SAVED FRAME",
+  "noFavoriteVideos": "还没有收藏视频"
 }
