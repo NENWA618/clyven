@@ -182,7 +182,7 @@ class NotificationsPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    notification.title,
+                    _title(notification.type, l10n),
                     style: const TextStyle(
                       color: _ink,
                       fontSize: 14,
@@ -191,7 +191,7 @@ class NotificationsPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    notification.message,
+                    _message(notification, l10n),
                     style: const TextStyle(
                       color: Color(0xFF77736C),
                       fontSize: 12,
@@ -225,6 +225,35 @@ class NotificationsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _title(
+    AppNotificationType type,
+    AppLocalizations l10n,
+  ) {
+    return switch (type) {
+      AppNotificationType.comment => l10n.notificationCommentTitle,
+      AppNotificationType.like => l10n.notificationLikeTitle,
+      AppNotificationType.follow => l10n.notificationFollowTitle,
+    };
+  }
+
+  String _message(
+    AppNotification notification,
+    AppLocalizations l10n,
+  ) {
+    return switch (notification.type) {
+      AppNotificationType.comment => l10n.notificationCommentMessage(
+          notification.actorName,
+          notification.contentPreview ?? '',
+        ),
+      AppNotificationType.like => l10n.notificationLikeMessage(
+          notification.actorName,
+        ),
+      AppNotificationType.follow => l10n.notificationFollowMessage(
+          notification.actorName,
+        ),
+    };
   }
 
   IconData _icon(AppNotificationType type) {
