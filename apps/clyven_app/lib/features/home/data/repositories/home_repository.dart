@@ -26,7 +26,7 @@ class MockHomeRepository implements HomeRepository {
       category: '纪录',
       topic: '纪录',
       duration: '38:20',
-      viewText: '21.4万次观看',
+      viewText: '214000',
       coverUrl:
           'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'
           '?auto=format&fit=crop&w=1400&q=85',
@@ -42,7 +42,7 @@ class MockHomeRepository implements HomeRepository {
         category: '城市影像',
         topic: '影像',
         duration: '12:48',
-        viewText: '8.6万次观看',
+        viewText: '86000',
         coverUrl:
             'https://images.unsplash.com/photo-1519501025264-65ba15a82390'
             '?auto=format&fit=crop&w=1200&q=80',
@@ -56,7 +56,7 @@ class MockHomeRepository implements HomeRepository {
         category: '开发手记',
         topic: '技术',
         duration: '28:16',
-        viewText: '4.2万次观看',
+        viewText: '42000',
         coverUrl:
             'https://images.unsplash.com/photo-1516321318423-f06f85e504b3'
             '?auto=format&fit=crop&w=1200&q=80',
@@ -70,7 +70,7 @@ class MockHomeRepository implements HomeRepository {
         category: '语言纪录',
         topic: '语言',
         duration: '18:35',
-        viewText: '13.7万次观看',
+        viewText: '137000',
         coverUrl:
             'https://images.unsplash.com/photo-1455390582262-044cdead277a'
             '?auto=format&fit=crop&w=1200&q=80',
@@ -84,7 +84,7 @@ class MockHomeRepository implements HomeRepository {
         category: '人文纪录',
         topic: '纪录',
         duration: '35:20',
-        viewText: '6.1万次观看',
+        viewText: '61000',
         coverUrl:
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
             '?auto=format&fit=crop&w=1200&q=80',
