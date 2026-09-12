@@ -1,3 +1,4 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,41 +7,32 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  static const Color _background =
-      Color(0xFFF4F1EA);
-
-  static const Color _ink =
-      Color(0xFF161616);
-
-  static const Color _purple =
-      Color(0xFF7657FF);
-
-  static const Color _acid =
-      Color(0xFFE5FF58);
+  static const Color _background = Color(0xFFF4F1EA);
+  static const Color _ink = Color(0xFF161616);
+  static const Color _purple = Color(0xFF7657FF);
+  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
     BuildContext context,
     WidgetRef ref,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildTopBar(context),
-
+            _buildTopBar(context, l10n),
             const Divider(
               height: 1,
               color: Color(0xFFE3DED5),
             ),
-
             Expanded(
               child: ListView(
-                physics:
-                    const BouncingScrollPhysics(),
-                padding:
-                    const EdgeInsets.fromLTRB(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
                   20,
                   24,
                   20,
@@ -48,85 +40,62 @@ class SettingsPage extends ConsumerWidget {
                 ),
                 children: [
                   _buildSectionTitle(
-                    'ACCOUNT',
-                    '账号',
+                    l10n.accountSectionEyebrow,
+                    l10n.accountSectionTitle,
                   ),
-
                   const SizedBox(height: 12),
-
                   _SettingsItem(
-                    icon:
-                        Icons.person_outline_rounded,
-                    title: '账号与资料',
-                    subtitle: '昵称、头像、个人简介',
+                    icon: Icons.person_outline_rounded,
+                    title: l10n.accountAndProfile,
+                    subtitle: l10n.accountAndProfileSubtitle,
                     onTap: () {
-                      // 下一步再接账号资料页
+                      // TODO: open account and profile settings
                     },
                   ),
-
                   const SizedBox(height: 10),
-
                   _SettingsItem(
-                    icon:
-                        Icons.lock_outline_rounded,
-                    title: '隐私',
-                    subtitle: '隐私与内容可见范围',
+                    icon: Icons.lock_outline_rounded,
+                    title: l10n.privacy,
+                    subtitle: l10n.privacySubtitle,
                     onTap: () {
-                      // 下一步再接隐私设置
+                      // TODO: open privacy settings
                     },
                   ),
-
                   const SizedBox(height: 30),
-
                   _buildSectionTitle(
-                    'APP',
-                    '应用',
+                    l10n.appSectionEyebrow,
+                    l10n.appSectionTitle,
                   ),
-
                   const SizedBox(height: 12),
-
                   _SettingsItem(
-                    icon: Icons
-                        .notifications_none_rounded,
-                    title: '通知',
-                    subtitle: '管理回响与推送通知',
+                    icon: Icons.notifications_none_rounded,
+                    title: l10n.notifications,
+                    subtitle: l10n.notificationsSettingsSubtitle,
                     onTap: () {
-                      // 下一步再接通知设置
+                      // TODO: open notification settings
                     },
                   ),
-
                   const SizedBox(height: 10),
-
                   _SettingsItem(
-                    icon:
-                        Icons.info_outline_rounded,
-                    title: '关于',
-                    subtitle: '版本与应用信息',
+                    icon: Icons.info_outline_rounded,
+                    title: l10n.about,
+                    subtitle: l10n.aboutSubtitle,
                     onTap: () {
-                      // 下一步再接关于页面
+                      // TODO: open about page
                     },
                   ),
-
                   const SizedBox(height: 36),
-
                   _buildSectionTitle(
-                    'IDENTITY',
-                    '当前身份',
+                    l10n.identitySectionEyebrow,
+                    l10n.currentIdentity,
                   ),
-
                   const SizedBox(height: 12),
-
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton(
                       onPressed: () async {
-                        await ref
-                            .read(
-                              authProvider
-                                  .notifier,
-                            )
-                            .logout();
+                        await ref.read(authProvider.notifier).logout();
 
                         if (!context.mounted) {
                           return;
@@ -134,54 +103,41 @@ class SettingsPage extends ConsumerWidget {
 
                         Navigator.pop(context);
                       },
-                      style:
-                          OutlinedButton.styleFrom(
+                      style: OutlinedButton.styleFrom(
                         foregroundColor: _ink,
                         side: const BorderSide(
-                          color:
-                              Color(0xFFCAC5BB),
+                          color: Color(0xFFCAC5BB),
                         ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
-                      child: const Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons
-                                .logout_rounded,
+                          const Icon(
+                            Icons.logout_rounded,
                             size: 18,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
-                            '退出当前身份',
-                            style: TextStyle(
-                              fontWeight:
-                                  FontWeight.w800,
+                            l10n.logoutCurrentIdentity,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  const Center(
+                  Center(
                     child: Text(
-                      'GLYPHORA',
-                      style: TextStyle(
-                        color:
-                            Color(0xFFAAA49B),
+                      l10n.appName.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFFAAA49B),
                         fontSize: 9,
-                        fontWeight:
-                            FontWeight.w800,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 2,
                       ),
                     ),
@@ -197,6 +153,7 @@ class SettingsPage extends ConsumerWidget {
 
   Widget _buildTopBar(
     BuildContext context,
+    AppLocalizations l10n,
   ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -216,17 +173,10 @@ class SettingsPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color:
-                    Colors.white.withOpacity(
-                  0.72,
-                ),
-                borderRadius:
-                    BorderRadius.circular(
-                  14,
-                ),
+                color: Colors.white.withOpacity(0.72),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color:
-                      const Color(0xFFE3DED5),
+                  color: const Color(0xFFE3DED5),
                 ),
               ),
               child: const Icon(
@@ -236,43 +186,36 @@ class SettingsPage extends ConsumerWidget {
               ),
             ),
           ),
-
           const SizedBox(width: 14),
-
-          const Expanded(
+          Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SETTINGS',
-                  style: TextStyle(
+                  l10n.settingsEyebrow,
+                  style: const TextStyle(
                     color: _purple,
                     fontSize: 9,
-                    fontWeight:
-                        FontWeight.w900,
+                    fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  '设置',
-                  style: TextStyle(
+                  l10n.settings,
+                  style: const TextStyle(
                     color: _ink,
                     fontSize: 18,
-                    fontWeight:
-                        FontWeight.w900,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
           ),
-
           Container(
             width: 10,
             height: 10,
-            decoration:
-                const BoxDecoration(
+            decoration: const BoxDecoration(
               color: _acid,
               shape: BoxShape.circle,
             ),
@@ -283,13 +226,13 @@ class SettingsPage extends ConsumerWidget {
   }
 
   Widget _buildSectionTitle(
-    String english,
+    String eyebrow,
     String title,
   ) {
     return Row(
       children: [
         Text(
-          english,
+          eyebrow,
           style: const TextStyle(
             color: _purple,
             fontSize: 9,
@@ -297,9 +240,7 @@ class SettingsPage extends ConsumerWidget {
             letterSpacing: 1.8,
           ),
         ),
-
         const SizedBox(width: 10),
-
         Text(
           title,
           style: const TextStyle(
@@ -313,8 +254,7 @@ class SettingsPage extends ConsumerWidget {
   }
 }
 
-class _SettingsItem
-    extends StatelessWidget {
+class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
@@ -328,28 +268,20 @@ class _SettingsItem
   });
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         decoration: BoxDecoration(
-          color:
-              Colors.white.withOpacity(
-            0.72,
-          ),
-          borderRadius:
-              BorderRadius.circular(20),
+          color: Colors.white.withOpacity(0.72),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color:
-                const Color(0xFFE3DED5),
+            color: const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -358,61 +290,40 @@ class _SettingsItem
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: const Color(
-                  0x147657FF,
-                ),
-                borderRadius:
-                    BorderRadius.circular(
-                  14,
-                ),
+                color: const Color(0x147657FF),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 icon,
-                color: const Color(
-                  0xFF7657FF,
-                ),
+                color: const Color(0xFF7657FF),
                 size: 21,
               ),
             ),
-
             const SizedBox(width: 14),
-
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style:
-                        const TextStyle(
-                      color: Color(
-                        0xFF161616,
-                      ),
+                    style: const TextStyle(
+                      color: Color(0xFF161616),
                       fontSize: 14,
-                      fontWeight:
-                          FontWeight.w800,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   Text(
                     subtitle,
-                    style:
-                        const TextStyle(
-                      color: Color(
-                        0xFF99938A,
-                      ),
+                    style: const TextStyle(
+                      color: Color(0xFF99938A),
                       fontSize: 10,
                     ),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(width: 10),
-
             const Icon(
               Icons.chevron_right_rounded,
               color: Color(0xFF99938A),
