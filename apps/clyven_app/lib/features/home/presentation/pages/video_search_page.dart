@@ -59,7 +59,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                 },
                 data: (state) {
                   final videos = state.feed.videos;
-                  final results = _filterVideos(videos);
+                  final results = _filterVideos(videos, l10n);
 
                   if (_keyword.isEmpty) {
                     return Center(
@@ -187,6 +187,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
 
   List<HomeVideo> _filterVideos(
     List<HomeVideo> videos,
+    AppLocalizations l10n,
   ) {
     if (_keyword.isEmpty) {
       return const [];
@@ -196,9 +197,13 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
 
     return videos.where(
       (video) {
+        final localizedCategory =
+            localizedTopicLabel(l10n, video.category).toLowerCase();
+
         return video.title.toLowerCase().contains(keyword) ||
             video.authorName.toLowerCase().contains(keyword) ||
             video.category.toLowerCase().contains(keyword) ||
+            localizedCategory.contains(keyword) ||
             video.description.toLowerCase().contains(keyword);
       },
     ).toList();
