@@ -2,39 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Flutter App Not Built</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clyven · Web app not built</title>
     <link rel="stylesheet" href="/css/style.css">
   </head>
   <body>
     <div class="content">
       <div class="logo-box">
-        <img src="/images/serverpod-logo.svg" width="160" style="margin-top: 8px; margin-bottom: 12px;">
-        <p><a href="https://serverpod.dev/">The missing server for Flutter</a></p>
+        <h1 style="margin-bottom: 6px;">Clyven</h1>
+        <p>Clyven web app / Clyven 网页应用</p>
       </div>
       <hr>
       <div class="info-box">
-        <p style="margin-bottom: 12px; font-weight: 600; color: #333;">Flutter app not built</p>
-        <p>
-          The Flutter web app has not been built yet.
+        <p style="margin-bottom: 12px; font-weight: 600; color: #333;">
+          Web app not built / 网页应用尚未构建
         </p>
         <p>
-          To build the app, run the following command in your Flutter project directory:
+          The Flutter web app has not been built yet.<br>
+          Flutter 网页应用目前还没有完成构建。
+        </p>
+        <p>
+          Build it from the Flutter project directory with:<br>
+          请在 Flutter 项目目录运行：
         </p>
         <div style="background-color: #f5f5f5; padding: 12px; border-radius: 6px; margin-top: 12px; margin-bottom: 12px; font-family: 'Courier New', monospace; font-size: 13px; color: #333; overflow-x: auto;">
           flutter build web --base-href /app/ --wasm -o ../clyven_backend_server/web/app
         </div>
-
         <p>
-          After building, restart the Serverpod server to serve the app.
+          Restart the Serverpod server after the build finishes.<br>
+          构建完成后，请重新启动 Serverpod 服务。
         </p>
       </div>
       <hr>
       <div class="link-box">
         <a href="https://serverpod.dev">Serverpod</a>
         •
-        <a href="https://docs.serverpod.dev">Get Started</a>
+        <a href="https://docs.serverpod.dev">Documentation</a>
         •
-        <a href="https://github.com/serverpod/serverpod">Github</a>
+        <a href="https://github.com/serverpod/serverpod">GitHub</a>
       </div>
     </div>
   </body>
