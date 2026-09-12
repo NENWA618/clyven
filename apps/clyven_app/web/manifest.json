@@ -1,11 +1,11 @@
 {
-    "name": "clyven_app",
-    "short_name": "clyven_app",
+    "name": "Clyven",
+    "short_name": "Clyven",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F4F1EA",
+    "theme_color": "#7657FF",
+    "description": "Clyven is a multilingual video and subtitle platform.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
