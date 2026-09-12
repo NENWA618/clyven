@@ -1,3 +1,5 @@
+import 'package:clyven_app/core/localization/localized_labels.dart';
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,20 +16,12 @@ class VideoSearchPage extends ConsumerStatefulWidget {
   }
 }
 
-class _VideoSearchPageState
-    extends ConsumerState<VideoSearchPage> {
-  static const Color _background =
-      Color(0xFFF4F1EA);
+class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
+  static const Color _background = Color(0xFFF4F1EA);
+  static const Color _ink = Color(0xFF161616);
+  static const Color _purple = Color(0xFF7657FF);
 
-  static const Color _ink =
-      Color(0xFF161616);
-
-  static const Color _purple =
-      Color(0xFF7657FF);
-
-  final TextEditingController
-      _searchController =
-      TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   String _keyword = '';
 
@@ -39,94 +33,77 @@ class _VideoSearchPageState
 
   @override
   Widget build(BuildContext context) {
-    final homeAsync =
-        ref.watch(homeProvider);
+    final homeAsync = ref.watch(homeProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-
+            _buildHeader(l10n),
             Expanded(
               child: homeAsync.when(
                 loading: () {
                   return const Center(
-                    child:
-                        CircularProgressIndicator(),
+                    child: CircularProgressIndicator(),
                   );
                 },
                 error: (
                   error,
                   stackTrace,
                 ) {
-                  return const Center(
-                    child: Text(
-                      '加载失败',
-                    ),
+                  return Center(
+                    child: Text(l10n.searchLoadFailed),
                   );
                 },
                 data: (state) {
-                  final videos =
-                      state.feed.videos;
-
-                  final results =
-                      _filterVideos(
-                    videos,
-                  );
+                  final videos = state.feed.videos;
+                  final results = _filterVideos(videos);
 
                   if (_keyword.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
-                        '输入标题、作者或分类',
-                        style: TextStyle(
-                          color:
-                              Color(0xFF908A81),
+                        l10n.searchPrompt,
+                        style: const TextStyle(
+                          color: Color(0xFF908A81),
                         ),
                       ),
                     );
                   }
 
                   if (results.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
-                        '没有找到相关视频',
-                        style: TextStyle(
-                          color:
-                              Color(0xFF908A81),
+                        l10n.searchNoResults,
+                        style: const TextStyle(
+                          color: Color(0xFF908A81),
                         ),
                       ),
                     );
                   }
 
                   return ListView.separated(
-                    padding:
-                        const EdgeInsets
-                            .fromLTRB(
+                    padding: const EdgeInsets.fromLTRB(
                       18,
                       12,
                       18,
                       40,
                     ),
-                    itemCount:
-                        results.length,
-                    separatorBuilder:
-                        (
+                    itemCount: results.length,
+                    separatorBuilder: (
                       context,
                       index,
                     ) {
-                      return const SizedBox(
-                        height: 10,
-                      );
+                      return const SizedBox(height: 10);
                     },
-                    itemBuilder:
-                        (
+                    itemBuilder: (
                       context,
                       index,
                     ) {
                       return _buildResult(
                         results[index],
+                        l10n,
                       );
                     },
                   );
@@ -139,10 +116,9 @@ class _VideoSearchPageState
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         14,
         12,
         14,
@@ -157,79 +133,49 @@ class _VideoSearchPageState
             child: Container(
               width: 42,
               height: 42,
-              decoration:
-                  BoxDecoration(
-                color: Colors.white
-                    .withOpacity(0.72),
-                borderRadius:
-                    BorderRadius.circular(
-                  14,
-                ),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.72),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
                 Icons.arrow_back_rounded,
               ),
             ),
           ),
-
-          const SizedBox(
-            width: 10,
-          ),
-
+          const SizedBox(width: 10),
           Expanded(
             child: TextField(
-              controller:
-                  _searchController,
+              controller: _searchController,
               autofocus: true,
               onChanged: (value) {
                 setState(() {
-                  _keyword =
-                      value.trim();
+                  _keyword = value.trim();
                 });
               },
-              decoration:
-                  InputDecoration(
-                hintText:
-                    '搜索视频、作者、分类',
-                prefixIcon:
-                    const Icon(
+              decoration: InputDecoration(
+                hintText: l10n.searchHint,
+                prefixIcon: const Icon(
                   Icons.search_rounded,
                 ),
-                suffixIcon:
-                    _keyword.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed:
-                                () {
-                              _searchController
-                                  .clear();
+                suffixIcon: _keyword.isEmpty
+                    ? null
+                    : IconButton(
+                        onPressed: () {
+                          _searchController.clear();
 
-                              setState(() {
-                                _keyword =
-                                    '';
-                              });
-                            },
-                            icon:
-                                const Icon(
-                              Icons
-                                  .close_rounded,
-                            ),
-                          ),
+                          setState(() {
+                            _keyword = '';
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.close_rounded,
+                        ),
+                      ),
                 filled: true,
-                fillColor:
-                    Colors.white
-                        .withOpacity(
-                  0.75,
-                ),
-                border:
-                    OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius
-                          .circular(
-                    18,
-                  ),
-                  borderSide:
-                      BorderSide.none,
+                fillColor: Colors.white.withOpacity(0.75),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -246,29 +192,21 @@ class _VideoSearchPageState
       return const [];
     }
 
-    final keyword =
-        _keyword.toLowerCase();
+    final keyword = _keyword.toLowerCase();
 
     return videos.where(
       (video) {
-        return video.title
-                .toLowerCase()
-                .contains(keyword) ||
-            video.authorName
-                .toLowerCase()
-                .contains(keyword) ||
-            video.category
-                .toLowerCase()
-                .contains(keyword) ||
-            video.description
-                .toLowerCase()
-                .contains(keyword);
+        return video.title.toLowerCase().contains(keyword) ||
+            video.authorName.toLowerCase().contains(keyword) ||
+            video.category.toLowerCase().contains(keyword) ||
+            video.description.toLowerCase().contains(keyword);
       },
     ).toList();
   }
 
   Widget _buildResult(
     HomeVideo video,
+    AppLocalizations l10n,
   ) {
     return GestureDetector(
       onTap: () {
@@ -284,22 +222,12 @@ class _VideoSearchPageState
         );
       },
       child: Container(
-        padding:
-            const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color:
-              Colors.white.withOpacity(
-            0.72,
-          ),
-          borderRadius:
-              BorderRadius.circular(
-            20,
-          ),
+          color: Colors.white.withOpacity(0.72),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color:
-                const Color(
-              0xFFE3DED5,
-            ),
+            color: const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -307,73 +235,44 @@ class _VideoSearchPageState
             Container(
               width: 46,
               height: 46,
-              decoration:
-                  BoxDecoration(
+              decoration: BoxDecoration(
                 color: _ink,
-                borderRadius:
-                    BorderRadius.circular(
-                  14,
-                ),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
                 Icons.play_arrow_rounded,
-                color:
-                    Color(0xFFE5FF58),
+                color: Color(0xFFE5FF58),
               ),
             ),
-
-            const SizedBox(
-              width: 14,
-            ),
-
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     video.title,
                     maxLines: 2,
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
-                    style:
-                        const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
                       color: _ink,
                       fontSize: 14,
-                      fontWeight:
-                          FontWeight
-                              .w800,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-
-                  const SizedBox(
-                    height: 6,
-                  ),
-
+                  const SizedBox(height: 6),
                   Text(
-                    '${video.authorName} · ${video.category}',
-                    style:
-                        const TextStyle(
-                      color:
-                          Color(
-                        0xFF77736C,
-                      ),
+                    '${video.authorName} · ${localizedTopicLabel(l10n, video.category)}',
+                    style: const TextStyle(
+                      color: Color(0xFF77736C),
                       fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(
-              width: 8,
-            ),
-
+            const SizedBox(width: 8),
             const Icon(
-              Icons
-                  .arrow_forward_rounded,
+              Icons.arrow_forward_rounded,
               color: _purple,
               size: 20,
             ),
