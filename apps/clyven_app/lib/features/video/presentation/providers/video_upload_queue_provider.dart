@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_min/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_min/return_code.dart';
@@ -121,8 +122,8 @@ class VideoUploadQueueNotifier
       );
 
       if (durationSeconds <= 0) {
-        throw StateError(
-          '无法读取视频时长',
+        throw const AppException(
+          AppErrorCode.videoDurationUnreadable,
         );
       }
 
@@ -174,7 +175,7 @@ class VideoUploadQueueNotifier
       );
     } catch (error, stackTrace) {
       debugPrint(
-        '视频上传失败：$error',
+        'Video upload failed: $error',
       );
 
       debugPrintStack(
@@ -184,7 +185,6 @@ class VideoUploadQueueNotifier
       _updateTask(
         taskId,
         status: VideoUploadStatus.failed,
-        errorMessage: error.toString(),
       );
     }
   }
@@ -247,8 +247,8 @@ class VideoUploadQueueNotifier
     if (!ReturnCode.isSuccess(
       returnCode,
     )) {
-      throw StateError(
-        '视频整理失败',
+      throw const AppException(
+        AppErrorCode.videoNormalizeFailed,
       );
     }
 
@@ -256,8 +256,8 @@ class VideoUploadQueueNotifier
         File(outputPath);
 
     if (!await outputFile.exists()) {
-      throw StateError(
-        '整理后的视频文件不存在',
+      throw const AppException(
+        AppErrorCode.normalizedVideoMissing,
       );
     }
 
@@ -332,8 +332,8 @@ class VideoUploadQueueNotifier
     if (!ReturnCode.isSuccess(
       returnCode,
     )) {
-      throw StateError(
-        '生成视频封面失败',
+      throw const AppException(
+        AppErrorCode.coverGenerationFailed,
       );
     }
 
@@ -341,8 +341,8 @@ class VideoUploadQueueNotifier
         File(outputPath);
 
     if (!await coverFile.exists()) {
-      throw StateError(
-        '生成的视频封面不存在',
+      throw const AppException(
+        AppErrorCode.generatedCoverMissing,
       );
     }
 
@@ -350,8 +350,8 @@ class VideoUploadQueueNotifier
         await coverFile.length();
 
     if (length <= 0) {
-      throw StateError(
-        '生成的视频封面为空',
+      throw const AppException(
+        AppErrorCode.generatedCoverEmpty,
       );
     }
 
