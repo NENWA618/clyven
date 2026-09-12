@@ -123,5 +123,18 @@
   "viewsCount": "{count} views",
   "@viewsCount": {"placeholders": {"count": {"type": "String"}}},
   "frameNumber": "FRAME {number}",
-  "@frameNumber": {"placeholders": {"number": {"type": "String"}}}
+  "@frameNumber": {"placeholders": {"number": {"type": "String"}}},
+  "mySubmissionsTitle": "My submissions",
+  "noSubmissions": "No submissions yet",
+  "publishFirstVideo": "Use the + on Home to publish your first video",
+  "submissionsLoadFailed": "Failed to load submissions",
+  "uploadWaiting": "Waiting to upload",
+  "uploadPreparing": "Processing video",
+  "uploadUploading": "Uploading",
+  "uploadFailed": "Upload failed",
+  "uploadComplete": "Upload complete",
+  "archiveEyebrow": "ARCHIVE",
+  "myFavorites": "My favorites",
+  "savedFrame": "SAVED FRAME",
+  "noFavoriteVideos": "No saved videos yet"
 }
