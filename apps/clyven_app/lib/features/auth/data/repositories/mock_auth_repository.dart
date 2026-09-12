@@ -1,8 +1,9 @@
+import 'package:clyven_app/core/errors/app_error.dart';
+
 import '../models/app_user.dart';
 import 'auth_repository.dart';
 
-class MockAuthRepository
-    implements AuthRepository {
+class MockAuthRepository implements AuthRepository {
   AppUser? _currentUser;
 
   String? _pendingEmail;
@@ -39,32 +40,24 @@ class MockAuthRepository
       const Duration(milliseconds: 500),
     );
 
-    final normalizedAccount =
-        account.trim().toLowerCase();
+    final normalizedAccount = account.trim().toLowerCase();
 
-    if (normalizedAccount.isEmpty ||
-        password.isEmpty) {
-      throw StateError(
-        '账号和密码不能为空',
+    if (normalizedAccount.isEmpty || password.isEmpty) {
+      throw const AppException(
+        AppErrorCode.accountAndPasswordRequired,
       );
     }
 
-    final savedPassword =
-        _passwords[normalizedAccount];
+    final savedPassword = _passwords[normalizedAccount];
+    final user = _users[normalizedAccount];
 
-    final user =
-        _users[normalizedAccount];
-
-    if (savedPassword == null ||
-        user == null ||
-        savedPassword != password) {
-      throw StateError(
-        '账号或密码错误',
+    if (savedPassword == null || user == null || savedPassword != password) {
+      throw const AppException(
+        AppErrorCode.invalidCredentials,
       );
     }
 
     _currentUser = user;
-
     return user;
   }
 
@@ -85,20 +78,18 @@ class MockAuthRepository
   Future<void> startRegistration({
     required String email,
   }) async {
-    final normalizedEmail =
-        email.trim().toLowerCase();
+    final normalizedEmail = email.trim().toLowerCase();
 
-    if (normalizedEmail.isEmpty ||
-        !normalizedEmail.contains('@')) {
-      throw StateError(
-        '请输入有效邮箱',
+    if (normalizedEmail.isEmpty || !normalizedEmail.contains('@')) {
+      throw const AppException(
+        AppErrorCode.invalidEmail,
       );
     }
 
     _pendingEmail = normalizedEmail;
     _registrationVerified = false;
 
-    // Mock 模式固定使用 123456。
+    // Mock mode uses a fixed verification code: 123456.
   }
 
   @override
@@ -106,14 +97,14 @@ class MockAuthRepository
     required String code,
   }) async {
     if (_pendingEmail == null) {
-      throw StateError(
-        '请先开始注册',
+      throw const AppException(
+        AppErrorCode.registrationNotStarted,
       );
     }
 
     if (code.trim() != '123456') {
-      throw StateError(
-        '验证码错误',
+      throw const AppException(
+        AppErrorCode.invalidVerificationCode,
       );
     }
 
@@ -127,14 +118,14 @@ class MockAuthRepository
     required String password,
   }) async {
     if (_pendingEmail == null) {
-      throw StateError(
-        '请先填写邮箱',
+      throw const AppException(
+        AppErrorCode.registrationEmailRequired,
       );
     }
 
     if (!_registrationVerified) {
-      throw StateError(
-        '请先验证邮箱',
+      throw const AppException(
+        AppErrorCode.emailVerificationPending,
       );
     }
 
@@ -161,61 +152,50 @@ class MockAuthRepository
       const Duration(milliseconds: 500),
     );
 
-    final normalizedUsername =
-        username.trim().toLowerCase();
-
-    final normalizedDisplayName =
-        displayName.trim();
+    final normalizedUsername = username.trim().toLowerCase();
+    final normalizedDisplayName = displayName.trim();
 
     if (normalizedUsername.isEmpty) {
-      throw StateError(
-        '用户名不能为空',
+      throw const AppException(
+        AppErrorCode.usernameRequired,
       );
     }
 
     if (normalizedDisplayName.isEmpty) {
-      throw StateError(
-        '显示名称不能为空',
+      throw const AppException(
+        AppErrorCode.displayNameRequired,
       );
     }
 
     if (password.length < 6) {
-      throw StateError(
-        '密码至少需要 6 个字符',
+      throw const AppException(
+        AppErrorCode.passwordTooShort6,
       );
     }
 
-    if (_users.containsKey(
-      normalizedUsername,
-    )) {
-      throw StateError(
-        '这个用户名已经被使用',
+    if (_users.containsKey(normalizedUsername)) {
+      throw const AppException(
+        AppErrorCode.usernameTaken,
       );
     }
 
     final user = AppUser(
-      id:
-          'user-${DateTime.now().microsecondsSinceEpoch}',
+      id: 'user-${DateTime.now().microsecondsSinceEpoch}',
       username: normalizedUsername,
       displayName: normalizedDisplayName,
       avatarUrl: '',
     );
 
     _users[normalizedUsername] = user;
-    _passwords[normalizedUsername] =
-        password;
+    _passwords[normalizedUsername] = password;
 
     if (email != null) {
-      final normalizedEmail =
-          email.trim().toLowerCase();
-
+      final normalizedEmail = email.trim().toLowerCase();
       _users[normalizedEmail] = user;
-      _passwords[normalizedEmail] =
-          password;
+      _passwords[normalizedEmail] = password;
     }
 
     _currentUser = user;
-
     return user;
   }
 
