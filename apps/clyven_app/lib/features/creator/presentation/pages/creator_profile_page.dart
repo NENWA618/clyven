@@ -1,12 +1,13 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../data/models/creator_profile.dart';
 import '../providers/creator_profile_provider.dart';
 
-class CreatorProfilePage
-    extends ConsumerWidget {
+class CreatorProfilePage extends ConsumerWidget {
   final String creatorId;
 
   const CreatorProfilePage({
@@ -14,17 +15,10 @@ class CreatorProfilePage
     required this.creatorId,
   });
 
-  static const Color _background =
-      Color(0xFFF4F1EA);
-
-  static const Color _ink =
-      Color(0xFF161616);
-
-  static const Color _purple =
-      Color(0xFF7657FF);
-
-  static const Color _acid =
-      Color(0xFFE5FF58);
+  static const Color _background = Color(0xFFF4F1EA);
+  static const Color _ink = Color(0xFF161616);
+  static const Color _purple = Color(0xFF7657FF);
+  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -34,26 +28,25 @@ class CreatorProfilePage
     final creatorAsync = ref.watch(
       creatorProfileProvider(creatorId),
     );
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: _background,
       body: creatorAsync.when(
         loading: () {
           return const Center(
-            child:
-                CircularProgressIndicator(),
+            child: CircularProgressIndicator(),
           );
         },
-
         error: (error, stackTrace) {
           return SafeArea(
             child: Column(
               children: [
                 _buildBackButton(context),
-                const Expanded(
+                Expanded(
                   child: Center(
                     child: Text(
-                      '创作者资料加载失败',
+                      l10n.creatorProfileLoadFailed,
                     ),
                   ),
                 ),
@@ -61,12 +54,12 @@ class CreatorProfilePage
             ),
           );
         },
-
         data: (state) {
           return _buildPage(
             context,
             ref,
             state,
+            l10n,
           );
         },
       ),
@@ -77,66 +70,56 @@ class CreatorProfilePage
     BuildContext context,
     WidgetRef ref,
     CreatorProfileState state,
+    AppLocalizations l10n,
   ) {
     final creator = state.creator;
 
     return CustomScrollView(
-      physics:
-          const BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       slivers: [
         SliverToBoxAdapter(
           child: _buildHero(
             context,
             creator,
+            l10n,
           ),
         ),
-
         SliverToBoxAdapter(
           child: _buildIdentity(
+            context,
             ref,
             state,
+            l10n,
           ),
         ),
-
         SliverToBoxAdapter(
           child: _buildStatistics(
+            context,
             creator,
+            l10n,
           ),
         ),
-
         SliverToBoxAdapter(
-          child: _buildSectionHeader(),
+          child: _buildSectionHeader(l10n),
         ),
-
         SliverPadding(
-          padding:
-              const EdgeInsets.fromLTRB(
-            18,
-            0,
-            18,
-            60,
-          ),
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 60),
           sliver: SliverList(
-            delegate:
-                SliverChildBuilderDelegate(
+            delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final video =
-                    creator.videos[index];
+                final video = creator.videos[index];
 
                 return Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    bottom: 14,
-                  ),
+                  padding: const EdgeInsets.only(bottom: 14),
                   child: _buildVideoCard(
                     context,
                     video,
                     index,
+                    l10n,
                   ),
                 );
               },
-              childCount:
-                  creator.videos.length,
+              childCount: creator.videos.length,
             ),
           ),
         ),
@@ -147,6 +130,7 @@ class CreatorProfilePage
   Widget _buildHero(
     BuildContext context,
     CreatorProfile creator,
+    AppLocalizations l10n,
   ) {
     return SizedBox(
       height: 290,
@@ -156,24 +140,17 @@ class CreatorProfilePage
           Image.network(
             creator.bannerUrl,
             fit: BoxFit.cover,
-            errorBuilder: (
-              context,
-              error,
-              stackTrace,
-            ) {
+            errorBuilder: (context, error, stackTrace) {
               return Container(
                 color: _purple,
               );
             },
           ),
-
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin:
-                    Alignment.topCenter,
-                end:
-                    Alignment.bottomCenter,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: [
                   Color(0x44000000),
                   Color(0x00000000),
@@ -182,94 +159,58 @@ class CreatorProfilePage
               ),
             ),
           ),
-
           Positioned(
-            top:
-                MediaQuery.paddingOf(
-                      context,
-                    ).top +
-                    10,
+            top: MediaQuery.paddingOf(context).top + 10,
             left: 16,
-            child:
-                _buildBackButton(
-              context,
-            ),
+            child: _buildBackButton(context),
           ),
-
           Positioned(
-            top:
-                MediaQuery.paddingOf(
-                      context,
-                    ).top +
-                    10,
+            top: MediaQuery.paddingOf(context).top + 10,
             right: 16,
             child: Container(
               width: 42,
               height: 42,
-              decoration:
-                  BoxDecoration(
-                color:
-                    Colors.black38,
-                borderRadius:
-                    BorderRadius
-                        .circular(
-                  14,
-                ),
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
-                Icons
-                    .more_horiz_rounded,
+                Icons.more_horiz_rounded,
                 color: Colors.white,
               ),
             ),
           ),
-
           Positioned(
             left: 20,
             bottom: 20,
             child: Row(
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets
-                          .symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 7,
                   ),
-                  decoration:
-                      BoxDecoration(
+                  decoration: BoxDecoration(
                     color: _acid,
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                      20,
-                    ),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'CREATOR SPACE',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.creatorSpace,
+                    style: const TextStyle(
                       color: _ink,
                       fontSize: 10,
-                      fontWeight:
-                          FontWeight.w900,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 1,
                     ),
                   ),
                 ),
-
-                const SizedBox(
-                  width: 10,
-                ),
-
+                const SizedBox(width: 10),
                 Text(
-                  '${creator.videoCount} FRAMES',
-                  style:
-                      const TextStyle(
-                    color:
-                        Colors.white70,
+                  l10n.framesCount(creator.videoCount),
+                  style: const TextStyle(
+                    color: Colors.white70,
                     fontSize: 10,
-                    fontWeight:
-                        FontWeight.w800,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 1,
                   ),
                 ),
@@ -282,65 +223,41 @@ class CreatorProfilePage
   }
 
   Widget _buildIdentity(
+    BuildContext context,
     WidgetRef ref,
     CreatorProfileState state,
+    AppLocalizations l10n,
   ) {
-    final creator =
-        state.creator;
+    final creator = state.creator;
 
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        22,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(
-                  22,
-                ),
+                borderRadius: BorderRadius.circular(22),
                 child: SizedBox(
                   width: 70,
                   height: 70,
                   child: Image.network(
                     creator.avatarUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (
-                      context,
-                      error,
-                      stackTrace,
-                    ) {
+                    errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: _purple,
-                        alignment:
-                            Alignment.center,
+                        alignment: Alignment.center,
                         child: Text(
-                          creator.name
-                                  .isEmpty
+                          creator.name.isEmpty
                               ? '?'
-                              : creator.name
-                                  .substring(
-                                    0,
-                                    1,
-                                  ),
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.white,
+                              : creator.name.substring(0, 1),
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 24,
-                            fontWeight:
-                                FontWeight
-                                    .w900,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       );
@@ -348,121 +265,74 @@ class CreatorProfilePage
                   ),
                 ),
               ),
-
-              const SizedBox(
-                width: 14,
-              ),
-
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'VOICE / MAKER',
-                      style:
-                          TextStyle(
+                    Text(
+                      l10n.voiceMaker,
+                      style: const TextStyle(
                         color: _purple,
                         fontSize: 9,
-                        fontWeight:
-                            FontWeight
-                                .w900,
-                        letterSpacing:
-                            1.7,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.7,
                       ),
                     ),
-
-                    const SizedBox(
-                      height: 5,
-                    ),
-
+                    const SizedBox(height: 5),
                     Text(
                       creator.name,
-                      style:
-                          const TextStyle(
+                      style: const TextStyle(
                         color: _ink,
                         fontSize: 24,
-                        fontWeight:
-                            FontWeight
-                                .w900,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ],
                 ),
               ),
-
               GestureDetector(
-                onTap:
-                    state.isChangingFollow
-                        ? null
-                        : () {
-                            ref
-                                .read(
-                                  creatorProfileProvider(
-                                    creator.id,
-                                  ).notifier,
-                                )
-                                .toggleFollow();
-                          },
-                child:
-                    AnimatedContainer(
-                  duration:
-                      const Duration(
-                    milliseconds: 180,
-                  ),
-                  padding:
-                      const EdgeInsets
-                          .symmetric(
+                onTap: state.isChangingFollow
+                    ? null
+                    : () {
+                        ref
+                            .read(
+                              creatorProfileProvider(creator.id).notifier,
+                            )
+                            .toggleFollow();
+                      },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 19,
                     vertical: 11,
                   ),
-                  decoration:
-                      BoxDecoration(
-                    color:
-                        state.isFollowing
-                            ? _ink
-                            : _acid,
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                      22,
-                    ),
+                  decoration: BoxDecoration(
+                    color: state.isFollowing ? _ink : _acid,
+                    borderRadius: BorderRadius.circular(22),
                   ),
                   child: Text(
                     state.isFollowing
-                        ? '已关注'
-                        : '关注',
-                    style:
-                        TextStyle(
-                      color:
-                          state.isFollowing
-                              ? Colors.white
-                              : _ink,
+                        ? l10n.followingButton
+                        : l10n.follow,
+                    style: TextStyle(
+                      color: state.isFollowing ? Colors.white : _ink,
                       fontSize: 12,
-                      fontWeight:
-                          FontWeight
-                              .w900,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-
-          const SizedBox(
-            height: 18,
-          ),
-
+          const SizedBox(height: 18),
           Text(
             creator.bio,
             style: const TextStyle(
-              color:
-                  Color(0xFF4F4B45),
+              color: Color(0xFF4F4B45),
               fontSize: 14,
               height: 1.65,
-              fontWeight:
-                  FontWeight.w500,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -471,49 +341,33 @@ class CreatorProfilePage
   }
 
   Widget _buildStatistics(
+    BuildContext context,
     CreatorProfile creator,
+    AppLocalizations l10n,
   ) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        24,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Container(
         height: 86,
         decoration: BoxDecoration(
           color: _ink,
-          borderRadius:
-              BorderRadius.circular(
-            25,
-          ),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Row(
           children: [
             _stat(
-              _formatCount(
-                creator.followerCount,
-              ),
-              '关注者',
+              _formatCount(context, creator.followerCount),
+              l10n.followers,
             ),
-
             _divider(),
-
             _stat(
-              creator.videoCount
-                  .toString(),
-              '作品',
+              _formatCount(context, creator.videoCount),
+              l10n.works,
             ),
-
             _divider(),
-
             _stat(
-              _formatCount(
-                creator.totalViewCount,
-              ),
-              '总观看',
+              _formatCount(context, creator.totalViewCount),
+              l10n.totalViews,
             ),
           ],
         ),
@@ -527,26 +381,25 @@ class CreatorProfilePage
   ) {
     return Expanded(
       child: Column(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             value,
             style: const TextStyle(
               color: _acid,
               fontSize: 18,
-              fontWeight:
-                  FontWeight.w900,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Colors.white54,
               fontSize: 9,
-              fontWeight:
-                  FontWeight.w700,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -562,35 +415,27 @@ class CreatorProfilePage
     );
   }
 
-  Widget _buildSectionHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(
-        20,
-        32,
-        20,
-        16,
-      ),
+  Widget _buildSectionHeader(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              '创作者轨道',
-              style: TextStyle(
+              l10n.creatorTrack,
+              style: const TextStyle(
                 color: _ink,
                 fontSize: 24,
-                fontWeight:
-                    FontWeight.w900,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
           Text(
-            'LATEST FRAMES',
-            style: TextStyle(
-              color:
-                  Color(0xFF99938A),
+            l10n.latestFrames,
+            style: const TextStyle(
+              color: Color(0xFF99938A),
               fontSize: 9,
-              fontWeight:
-                  FontWeight.w800,
+              fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
             ),
           ),
@@ -603,7 +448,10 @@ class CreatorProfilePage
     BuildContext context,
     CreatorVideoPreview video,
     int index,
+    AppLocalizations l10n,
   ) {
+    final number = (index + 1).toString().padLeft(2, '0');
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -620,78 +468,46 @@ class CreatorProfilePage
       child: Container(
         height: 125,
         decoration: BoxDecoration(
-          color: Colors.white
-              .withOpacity(0.72),
-          borderRadius:
-              BorderRadius.circular(
-            23,
-          ),
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(23),
           border: Border.all(
-            color:
-                const Color(
-              0xFFE3DED5,
-            ),
+            color: const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius:
-                  const BorderRadius
-                      .horizontal(
-                left:
-                    Radius.circular(
-                  22,
-                ),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(22),
               ),
               child: SizedBox(
                 width: 145,
-                height:
-                    double.infinity,
+                height: double.infinity,
                 child: Stack(
-                  fit:
-                      StackFit.expand,
+                  fit: StackFit.expand,
                   children: [
                     Image.network(
                       video.coverUrl,
-                      fit:
-                          BoxFit.cover,
+                      fit: BoxFit.cover,
                     ),
-
                     Positioned(
                       left: 9,
                       bottom: 9,
-                      child:
-                          Container(
-                        padding:
-                            const EdgeInsets
-                                .symmetric(
-                          horizontal:
-                              8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
                           vertical: 5,
                         ),
-                        decoration:
-                            BoxDecoration(
+                        decoration: BoxDecoration(
                           color: _ink,
-                          borderRadius:
-                              BorderRadius
-                                  .circular(
-                            12,
-                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _duration(
-                            video
-                                .durationSeconds,
-                          ),
-                          style:
-                              const TextStyle(
-                            color: Colors
-                                .white,
+                          _duration(video.durationSeconds),
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 9,
-                            fontWeight:
-                                FontWeight
-                                    .w800,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -700,63 +516,41 @@ class CreatorProfilePage
                 ),
               ),
             ),
-
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets
-                        .all(
-                  14,
-                ),
+                padding: const EdgeInsets.all(14),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'FRAME ${(index + 1).toString().padLeft(2, '0')}',
-                      style:
-                          const TextStyle(
+                      l10n.frameNumber(number),
+                      style: const TextStyle(
                         color: _purple,
                         fontSize: 8,
-                        fontWeight:
-                            FontWeight
-                                .w900,
-                        letterSpacing:
-                            1.3,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.3,
                       ),
                     ),
-
-                    const SizedBox(
-                      height: 7,
-                    ),
-
+                    const SizedBox(height: 7),
                     Expanded(
                       child: Text(
                         video.title,
                         maxLines: 3,
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-                        style:
-                            const TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
                           color: _ink,
                           fontSize: 15,
                           height: 1.25,
-                          fontWeight:
-                              FontWeight
-                                  .w800,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
-
                     Text(
-                      '${_formatCount(video.viewCount)} 次观看',
-                      style:
-                          const TextStyle(
-                        color: Color(
-                          0xFF908A81,
-                        ),
+                      l10n.viewsCount(
+                        _formatCount(context, video.viewCount),
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFF908A81),
                         fontSize: 10,
                       ),
                     ),
@@ -770,9 +564,7 @@ class CreatorProfilePage
     );
   }
 
-  Widget _buildBackButton(
-    BuildContext context,
-  ) {
+  Widget _buildBackButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
@@ -782,10 +574,7 @@ class CreatorProfilePage
         height: 42,
         decoration: BoxDecoration(
           color: Colors.black38,
-          borderRadius:
-              BorderRadius.circular(
-            14,
-          ),
+          borderRadius: BorderRadius.circular(14),
         ),
         child: const Icon(
           Icons.arrow_back_rounded,
@@ -795,37 +584,21 @@ class CreatorProfilePage
     );
   }
 
-  static String _formatCount(
+  String _formatCount(
+    BuildContext context,
     int value,
   ) {
-    if (value >= 10000) {
-      final result =
-          value / 10000;
-
-      return '${result.toStringAsFixed(result >= 10 ? 0 : 1)}万';
-    }
-
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}k';
-    }
-
-    return value.toString();
+    final localeName = Localizations.localeOf(context).toString();
+    return NumberFormat.compact(
+      locale: localeName,
+    ).format(value);
   }
 
-  static String _duration(
-    int seconds,
-  ) {
-    final duration =
-        Duration(seconds: seconds);
-
-    final minutes =
-        duration.inMinutes;
-
+  static String _duration(int seconds) {
+    final duration = Duration(seconds: seconds);
+    final minutes = duration.inMinutes;
     final remainingSeconds =
-        duration.inSeconds
-            .remainder(60)
-            .toString()
-            .padLeft(2, '0');
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
 
     return '$minutes:$remainingSeconds';
   }
