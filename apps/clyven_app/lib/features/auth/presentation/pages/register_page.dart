@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/localization/localized_error_message.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -586,10 +587,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return const SizedBox();
     }
 
-    final message = authAsync.error.toString().replaceFirst(
-          'Bad state: ',
-          '',
-        );
+    final l10n = AppLocalizations.of(context)!;
+    final message = localizedErrorMessage(
+      l10n,
+      authAsync.error,
+    );
 
     return Container(
       width: double.infinity,
