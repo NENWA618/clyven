@@ -1,3 +1,4 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,42 +13,22 @@ class RegisterPage extends ConsumerStatefulWidget {
   }
 }
 
-class _RegisterPageState
-    extends ConsumerState<RegisterPage> {
-  static const Color _background =
-      Color(0xFFF4F1EA);
+class _RegisterPageState extends ConsumerState<RegisterPage> {
+  static const Color _background = Color(0xFFF4F1EA);
+  static const Color _ink = Color(0xFF161616);
+  static const Color _acid = Color(0xFFE5FF58);
 
-  static const Color _ink =
-      Color(0xFF161616);
-
-  static const Color _acid =
-      Color(0xFFE5FF58);
-
-  final TextEditingController
-      _emailController =
-      TextEditingController();
-
-  final TextEditingController
-      _codeController =
-      TextEditingController();
-
-  final TextEditingController
-      _usernameController =
-      TextEditingController();
-
-  final TextEditingController
-      _displayNameController =
-      TextEditingController();
-
-  final TextEditingController
-      _passwordController =
-      TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   bool _hidePassword = true;
 
-  // 0 = 邮箱
-  // 1 = 验证码
-  // 2 = 创建身份
+  // 0 = email
+  // 1 = verification code
+  // 2 = create identity
   int _step = 0;
 
   @override
@@ -57,27 +38,21 @@ class _RegisterPageState
     _usernameController.dispose();
     _displayNameController.dispose();
     _passwordController.dispose();
-
     super.dispose();
   }
 
   Future<void> _sendCode() async {
-    final email =
-        _emailController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+    final email = _emailController.text.trim();
 
     if (email.isEmpty) {
-      _showMessage('请输入邮箱');
+      _showMessage(l10n.emailRequired);
       return;
     }
 
-    final success =
-        await ref
-            .read(
-              authProvider.notifier,
-            )
-            .startRegistration(
-              email: email,
-            );
+    final success = await ref
+        .read(authProvider.notifier)
+        .startRegistration(email: email);
 
     if (!mounted) {
       return;
@@ -91,22 +66,17 @@ class _RegisterPageState
   }
 
   Future<void> _verifyCode() async {
-    final code =
-        _codeController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+    final code = _codeController.text.trim();
 
     if (code.isEmpty) {
-      _showMessage('请输入验证码');
+      _showMessage(l10n.verificationCodeRequired);
       return;
     }
 
-    final success =
-        await ref
-            .read(
-              authProvider.notifier,
-            )
-            .verifyRegistrationCode(
-              code: code,
-            );
+    final success = await ref
+        .read(authProvider.notifier)
+        .verifyRegistrationCode(code: code);
 
     if (!mounted) {
       return;
@@ -119,42 +89,32 @@ class _RegisterPageState
     }
   }
 
-  Future<void> _finishRegistration()
-      async {
-    final username =
-        _usernameController.text.trim();
-
-    final displayName =
-        _displayNameController.text.trim();
-
-    final password =
-        _passwordController.text;
+  Future<void> _finishRegistration() async {
+    final l10n = AppLocalizations.of(context)!;
+    final username = _usernameController.text.trim();
+    final displayName = _displayNameController.text.trim();
+    final password = _passwordController.text;
 
     if (username.isEmpty) {
-      _showMessage('请输入用户名');
+      _showMessage(l10n.usernameRequired);
       return;
     }
 
     if (displayName.isEmpty) {
-      _showMessage('请输入显示名称');
+      _showMessage(l10n.displayNameRequired);
       return;
     }
 
     if (password.length < 8) {
-      _showMessage('密码至少需要 8 个字符');
+      _showMessage(l10n.passwordMin8Validation);
       return;
     }
 
-    final success =
-        await ref
-            .read(
-              authProvider.notifier,
-            )
-            .finishRegistration(
-              username: username,
-              displayName: displayName,
-              password: password,
-            );
+    final success = await ref.read(authProvider.notifier).finishRegistration(
+          username: username,
+          displayName: displayName,
+          password: password,
+        );
 
     if (!mounted) {
       return;
@@ -168,11 +128,8 @@ class _RegisterPageState
     }
   }
 
-  void _showMessage(
-    String message,
-  ) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
       ),
@@ -180,85 +137,55 @@ class _RegisterPageState
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    final authAsync =
-        ref.watch(authProvider);
+  Widget build(BuildContext context) {
+    final authAsync = ref.watch(authProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.fromLTRB(
+          padding: const EdgeInsets.fromLTRB(
             24,
             18,
             24,
             30,
           ),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBackButton(),
-
-              const SizedBox(
-                height: 34,
-              ),
-
-              _buildBadge(),
-
-              const SizedBox(
-                height: 18,
-              ),
-
-              const Text(
-                '建立你的\n内容身份',
-                style: TextStyle(
+              const SizedBox(height: 34),
+              _buildBadge(l10n),
+              const SizedBox(height: 18),
+              Text(
+                l10n.registerTitle,
+                style: const TextStyle(
                   color: _ink,
                   fontSize: 42,
                   height: 1.05,
-                  fontWeight:
-                      FontWeight.w900,
+                  fontWeight: FontWeight.w900,
                   letterSpacing: -1.6,
                 ),
               ),
-
-              const SizedBox(
-                height: 16,
-              ),
-
+              const SizedBox(height: 16),
               Text(
-                _subtitle,
+                _subtitle(l10n),
                 style: TextStyle(
-                  color: _ink.withValues(
-                    alpha: 0.62,
-                  ),
+                  color: _ink.withValues(alpha: 0.62),
                   fontSize: 15,
                   height: 1.55,
-                  fontWeight:
-                      FontWeight.w500,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-
-              const SizedBox(
-                height: 34,
-              ),
-
-              _buildStepIndicator(),
-
-              const SizedBox(
-                height: 26,
-              ),
-
+              const SizedBox(height: 34),
+              _buildStepIndicator(l10n),
+              const SizedBox(height: 26),
               AnimatedSwitcher(
-                duration:
-                    const Duration(
-                  milliseconds: 220,
-                ),
+                duration: const Duration(milliseconds: 220),
                 child: _buildCurrentStep(
                   authAsync,
+                  l10n,
                 ),
               ),
             ],
@@ -268,17 +195,14 @@ class _RegisterPageState
     );
   }
 
-  String get _subtitle {
+  String _subtitle(AppLocalizations l10n) {
     switch (_step) {
       case 0:
-        return '先验证你的邮箱。这个邮箱以后可以用于登录和找回账号。';
-
+        return l10n.registerSubtitleEmail;
       case 1:
-        return '输入邮箱收到的验证码，完成邮箱验证。';
-
+        return l10n.registerSubtitleCode;
       case 2:
-        return '一个身份可以观看、讨论、收藏，也可以成为创作者。';
-
+        return l10n.registerSubtitleIdentity;
       default:
         return '';
     }
@@ -286,8 +210,7 @@ class _RegisterPageState
 
   Widget _buildBackButton() {
     return InkWell(
-      borderRadius:
-          BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(30),
       onTap: () {
         if (_step == 0) {
           Navigator.pop(context);
@@ -302,10 +225,7 @@ class _RegisterPageState
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: Colors.white
-              .withValues(
-            alpha: 0.68,
-          ),
+          color: Colors.white.withValues(alpha: 0.68),
           shape: BoxShape.circle,
         ),
         child: const Icon(
@@ -316,55 +236,44 @@ class _RegisterPageState
     );
   }
 
-  Widget _buildBadge() {
+  Widget _buildBadge(AppLocalizations l10n) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 7,
       ),
       decoration: BoxDecoration(
         color: _acid,
-        borderRadius:
-            BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: const Text(
-        'NEW VOICE',
-        style: TextStyle(
+      child: Text(
+        l10n.newVoice,
+        style: const TextStyle(
           color: _ink,
           fontSize: 11,
-          fontWeight:
-              FontWeight.w900,
+          fontWeight: FontWeight.w900,
           letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _buildStepIndicator() {
+  Widget _buildStepIndicator(AppLocalizations l10n) {
     return Row(
       children: [
         _stepDot(
           index: 0,
-          text: '邮箱',
+          text: l10n.email,
         ),
-
-        _stepLine(
-          active: _step >= 1,
-        ),
-
+        _stepLine(active: _step >= 1),
         _stepDot(
           index: 1,
-          text: '验证',
+          text: l10n.verification,
         ),
-
-        _stepLine(
-          active: _step >= 2,
-        ),
-
+        _stepLine(active: _step >= 2),
         _stepDot(
           index: 2,
-          text: '身份',
+          text: l10n.identity,
         ),
       ],
     );
@@ -374,65 +283,38 @@ class _RegisterPageState
     required int index,
     required String text,
   }) {
-    final active =
-        _step >= index;
+    final active = _step >= index;
 
     return Column(
       children: [
         AnimatedContainer(
-          duration:
-              const Duration(
-            milliseconds: 180,
-          ),
+          duration: const Duration(milliseconds: 180),
           width: 30,
           height: 30,
-          alignment:
-              Alignment.center,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color:
-                active
-                    ? _ink
-                    : Colors.white,
+            color: active ? _ink : Colors.white,
             shape: BoxShape.circle,
             border: Border.all(
-              color:
-                  active
-                      ? _ink
-                      : const Color(
-                          0xFFD8D2C9,
-                        ),
+              color: active ? _ink : const Color(0xFFD8D2C9),
             ),
           ),
           child: Text(
             '${index + 1}',
             style: TextStyle(
-              color:
-                  active
-                      ? _acid
-                      : _ink,
+              color: active ? _acid : _ink,
               fontSize: 12,
-              fontWeight:
-                  FontWeight.w800,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ),
-
-        const SizedBox(
-          height: 6,
-        ),
-
+        const SizedBox(height: 6),
         Text(
           text,
           style: TextStyle(
-            color: _ink.withValues(
-              alpha:
-                  active
-                      ? 1
-                      : 0.45,
-            ),
+            color: _ink.withValues(alpha: active ? 1 : 0.45),
             fontSize: 11,
-            fontWeight:
-                FontWeight.w700,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -444,42 +326,37 @@ class _RegisterPageState
   }) {
     return Expanded(
       child: Container(
-        margin:
-            const EdgeInsets.only(
+        margin: const EdgeInsets.only(
           left: 8,
           right: 8,
           bottom: 20,
         ),
         height: 2,
-        color:
-            active
-                ? _ink
-                : const Color(
-                    0xFFD8D2C9,
-                  ),
+        color: active ? _ink : const Color(0xFFD8D2C9),
       ),
     );
   }
 
   Widget _buildCurrentStep(
     AsyncValue authAsync,
+    AppLocalizations l10n,
   ) {
     switch (_step) {
       case 0:
         return _buildEmailStep(
           authAsync,
+          l10n,
         );
-
       case 1:
         return _buildCodeStep(
           authAsync,
+          l10n,
         );
-
       case 2:
         return _buildIdentityStep(
           authAsync,
+          l10n,
         );
-
       default:
         return const SizedBox();
     }
@@ -487,42 +364,24 @@ class _RegisterPageState
 
   Widget _buildEmailStep(
     AsyncValue authAsync,
+    AppLocalizations l10n,
   ) {
     return Column(
-      key:
-          const ValueKey(
-        'email',
-      ),
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      key: const ValueKey('email'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildField(
-          controller:
-              _emailController,
-          hint: '邮箱',
-          icon:
-              Icons.mail_outline_rounded,
-          keyboardType:
-              TextInputType
-                  .emailAddress,
+          controller: _emailController,
+          hint: l10n.email,
+          icon: Icons.mail_outline_rounded,
+          keyboardType: TextInputType.emailAddress,
         ),
-
-        const SizedBox(
-          height: 20,
-        ),
-
-        _buildError(
-          authAsync,
-        ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
+        const SizedBox(height: 20),
+        _buildError(authAsync),
+        const SizedBox(height: 14),
         _buildButton(
-          text: '发送验证码',
-          loading:
-              authAsync.isLoading,
+          text: l10n.sendVerificationCode,
+          loading: authAsync.isLoading,
           onPressed: _sendCode,
         ),
       ],
@@ -531,67 +390,37 @@ class _RegisterPageState
 
   Widget _buildCodeStep(
     AsyncValue authAsync,
+    AppLocalizations l10n,
   ) {
     return Column(
-      key:
-          const ValueKey(
-        'code',
-      ),
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      key: const ValueKey('code'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           _emailController.text,
           style: TextStyle(
-            color: _ink.withValues(
-              alpha: 0.55,
-            ),
+            color: _ink.withValues(alpha: 0.55),
             fontSize: 13,
-            fontWeight:
-                FontWeight.w600,
+            fontWeight: FontWeight.w600,
           ),
         ),
-
-        const SizedBox(
-          height: 12,
-        ),
-
+        const SizedBox(height: 12),
         _buildField(
-          controller:
-              _codeController,
-          hint: '验证码',
-          icon:
-              Icons.lock_clock_outlined,
-          keyboardType:
-              TextInputType.number,
+          controller: _codeController,
+          hint: l10n.verificationCode,
+          icon: Icons.lock_clock_outlined,
+          keyboardType: TextInputType.number,
         ),
-
-        const SizedBox(
-          height: 12,
-        ),
-
+        const SizedBox(height: 12),
         TextButton(
-          onPressed:
-              authAsync.isLoading
-                  ? null
-                  : _sendCode,
-          child: const Text(
-            '重新发送验证码',
-          ),
+          onPressed: authAsync.isLoading ? null : _sendCode,
+          child: Text(l10n.resendVerificationCode),
         ),
-
-        _buildError(
-          authAsync,
-        ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
+        _buildError(authAsync),
+        const SizedBox(height: 14),
         _buildButton(
-          text: '验证邮箱',
-          loading:
-              authAsync.isLoading,
+          text: l10n.verifyEmail,
+          loading: authAsync.isLoading,
           onPressed: _verifyCode,
         ),
       ],
@@ -600,152 +429,89 @@ class _RegisterPageState
 
   Widget _buildIdentityStep(
     AsyncValue authAsync,
+    AppLocalizations l10n,
   ) {
     return Column(
-      key:
-          const ValueKey(
-        'identity',
-      ),
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      key: const ValueKey('identity'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildField(
-          controller:
-              _usernameController,
-          hint: '用户名',
-          icon:
-              Icons
-                  .alternate_email_rounded,
+          controller: _usernameController,
+          hint: l10n.username,
+          icon: Icons.alternate_email_rounded,
         ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
+        const SizedBox(height: 14),
         _buildField(
-          controller:
-              _displayNameController,
-          hint: '显示名称',
-          icon:
-              Icons.badge_outlined,
+          controller: _displayNameController,
+          hint: l10n.displayName,
+          icon: Icons.badge_outlined,
         ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
-        _buildPasswordField(),
-
-        const SizedBox(
-          height: 12,
-        ),
-
+        const SizedBox(height: 14),
+        _buildPasswordField(l10n),
+        const SizedBox(height: 12),
         Text(
-          '密码至少 8 个字符',
+          l10n.passwordMin8Hint,
           style: TextStyle(
-            color: _ink.withValues(
-              alpha: 0.46,
-            ),
+            color: _ink.withValues(alpha: 0.46),
             fontSize: 12,
-            fontWeight:
-                FontWeight.w500,
+            fontWeight: FontWeight.w500,
           ),
         ),
-
-        const SizedBox(
-          height: 10,
-        ),
-
-        _buildError(
-          authAsync,
-        ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
+        const SizedBox(height: 10),
+        _buildError(authAsync),
+        const SizedBox(height: 14),
         _buildButton(
-          text: '创建身份',
-          loading:
-              authAsync.isLoading,
-          onPressed:
-              _finishRegistration,
+          text: l10n.createIdentity,
+          loading: authAsync.isLoading,
+          onPressed: _finishRegistration,
         ),
       ],
     );
   }
 
   Widget _buildField({
-    required
-    TextEditingController controller,
+    required TextEditingController controller,
     required String hint,
     required IconData icon,
-    TextInputType?
-        keyboardType,
+    TextInputType? keyboardType,
   }) {
     return TextField(
       controller: controller,
-      keyboardType:
-          keyboardType,
-      textInputAction:
-          TextInputAction.next,
+      keyboardType: keyboardType,
+      textInputAction: TextInputAction.next,
       style: const TextStyle(
         color: _ink,
         fontSize: 16,
-        fontWeight:
-            FontWeight.w600,
+        fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: _ink.withValues(
-            alpha: 0.38,
-          ),
+          color: _ink.withValues(alpha: 0.38),
         ),
         prefixIcon: Icon(
           icon,
           color: _ink,
         ),
         filled: true,
-        fillColor: Colors.white
-            .withValues(
-          alpha: 0.72,
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(
+        fillColor: Colors.white.withValues(alpha: 0.72),
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 18,
         ),
-        border:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              BorderSide.none,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
         ),
-        enabledBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              const BorderSide(
-            color: Color(
-              0xFFE3DED5,
-            ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
+            color: Color(0xFFE3DED5),
           ),
         ),
-        focusedBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              const BorderSide(
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
             color: _ink,
             width: 1.5,
           ),
@@ -754,90 +520,59 @@ class _RegisterPageState
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(AppLocalizations l10n) {
     return TextField(
-      controller:
-          _passwordController,
-      obscureText:
-          _hidePassword,
-      textInputAction:
-          TextInputAction.done,
+      controller: _passwordController,
+      obscureText: _hidePassword,
+      textInputAction: TextInputAction.done,
       onSubmitted: (_) {
         _finishRegistration();
       },
       style: const TextStyle(
         color: _ink,
         fontSize: 16,
-        fontWeight:
-            FontWeight.w600,
+        fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
-        hintText: '密码',
+        hintText: l10n.password,
         hintStyle: TextStyle(
-          color: _ink.withValues(
-            alpha: 0.38,
-          ),
+          color: _ink.withValues(alpha: 0.38),
         ),
-        prefixIcon:
-            const Icon(
+        prefixIcon: const Icon(
           Icons.lock_outline_rounded,
           color: _ink,
         ),
         suffixIcon: IconButton(
           onPressed: () {
             setState(() {
-              _hidePassword =
-                  !_hidePassword;
+              _hidePassword = !_hidePassword;
             });
           },
           icon: Icon(
             _hidePassword
-                ? Icons
-                    .visibility_off_outlined
-                : Icons
-                    .visibility_outlined,
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
           ),
         ),
         filled: true,
-        fillColor: Colors.white
-            .withValues(
-          alpha: 0.72,
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(
+        fillColor: Colors.white.withValues(alpha: 0.72),
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
           vertical: 18,
         ),
-        border:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              BorderSide.none,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
         ),
-        enabledBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              const BorderSide(
-            color: Color(
-              0xFFE3DED5,
-            ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
+            color: Color(0xFFE3DED5),
           ),
         ),
-        focusedBorder:
-            OutlineInputBorder(
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
-          borderSide:
-              const BorderSide(
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
             color: _ink,
             width: 1.5,
           ),
@@ -846,45 +581,29 @@ class _RegisterPageState
     );
   }
 
-  Widget _buildError(
-    AsyncValue authAsync,
-  ) {
+  Widget _buildError(AsyncValue authAsync) {
     if (!authAsync.hasError) {
       return const SizedBox();
     }
 
-    final message =
-        authAsync.error
-            .toString()
-            .replaceFirst(
-              'Bad state: ',
-              '',
-            );
+    final message = authAsync.error.toString().replaceFirst(
+          'Bad state: ',
+          '',
+        );
 
     return Container(
       width: double.infinity,
-      padding:
-          const EdgeInsets.all(
-        14,
-      ),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(
-          0xFFFFE6E2,
-        ),
-        borderRadius:
-            BorderRadius.circular(
-          14,
-        ),
+        color: const Color(0xFFFFE6E2),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         message,
         style: const TextStyle(
-          color: Color(
-            0xFF9E2921,
-          ),
+          color: Color(0xFF9E2921),
           fontSize: 13,
-          fontWeight:
-              FontWeight.w600,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -893,54 +612,37 @@ class _RegisterPageState
   Widget _buildButton({
     required String text,
     required bool loading,
-    required
-    Future<void> Function()
-        onPressed,
+    required Future<void> Function() onPressed,
   }) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: FilledButton(
-        onPressed:
-            loading
-                ? null
-                : onPressed,
-        style:
-            FilledButton.styleFrom(
+        onPressed: loading ? null : onPressed,
+        style: FilledButton.styleFrom(
           backgroundColor: _ink,
           foregroundColor: _acid,
-          disabledBackgroundColor:
-              _ink.withValues(
-            alpha: 0.55,
-          ),
-          shape:
-              RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(
-              18,
-            ),
+          disabledBackgroundColor: _ink.withValues(alpha: 0.55),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
         ),
-        child:
-            loading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child:
-                        CircularProgressIndicator(
-                      strokeWidth: 2.4,
-                      color: _acid,
-                    ),
-                  )
-                : Text(
-                    text,
-                    style:
-                        const TextStyle(
-                      fontSize: 15,
-                      fontWeight:
-                          FontWeight.w800,
-                    ),
-                  ),
+        child: loading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  color: _acid,
+                ),
+              )
+            : Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
       ),
     );
   }
