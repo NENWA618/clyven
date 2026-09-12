@@ -62,5 +62,57 @@
   "topicGaming": "游戏",
   "topicMusic": "音乐",
   "topicCity": "城市",
-  "topicDocumentary": "纪录"
+  "topicDocumentary": "纪录",
+  "tracesEyebrow": "TRACES",
+  "watchHistory": "观看轨迹",
+  "clear": "清空",
+  "noWatchHistory": "还没有留下观看轨迹",
+  "followingEyebrow": "ORBIT",
+  "followingTitle": "我的关注",
+  "noFollowingCreators": "还没有关注创作者",
+  "followers": "关注者",
+  "videos": "个视频",
+  "echoesEyebrow": "ECHOES",
+  "notificationsLoadFailed": "回响加载失败",
+  "justNow": "刚刚",
+  "minutesAgo": "{count} 分钟前",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count} 小时前",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count} 天前",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsEyebrow": "SETTINGS",
+  "accountSectionEyebrow": "ACCOUNT",
+  "accountSectionTitle": "账号",
+  "accountAndProfile": "账号与资料",
+  "accountAndProfileSubtitle": "昵称、头像、个人简介",
+  "privacy": "隐私",
+  "privacySubtitle": "隐私与内容可见范围",
+  "appSectionEyebrow": "APP",
+  "appSectionTitle": "应用",
+  "notifications": "通知",
+  "notificationsSettingsSubtitle": "管理回响与推送通知",
+  "about": "关于",
+  "aboutSubtitle": "版本与应用信息",
+  "identitySectionEyebrow": "IDENTITY",
+  "currentIdentity": "当前身份",
+  "logoutCurrentIdentity": "退出当前身份"
 }
