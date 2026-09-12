@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/localization/app_locale_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ class SettingsPage extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final selectedLocale = ref.watch(appLocaleProvider);
 
     return Scaffold(
       backgroundColor: _background,
@@ -67,6 +69,23 @@ class SettingsPage extends ConsumerWidget {
                     l10n.appSectionTitle,
                   ),
                   const SizedBox(height: 12),
+                  _SettingsItem(
+                    icon: Icons.language_rounded,
+                    title: l10n.language,
+                    subtitle: _languageLabel(
+                      selectedLocale,
+                      l10n,
+                    ),
+                    onTap: () {
+                      _showLanguageSheet(
+                        context,
+                        ref,
+                        l10n,
+                        selectedLocale,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
                   _SettingsItem(
                     icon: Icons.notifications_none_rounded,
                     title: l10n.notifications,
@@ -148,6 +167,100 @@ class SettingsPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  String _languageLabel(
+    Locale? locale,
+    AppLocalizations l10n,
+  ) {
+    if (locale == null) {
+      return l10n.languageSystem;
+    }
+
+    return switch (locale.languageCode) {
+      'en' => l10n.languageEnglish,
+      'zh' => l10n.languageChinese,
+      _ => l10n.languageSettingsSubtitle,
+    };
+  }
+
+  Future<void> _showLanguageSheet(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    Locale? selectedLocale,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: _background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(28),
+        ),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              18,
+              18,
+              18,
+              24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                  ),
+                  child: Text(
+                    l10n.language,
+                    style: const TextStyle(
+                      color: _ink,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _LanguageOption(
+                  label: l10n.languageSystem,
+                  selected: selectedLocale == null,
+                  onTap: () {
+                    ref
+                        .read(appLocaleProvider.notifier)
+                        .useSystem();
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+                _LanguageOption(
+                  label: l10n.languageEnglish,
+                  selected: selectedLocale?.languageCode == 'en',
+                  onTap: () {
+                    ref
+                        .read(appLocaleProvider.notifier)
+                        .useEnglish();
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+                _LanguageOption(
+                  label: l10n.languageChinese,
+                  selected: selectedLocale?.languageCode == 'zh',
+                  onTap: () {
+                    ref
+                        .read(appLocaleProvider.notifier)
+                        .useSimplifiedChinese();
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -250,6 +363,41 @@ class SettingsPage extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LanguageOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      onTap: onTap,
+      title: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF161616),
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      trailing: selected
+          ? const Icon(
+              Icons.check_circle_rounded,
+              color: Color(0xFF7657FF),
+            )
+          : null,
     );
   }
 }
