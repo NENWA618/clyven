@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -50,8 +51,8 @@ class VideoInteractionNotifier
     );
 
     if (user == null) {
-      throw StateError(
-        '用户尚未登录',
+      throw const AppException(
+        AppErrorCode.notLoggedIn,
       );
     }
 
