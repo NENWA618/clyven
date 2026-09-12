@@ -1,7 +1,10 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/utils/require_login.dart';
 import '../../../creator/presentation/pages/following_creators_page.dart';
 import '../../../history/presentation/pages/watch_history_page.dart';
 import '../../../video/presentation/pages/video_detail_page.dart';
@@ -10,212 +13,28 @@ import '../../data/models/user_profile.dart';
 import '../providers/my_profile_provider.dart';
 import 'my_submissions_page.dart';
 import 'settings_page.dart';
-import '../../../auth/presentation/utils/require_login.dart';
 
 class MyProfilePage extends ConsumerWidget {
   const MyProfilePage({super.key});
 
-  static const Color _background =
-      Color(0xFFF4F1EA);
-
-  static const Color _ink =
-      Color(0xFF161616);
-
-  static const Color _purple =
-      Color(0xFF7657FF);
-
-  static const Color _acid =
-      Color(0xFFE5FF58);
-
-  Widget _buildGuestContent(
-  BuildContext context,
-  WidgetRef ref,
-) {
-  Future<void> login() async {
-    await requireLogin(
-      context,
-      ref,
-    );
-  }
-
-  return Scaffold(
-    backgroundColor: _background,
-    body: SafeArea(
-      bottom: false,
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: _buildTopBar(context),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                24,
-                20,
-                0,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 82,
-                    height: 82,
-                    decoration: BoxDecoration(
-                      color: _purple,
-                      borderRadius:
-                          BorderRadius.circular(25),
-                    ),
-                    child: const Icon(
-                      Icons.person_outline_rounded,
-                      color: Colors.white,
-                      size: 34,
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '游客',
-                          style: TextStyle(
-                            color: _ink,
-                            fontSize: 27,
-                            fontWeight:
-                                FontWeight.w900,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text(
-                          '登录后查看你的个人资料与内容',
-                          style: TextStyle(
-                            color: Color(0xFF77736C),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                24,
-                20,
-                0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _libraryItem(
-                      icon: Icons.video_library_outlined,
-                      title: '投稿',
-                      subtitle: '我的作品',
-                      onTap: login,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _libraryItem(
-                      icon: Icons.bookmark_border_rounded,
-                      title: '收藏',
-                      subtitle: '保存内容',
-                      onTap: login,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _libraryItem(
-                      icon: Icons.history_rounded,
-                      title: '历史',
-                      subtitle: '观看轨迹',
-                      onTap: login,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: _libraryItem(
-                      icon: Icons.people_outline_rounded,
-                      title: '关注',
-                      subtitle: '我的频道',
-                      onTap: login,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                28,
-                20,
-                0,
-              ),
-              child: SizedBox(
-                height: 52,
-                child: FilledButton(
-                  onPressed: login,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: _ink,
-                    foregroundColor: _acid,
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(18),
-                    ),
-                  ),
-                  child: const Text(
-                    '登录 / 注册',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 60),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+  static const Color _background = Color(0xFFF4F1EA);
+  static const Color _ink = Color(0xFF161616);
+  static const Color _purple = Color(0xFF7657FF);
+  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
     BuildContext context,
     WidgetRef ref,
   ) {
-    final authAsync =
-        ref.watch(authProvider);
+    final authAsync = ref.watch(authProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (authAsync.isLoading) {
       return const Scaffold(
         backgroundColor: _background,
         body: Center(
-          child:
-              CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -226,43 +45,32 @@ class MyProfilePage extends ConsumerWidget {
       return _buildGuestContent(
         context,
         ref,
+        l10n,
       );
     }
 
-    final profileAsync =
-        ref.watch(myProfileProvider);
+    final profileAsync = ref.watch(myProfileProvider);
 
     return Scaffold(
       backgroundColor: _background,
       body: profileAsync.when(
         loading: () {
           return const Center(
-            child:
-                CircularProgressIndicator(),
+            child: CircularProgressIndicator(),
           );
         },
-        error: (
-          error,
-          stackTrace,
-        ) {
+        error: (error, stackTrace) {
           return SafeArea(
             child: Column(
               children: [
-                _buildTopBar(
-                  context,
-                ),
-
+                _buildTopBar(context, l10n),
                 Expanded(
                   child: Center(
                     child: FilledButton(
                       onPressed: () {
-                        ref.invalidate(
-                          myProfileProvider,
-                        );
+                        ref.invalidate(myProfileProvider);
                       },
-                      child: const Text(
-                        '重新加载',
-                      ),
+                      child: Text(l10n.reload),
                     ),
                   ),
                 ),
@@ -275,8 +83,123 @@ class MyProfilePage extends ConsumerWidget {
             context,
             ref,
             profile,
+            l10n,
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildGuestContent(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    Future<void> login() async {
+      await requireLogin(
+        context,
+        ref,
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: _background,
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: _buildTopBar(context, l10n),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 82,
+                      height: 82,
+                      decoration: BoxDecoration(
+                        color: _purple,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: const Icon(
+                        Icons.person_outline_rounded,
+                        color: Colors.white,
+                        size: 34,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.guest,
+                            style: const TextStyle(
+                              color: _ink,
+                              fontSize: 27,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.guestProfileSubtitle,
+                            style: const TextStyle(
+                              color: Color(0xFF77736C),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                child: _buildLibraryRow(
+                  context,
+                  l10n,
+                  submissionsTap: login,
+                  favoritesTap: login,
+                  historyTap: login,
+                  followingTap: login,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
+                child: SizedBox(
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: login,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _ink,
+                      foregroundColor: _acid,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.loginOrRegister,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 60),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -285,127 +208,89 @@ class MyProfilePage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     UserProfile profile,
+    AppLocalizations l10n,
   ) {
     return SafeArea(
       bottom: false,
       child: RefreshIndicator(
         onRefresh: () {
-          return ref
-              .read(
-                myProfileProvider
-                    .notifier,
-              )
-              .refresh();
+          return ref.read(myProfileProvider.notifier).refresh();
         },
         child: CustomScrollView(
-          physics:
-              const AlwaysScrollableScrollPhysics(
-            parent:
-                BouncingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
           slivers: [
             SliverToBoxAdapter(
-              child:
-                  _buildTopBar(context),
+              child: _buildTopBar(context, l10n),
             ),
-
             SliverToBoxAdapter(
-              child:
-                  _buildIdentity(profile),
+              child: _buildIdentity(profile),
             ),
-
             SliverToBoxAdapter(
-              child:
-                  _buildStats(profile),
+              child: _buildStats(
+                context,
+                profile,
+                l10n,
+              ),
             ),
-
             SliverToBoxAdapter(
-              child:
-                  _buildLibrary(context),
+              child: _buildLibrary(
+                context,
+                l10n,
+              ),
             ),
-
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding:
-                    EdgeInsets.fromLTRB(
-                  20,
-                  32,
-                  20,
-                  15,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 32, 20, 15),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
-                        '我的轨道',
-                        style: TextStyle(
+                        l10n.myTrack,
+                        style: const TextStyle(
                           color: _ink,
                           fontSize: 25,
-                          fontWeight:
-                              FontWeight
-                                  .w900,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
-
                     Text(
-                      'MY FRAMES',
-                      style: TextStyle(
-                        color: Color(
-                          0xFF99938A,
-                        ),
+                      l10n.myFrames,
+                      style: const TextStyle(
+                        color: Color(0xFF99938A),
                         fontSize: 9,
-                        fontWeight:
-                            FontWeight
-                                .w800,
-                        letterSpacing:
-                            1.4,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-
             SliverPadding(
-              padding:
-                  const EdgeInsets
-                      .symmetric(
-                horizontal: 18,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               sliver: SliverList(
-                delegate:
-                    SliverChildBuilderDelegate(
-                  (
-                    context,
-                    index,
-                  ) {
-                    final video =
-                        profile
-                            .videos[index];
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final video = profile.videos[index];
 
                     return Padding(
-                      padding:
-                          const EdgeInsets
-                              .only(
-                        bottom: 14,
-                      ),
+                      padding: const EdgeInsets.only(bottom: 14),
                       child: _buildVideo(
                         context,
                         video,
                         index,
+                        l10n,
                       ),
                     );
                   },
-                  childCount:
-                      profile.videos.length,
+                  childCount: profile.videos.length,
                 ),
               ),
             ),
-
             const SliverToBoxAdapter(
-              child:
-                  SizedBox(height: 50),
+              child: SizedBox(height: 50),
             ),
           ],
         ),
@@ -415,61 +300,44 @@ class MyProfilePage extends ConsumerWidget {
 
   Widget _buildTopBar(
     BuildContext context,
+    AppLocalizations l10n,
   ) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        12,
-        16,
-        10,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 12, 16, 10),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'MY SPACE',
-                  style: TextStyle(
+                  l10n.profileEyebrow,
+                  style: const TextStyle(
                     color: _purple,
                     fontSize: 9,
-                    fontWeight:
-                        FontWeight
-                            .w900,
+                    fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                   ),
                 ),
-
-                SizedBox(height: 3),
-
+                const SizedBox(height: 3),
                 Text(
-                  '我的',
-                  style: TextStyle(
+                  l10n.navProfile,
+                  style: const TextStyle(
                     color: _ink,
                     fontSize: 18,
-                    fontWeight:
-                        FontWeight
-                            .w900,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
           ),
-
           GestureDetector(
-            behavior:
-                HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (
-                    context,
-                  ) {
+                  builder: (context) {
                     return const SettingsPage();
                   },
                 ),
@@ -478,21 +346,12 @@ class MyProfilePage extends ConsumerWidget {
             child: Container(
               width: 42,
               height: 42,
-              decoration:
-                  BoxDecoration(
-                color: Colors.white
-                    .withOpacity(
-                  0.72,
-                ),
-                borderRadius:
-                    BorderRadius
-                        .circular(
-                  14,
-                ),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
-                Icons
-                    .settings_outlined,
+                Icons.settings_outlined,
                 size: 20,
               ),
             ),
@@ -502,116 +361,66 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentity(
-    UserProfile profile,
-  ) {
+  Widget _buildIdentity(UserProfile profile) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        22,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius:
-                BorderRadius.circular(
-              25,
-            ),
+            borderRadius: BorderRadius.circular(25),
             child: Container(
               width: 82,
               height: 82,
               color: _purple,
-              child:
-                  profile.avatarUrl.isEmpty
-                      ? Center(
-                          child: Text(
-                            profile
-                                    .displayName
-                                    .isEmpty
-                                ? '?'
-                                : profile
-                                    .displayName
-                                    .substring(
-                                      0,
-                                      1,
-                                    )
-                                    .toUpperCase(),
-                            style:
-                                const TextStyle(
-                              color:
-                                  Colors
-                                      .white,
-                              fontSize:
-                                  30,
-                              fontWeight:
-                                  FontWeight
-                                      .w900,
-                            ),
-                          ),
-                        )
-                      : Image.network(
-                          profile
-                              .avatarUrl,
-                          fit: BoxFit
-                              .cover,
+              child: profile.avatarUrl.isEmpty
+                  ? Center(
+                      child: Text(
+                        profile.displayName.isEmpty
+                            ? '?'
+                            : profile.displayName
+                                .substring(0, 1)
+                                .toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
                         ),
+                      ),
+                    )
+                  : Image.network(
+                      profile.avatarUrl,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
-
           const SizedBox(width: 16),
-
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   profile.displayName,
-                  style:
-                      const TextStyle(
+                  style: const TextStyle(
                     color: _ink,
                     fontSize: 27,
-                    fontWeight:
-                        FontWeight
-                            .w900,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-
-                const SizedBox(
-                  height: 5,
-                ),
-
+                const SizedBox(height: 5),
                 Text(
                   '@${profile.username}',
-                  style:
-                      const TextStyle(
-                    color: Color(
-                      0xFF77736C,
-                    ),
+                  style: const TextStyle(
+                    color: Color(0xFF77736C),
                     fontSize: 12,
-                    fontWeight:
-                        FontWeight
-                            .w700,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-
-                const SizedBox(
-                  height: 12,
-                ),
-
+                const SizedBox(height: 12),
                 Text(
                   profile.bio,
-                  style:
-                      const TextStyle(
-                    color: Color(
-                      0xFF4F4B45,
-                    ),
+                  style: const TextStyle(
+                    color: Color(0xFF4F4B45),
                     fontSize: 13,
                     height: 1.5,
                   ),
@@ -625,49 +434,33 @@ class MyProfilePage extends ConsumerWidget {
   }
 
   Widget _buildStats(
+    BuildContext context,
     UserProfile profile,
+    AppLocalizations l10n,
   ) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        24,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Container(
         height: 82,
         decoration: BoxDecoration(
           color: _ink,
-          borderRadius:
-              BorderRadius.circular(
-            25,
-          ),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Row(
           children: [
             _stat(
-              _count(
-                profile.followerCount,
-              ),
-              '关注者',
+              _count(context, profile.followerCount),
+              l10n.followers,
             ),
-
             _line(),
-
             _stat(
-              _count(
-                profile.followingCount,
-              ),
-              '关注',
+              _count(context, profile.followingCount),
+              l10n.followingStat,
             ),
-
             _line(),
-
             _stat(
-              profile.videoCount
-                  .toString(),
-              '投稿',
+              _count(context, profile.videoCount),
+              l10n.submissionsStat,
             ),
           ],
         ),
@@ -677,108 +470,103 @@ class MyProfilePage extends ConsumerWidget {
 
   Widget _buildLibrary(
     BuildContext context,
+    AppLocalizations l10n,
   ) {
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(
-        20,
-        24,
-        20,
-        0,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      child: _buildLibraryRow(
+        context,
+        l10n,
+        submissionsTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const MySubmissionsPage();
+              },
+            ),
+          );
+        },
+        favoritesTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const FavoriteVideosPage();
+              },
+            ),
+          );
+        },
+        historyTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const WatchHistoryPage();
+              },
+            ),
+          );
+        },
+        followingTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const FollowingCreatorsPage();
+              },
+            ),
+          );
+        },
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _libraryItem(
-              icon: Icons
-                  .video_library_outlined,
-              title: '投稿',
-              subtitle: '我的作品',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (
-                      context,
-                    ) {
-                      return const MySubmissionsPage();
-                    },
-                  ),
-                );
-              },
-            ),
+    );
+  }
+
+  Widget _buildLibraryRow(
+    BuildContext context,
+    AppLocalizations l10n, {
+    required VoidCallback submissionsTap,
+    required VoidCallback favoritesTap,
+    required VoidCallback historyTap,
+    required VoidCallback followingTap,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: _libraryItem(
+            icon: Icons.video_library_outlined,
+            title: l10n.submissions,
+            subtitle: l10n.myWorks,
+            onTap: submissionsTap,
           ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: _libraryItem(
-              icon: Icons
-                  .bookmark_border_rounded,
-              title: '收藏',
-              subtitle: '保存内容',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (
-                      context,
-                    ) {
-                      return const FavoriteVideosPage();
-                    },
-                  ),
-                );
-              },
-            ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _libraryItem(
+            icon: Icons.bookmark_border_rounded,
+            title: l10n.favorites,
+            subtitle: l10n.savedContent,
+            onTap: favoritesTap,
           ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: _libraryItem(
-              icon:
-                  Icons.history_rounded,
-              title: '历史',
-              subtitle: '观看轨迹',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (
-                      context,
-                    ) {
-                      return const WatchHistoryPage();
-                    },
-                  ),
-                );
-              },
-            ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _libraryItem(
+            icon: Icons.history_rounded,
+            title: l10n.history,
+            subtitle: l10n.watchHistory,
+            onTap: historyTap,
           ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: _libraryItem(
-              icon: Icons
-                  .people_outline_rounded,
-              title: '关注',
-              subtitle: '我的频道',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (
-                      context,
-                    ) {
-                      return const FollowingCreatorsPage();
-                    },
-                  ),
-                );
-              },
-            ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _libraryItem(
+            icon: Icons.people_outline_rounded,
+            title: l10n.followingStat,
+            subtitle: l10n.myChannels,
+            onTap: followingTap,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -789,67 +577,44 @@ class MyProfilePage extends ConsumerWidget {
     VoidCallback? onTap,
   }) {
     return GestureDetector(
-      behavior:
-          HitTestBehavior.opaque,
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         height: 105,
-        padding:
-            const EdgeInsets.all(
-          11,
-        ),
+        padding: const EdgeInsets.all(11),
         decoration: BoxDecoration(
-          color:
-              Colors.white.withOpacity(
-            0.72,
-          ),
-          borderRadius:
-              BorderRadius.circular(
-            20,
-          ),
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(
-              0xFFE3DED5,
-            ),
+            color: const Color(0xFFE3DED5),
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
               icon,
               color: _purple,
               size: 21,
             ),
-
             const Spacer(),
-
             Text(
               title,
-              style:
-                  const TextStyle(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
                 color: _ink,
                 fontSize: 13,
-                fontWeight:
-                    FontWeight.w800,
+                fontWeight: FontWeight.w800,
               ),
             ),
-
-            const SizedBox(
-              height: 2,
-            ),
-
+            const SizedBox(height: 2),
             Text(
               subtitle,
               maxLines: 1,
-              overflow:
-                  TextOverflow.ellipsis,
-              style:
-                  const TextStyle(
-                color: Color(
-                  0xFF99938A,
-                ),
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF99938A),
                 fontSize: 8,
               ),
             ),
@@ -863,17 +628,17 @@ class MyProfilePage extends ConsumerWidget {
     BuildContext context,
     ProfileVideo video,
     int index,
+    AppLocalizations l10n,
   ) {
+    final number = (index + 1).toString().padLeft(2, '0');
+
     return GestureDetector(
-      behavior:
-          HitTestBehavior.opaque,
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (
-              context,
-            ) {
+            builder: (context) {
               return VideoDetailPage(
                 videoId: video.id,
               );
@@ -884,76 +649,46 @@ class MyProfilePage extends ConsumerWidget {
       child: Container(
         height: 125,
         decoration: BoxDecoration(
-          color:
-              Colors.white.withOpacity(
-            0.72,
-          ),
-          borderRadius:
-              BorderRadius.circular(
-            23,
-          ),
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(23),
           border: Border.all(
-            color: const Color(
-              0xFFE3DED5,
-            ),
+            color: const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius:
-                  const BorderRadius
-                      .horizontal(
-                left: Radius.circular(
-                  22,
-                ),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(22),
               ),
               child: SizedBox(
                 width: 145,
-                height:
-                    double.infinity,
+                height: double.infinity,
                 child: Stack(
-                  fit:
-                      StackFit.expand,
+                  fit: StackFit.expand,
                   children: [
                     Image.network(
                       video.coverUrl,
-                      fit:
-                          BoxFit.cover,
+                      fit: BoxFit.cover,
                     ),
-
                     Positioned(
                       right: 8,
                       bottom: 8,
                       child: Container(
-                        padding:
-                            const EdgeInsets
-                                .symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 5,
                         ),
-                        decoration:
-                            BoxDecoration(
+                        decoration: BoxDecoration(
                           color: _ink,
-                          borderRadius:
-                              BorderRadius
-                                  .circular(
-                            12,
-                          ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _duration(
-                            video
-                                .durationSeconds,
-                          ),
-                          style:
-                              const TextStyle(
-                            color: Colors
-                                .white,
+                          _duration(video.durationSeconds),
+                          style: const TextStyle(
+                            color: Colors.white,
                             fontSize: 9,
-                            fontWeight:
-                                FontWeight
-                                    .w800,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -962,63 +697,41 @@ class MyProfilePage extends ConsumerWidget {
                 ),
               ),
             ),
-
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets
-                        .all(
-                  14,
-                ),
+                padding: const EdgeInsets.all(14),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'FRAME ${(index + 1).toString().padLeft(2, '0')}',
-                      style:
-                          const TextStyle(
+                      l10n.frameNumber(number),
+                      style: const TextStyle(
                         color: _purple,
                         fontSize: 8,
-                        fontWeight:
-                            FontWeight
-                                .w900,
-                        letterSpacing:
-                            1.3,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.3,
                       ),
                     ),
-
-                    const SizedBox(
-                      height: 7,
-                    ),
-
+                    const SizedBox(height: 7),
                     Expanded(
                       child: Text(
                         video.title,
                         maxLines: 3,
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-                        style:
-                            const TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
                           color: _ink,
                           fontSize: 15,
                           height: 1.25,
-                          fontWeight:
-                              FontWeight
-                                  .w800,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
-
                     Text(
-                      '${_count(video.viewCount)} 次观看',
-                      style:
-                          const TextStyle(
-                        color: Color(
-                          0xFF908A81,
-                        ),
+                      l10n.viewsCount(
+                        _count(context, video.viewCount),
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xFF908A81),
                         fontSize: 10,
                       ),
                     ),
@@ -1038,28 +751,22 @@ class MyProfilePage extends ConsumerWidget {
   ) {
     return Expanded(
       child: Column(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             value,
-            style:
-                const TextStyle(
+            style: const TextStyle(
               color: _acid,
               fontSize: 18,
-              fontWeight:
-                  FontWeight.w900,
+              fontWeight: FontWeight.w900,
             ),
           ),
-
-          const SizedBox(
-            height: 4,
-          ),
-
+          const SizedBox(height: 4),
           Text(
             label,
-            style:
-                const TextStyle(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
               color: Colors.white54,
               fontSize: 9,
             ),
@@ -1077,42 +784,23 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  static String _count(
+  String _count(
+    BuildContext context,
     int value,
   ) {
-    if (value >= 10000) {
-      final result =
-          value / 10000;
-
-      return '${result.toStringAsFixed(result >= 10 ? 0 : 1)}万';
-    }
-
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}k';
-    }
-
-    return value.toString();
+    final localeName = Localizations.localeOf(context).toString();
+    return NumberFormat.compact(
+      locale: localeName,
+    ).format(value);
   }
 
-  static String _duration(
-    int seconds,
-  ) {
-    final duration =
-        Duration(
-      seconds: seconds,
-    );
-
-    final minutes =
-        duration.inMinutes;
-
-    final remainingSeconds =
-        duration.inSeconds
-            .remainder(60)
-            .toString()
-            .padLeft(
-              2,
-              '0',
-            );
+  static String _duration(int seconds) {
+    final duration = Duration(seconds: seconds);
+    final minutes = duration.inMinutes;
+    final remainingSeconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
     return '$minutes:$remainingSeconds';
   }
