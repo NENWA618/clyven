@@ -27,6 +27,10 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
+      - name: Check localization completeness
+        working-directory: apps/clyven_app
+        run: dart run tool/check_l10n_keys.dart
+
       - name: Generate Flutter localizations
         working-directory: apps/clyven_app
         run: flutter gen-l10n
