@@ -1,4 +1,8 @@
+import 'package:clyven_app/core/localization/app_locale_provider.dart';
+import 'package:clyven_app/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../video/data/models/video_detail.dart';
 import '../../../video/presentation/providers/video_detail_provider.dart';
@@ -56,17 +60,17 @@ class HomeNotifier
     );
   }
 
-  // ============================================================
-  // 首次加载
-  // ============================================================
-
   @override
   Future<HomeState> build() async {
     const selectedTopic =
         '全部';
 
-    // 这里改成：
-    // 获取所有用户发布的视频。
+    final selectedLocale =
+        ref.watch(appLocaleProvider);
+
+    final locale =
+        _resolveLocale(selectedLocale);
+
     final publishedVideos =
         await ref.watch(
       allPublishedVideosProvider
@@ -78,6 +82,7 @@ class HomeNotifier
       topic: selectedTopic,
       publishedVideos:
           publishedVideos,
+      locale: locale,
     );
 
     return HomeState(
@@ -86,10 +91,6 @@ class HomeNotifier
       feed: feed,
     );
   }
-
-  // ============================================================
-  // 切换分类
-  // ============================================================
 
   Future<void> selectTopic(
     String topic,
@@ -113,11 +114,14 @@ class HomeNotifier
     state =
         await AsyncValue.guard(
       () async {
-        // 所有用户的视频。
         final publishedVideos =
             await ref.read(
           allPublishedVideosProvider
               .future,
+        );
+
+        final locale = _resolveLocale(
+          ref.read(appLocaleProvider),
         );
 
         final feed =
@@ -125,6 +129,7 @@ class HomeNotifier
           topic: topic,
           publishedVideos:
               publishedVideos,
+          locale: locale,
         );
 
         return HomeState(
@@ -135,10 +140,6 @@ class HomeNotifier
       },
     );
   }
-
-  // ============================================================
-  // 下拉刷新
-  // ============================================================
 
   Future<void> refresh() async {
     final currentState =
@@ -152,8 +153,6 @@ class HomeNotifier
     state =
         await AsyncValue.guard(
       () async {
-        // 强制重新从 Serverpod
-        // 查询所有用户的视频。
         ref.invalidate(
           allPublishedVideosProvider,
         );
@@ -164,11 +163,16 @@ class HomeNotifier
               .future,
         );
 
+        final locale = _resolveLocale(
+          ref.read(appLocaleProvider),
+        );
+
         final feed =
             await _loadFeed(
           topic: topic,
           publishedVideos:
               publishedVideos,
+          locale: locale,
         );
 
         return HomeState(
@@ -180,20 +184,21 @@ class HomeNotifier
     );
   }
 
-  // ============================================================
-  // 组合首页数据
-  // ============================================================
-
   Future<HomeFeed> _loadFeed({
     required String topic,
     required List<VideoDetail>
         publishedVideos,
+    required Locale locale,
   }) async {
     final originalFeed =
         await _repository
             .loadHomeFeed(
       topic: topic,
     );
+
+    final l10n =
+        await AppLocalizations.delegate
+            .load(locale);
 
     final uploadedVideos =
         publishedVideos
@@ -210,35 +215,49 @@ class HomeNotifier
               },
             )
             .map(
-              _toHomeVideo,
+              (video) => _toHomeVideo(
+                video,
+                l10n,
+                locale,
+              ),
+            )
+            .toList(
+              growable: false,
+            );
+
+    final localizedOriginalVideos =
+        originalFeed.videos
+            .map(
+              (video) =>
+                  _localizeMockVideo(
+                video,
+                l10n,
+                locale,
+              ),
             )
             .toList(
               growable: false,
             );
 
     return HomeFeed(
-      // 今日主片暂时继续用原来的 Mock。
       featuredVideo:
-          originalFeed
-              .featuredVideo,
-
-      // 所有用户真实投稿放前面。
+          _localizeMockVideo(
+        originalFeed.featuredVideo,
+        l10n,
+        locale,
+      ),
       videos:
           List.unmodifiable([
         ...uploadedVideos,
-
-        // 原来的演示视频继续保留。
-        ...originalFeed.videos,
+        ...localizedOriginalVideos,
       ]),
     );
   }
 
-  // ============================================================
-  // VideoDetail -> HomeVideo
-  // ============================================================
-
   HomeVideo _toHomeVideo(
     VideoDetail video,
+    AppLocalizations l10n,
+    Locale locale,
   ) {
     return HomeVideo(
       id: video.id,
@@ -255,13 +274,81 @@ class HomeNotifier
           _formatDuration(
         video.durationSeconds,
       ),
-      viewText:
-          '${_formatCount(video.viewCount)}次观看',
+      viewText: _formatViewText(
+        video.viewCount,
+        l10n,
+        locale,
+      ),
       coverUrl:
           video.coverUrl,
       videoUrl:
           video.videoUrl,
     );
+  }
+
+  HomeVideo _localizeMockVideo(
+    HomeVideo video,
+    AppLocalizations l10n,
+    Locale locale,
+  ) {
+    final viewCount =
+        int.tryParse(video.viewText);
+
+    if (viewCount == null) {
+      return video;
+    }
+
+    return HomeVideo(
+      id: video.id,
+      title: video.title,
+      description: video.description,
+      authorName: video.authorName,
+      category: video.category,
+      topic: video.topic,
+      duration: video.duration,
+      viewText: _formatViewText(
+        viewCount,
+        l10n,
+        locale,
+      ),
+      coverUrl: video.coverUrl,
+      videoUrl: video.videoUrl,
+    );
+  }
+
+  String _formatViewText(
+    int value,
+    AppLocalizations l10n,
+    Locale locale,
+  ) {
+    final compact =
+        NumberFormat.compact(
+      locale: locale.toString(),
+    ).format(value);
+
+    return l10n.viewsCount(compact);
+  }
+
+  Locale _resolveLocale(
+    Locale? selectedLocale,
+  ) {
+    final candidate =
+        selectedLocale ??
+            WidgetsBinding
+                .instance
+                .platformDispatcher
+                .locale;
+
+    for (final supportedLocale
+        in AppLocalizations
+            .supportedLocales) {
+      if (supportedLocale.languageCode ==
+          candidate.languageCode) {
+        return supportedLocale;
+      }
+    }
+
+    return const Locale('en');
   }
 
   String _formatDuration(
@@ -298,27 +385,6 @@ class HomeNotifier
     }
 
     return '${duration.inMinutes}:$remainingSeconds';
-  }
-
-  String _formatCount(
-    int value,
-  ) {
-    if (value >= 10000) {
-      final result =
-          value / 10000;
-
-      if (result >= 10) {
-        return '${result.toStringAsFixed(0)}万';
-      }
-
-      return '${result.toStringAsFixed(1)}万';
-    }
-
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}k';
-    }
-
-    return value.toString();
   }
 }
 
