@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/localization/localized_error_message.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,7 +98,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: Text(
-                    authAsync.error.toString(),
+                    localizedErrorMessage(
+                      l10n,
+                      authAsync.error,
+                    ),
                     style: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 12,
