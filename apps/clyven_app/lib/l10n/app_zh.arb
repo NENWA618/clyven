@@ -76,29 +76,11 @@
   "notificationsLoadFailed": "回响加载失败",
   "justNow": "刚刚",
   "minutesAgo": "{count} 分钟前",
-  "@minutesAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@minutesAgo": {"placeholders": {"count": {"type": "int"}}},
   "hoursAgo": "{count} 小时前",
-  "@hoursAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@hoursAgo": {"placeholders": {"count": {"type": "int"}}},
   "daysAgo": "{count} 天前",
-  "@daysAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@daysAgo": {"placeholders": {"count": {"type": "int"}}},
   "settingsEyebrow": "SETTINGS",
   "accountSectionEyebrow": "ACCOUNT",
   "accountSectionTitle": "账号",
@@ -114,5 +96,14 @@
   "aboutSubtitle": "版本与应用信息",
   "identitySectionEyebrow": "IDENTITY",
   "currentIdentity": "当前身份",
-  "logoutCurrentIdentity": "退出当前身份"
+  "logoutCurrentIdentity": "退出当前身份",
+  "commentEyebrow": "ECHO",
+  "discussionHappening": "讨论正在发生",
+  "noDiscussion": "还没有讨论\n留下第一条回响",
+  "reply": "回应",
+  "replyingTo": "回应 {name}",
+  "@replyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "writeReplyHint": "写下你的回应…",
+  "leaveEchoHint": "留下你的回响…",
+  "reloadComments": "重新加载评论"
 }
