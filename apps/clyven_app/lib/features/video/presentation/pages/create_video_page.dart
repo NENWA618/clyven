@@ -1,16 +1,11 @@
-import 'dart:io';
-
+import 'package:clyven_app/core/localization/localized_error_message.dart';
 import 'package:clyven_app/core/localization/localized_labels.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../data/models/video_upload_draft.dart';
 import '../providers/video_upload_queue_provider.dart';
 
 class CreateVideoPage extends ConsumerStatefulWidget {
@@ -47,115 +42,6 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     '城市',
     '纪录',
   ];
-
-  Future<String> _normalizeVideo(String inputPath) async {
-    final l10n = AppLocalizations.of(context)!;
-    final inputFile = File(inputPath);
-    final outputPath =
-        '${inputFile.parent.path}/normalized-${DateTime.now().microsecondsSinceEpoch}.mp4';
-
-    final session = await FFmpegKit.executeWithArguments(
-      [
-        '-y',
-        '-fflags',
-        '+genpts',
-        '-i',
-        inputPath,
-        '-map',
-        '0:v:0',
-        '-map',
-        '0:a?',
-        '-c',
-        'copy',
-        '-avoid_negative_ts',
-        'make_zero',
-        '-movflags',
-        '+faststart',
-        outputPath,
-      ],
-    );
-
-    final returnCode = await session.getReturnCode();
-
-    if (!ReturnCode.isSuccess(returnCode)) {
-      throw StateError(l10n.videoNormalizeFailed);
-    }
-
-    final outputFile = File(outputPath);
-
-    if (!await outputFile.exists()) {
-      throw StateError(l10n.normalizedVideoMissing);
-    }
-
-    return outputPath;
-  }
-
-  Future<String> _createVideoCover(String videoPath) async {
-    final l10n = AppLocalizations.of(context)!;
-    final videoFile = File(videoPath);
-    final outputPath =
-        '${videoFile.parent.path}/cover-${DateTime.now().microsecondsSinceEpoch}.jpg';
-
-    final session = await FFmpegKit.executeWithArguments(
-      [
-        '-y',
-        '-ss',
-        '1',
-        '-i',
-        videoPath,
-        '-frames:v',
-        '1',
-        '-q:v',
-        '2',
-        outputPath,
-      ],
-    );
-
-    final returnCode = await session.getReturnCode();
-
-    if (!ReturnCode.isSuccess(returnCode)) {
-      throw StateError(l10n.coverGenerationFailed);
-    }
-
-    final coverFile = File(outputPath);
-
-    if (!await coverFile.exists()) {
-      throw StateError(l10n.generatedCoverMissing);
-    }
-
-    final length = await coverFile.length();
-
-    if (length <= 0) {
-      throw StateError(l10n.generatedCoverEmpty);
-    }
-
-    return outputPath;
-  }
-
-  Future<int> _readVideoDuration(String path) async {
-    final session = await FFprobeKit.getMediaInformation(path);
-    final information = session.getMediaInformation();
-
-    if (information == null) {
-      debugPrint('FFprobe could not read video information');
-      return 0;
-    }
-
-    final rawDuration = information.getDuration();
-    debugPrint('FFprobe duration: $rawDuration');
-
-    if (rawDuration == null) {
-      return 0;
-    }
-
-    final seconds = double.tryParse(rawDuration);
-
-    if (seconds == null) {
-      return 0;
-    }
-
-    return seconds.round();
-  }
 
   @override
   void dispose() {
@@ -247,7 +133,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       });
 
       _showMessage(
-        l10n.enqueueUploadFailed(error.toString()),
+        l10n.enqueueUploadFailed(
+          localizedErrorMessage(l10n, error),
+        ),
       );
     }
   }
