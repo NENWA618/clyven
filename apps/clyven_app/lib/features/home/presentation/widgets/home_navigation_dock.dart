@@ -1,3 +1,4 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class HomeNavigationDock extends StatelessWidget {
@@ -19,6 +20,8 @@ class HomeNavigationDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(
         18,
@@ -46,16 +49,14 @@ class HomeNavigationDock extends StatelessWidget {
           children: [
             _buildItem(
               icon: Icons.blur_on_rounded,
-              label: '星轨',
+              label: l10n.navHome,
               index: 0,
             ),
-
             _buildItem(
               icon: Icons.explore_outlined,
-              label: '发现',
+              label: l10n.navDiscover,
               index: 1,
             ),
-
             Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -77,17 +78,15 @@ class HomeNavigationDock extends StatelessWidget {
                 ),
               ),
             ),
-
             _buildItem(
               icon: Icons.notifications_none_rounded,
-              label: '回响',
+              label: l10n.navEchoes,
               index: 2,
               badgeCount: unreadCount,
             ),
-
             _buildItem(
               icon: Icons.person_outline_rounded,
-              label: '我的',
+              label: l10n.navProfile,
               index: 3,
             ),
           ],
@@ -102,8 +101,7 @@ class HomeNavigationDock extends StatelessWidget {
     required int index,
     int badgeCount = 0,
   }) {
-    final selected =
-        selectedIndex == index;
+    final selected = selectedIndex == index;
 
     return Expanded(
       child: GestureDetector(
@@ -120,56 +118,44 @@ class HomeNavigationDock extends StatelessWidget {
                 Icon(
                   icon,
                   size: 22,
-                  color: selected
-                      ? _acidColor
-                      : Colors.white54,
+                  color: selected ? _acidColor : Colors.white54,
                 ),
-
                 if (badgeCount > 0)
                   Positioned(
                     right: -9,
                     top: -7,
                     child: Container(
-                      constraints:
-                          const BoxConstraints(
+                      constraints: const BoxConstraints(
                         minWidth: 17,
                         minHeight: 17,
                       ),
-                      padding:
-                          const EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 4,
                       ),
                       alignment: Alignment.center,
-                      decoration:
-                          const BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: _acidColor,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
-                        badgeCount > 99
-                            ? '99+'
-                            : badgeCount.toString(),
-                        style:
-                            const TextStyle(
+                        badgeCount > 99 ? '99+' : badgeCount.toString(),
+                        style: const TextStyle(
                           color: _inkColor,
                           fontSize: 8,
-                          fontWeight:
-                              FontWeight.w900,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
                   ),
               ],
             ),
-
             const SizedBox(height: 4),
-
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: selected
-                    ? _acidColor
-                    : Colors.white54,
+                color: selected ? _acidColor : Colors.white54,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
               ),
