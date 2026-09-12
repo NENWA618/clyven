@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#F4F1EA",
     "theme_color": "#7657FF",
-    "description": "Clyven is a multilingual video and subtitle platform.",
+    "description": "Clyven is a multilingual video and subtitle platform. Clyven 是一个多语言视频与字幕平台。",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
