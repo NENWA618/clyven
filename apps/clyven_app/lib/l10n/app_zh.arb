@@ -121,5 +121,7 @@
   "followingStat": "关注",
   "submissionsStat": "投稿",
   "viewsCount": "{count} 次观看",
-  "@viewsCount": {"placeholders": {"count": {"type": "String"}}}
+  "@viewsCount": {"placeholders": {"count": {"type": "String"}}},
+  "frameNumber": "FRAME {number}",
+  "@frameNumber": {"placeholders": {"number": {"type": "String"}}}
 }
