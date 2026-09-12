@@ -1,19 +1,16 @@
+import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../models/app_user.dart';
 import 'auth_repository.dart';
 
-class ServerpodAuthRepository
-    implements AuthRepository {
+class ServerpodAuthRepository implements AuthRepository {
   final Client client;
 
-  late final EmailAuthController
-      _emailController =
-      EmailAuthController(
+  late final EmailAuthController _emailController = EmailAuthController(
     client: client,
-    startScreen:
-        EmailFlowScreen.login,
+    startScreen: EmailFlowScreen.login,
   );
 
   ServerpodAuthRepository({
@@ -36,18 +33,17 @@ class ServerpodAuthRepository
     required String account,
     required String password,
   }) async {
-    final email =
-        account.trim().toLowerCase();
+    final email = account.trim().toLowerCase();
 
     if (email.isEmpty) {
-      throw StateError(
-        '请输入邮箱',
+      throw const AppException(
+        AppErrorCode.emailRequired,
       );
     }
 
     if (password.isEmpty) {
-      throw StateError(
-        '请输入密码',
+      throw const AppException(
+        AppErrorCode.passwordRequired,
       );
     }
 
@@ -55,36 +51,31 @@ class ServerpodAuthRepository
       EmailFlowScreen.login,
     );
 
-    _emailController
-        .emailController
-        .text = email;
-
-    _emailController
-        .passwordController
-        .text = password;
+    _emailController.emailController.text = email;
+    _emailController.passwordController.text = password;
 
     await _emailController.login();
 
     if (!_emailController.isAuthenticated) {
-      throw StateError(
-        _emailController.errorMessage ??
-            '邮箱或密码错误',
+      throw AppException(
+        AppErrorCode.invalidCredentials,
+        technicalDetails: _emailController.errorMessage,
       );
     }
 
     return _loadCurrentUser();
   }
 
-  // 真实 Serverpod 注册必须经过邮箱验证码。
-  // 暂时保留这个方法只是为了兼容现有 RegisterPage。
+  // Real Serverpod registration must go through email verification first.
+  // This method remains only for compatibility with the existing repository API.
   @override
   Future<AppUser> register({
     required String username,
     required String displayName,
     required String password,
   }) {
-    throw StateError(
-      '真实账号需要先验证邮箱',
+    throw const AppException(
+      AppErrorCode.emailVerificationRequired,
     );
   }
 
@@ -92,13 +83,11 @@ class ServerpodAuthRepository
   Future<void> startRegistration({
     required String email,
   }) async {
-    final normalizedEmail =
-        email.trim().toLowerCase();
+    final normalizedEmail = email.trim().toLowerCase();
 
-    if (normalizedEmail.isEmpty ||
-        !normalizedEmail.contains('@')) {
-      throw StateError(
-        '请输入有效邮箱',
+    if (normalizedEmail.isEmpty || !normalizedEmail.contains('@')) {
+      throw const AppException(
+        AppErrorCode.invalidEmail,
       );
     }
 
@@ -106,18 +95,17 @@ class ServerpodAuthRepository
       EmailFlowScreen.startRegistration,
     );
 
-    _emailController
-        .emailController
-        .text = normalizedEmail;
+    _emailController.emailController.text = normalizedEmail;
 
-    await _emailController
-        .startRegistration();
+    await _emailController.startRegistration();
 
-    final error =
-        _emailController.errorMessage;
+    final error = _emailController.errorMessage;
 
     if (error != null) {
-      throw StateError(error);
+      throw AppException(
+        AppErrorCode.authOperationFailed,
+        technicalDetails: error,
+      );
     }
   }
 
@@ -125,27 +113,25 @@ class ServerpodAuthRepository
   Future<void> verifyRegistrationCode({
     required String code,
   }) async {
-    final normalizedCode =
-        code.trim();
+    final normalizedCode = code.trim();
 
     if (normalizedCode.isEmpty) {
-      throw StateError(
-        '请输入验证码',
+      throw const AppException(
+        AppErrorCode.verificationCodeRequired,
       );
     }
 
-    _emailController
-        .verificationCodeController
-        .text = normalizedCode;
+    _emailController.verificationCodeController.text = normalizedCode;
 
-    await _emailController
-        .verifyRegistrationCode();
+    await _emailController.verifyRegistrationCode();
 
-    final error =
-        _emailController.errorMessage;
+    final error = _emailController.errorMessage;
 
     if (error != null) {
-      throw StateError(error);
+      throw AppException(
+        AppErrorCode.invalidVerificationCode,
+        technicalDetails: error,
+      );
     }
   }
 
@@ -155,54 +141,43 @@ class ServerpodAuthRepository
     required String displayName,
     required String password,
   }) async {
-    final normalizedUsername =
-        username.trim();
-
-    final normalizedDisplayName =
-        displayName.trim();
+    final normalizedUsername = username.trim();
+    final normalizedDisplayName = displayName.trim();
 
     if (normalizedUsername.isEmpty) {
-      throw StateError(
-        '用户名不能为空',
+      throw const AppException(
+        AppErrorCode.usernameRequired,
       );
     }
 
     if (normalizedDisplayName.isEmpty) {
-      throw StateError(
-        '显示名称不能为空',
+      throw const AppException(
+        AppErrorCode.displayNameRequired,
       );
     }
 
-    // Serverpod Email IdP 默认最低 8 位。
     if (password.length < 8) {
-      throw StateError(
-        '密码至少需要 8 个字符',
+      throw const AppException(
+        AppErrorCode.passwordTooShort8,
       );
     }
 
-    _emailController
-        .passwordController
-        .text = password;
+    _emailController.passwordController.text = password;
 
-    await _emailController
-        .finishRegistration();
+    await _emailController.finishRegistration();
 
     if (!_emailController.isAuthenticated) {
-      throw StateError(
-        _emailController.errorMessage ??
-            '注册失败',
+      throw AppException(
+        AppErrorCode.registrationFailed,
+        technicalDetails: _emailController.errorMessage,
       );
     }
 
-    // 注册成功后写入社区用户名。
-    await client.userProfileEdit
-        .changeUserName(
+    await client.userProfileEdit.changeUserName(
       normalizedUsername,
     );
 
-    // 写入显示名称。
-    await client.userProfileEdit
-        .changeFullName(
+    await client.userProfileEdit.changeFullName(
       normalizedDisplayName,
     );
 
@@ -215,28 +190,17 @@ class ServerpodAuthRepository
   }
 
   Future<AppUser> _loadCurrentUser() async {
-    final profile =
-        await client.userProfileEdit.get();
+    final profile = await client.userProfileEdit.get();
 
-    final username =
-        profile.userName ??
-        profile.email ??
-        '';
-
+    final username = profile.userName ?? profile.email ?? '';
     final displayName =
-        profile.fullName ??
-        profile.userName ??
-        profile.email ??
-        '';
+        profile.fullName ?? profile.userName ?? profile.email ?? '';
 
     return AppUser(
-      id:
-          profile.authUserId.toString(),
+      id: profile.authUserId.toString(),
       username: username,
       displayName: displayName,
-      avatarUrl:
-          profile.imageUrl?.toString() ??
-          '',
+      avatarUrl: profile.imageUrl?.toString() ?? '',
     );
   }
 }
