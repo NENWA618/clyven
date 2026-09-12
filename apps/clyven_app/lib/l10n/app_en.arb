@@ -105,5 +105,21 @@
   "@replyingTo": {"placeholders": {"name": {"type": "String"}}},
   "writeReplyHint": "Write your reply…",
   "leaveEchoHint": "Leave your echo…",
-  "reloadComments": "Reload comments"
+  "reloadComments": "Reload comments",
+  "profileEyebrow": "MY SPACE",
+  "guest": "Guest",
+  "guestProfileSubtitle": "Log in to view your profile and content",
+  "submissions": "Submissions",
+  "myWorks": "My work",
+  "favorites": "Favorites",
+  "savedContent": "Saved content",
+  "history": "History",
+  "myChannels": "My channels",
+  "loginOrRegister": "Log in / Register",
+  "myTrack": "My track",
+  "myFrames": "MY FRAMES",
+  "followingStat": "Following",
+  "submissionsStat": "Posts",
+  "viewsCount": "{count} views",
+  "@viewsCount": {"placeholders": {"count": {"type": "String"}}}
 }
