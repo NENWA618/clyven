@@ -105,5 +105,21 @@
   "@replyingTo": {"placeholders": {"name": {"type": "String"}}},
   "writeReplyHint": "写下你的回应…",
   "leaveEchoHint": "留下你的回响…",
-  "reloadComments": "重新加载评论"
+  "reloadComments": "重新加载评论",
+  "profileEyebrow": "MY SPACE",
+  "guest": "游客",
+  "guestProfileSubtitle": "登录后查看你的个人资料与内容",
+  "submissions": "投稿",
+  "myWorks": "我的作品",
+  "favorites": "收藏",
+  "savedContent": "保存内容",
+  "history": "历史",
+  "myChannels": "我的频道",
+  "loginOrRegister": "登录 / 注册",
+  "myTrack": "我的轨道",
+  "myFrames": "MY FRAMES",
+  "followingStat": "关注",
+  "submissionsStat": "投稿",
+  "viewsCount": "{count} 次观看",
+  "@viewsCount": {"placeholders": {"count": {"type": "String"}}}
 }
