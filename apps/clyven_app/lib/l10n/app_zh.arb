@@ -1,0 +1,9 @@
+{
+  "login": "登录",
+  "register": "注册",
+  "cancel": "取消",
+  "account": "账号",
+  "password": "密码",
+  "reload": "重新加载",
+  "settings": "设置"
+}

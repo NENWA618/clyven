@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/auth/presentation/auth_gate.dart';
+import 'l10n/app_localizations.dart';
+
 void main() {
   runApp(
     const ProviderScope(
@@ -16,11 +18,19 @@ class ClyvenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      home: const AuthGate(),
-    );
+    debugShowCheckedModeBanner: false,
+
+    localizationsDelegates:
+        AppLocalizations.localizationsDelegates,
+
+    supportedLocales:
+        AppLocalizations.supportedLocales,
+
+    theme: ThemeData(
+      useMaterial3: true,
+    ),
+
+    home: const AuthGate(),
+  );
   }
 }
