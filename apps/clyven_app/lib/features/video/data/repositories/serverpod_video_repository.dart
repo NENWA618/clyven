@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart'
     as serverpod;
 import 'package:serverpod_client/serverpod_client.dart';
@@ -30,7 +31,9 @@ class ServerpodVideoRepository
         await client.video.getVideo(id);
 
     if (video == null) {
-      throw StateError('视频不存在');
+      throw const AppException(
+        AppErrorCode.videoNotFound,
+      );
     }
 
     return _toVideoDetailWithUrls(
@@ -190,8 +193,9 @@ class ServerpodVideoRepository
         File(localPath);
 
     if (!await file.exists()) {
-      throw StateError(
-        '上传文件不存在：$localPath',
+      throw AppException(
+        AppErrorCode.uploadFileMissing,
+        technicalDetails: localPath,
       );
     }
 
@@ -199,8 +203,9 @@ class ServerpodVideoRepository
         await file.length();
 
     if (fileSize <= 0) {
-      throw StateError(
-        '上传文件为空：$localPath',
+      throw AppException(
+        AppErrorCode.uploadFileEmpty,
+        technicalDetails: localPath,
       );
     }
 
@@ -213,8 +218,9 @@ class ServerpodVideoRepository
 
     if (uploadDescription ==
         null) {
-      throw StateError(
-        '无法创建文件上传任务：$storageKey',
+      throw AppException(
+        AppErrorCode.uploadDescriptionFailed,
+        technicalDetails: storageKey,
       );
     }
 
@@ -230,8 +236,9 @@ class ServerpodVideoRepository
     );
 
     if (!uploaded) {
-      throw StateError(
-        '文件上传失败：$storageKey',
+      throw AppException(
+        AppErrorCode.uploadFailed,
+        technicalDetails: storageKey,
       );
     }
 
@@ -242,8 +249,9 @@ class ServerpodVideoRepository
     );
 
     if (!verified) {
-      throw StateError(
-        '文件上传验证失败：$storageKey',
+      throw AppException(
+        AppErrorCode.uploadVerificationFailed,
+        technicalDetails: storageKey,
       );
     }
   }
@@ -271,8 +279,9 @@ class ServerpodVideoRepository
     );
 
     if (videoUrl.isEmpty) {
-      throw StateError(
-        '无法获取视频播放地址',
+      throw AppException(
+        AppErrorCode.videoUrlUnavailable,
+        technicalDetails: video.videoStorageKey,
       );
     }
 
