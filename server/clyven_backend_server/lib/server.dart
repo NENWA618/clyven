@@ -112,8 +112,8 @@ Future<void> _sendRegistrationCode(
 }) async {
   await _sendVerificationEmail(
     email: email,
-    subject: 'Glyphora 注册验证码',
-    title: '欢迎加入 Glyphora',
+    subject: 'Clyven verification code / Clyven 注册验证码',
+    title: 'Welcome to Clyven / 欢迎加入 Clyven',
     verificationCode: verificationCode,
   );
 }
@@ -127,8 +127,8 @@ Future<void> _sendPasswordResetCode(
 }) async {
   await _sendVerificationEmail(
     email: email,
-    subject: 'Glyphora 密码重置验证码',
-    title: '重置你的 Glyphora 密码',
+    subject: 'Clyven password reset code / Clyven 密码重置验证码',
+    title: 'Reset your Clyven password / 重置你的 Clyven 密码',
     verificationCode: verificationCode,
   );
 }
@@ -145,13 +145,13 @@ Future<void> _sendVerificationEmail({
 
   if (smtpEmail == null || smtpEmail.isEmpty) {
     throw StateError(
-      '没有配置 SMTP_EMAIL',
+      'SMTP_EMAIL is not configured',
     );
   }
 
   if (smtpPassword == null || smtpPassword.isEmpty) {
     throw StateError(
-      '没有配置 SMTP_APP_PASSWORD',
+      'SMTP_APP_PASSWORD is not configured',
     );
   }
 
@@ -163,7 +163,7 @@ Future<void> _sendVerificationEmail({
   final message = mailer.Message()
     ..from = mailer.Address(
       smtpEmail,
-      'Glyphora',
+      'Clyven',
     )
     ..recipients.add(email)
     ..subject = subject
@@ -171,15 +171,15 @@ Future<void> _sendVerificationEmail({
         '''
 $title
 
-你的验证码是：
+Your verification code is / 你的验证码是：
 
 $verificationCode
 
-验证码仅用于本次操作。
+This code is only for this request. / 验证码仅用于本次操作。
 
-如果这不是你的操作，请忽略这封邮件。
+If this wasn't you, you can ignore this email. / 如果这不是你的操作，请忽略这封邮件。
 
-Glyphora
+Clyven
 ''';
 
   await mailer.send(
