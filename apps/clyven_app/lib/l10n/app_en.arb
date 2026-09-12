@@ -76,29 +76,11 @@
   "notificationsLoadFailed": "Failed to load echoes",
   "justNow": "Just now",
   "minutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
-  "@minutesAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@minutesAgo": {"placeholders": {"count": {"type": "int"}}},
   "hoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
-  "@hoursAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@hoursAgo": {"placeholders": {"count": {"type": "int"}}},
   "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
-  "@daysAgo": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
+  "@daysAgo": {"placeholders": {"count": {"type": "int"}}},
   "settingsEyebrow": "SETTINGS",
   "accountSectionEyebrow": "ACCOUNT",
   "accountSectionTitle": "Account",
@@ -114,5 +96,14 @@
   "aboutSubtitle": "Version and app information",
   "identitySectionEyebrow": "IDENTITY",
   "currentIdentity": "Current identity",
-  "logoutCurrentIdentity": "Log out of this identity"
+  "logoutCurrentIdentity": "Log out of this identity",
+  "commentEyebrow": "ECHO",
+  "discussionHappening": "The discussion is happening",
+  "noDiscussion": "No discussion yet\nLeave the first echo",
+  "reply": "Reply",
+  "replyingTo": "Replying to {name}",
+  "@replyingTo": {"placeholders": {"name": {"type": "String"}}},
+  "writeReplyHint": "Write your reply…",
+  "leaveEchoHint": "Leave your echo…",
+  "reloadComments": "Reload comments"
 }
