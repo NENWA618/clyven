@@ -19,19 +19,23 @@ class MockHomeRepository implements HomeRepository {
     );
 
     const featuredVideo = HomeVideo(
-      id: 'featured-001',
-      title: '沿着旧铁路，寻找逐渐消失的声音',
-      description: '一部关于地方语言、记忆和迁徙的影像记录。',
-      authorName: '语言群岛',
-      category: '纪录',
-      topic: '纪录',
-      duration: '38:20',
-      viewText: '214000',
-      coverUrl:
-          'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'
-          '?auto=format&fit=crop&w=1400&q=85',
-      videoUrl: '',
-    );
+    id: 'featured-en-001',
+    title: 'The Last Voices Along the Old Railway',
+    description:
+        'A journey through language, memory, migration and the communities that still keep these voices alive.',
+    authorName: 'Atlas of Voices',
+
+    // 这里继续用内部稳定分类值，不要改成 Documentary
+    category: '纪录',
+    topic: '纪录',
+
+    duration: '24:18',
+    viewText: '328000',
+    coverUrl:
+        'https://images.unsplash.com/photo-1473445361085-b9a07f55608b'
+        '?auto=format&fit=crop&w=1400&q=85',
+    videoUrl: '',
+  );
 
     const allVideos = <HomeVideo>[
       HomeVideo(
@@ -87,6 +91,20 @@ class MockHomeRepository implements HomeRepository {
         viewText: '61000',
         coverUrl:
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'
+            '?auto=format&fit=crop&w=1200&q=80',
+        videoUrl: '',
+      ),
+      HomeVideo(
+        id: 'featured-zh-001',
+        title: '沿着旧铁路，寻找逐渐消失的声音',
+        description: '一部关于地方语言、记忆和迁徙的影像记录。',
+        authorName: '语言群岛',
+        category: '纪录',
+        topic: '纪录',
+        duration: '38:20',
+        viewText: '214000',
+        coverUrl:
+            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee'
             '?auto=format&fit=crop&w=1200&q=80',
         videoUrl: '',
       ),

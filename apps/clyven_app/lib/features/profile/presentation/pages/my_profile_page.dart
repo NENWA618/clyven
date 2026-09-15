@@ -522,107 +522,125 @@ class MyProfilePage extends ConsumerWidget {
   }
 
   Widget _buildLibraryRow(
-    BuildContext context,
-    AppLocalizations l10n, {
-    required VoidCallback submissionsTap,
-    required VoidCallback favoritesTap,
-    required VoidCallback historyTap,
-    required VoidCallback followingTap,
-  }) {
-    return Row(
-      children: [
-        Expanded(
-          child: _libraryItem(
-            icon: Icons.video_library_outlined,
-            title: l10n.submissions,
-            subtitle: l10n.myWorks,
-            onTap: submissionsTap,
+  BuildContext context,
+  AppLocalizations l10n, {
+  required VoidCallback submissionsTap,
+  required VoidCallback favoritesTap,
+  required VoidCallback historyTap,
+  required VoidCallback followingTap,
+}) {
+  return Column(
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: _libraryItem(
+              icon: Icons.video_library_outlined,
+              title: l10n.submissions,
+              subtitle: l10n.myWorks,
+              onTap: submissionsTap,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _libraryItem(
-            icon: Icons.bookmark_border_rounded,
-            title: l10n.favorites,
-            subtitle: l10n.savedContent,
-            onTap: favoritesTap,
+          const SizedBox(width: 10),
+          Expanded(
+            child: _libraryItem(
+              icon: Icons.bookmark_border_rounded,
+              title: l10n.favorites,
+              subtitle: l10n.savedContent,
+              onTap: favoritesTap,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _libraryItem(
-            icon: Icons.history_rounded,
-            title: l10n.history,
-            subtitle: l10n.watchHistory,
-            onTap: historyTap,
+        ],
+      ),
+      const SizedBox(height: 10),
+      Row(
+        children: [
+          Expanded(
+            child: _libraryItem(
+              icon: Icons.history_rounded,
+              title: l10n.history,
+              subtitle: l10n.watchHistory,
+              onTap: historyTap,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _libraryItem(
-            icon: Icons.people_outline_rounded,
-            title: l10n.followingStat,
-            subtitle: l10n.myChannels,
-            onTap: followingTap,
+          const SizedBox(width: 10),
+          Expanded(
+            child: _libraryItem(
+              icon: Icons.people_outline_rounded,
+              title: l10n.followingStat,
+              subtitle: l10n.myChannels,
+              onTap: followingTap,
+            ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      ),
+    ],
+  );
+}
 
-  Widget _libraryItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        height: 105,
-        padding: const EdgeInsets.all(11),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              color: _purple,
-              size: 21,
-            ),
-            const Spacer(),
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: _ink,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFF99938A),
-                fontSize: 8,
-              ),
-            ),
-          ],
+Widget _libraryItem({
+  required IconData icon,
+  required String title,
+  required String subtitle,
+  VoidCallback? onTap,
+}) {
+  return GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: onTap,
+    child: Container(
+      height: 100,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE3DED5),
         ),
       ),
-    );
-  }
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: _purple.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              icon,
+              color: _purple,
+              size: 20,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            softWrap: false,
+            style: const TextStyle(
+              color: _ink,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            softWrap: false,
+            style: const TextStyle(
+              color: Color(0xFF99938A),
+              fontSize: 9,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildVideo(
     BuildContext context,

@@ -11,8 +11,50 @@ abstract class NotificationRepository {
 
 class MockNotificationRepository
     implements NotificationRepository {
-  final List<AppNotification>
-      _notifications = [
+  final List<AppNotification> _notifications = [
+  AppNotification(
+    id: 'notification-001',
+    type: AppNotificationType.comment,
+    actorName: 'Harbor Signal',
+    contentPreview: 'This perspective is really interesting.',
+    createdAt: DateTime(
+      2026,
+      8,
+      7,
+      12,
+      30,
+    ),
+    isRead: false,
+    videoId: 'video-001',
+  ),
+  AppNotification(
+    id: 'notification-002',
+    type: AppNotificationType.like,
+    actorName: 'Atlas of Voices',
+    createdAt: DateTime(
+      2026,
+      8,
+      7,
+      10,
+      15,
+    ),
+    isRead: false,
+    videoId: 'video-002',
+  ),
+  AppNotification(
+    id: 'notification-003',
+    type: AppNotificationType.follow,
+    actorName: 'Boundary Archive',
+    createdAt: DateTime(
+      2026,
+      8,
+      6,
+      20,
+      40,
+    ),
+    isRead: true,
+  ),
+
     AppNotification(
       id: 'notification-001',
       type: AppNotificationType.comment,
