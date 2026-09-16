@@ -1,6 +1,7 @@
 name: clyven_studio
 description: A new Jaspr project
 version: 0.0.1
+publish_to: none
 
 environment:
   sdk: ^3.10.0

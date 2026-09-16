@@ -1,6 +1,8 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import '../services/subtitle_srt_parser.dart';
+import '../services/subtitle_srt_exporter.dart';
 
 class SubtitleEndpoint extends Endpoint {
   Future<List<SubtitleCueDetail>> getCueDetails(
@@ -8,50 +10,484 @@ class SubtitleEndpoint extends Endpoint {
     required int videoId,
     required String languageCode,
   }) async {
-    // 1. 找到这个视频对应语言的字幕轨
     final track = await SubtitleTrack.db.findFirstRow(
       session,
       where: (t) =>
-          t.videoId.equals(videoId) &
-          t.languageCode.equals(languageCode),
+          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
     );
 
     if (track == null) {
       return [];
     }
 
-    // 2. 找这个字幕轨的所有字幕句
     final cues = await SubtitleCue.db.find(
       session,
       where: (c) => c.trackId.equals(track.id),
       orderBy: (c) => c.startMs,
     );
 
-    final result = <SubtitleCueDetail>[];
+    if (cues.isEmpty) {
+      return [];
+    }
 
-    // 3. 每一句分别找 Token 和 Phrase
-    for (final cue in cues) {
-      final tokens = await SubtitleToken.db.find(
-        session,
-        where: (t) => t.cueId.equals(cue.id),
-        orderBy: (t) => t.position,
-      );
+    final cueIds = cues.map((cue) => cue.id).whereType<int>().toSet();
 
-      final phrases = await SubtitlePhrase.db.find(
-        session,
-        where: (p) => p.cueId.equals(cue.id),
-        orderBy: (p) => p.startPosition,
-      );
+    final tokens = await SubtitleToken.db.find(
+      session,
+      where: (t) => t.cueId.inSet(cueIds),
+      orderBy: (t) => t.position,
+    );
 
-      result.add(
+    final phrases = await SubtitlePhrase.db.find(
+      session,
+      where: (p) => p.cueId.inSet(cueIds),
+      orderBy: (p) => p.startPosition,
+    );
+
+    final tokensByCueId = <int, List<SubtitleToken>>{};
+
+    for (final token in tokens) {
+      tokensByCueId
+          .putIfAbsent(
+            token.cueId,
+            () => [],
+          )
+          .add(token);
+    }
+
+    final phrasesByCueId = <int, List<SubtitlePhrase>>{};
+
+    for (final phrase in phrases) {
+      phrasesByCueId
+          .putIfAbsent(
+            phrase.cueId,
+            () => [],
+          )
+          .add(phrase);
+    }
+
+    return [
+      for (final cue in cues)
         SubtitleCueDetail(
           cue: cue,
-          tokens: tokens,
-          phrases: phrases,
+          tokens: cue.id == null ? [] : tokensByCueId[cue.id!] ?? [],
+          phrases: cue.id == null ? [] : phrasesByCueId[cue.id!] ?? [],
         ),
+    ];
+  }
+
+  Future<SubtitleSrtPreview> previewSrtImport(
+    Session session, {
+    required int videoId,
+    required String languageCode,
+    required String content,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能导入字幕');
+    }
+
+    final track = await SubtitleTrack.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+    );
+
+    if (track == null) {
+      throw Exception('找不到字幕轨');
+    }
+
+    final video = await Video.db.findById(
+      session,
+      videoId,
+    );
+
+    if (video == null) {
+      throw Exception('找不到视频');
+    }
+
+    final parser = SubtitleSrtParser();
+    final result = parser.parse(content);
+
+    final durationErrors = _validateCueDuration(
+      result.cues,
+      video.durationSeconds * 1000,
+    );
+
+    result.errors.addAll(durationErrors);
+
+    return SubtitleSrtPreview(
+      cueCount: result.cues.length,
+      errorCount: result.errors.length,
+      errors: result.errors,
+      canImport: result.canImport,
+    );
+  }
+
+  Future<int> confirmReplaceSrtImport(
+    Session session, {
+    required int videoId,
+    required String languageCode,
+    required String content,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能导入字幕');
+    }
+
+    final video = await Video.db.findById(
+      session,
+      videoId,
+    );
+
+    if (video == null) {
+      throw Exception('找不到视频');
+    }
+
+    final parser = SubtitleSrtParser();
+    final result = parser.parse(content);
+
+    final durationErrors = _validateCueDuration(
+      result.cues,
+      video.durationSeconds * 1000,
+    );
+
+    result.errors.addAll(durationErrors);
+
+    if (!result.canImport) {
+      throw Exception(
+        'SRT 存在 ${result.errors.length} 个错误，无法导入',
       );
     }
 
-    return result;
+    if (result.cues.isEmpty) {
+      throw Exception('SRT 中没有可导入的字幕');
+    }
+
+    final track = await SubtitleTrack.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+    );
+
+    if (track == null || track.id == null) {
+      throw Exception('找不到字幕轨');
+    }
+
+    final trackId = track.id!;
+
+    await session.db.transaction(
+      (transaction) async {
+        final existingCues = await SubtitleCue.db.find(
+          session,
+          where: (c) => c.trackId.equals(trackId),
+          transaction: transaction,
+        );
+
+        for (final cue in existingCues) {
+          final cueId = cue.id;
+
+          if (cueId == null) {
+            continue;
+          }
+
+          await SubtitleToken.db.deleteWhere(
+            session,
+            where: (t) => t.cueId.equals(cueId),
+            transaction: transaction,
+          );
+
+          await SubtitlePhrase.db.deleteWhere(
+            session,
+            where: (p) => p.cueId.equals(cueId),
+            transaction: transaction,
+          );
+        }
+
+        await SubtitleCue.db.deleteWhere(
+          session,
+          where: (c) => c.trackId.equals(trackId),
+          transaction: transaction,
+        );
+
+        for (final parsedCue in result.cues) {
+          final cue = SubtitleCue(
+            trackId: trackId,
+            startMs: parsedCue.startMs,
+            endMs: parsedCue.endMs,
+            text: parsedCue.text,
+          );
+
+          await SubtitleCue.db.insertRow(
+            session,
+            cue,
+            transaction: transaction,
+          );
+        }
+      },
+    );
+
+    return result.cues.length;
+  }
+
+  Future<String> exportSrt(
+    Session session, {
+    required int videoId,
+    required String languageCode,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能导出字幕');
+    }
+
+    final track = await SubtitleTrack.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+    );
+
+    if (track == null || track.id == null) {
+      throw Exception('找不到字幕轨');
+    }
+
+    final cues = await SubtitleCue.db.find(
+      session,
+      where: (c) => c.trackId.equals(track.id!),
+      orderBy: (c) => c.startMs,
+    );
+
+    if (cues.isEmpty) {
+      throw Exception('当前字幕轨没有可导出的字幕');
+    }
+
+    final exporter = SubtitleSrtExporter();
+
+    return exporter.export(cues);
+  }
+
+  Future<SubtitleCue> updateCueText(
+    Session session, {
+    required int cueId,
+    required String text,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能修改字幕');
+    }
+
+    final normalizedText = text.trim();
+
+    if (normalizedText.isEmpty) {
+      throw Exception('字幕内容不能为空');
+    }
+
+    final cue = await SubtitleCue.db.findById(
+      session,
+      cueId,
+    );
+
+    if (cue == null) {
+      throw Exception('找不到字幕');
+    }
+
+    cue.text = normalizedText;
+    cue.updatedAt = DateTime.now();
+
+    final updatedCue = await SubtitleCue.db.updateRow(
+      session,
+      cue,
+    );
+
+    await SubtitleToken.db.deleteWhere(
+      session,
+      where: (t) => t.cueId.equals(cueId),
+    );
+
+    await SubtitlePhrase.db.deleteWhere(
+      session,
+      where: (p) => p.cueId.equals(cueId),
+    );
+
+    return updatedCue;
+  }
+
+  Future<SubtitleCue> updateCueTiming(
+    Session session, {
+    required int cueId,
+    required int startMs,
+    required int endMs,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能修改字幕时间');
+    }
+
+    if (startMs < 0) {
+      throw Exception('开始时间不能小于 0');
+    }
+
+    if (endMs <= startMs) {
+      throw Exception('结束时间必须大于开始时间');
+    }
+
+    final cue = await SubtitleCue.db.findById(
+      session,
+      cueId,
+    );
+
+    if (cue == null) {
+      throw Exception('找不到字幕');
+    }
+
+    await _ensureNoTimingOverlap(
+      session,
+      trackId: cue.trackId,
+      startMs: startMs,
+      endMs: endMs,
+      excludeCueId: cueId,
+    );
+
+    cue.startMs = startMs;
+    cue.endMs = endMs;
+    cue.updatedAt = DateTime.now();
+
+    return SubtitleCue.db.updateRow(
+      session,
+      cue,
+    );
+  }
+
+  Future<void> _ensureNoTimingOverlap(
+    Session session, {
+    required int trackId,
+    required int startMs,
+    required int endMs,
+    int? excludeCueId,
+  }) async {
+    final existingCues = await SubtitleCue.db.find(
+      session,
+      where: (c) => c.trackId.equals(trackId),
+    );
+
+    for (final existing in existingCues) {
+      if (existing.id == excludeCueId) {
+        continue;
+      }
+
+      final overlaps = startMs < existing.endMs && endMs > existing.startMs;
+
+      if (overlaps) {
+        throw Exception(
+          '字幕时间与现有字幕重叠：'
+          '${existing.startMs}ms - ${existing.endMs}ms',
+        );
+      }
+    }
+  }
+
+  Future<SubtitleCue> createCue(
+    Session session, {
+    required int videoId,
+    required String languageCode,
+    required int startMs,
+    required int endMs,
+    required String text,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能新增字幕');
+    }
+
+    if (text.trim().isEmpty) {
+      throw Exception('字幕内容不能为空');
+    }
+
+    if (startMs < 0) {
+      throw Exception('开始时间不能小于 0');
+    }
+
+    if (endMs <= startMs) {
+      throw Exception('结束时间必须大于开始时间');
+    }
+
+    final track = await SubtitleTrack.db.findFirstRow(
+      session,
+      where: (t) =>
+          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+    );
+
+    if (track == null || track.id == null) {
+      throw Exception('找不到字幕轨');
+    }
+
+    await _ensureNoTimingOverlap(
+      session,
+      trackId: track.id!,
+      startMs: startMs,
+      endMs: endMs,
+    );
+
+    final cue = SubtitleCue(
+      trackId: track.id!,
+      startMs: startMs,
+      endMs: endMs,
+      text: text.trim(),
+    );
+
+    return SubtitleCue.db.insertRow(
+      session,
+      cue,
+    );
+  }
+
+  Future<void> deleteCue(
+    Session session, {
+    required int cueId,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('需要登录后才能删除字幕');
+    }
+
+    final cue = await SubtitleCue.db.findById(
+      session,
+      cueId,
+    );
+
+    if (cue == null) {
+      throw Exception('找不到字幕');
+    }
+
+    await SubtitleToken.db.deleteWhere(
+      session,
+      where: (t) => t.cueId.equals(cueId),
+    );
+
+    await SubtitlePhrase.db.deleteWhere(
+      session,
+      where: (p) => p.cueId.equals(cueId),
+    );
+
+    await SubtitleCue.db.deleteWhere(
+      session,
+      where: (c) => c.id.equals(cueId),
+    );
+  }
+
+  List<String> _validateCueDuration(
+    List<ParsedSubtitleCue> cues,
+    int videoDurationMs,
+  ) {
+    final errors = <String>[];
+
+    for (final cue in cues) {
+      if (cue.startMs >= videoDurationMs) {
+        errors.add(
+          '第 ${cue.sourceNumber} 条字幕开始时间超出视频时长',
+        );
+        continue;
+      }
+
+      if (cue.endMs > videoDurationMs) {
+        errors.add(
+          '第 ${cue.sourceNumber} 条字幕结束时间超出视频时长',
+        );
+      }
+    }
+
+    return errors;
   }
 }

@@ -427,6 +427,98 @@ class Endpoints extends _i1.EndpointDispatch {
                     explanationLanguageCode: params['explanationLanguageCode'],
                   ),
         ),
+        'listEntries': _i1.MethodConnector(
+          name: 'listEntries',
+          params: {
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'offset': _i1.ParameterDescription(
+              name: 'offset',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dictionary'] as _i5.DictionaryEndpoint)
+                  .listEntries(
+                    session,
+                    languageCode: params['languageCode'],
+                    offset: params['offset'],
+                    limit: params['limit'],
+                  ),
+        ),
+        'updateEntryRow': _i1.MethodConnector(
+          name: 'updateEntryRow',
+          params: {
+            'entryId': _i1.ParameterDescription(
+              name: 'entryId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'headword': _i1.ParameterDescription(
+              name: 'headword',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'nomText': _i1.ParameterDescription(
+              name: 'nomText',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'chineseGloss': _i1.ParameterDescription(
+              name: 'chineseGloss',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'partOfSpeech': _i1.ParameterDescription(
+              name: 'partOfSpeech',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'vietnameseExample': _i1.ParameterDescription(
+              name: 'vietnameseExample',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'nomExample': _i1.ParameterDescription(
+              name: 'nomExample',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'chineseExample': _i1.ParameterDescription(
+              name: 'chineseExample',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dictionary'] as _i5.DictionaryEndpoint)
+                  .updateEntryRow(
+                    session,
+                    entryId: params['entryId'],
+                    headword: params['headword'],
+                    nomText: params['nomText'],
+                    chineseGloss: params['chineseGloss'],
+                    partOfSpeech: params['partOfSpeech'],
+                    vietnameseExample: params['vietnameseExample'],
+                    nomExample: params['nomExample'],
+                    chineseExample: params['chineseExample'],
+                  ),
+        ),
       },
     );
     connectors['dictionaryImport'] = _i1.EndpointConnector(
@@ -697,6 +789,211 @@ class Endpoints extends _i1.EndpointDispatch {
                     session,
                     videoId: params['videoId'],
                     languageCode: params['languageCode'],
+                  ),
+        ),
+        'previewSrtImport': _i1.MethodConnector(
+          name: 'previewSrtImport',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'content': _i1.ParameterDescription(
+              name: 'content',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['subtitle'] as _i8.SubtitleEndpoint)
+                  .previewSrtImport(
+                    session,
+                    videoId: params['videoId'],
+                    languageCode: params['languageCode'],
+                    content: params['content'],
+                  ),
+        ),
+        'confirmReplaceSrtImport': _i1.MethodConnector(
+          name: 'confirmReplaceSrtImport',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'content': _i1.ParameterDescription(
+              name: 'content',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['subtitle'] as _i8.SubtitleEndpoint)
+                  .confirmReplaceSrtImport(
+                    session,
+                    videoId: params['videoId'],
+                    languageCode: params['languageCode'],
+                    content: params['content'],
+                  ),
+        ),
+        'exportSrt': _i1.MethodConnector(
+          name: 'exportSrt',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['subtitle'] as _i8.SubtitleEndpoint).exportSrt(
+                    session,
+                    videoId: params['videoId'],
+                    languageCode: params['languageCode'],
+                  ),
+        ),
+        'updateCueText': _i1.MethodConnector(
+          name: 'updateCueText',
+          params: {
+            'cueId': _i1.ParameterDescription(
+              name: 'cueId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'text': _i1.ParameterDescription(
+              name: 'text',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['subtitle'] as _i8.SubtitleEndpoint).updateCueText(
+                    session,
+                    cueId: params['cueId'],
+                    text: params['text'],
+                  ),
+        ),
+        'updateCueTiming': _i1.MethodConnector(
+          name: 'updateCueTiming',
+          params: {
+            'cueId': _i1.ParameterDescription(
+              name: 'cueId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'startMs': _i1.ParameterDescription(
+              name: 'startMs',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'endMs': _i1.ParameterDescription(
+              name: 'endMs',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['subtitle'] as _i8.SubtitleEndpoint)
+                  .updateCueTiming(
+                    session,
+                    cueId: params['cueId'],
+                    startMs: params['startMs'],
+                    endMs: params['endMs'],
+                  ),
+        ),
+        'createCue': _i1.MethodConnector(
+          name: 'createCue',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'startMs': _i1.ParameterDescription(
+              name: 'startMs',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'endMs': _i1.ParameterDescription(
+              name: 'endMs',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'text': _i1.ParameterDescription(
+              name: 'text',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['subtitle'] as _i8.SubtitleEndpoint).createCue(
+                    session,
+                    videoId: params['videoId'],
+                    languageCode: params['languageCode'],
+                    startMs: params['startMs'],
+                    endMs: params['endMs'],
+                    text: params['text'],
+                  ),
+        ),
+        'deleteCue': _i1.MethodConnector(
+          name: 'deleteCue',
+          params: {
+            'cueId': _i1.ParameterDescription(
+              name: 'cueId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['subtitle'] as _i8.SubtitleEndpoint).deleteCue(
+                    session,
+                    cueId: params['cueId'],
                   ),
         ),
       },

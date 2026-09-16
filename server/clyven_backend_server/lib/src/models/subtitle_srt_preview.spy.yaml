@@ -1,0 +1,7 @@
+class: SubtitleSrtPreview
+
+fields:
+  cueCount: int
+  errorCount: int
+  errors: List<String>
+  canImport: bool

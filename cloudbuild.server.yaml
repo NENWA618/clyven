@@ -1,0 +1,12 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - server/clyven_backend_server/Dockerfile
+      - -t
+      - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:subtitle-delete-20260917
+      - .
+
+images:
+  - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:subtitle-delete-20260917

@@ -17,6 +17,8 @@ userProfileEdit:
   - get:
 dictionary:
   - lookup:
+  - listEntries:
+  - updateEntryRow:
 dictionaryImport:
   - getProfiles:
   - getProfile:
@@ -31,6 +33,13 @@ knownEntry:
   - getKnowledgeStates:
 subtitle:
   - getCueDetails:
+  - previewSrtImport:
+  - confirmReplaceSrtImport:
+  - exportSrt:
+  - updateCueText:
+  - updateCueTiming:
+  - createCue:
+  - deleteCue:
 video:
   - create:
   - getVideos:

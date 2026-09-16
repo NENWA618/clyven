@@ -32,29 +32,32 @@ import 'knowledge_state_result.dart' as _i19;
 import 'subtitle_cue.dart' as _i20;
 import 'subtitle_cue_detail.dart' as _i21;
 import 'subtitle_phrase.dart' as _i22;
-import 'subtitle_token.dart' as _i23;
-import 'subtitle_track.dart' as _i24;
-import 'user_known_entry.dart' as _i25;
-import 'video.dart' as _i26;
-import 'video_status.dart' as _i27;
-import 'word_list.dart' as _i28;
-import 'word_list_detail.dart' as _i29;
-import 'word_list_item.dart' as _i30;
-import 'word_list_item_detail.dart' as _i31;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
-    as _i32;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
+import 'subtitle_srt_preview.dart' as _i23;
+import 'subtitle_token.dart' as _i24;
+import 'subtitle_track.dart' as _i25;
+import 'user_known_entry.dart' as _i26;
+import 'video.dart' as _i27;
+import 'video_status.dart' as _i28;
+import 'word_list.dart' as _i29;
+import 'word_list_detail.dart' as _i30;
+import 'word_list_item.dart' as _i31;
+import 'word_list_item_detail.dart' as _i32;
+import 'package:clyven_backend_client/src/protocol/dictionary_entry_detail.dart'
     as _i33;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
     as _i34;
-import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
     as _i35;
-import 'package:clyven_backend_client/src/protocol/video.dart' as _i36;
-import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i37;
+import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
+    as _i36;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+    as _i37;
+import 'package:clyven_backend_client/src/protocol/video.dart' as _i38;
+import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i39;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i38;
+    as _i40;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
-    as _i39;
+    as _i41;
 export 'dictionary_definition.dart';
 export 'dictionary_entry.dart';
 export 'dictionary_entry_detail.dart';
@@ -76,6 +79,7 @@ export 'knowledge_state_result.dart';
 export 'subtitle_cue.dart';
 export 'subtitle_cue_detail.dart';
 export 'subtitle_phrase.dart';
+export 'subtitle_srt_preview.dart';
 export 'subtitle_token.dart';
 export 'subtitle_track.dart';
 export 'user_known_entry.dart';
@@ -184,32 +188,35 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i22.SubtitlePhrase) {
       return _i22.SubtitlePhrase.fromJson(data) as T;
     }
-    if (t == _i23.SubtitleToken) {
-      return _i23.SubtitleToken.fromJson(data) as T;
+    if (t == _i23.SubtitleSrtPreview) {
+      return _i23.SubtitleSrtPreview.fromJson(data) as T;
     }
-    if (t == _i24.SubtitleTrack) {
-      return _i24.SubtitleTrack.fromJson(data) as T;
+    if (t == _i24.SubtitleToken) {
+      return _i24.SubtitleToken.fromJson(data) as T;
     }
-    if (t == _i25.UserKnownEntry) {
-      return _i25.UserKnownEntry.fromJson(data) as T;
+    if (t == _i25.SubtitleTrack) {
+      return _i25.SubtitleTrack.fromJson(data) as T;
     }
-    if (t == _i26.Video) {
-      return _i26.Video.fromJson(data) as T;
+    if (t == _i26.UserKnownEntry) {
+      return _i26.UserKnownEntry.fromJson(data) as T;
     }
-    if (t == _i27.VideoStatus) {
-      return _i27.VideoStatus.fromJson(data) as T;
+    if (t == _i27.Video) {
+      return _i27.Video.fromJson(data) as T;
     }
-    if (t == _i28.WordList) {
-      return _i28.WordList.fromJson(data) as T;
+    if (t == _i28.VideoStatus) {
+      return _i28.VideoStatus.fromJson(data) as T;
     }
-    if (t == _i29.WordListDetail) {
-      return _i29.WordListDetail.fromJson(data) as T;
+    if (t == _i29.WordList) {
+      return _i29.WordList.fromJson(data) as T;
     }
-    if (t == _i30.WordListItem) {
-      return _i30.WordListItem.fromJson(data) as T;
+    if (t == _i30.WordListDetail) {
+      return _i30.WordListDetail.fromJson(data) as T;
     }
-    if (t == _i31.WordListItemDetail) {
-      return _i31.WordListItemDetail.fromJson(data) as T;
+    if (t == _i31.WordListItem) {
+      return _i31.WordListItem.fromJson(data) as T;
+    }
+    if (t == _i32.WordListItemDetail) {
+      return _i32.WordListItemDetail.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.DictionaryDefinition?>()) {
       return (data != null ? _i2.DictionaryDefinition.fromJson(data) : null)
@@ -296,32 +303,36 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i22.SubtitlePhrase?>()) {
       return (data != null ? _i22.SubtitlePhrase.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i23.SubtitleToken?>()) {
-      return (data != null ? _i23.SubtitleToken.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i23.SubtitleSrtPreview?>()) {
+      return (data != null ? _i23.SubtitleSrtPreview.fromJson(data) : null)
+          as T;
     }
-    if (t == _i1.getType<_i24.SubtitleTrack?>()) {
-      return (data != null ? _i24.SubtitleTrack.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i24.SubtitleToken?>()) {
+      return (data != null ? _i24.SubtitleToken.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i25.UserKnownEntry?>()) {
-      return (data != null ? _i25.UserKnownEntry.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i25.SubtitleTrack?>()) {
+      return (data != null ? _i25.SubtitleTrack.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i26.Video?>()) {
-      return (data != null ? _i26.Video.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i26.UserKnownEntry?>()) {
+      return (data != null ? _i26.UserKnownEntry.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i27.VideoStatus?>()) {
-      return (data != null ? _i27.VideoStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i27.Video?>()) {
+      return (data != null ? _i27.Video.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i28.WordList?>()) {
-      return (data != null ? _i28.WordList.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i28.VideoStatus?>()) {
+      return (data != null ? _i28.VideoStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i29.WordListDetail?>()) {
-      return (data != null ? _i29.WordListDetail.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i29.WordList?>()) {
+      return (data != null ? _i29.WordList.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i30.WordListItem?>()) {
-      return (data != null ? _i30.WordListItem.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i30.WordListDetail?>()) {
+      return (data != null ? _i30.WordListDetail.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i31.WordListItemDetail?>()) {
-      return (data != null ? _i31.WordListItemDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i31.WordListItem?>()) {
+      return (data != null ? _i31.WordListItem.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i32.WordListItemDetail?>()) {
+      return (data != null ? _i32.WordListItemDetail.fromJson(data) : null)
           as T;
     }
     if (t == List<_i2.DictionaryDefinition>) {
@@ -369,9 +380,9 @@ class Protocol extends _i1.SerializationManager {
               .toList()
           as T;
     }
-    if (t == List<_i23.SubtitleToken>) {
+    if (t == List<_i24.SubtitleToken>) {
       return (data as List)
-              .map((e) => deserialize<_i23.SubtitleToken>(e))
+              .map((e) => deserialize<_i24.SubtitleToken>(e))
               .toList()
           as T;
     }
@@ -381,15 +392,21 @@ class Protocol extends _i1.SerializationManager {
               .toList()
           as T;
     }
-    if (t == List<_i31.WordListItemDetail>) {
+    if (t == List<_i32.WordListItemDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i31.WordListItemDetail>(e))
+              .map((e) => deserialize<_i32.WordListItemDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i32.DictionaryImportProfile>) {
+    if (t == List<_i33.DictionaryEntryDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i32.DictionaryImportProfile>(e))
+              .map((e) => deserialize<_i33.DictionaryEntryDetail>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i34.DictionaryImportProfile>) {
+      return (data as List)
+              .map((e) => deserialize<_i34.DictionaryImportProfile>(e))
               .toList()
           as T;
     }
@@ -399,37 +416,37 @@ class Protocol extends _i1.SerializationManager {
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
     }
-    if (t == List<_i33.KnowledgeStateResult>) {
+    if (t == List<_i35.KnowledgeStateResult>) {
       return (data as List)
-              .map((e) => deserialize<_i33.KnowledgeStateResult>(e))
+              .map((e) => deserialize<_i35.KnowledgeStateResult>(e))
               .toList()
           as T;
     }
-    if (t == List<_i34.KnowledgeStateQuery>) {
+    if (t == List<_i36.KnowledgeStateQuery>) {
       return (data as List)
-              .map((e) => deserialize<_i34.KnowledgeStateQuery>(e))
+              .map((e) => deserialize<_i36.KnowledgeStateQuery>(e))
               .toList()
           as T;
     }
-    if (t == List<_i35.SubtitleCueDetail>) {
+    if (t == List<_i37.SubtitleCueDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i35.SubtitleCueDetail>(e))
+              .map((e) => deserialize<_i37.SubtitleCueDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i36.Video>) {
-      return (data as List).map((e) => deserialize<_i36.Video>(e)).toList()
+    if (t == List<_i38.Video>) {
+      return (data as List).map((e) => deserialize<_i38.Video>(e)).toList()
           as T;
     }
-    if (t == List<_i37.WordList>) {
-      return (data as List).map((e) => deserialize<_i37.WordList>(e)).toList()
+    if (t == List<_i39.WordList>) {
+      return (data as List).map((e) => deserialize<_i39.WordList>(e)).toList()
           as T;
     }
     try {
-      return _i38.Protocol().deserialize<T>(data, t);
+      return _i40.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _i39.Protocol().deserialize<T>(data, t);
+      return _i41.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -457,15 +474,16 @@ class Protocol extends _i1.SerializationManager {
       _i20.SubtitleCue => 'SubtitleCue',
       _i21.SubtitleCueDetail => 'SubtitleCueDetail',
       _i22.SubtitlePhrase => 'SubtitlePhrase',
-      _i23.SubtitleToken => 'SubtitleToken',
-      _i24.SubtitleTrack => 'SubtitleTrack',
-      _i25.UserKnownEntry => 'UserKnownEntry',
-      _i26.Video => 'Video',
-      _i27.VideoStatus => 'VideoStatus',
-      _i28.WordList => 'WordList',
-      _i29.WordListDetail => 'WordListDetail',
-      _i30.WordListItem => 'WordListItem',
-      _i31.WordListItemDetail => 'WordListItemDetail',
+      _i23.SubtitleSrtPreview => 'SubtitleSrtPreview',
+      _i24.SubtitleToken => 'SubtitleToken',
+      _i25.SubtitleTrack => 'SubtitleTrack',
+      _i26.UserKnownEntry => 'UserKnownEntry',
+      _i27.Video => 'Video',
+      _i28.VideoStatus => 'VideoStatus',
+      _i29.WordList => 'WordList',
+      _i30.WordListDetail => 'WordListDetail',
+      _i31.WordListItem => 'WordListItem',
+      _i32.WordListItemDetail => 'WordListItemDetail',
       _ => null,
     };
   }
@@ -525,30 +543,32 @@ class Protocol extends _i1.SerializationManager {
         return 'SubtitleCueDetail';
       case _i22.SubtitlePhrase():
         return 'SubtitlePhrase';
-      case _i23.SubtitleToken():
+      case _i23.SubtitleSrtPreview():
+        return 'SubtitleSrtPreview';
+      case _i24.SubtitleToken():
         return 'SubtitleToken';
-      case _i24.SubtitleTrack():
+      case _i25.SubtitleTrack():
         return 'SubtitleTrack';
-      case _i25.UserKnownEntry():
+      case _i26.UserKnownEntry():
         return 'UserKnownEntry';
-      case _i26.Video():
+      case _i27.Video():
         return 'Video';
-      case _i27.VideoStatus():
+      case _i28.VideoStatus():
         return 'VideoStatus';
-      case _i28.WordList():
+      case _i29.WordList():
         return 'WordList';
-      case _i29.WordListDetail():
+      case _i30.WordListDetail():
         return 'WordListDetail';
-      case _i30.WordListItem():
+      case _i31.WordListItem():
         return 'WordListItem';
-      case _i31.WordListItemDetail():
+      case _i32.WordListItemDetail():
         return 'WordListItemDetail';
     }
-    className = _i38.Protocol().getClassNameForObject(data);
+    className = _i40.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_idp.$className';
     }
-    className = _i39.Protocol().getClassNameForObject(data);
+    className = _i41.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -624,40 +644,43 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'SubtitlePhrase') {
       return deserialize<_i22.SubtitlePhrase>(data['data']);
     }
+    if (dataClassName == 'SubtitleSrtPreview') {
+      return deserialize<_i23.SubtitleSrtPreview>(data['data']);
+    }
     if (dataClassName == 'SubtitleToken') {
-      return deserialize<_i23.SubtitleToken>(data['data']);
+      return deserialize<_i24.SubtitleToken>(data['data']);
     }
     if (dataClassName == 'SubtitleTrack') {
-      return deserialize<_i24.SubtitleTrack>(data['data']);
+      return deserialize<_i25.SubtitleTrack>(data['data']);
     }
     if (dataClassName == 'UserKnownEntry') {
-      return deserialize<_i25.UserKnownEntry>(data['data']);
+      return deserialize<_i26.UserKnownEntry>(data['data']);
     }
     if (dataClassName == 'Video') {
-      return deserialize<_i26.Video>(data['data']);
+      return deserialize<_i27.Video>(data['data']);
     }
     if (dataClassName == 'VideoStatus') {
-      return deserialize<_i27.VideoStatus>(data['data']);
+      return deserialize<_i28.VideoStatus>(data['data']);
     }
     if (dataClassName == 'WordList') {
-      return deserialize<_i28.WordList>(data['data']);
+      return deserialize<_i29.WordList>(data['data']);
     }
     if (dataClassName == 'WordListDetail') {
-      return deserialize<_i29.WordListDetail>(data['data']);
+      return deserialize<_i30.WordListDetail>(data['data']);
     }
     if (dataClassName == 'WordListItem') {
-      return deserialize<_i30.WordListItem>(data['data']);
+      return deserialize<_i31.WordListItem>(data['data']);
     }
     if (dataClassName == 'WordListItemDetail') {
-      return deserialize<_i31.WordListItemDetail>(data['data']);
+      return deserialize<_i32.WordListItemDetail>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
-      return _i38.Protocol().deserializeByClassName(data);
+      return _i40.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i39.Protocol().deserializeByClassName(data);
+      return _i41.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -672,10 +695,10 @@ class Protocol extends _i1.SerializationManager {
       return null;
     }
     try {
-      return _i38.Protocol().mapRecordToJson(record);
+      return _i40.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i39.Protocol().mapRecordToJson(record);
+      return _i41.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

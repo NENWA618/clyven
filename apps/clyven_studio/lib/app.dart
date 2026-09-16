@@ -3,7 +3,11 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/studio_shell.dart';
+import 'pages/dictionary/dictionary_import_page.dart';
+import 'pages/subtitles/subtitles_page.dart';
+import 'pages/subtitles/subtitle_editor_page.dart';
 import 'pages/dashboard_page.dart';
+import 'pages/dictionary_page.dart';
 import 'pages/home.dart';
 import 'pages/placeholder_page.dart';
 
@@ -45,30 +49,44 @@ class App extends StatelessComponent {
                   path: '/subtitles',
                   title: 'Subtitles · Clyven Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Subtitles',
-                      description: '管理字幕轨、语言版本与字幕编辑。',
+                    return const SubtitlesPage();
+                  },
+                ),
+                Route(
+                  path: '/subtitles/:videoId/:languageCode',
+                  title: 'Subtitle Editor · Clyven Studio',
+                  builder: (context, state) {
+                    final videoId = int.tryParse(
+                      state.params['videoId'] ?? '',
+                    );
+
+                    final languageCode = state.params['languageCode'] ?? '';
+
+                    if (videoId == null || languageCode.isEmpty) {
+                      return const PlaceholderPage(
+                        title: 'Subtitle Editor',
+                        description: '无效的视频或语言参数。',
+                      );
+                    }
+
+                    return SubtitleEditorPage(
+                      videoId: videoId,
+                      languageCode: languageCode,
                     );
                   },
                 ),
                 Route(
-                  path: '/dictionary',
-                  title: 'Dictionary · Clyven Studio',
-                  builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Dictionary',
-                      description: '搜索与维护词条、释义、字形和例句。',
-                    );
-                  },
-                ),
+                    path: '/dictionary',
+                    title: 'Dictionary · Clyven Studio',
+                    builder: (context, state) {
+                      return const DictionaryPage();
+                    },
+                  ),
                 Route(
                   path: '/dictionary/import',
                   title: 'Dictionary Import · Clyven Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Dictionary Import',
-                      description: 'Excel 导入、Preview 与正式写入。',
-                    );
+                    return const DictionaryImportPage();
                   },
                 ),
                 Route(

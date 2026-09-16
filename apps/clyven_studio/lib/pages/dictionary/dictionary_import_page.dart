@@ -1,22 +1,42 @@
 import 'dart:convert';
 
 import 'package:clyven_backend_client/clyven_backend_client.dart';
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
-import '../services/excel_file_reader.dart';
-import '../services/studio_client.dart';
+import '../../services/excel_file_reader.dart';
 
-class Home extends StatefulComponent {
-  const Home({super.key});
+class _MemoryAuthStorage implements ClientAuthSuccessStorage {
+  AuthSuccess? _value;
 
   @override
-  State<Home> createState() => _HomeState();
+  Future<AuthSuccess?> get() async {
+    return _value;
+  }
+
+  @override
+  Future<void> set(AuthSuccess? data) async {
+    _value = data;
+  }
 }
 
-class _HomeState extends State<Home> {
-  final client = studioClient;
+class DictionaryImportPage extends StatefulComponent {
+  const DictionaryImportPage({super.key});
+
+  @override
+  State<DictionaryImportPage> createState() => _DictionaryImportPageState();
+}
+
+class _DictionaryImportPageState extends State<DictionaryImportPage> {
+  final client =
+      Client(
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+          connectionTimeout: const Duration(minutes: 2),
+        )
+        ..authSessionManager = ClientAuthSessionManager(
+          storage: _MemoryAuthStorage(),
+        );
 
   // =========================
   // LOGIN
@@ -61,41 +81,10 @@ class _HomeState extends State<Home> {
 
   DictionaryImportCommitResult? commitResult;
 
-  // =========================
-  // DICTIONARY TABLE
-  // =========================
-
-  List<DictionaryEntryDetail> dictionaryEntries = [];
-
-  bool dictionaryEntriesLoading = false;
-  String? dictionaryEntriesError;
-
-  int dictionaryVisibleCount = 100;
-
-  // =========================
-  // SUBTITLE WORKSPACE
-  // =========================
-
-  List<Video> studioVideos = [];
-  int? selectedVideoId;
-
-  String subtitleLanguageCode = 'vi';
-
-  bool videosLoading = false;
-  bool subtitleLoading = false;
-
-  String? videosError;
-  String? subtitleError;
-
-  List<SubtitleCueDetail> subtitleCues = [];
-
   @override
   void initState() {
     super.initState();
-
-    _restoreLogin();
     _loadProfiles();
-    _loadVideos();
   }
 
   // =========================
@@ -135,41 +124,11 @@ class _HomeState extends State<Home> {
         loginLoading = false;
         loginPassword = '';
       });
-
-      await _loadDictionaryEntries();
     } catch (e) {
       setState(() {
         loggedIn = false;
         loginLoading = false;
         loginError = e.toString();
-      });
-    }
-  }
-
-  Future<void> _restoreLogin() async {
-    try {
-      await client.auth.initialize();
-
-      if (!mounted) {
-        return;
-      }
-
-      final authenticated = client.auth.isAuthenticated;
-
-      setState(() {
-        loggedIn = authenticated;
-      });
-
-      if (authenticated) {
-        await _loadDictionaryEntries();
-      }
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      setState(() {
-        loggedIn = false;
       });
     }
   }
@@ -291,169 +250,10 @@ class _HomeState extends State<Home> {
         commitLoading = false;
         showImportConfirm = false;
       });
-
-      await _loadDictionaryEntries();
     } catch (e) {
       setState(() {
         commitError = e.toString();
         commitLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadDictionaryEntries() async {
-    if (!loggedIn) {
-      return;
-    }
-
-    setState(() {
-      dictionaryEntriesLoading = true;
-      dictionaryEntriesError = null;
-    });
-
-    try {
-      const pageSize = 100;
-
-      final allEntries = <DictionaryEntryDetail>[];
-
-      var offset = 0;
-
-      while (true) {
-        final page = await client.dictionary.listEntries(
-          languageCode: 'vi',
-          offset: offset,
-          limit: pageSize,
-        );
-
-        allEntries.addAll(page);
-
-        if (page.length < pageSize) {
-          break;
-        }
-
-        offset += page.length;
-      }
-
-      setState(() {
-        dictionaryEntries = allEntries;
-        dictionaryEntriesLoading = false;
-        dictionaryVisibleCount = 100;
-      });
-    } catch (e) {
-      setState(() {
-        dictionaryEntriesLoading = false;
-        dictionaryEntriesError = e.toString();
-      });
-    }
-  }
-
-  String _dictionaryForm(
-    DictionaryEntryDetail detail,
-    String scriptCode,
-  ) {
-    for (final form in detail.forms) {
-      if (form.scriptCode == scriptCode) {
-        return form.text;
-      }
-    }
-
-    return '';
-  }
-
-  String _dictionaryDefinition(
-    DictionaryEntryDetail detail,
-    String languageCode,
-  ) {
-    for (final definition in detail.definitions) {
-      if (definition.explanationLanguageCode == languageCode) {
-        return definition.gloss;
-      }
-    }
-
-    return '';
-  }
-
-  String _dictionaryExample(
-    DictionaryEntryDetail detail, {
-    required String languageCode,
-    required String scriptCode,
-  }) {
-    for (final example in detail.examples) {
-      for (final text in example.texts) {
-        if (text.languageCode == languageCode && text.scriptCode == scriptCode) {
-          return text.text;
-        }
-      }
-    }
-
-    return '';
-  }
-
-  Future<void> _loadVideos() async {
-    setState(() {
-      videosLoading = true;
-      videosError = null;
-    });
-
-    try {
-      final result = await client.video.getVideos();
-
-      setState(() {
-        studioVideos = result;
-        videosLoading = false;
-
-        if (result.isNotEmpty && selectedVideoId == null) {
-          selectedVideoId = result.first.id;
-        }
-      });
-    } catch (e) {
-      setState(() {
-        videosError = e.toString();
-        videosLoading = false;
-      });
-    }
-  }
-
-  // =========================
-  // LOAD SUBTITLES
-  // =========================
-
-  Future<void> _loadSubtitles() async {
-    if (selectedVideoId == null) {
-      setState(() {
-        subtitleError = '请选择视频';
-      });
-
-      return;
-    }
-
-    if (subtitleLanguageCode.trim().isEmpty) {
-      setState(() {
-        subtitleError = '请输入语言代码';
-      });
-      return;
-    }
-
-    setState(() {
-      subtitleLoading = true;
-      subtitleError = null;
-      subtitleCues = [];
-    });
-
-    try {
-      final result = await client.subtitle.getCueDetails(
-        videoId: selectedVideoId!,
-        languageCode: subtitleLanguageCode.trim().toLowerCase(),
-      );
-
-      setState(() {
-        subtitleCues = result;
-        subtitleLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        subtitleError = e.toString();
-        subtitleLoading = false;
       });
     }
   }
@@ -487,45 +287,13 @@ class _HomeState extends State<Home> {
     return div(
       classes: 'studio-page',
       [
-        // =========================
-        // HERO
-        // =========================
         div(
-          classes: 'studio-hero',
+          classes: 'page-heading',
           [
-            div([
-              p(
-                classes: 'eyebrow',
-                [.text('Clyven Content Operations')],
-              ),
-              h1(
-                classes: 'studio-title',
-                [.text('Clyven Studio')],
-              ),
-              p(
-                classes: 'studio-subtitle',
-                [
-                  .text(
-                    '管理 Clyven 的词典、字幕与语言内容。',
-                  ),
-                ],
-              ),
+            h1([.text('Dictionary Import')]),
+            p([
+              .text('通过 Import Profile 预览并导入词典 Excel 数据。'),
             ]),
-            if (loading)
-              span(
-                classes: 'status-pill',
-                [.text('● Connecting...')],
-              )
-            else if (error != null)
-              span(
-                classes: 'status-pill error',
-                [.text('● Serverpod Offline')],
-              )
-            else
-              span(
-                classes: 'status-pill connected',
-                [.text('● Serverpod Connected')],
-              ),
           ],
         ),
 
@@ -934,337 +702,6 @@ class _HomeState extends State<Home> {
                                 ul([
                                   for (final message in commitResult!.messages) li([.text(message)]),
                                 ]),
-                              ],
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-
-        div(
-          classes: 'panel dictionary-table-panel',
-          [
-            div(
-              classes: 'panel-header',
-              [
-                div(
-                  [
-                    h2([.text('Dictionary Entries')]),
-                    p([
-                      .text(
-                        '数据库中的越南语主词表，可在这里统一管理。',
-                      ),
-                    ]),
-                  ],
-                ),
-                div(
-                  classes: 'dictionary-table-count',
-                  [
-                    .text('${dictionaryEntries.length} entries'),
-                  ],
-                ),
-              ],
-            ),
-            div(
-              classes: 'panel-body',
-              [
-                if (dictionaryEntriesLoading)
-                  div(
-                    classes: 'preview-loading',
-                    [
-                      .text('正在读取词库...'),
-                    ],
-                  )
-                else if (dictionaryEntriesError != null)
-                  div(
-                    classes: 'preview-error',
-                    [
-                      .text(dictionaryEntriesError!),
-                    ],
-                  )
-                else if (dictionaryEntries.isEmpty)
-                  p(
-                    classes: 'empty-state',
-                    [
-                      .text(
-                        loggedIn ? '数据库目前没有词条' : '登录后显示词库',
-                      ),
-                    ],
-                  )
-                else ...[
-                  div(
-                    classes: 'dictionary-table-scroll',
-                    [
-                      div(
-                        classes: 'dictionary-table-row dictionary-table-header',
-                        [
-                          div([.text('#')]),
-                          div([.text('国语字')]),
-                          div([.text('喃字')]),
-                          div([.text('中文')]),
-                          div([.text('词性')]),
-                          div([.text('国语字例句')]),
-                          div([.text('喃字例句')]),
-                          div([.text('中文例句')]),
-                        ],
-                      ),
-                      for (
-                        var index = 0;
-                        index <
-                            (dictionaryVisibleCount < dictionaryEntries.length
-                                ? dictionaryVisibleCount
-                                : dictionaryEntries.length);
-                        index++
-                      )
-                        () {
-                          final detail = dictionaryEntries[index];
-
-                          return div(
-                            classes: 'dictionary-table-row',
-                            [
-                              div([
-                                .text('${index + 1}'),
-                              ]),
-                              div([
-                                .text(detail.entry.text),
-                              ]),
-                              div([
-                                .text(
-                                  _dictionaryForm(
-                                    detail,
-                                    'nom',
-                                  ),
-                                ),
-                              ]),
-                              div([
-                                .text(
-                                  _dictionaryDefinition(
-                                    detail,
-                                    'zh',
-                                  ),
-                                ),
-                              ]),
-                              div([
-                                .text(
-                                  detail.entry.partOfSpeech ?? '',
-                                ),
-                              ]),
-                              div([
-                                .text(
-                                  _dictionaryExample(
-                                    detail,
-                                    languageCode: 'vi',
-                                    scriptCode: 'latn',
-                                  ),
-                                ),
-                              ]),
-                              div([
-                                .text(
-                                  _dictionaryExample(
-                                    detail,
-                                    languageCode: 'vi',
-                                    scriptCode: 'nom',
-                                  ),
-                                ),
-                              ]),
-                              div([
-                                .text(
-                                  _dictionaryExample(
-                                    detail,
-                                    languageCode: 'zh',
-                                    scriptCode: 'hans',
-                                  ),
-                                ),
-                              ]),
-                            ],
-                          );
-                        }(),
-                    ],
-                  ),
-                  if (dictionaryVisibleCount < dictionaryEntries.length)
-                    div(
-                      classes: 'dictionary-load-more',
-                      [
-                        button(
-                          classes: 'import-button',
-                          onClick: () {
-                            setState(() {
-                              final next = dictionaryVisibleCount + 100;
-
-                              dictionaryVisibleCount = next > dictionaryEntries.length
-                                  ? dictionaryEntries.length
-                                  : next;
-                            });
-                          },
-                          [
-                            .text(
-                              '加载更多 · '
-                              '剩余 ${dictionaryEntries.length - dictionaryVisibleCount} 条',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                ],
-              ],
-            ),
-          ],
-        ),
-
-        // =========================
-        // SUBTITLE WORKSPACE
-        // =========================
-        div(
-          classes: 'subtitle-workspace',
-          [
-            div(
-              classes: 'panel',
-              [
-                div(
-                  classes: 'panel-header',
-                  [
-                    h2([.text('Subtitle Workspace')]),
-                    p([
-                      .text(
-                        '读取现有视频字幕。目前先做只读查看。',
-                      ),
-                    ]),
-                  ],
-                ),
-                div(
-                  classes: 'panel-body',
-                  [
-                    if (videosLoading)
-                      div(
-                        classes: 'preview-loading',
-                        [.text('正在读取视频...')],
-                      )
-                    else if (videosError != null)
-                      div(
-                        classes: 'preview-error',
-                        [.text(videosError!)],
-                      )
-                    else if (studioVideos.isEmpty)
-                      p(
-                        classes: 'empty-state',
-                        [.text('目前没有视频')],
-                      )
-                    else ...[
-                      div(
-                        classes: 'video-picker',
-                        [
-                          for (final video in studioVideos)
-                            button(
-                              classes: 'video-card ${selectedVideoId == video.id ? 'selected' : ''}',
-                              onClick: () {
-                                setState(() {
-                                  selectedVideoId = video.id;
-                                  subtitleCues = [];
-                                  subtitleError = null;
-                                });
-                              },
-                              [
-                                div(
-                                  classes: 'video-card-title',
-                                  [.text(video.title)],
-                                ),
-                                div(
-                                  classes: 'video-card-meta',
-                                  [
-                                    .text(
-                                      'Video #${video.id} · ${video.authorName}',
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                      div(
-                        classes: 'subtitle-search',
-                        [
-                          input<String>(
-                            type: InputType.text,
-                            attributes: {
-                              'placeholder': 'Language Code',
-                              'value': subtitleLanguageCode,
-                            },
-                            events: events<String>(
-                              onInput: (value) {
-                                subtitleLanguageCode = value;
-                              },
-                            ),
-                          ),
-                          button(
-                            classes: 'subtitle-load-button',
-                            attributes: subtitleLoading
-                                ? {
-                                    'disabled': 'disabled',
-                                  }
-                                : null,
-                            onClick: subtitleLoading
-                                ? null
-                                : () {
-                                    _loadSubtitles();
-                                  },
-                            [
-                              .text(
-                                subtitleLoading ? '读取中...' : 'Load Subtitles',
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-
-                    if (subtitleError != null)
-                      div(
-                        classes: 'preview-error',
-                        [.text(subtitleError!)],
-                      ),
-
-                    if (!subtitleLoading && subtitleError == null && subtitleCues.isEmpty)
-                      p(
-                        classes: 'empty-state',
-                        [
-                          .text(
-                            selectedVideoId == null ? '请选择视频' : '点击 Load Subtitles 读取字幕',
-                          ),
-                        ],
-                      ),
-
-                    if (subtitleCues.isNotEmpty)
-                      div(
-                        classes: 'subtitle-list',
-                        [
-                          for (final detail in subtitleCues)
-                            div(
-                              classes: 'subtitle-cue',
-                              [
-                                div(
-                                  classes: 'subtitle-time',
-                                  [
-                                    .text(
-                                      '${detail.cue.startMs} ms → ${detail.cue.endMs} ms',
-                                    ),
-                                  ],
-                                ),
-                                div(
-                                  classes: 'subtitle-text',
-                                  [.text(detail.cue.text)],
-                                ),
-                                div(
-                                  classes: 'subtitle-meta',
-                                  [
-                                    .text(
-                                      'Tokens: ${detail.tokens.length} · Phrases: ${detail.phrases.length}',
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                         ],

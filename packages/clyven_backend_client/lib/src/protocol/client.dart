@@ -33,13 +33,16 @@ import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
     as _i12;
 import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
     as _i13;
-import 'package:clyven_backend_client/src/protocol/video.dart' as _i14;
-import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i15;
+import 'package:clyven_backend_client/src/protocol/subtitle_srt_preview.dart'
+    as _i14;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue.dart' as _i15;
+import 'package:clyven_backend_client/src/protocol/video.dart' as _i16;
+import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i17;
 import 'package:clyven_backend_client/src/protocol/word_list_detail.dart'
-    as _i16;
+    as _i18;
 import 'package:clyven_backend_client/src/protocol/greetings/greeting.dart'
-    as _i17;
-import 'protocol.dart' as _i18;
+    as _i19;
+import 'protocol.dart' as _i20;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -339,6 +342,44 @@ class EndpointDictionary extends _i2.EndpointRef {
       'explanationLanguageCode': explanationLanguageCode,
     },
   );
+
+  _i3.Future<List<_i6.DictionaryEntryDetail>> listEntries({
+    required String languageCode,
+    required int offset,
+    required int limit,
+  }) => caller.callServerEndpoint<List<_i6.DictionaryEntryDetail>>(
+    'dictionary',
+    'listEntries',
+    {
+      'languageCode': languageCode,
+      'offset': offset,
+      'limit': limit,
+    },
+  );
+
+  _i3.Future<void> updateEntryRow({
+    required int entryId,
+    required String headword,
+    required String nomText,
+    required String chineseGloss,
+    required String partOfSpeech,
+    required String vietnameseExample,
+    required String nomExample,
+    required String chineseExample,
+  }) => caller.callServerEndpoint<void>(
+    'dictionary',
+    'updateEntryRow',
+    {
+      'entryId': entryId,
+      'headword': headword,
+      'nomText': nomText,
+      'chineseGloss': chineseGloss,
+      'partOfSpeech': partOfSpeech,
+      'vietnameseExample': vietnameseExample,
+      'nomExample': nomExample,
+      'chineseExample': chineseExample,
+    },
+  );
 }
 
 /// {@category Endpoint}
@@ -476,6 +517,97 @@ class EndpointSubtitle extends _i2.EndpointRef {
       'languageCode': languageCode,
     },
   );
+
+  _i3.Future<_i14.SubtitleSrtPreview> previewSrtImport({
+    required int videoId,
+    required String languageCode,
+    required String content,
+  }) => caller.callServerEndpoint<_i14.SubtitleSrtPreview>(
+    'subtitle',
+    'previewSrtImport',
+    {
+      'videoId': videoId,
+      'languageCode': languageCode,
+      'content': content,
+    },
+  );
+
+  _i3.Future<int> confirmReplaceSrtImport({
+    required int videoId,
+    required String languageCode,
+    required String content,
+  }) => caller.callServerEndpoint<int>(
+    'subtitle',
+    'confirmReplaceSrtImport',
+    {
+      'videoId': videoId,
+      'languageCode': languageCode,
+      'content': content,
+    },
+  );
+
+  _i3.Future<String> exportSrt({
+    required int videoId,
+    required String languageCode,
+  }) => caller.callServerEndpoint<String>(
+    'subtitle',
+    'exportSrt',
+    {
+      'videoId': videoId,
+      'languageCode': languageCode,
+    },
+  );
+
+  _i3.Future<_i15.SubtitleCue> updateCueText({
+    required int cueId,
+    required String text,
+  }) => caller.callServerEndpoint<_i15.SubtitleCue>(
+    'subtitle',
+    'updateCueText',
+    {
+      'cueId': cueId,
+      'text': text,
+    },
+  );
+
+  _i3.Future<_i15.SubtitleCue> updateCueTiming({
+    required int cueId,
+    required int startMs,
+    required int endMs,
+  }) => caller.callServerEndpoint<_i15.SubtitleCue>(
+    'subtitle',
+    'updateCueTiming',
+    {
+      'cueId': cueId,
+      'startMs': startMs,
+      'endMs': endMs,
+    },
+  );
+
+  _i3.Future<_i15.SubtitleCue> createCue({
+    required int videoId,
+    required String languageCode,
+    required int startMs,
+    required int endMs,
+    required String text,
+  }) => caller.callServerEndpoint<_i15.SubtitleCue>(
+    'subtitle',
+    'createCue',
+    {
+      'videoId': videoId,
+      'languageCode': languageCode,
+      'startMs': startMs,
+      'endMs': endMs,
+      'text': text,
+    },
+  );
+
+  _i3.Future<void> deleteCue({required int cueId}) =>
+      caller.callServerEndpoint<void>(
+        'subtitle',
+        'deleteCue',
+        {'cueId': cueId},
+      );
 }
 
 /// {@category Endpoint}
@@ -485,7 +617,7 @@ class EndpointVideo extends _i2.EndpointRef {
   @override
   String get name => 'video';
 
-  _i3.Future<_i14.Video> create({
+  _i3.Future<_i16.Video> create({
     required String authorId,
     required String authorName,
     required String title,
@@ -495,7 +627,7 @@ class EndpointVideo extends _i2.EndpointRef {
     required String videoStorageKey,
     String? coverStorageKey,
     required int durationSeconds,
-  }) => caller.callServerEndpoint<_i14.Video>(
+  }) => caller.callServerEndpoint<_i16.Video>(
     'video',
     'create',
     {
@@ -511,15 +643,15 @@ class EndpointVideo extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i14.Video>> getVideos() =>
-      caller.callServerEndpoint<List<_i14.Video>>(
+  _i3.Future<List<_i16.Video>> getVideos() =>
+      caller.callServerEndpoint<List<_i16.Video>>(
         'video',
         'getVideos',
         {},
       );
 
-  _i3.Future<_i14.Video?> getVideo(int id) =>
-      caller.callServerEndpoint<_i14.Video?>(
+  _i3.Future<_i16.Video?> getVideo(int id) =>
+      caller.callServerEndpoint<_i16.Video?>(
         'video',
         'getVideo',
         {'id': id},
@@ -559,17 +691,17 @@ class EndpointWordList extends _i2.EndpointRef {
   @override
   String get name => 'wordList';
 
-  _i3.Future<List<_i15.WordList>> getLists() =>
-      caller.callServerEndpoint<List<_i15.WordList>>(
+  _i3.Future<List<_i17.WordList>> getLists() =>
+      caller.callServerEndpoint<List<_i17.WordList>>(
         'wordList',
         'getLists',
         {},
       );
 
-  _i3.Future<_i16.WordListDetail?> getListDetail({
+  _i3.Future<_i18.WordListDetail?> getListDetail({
     required int listId,
     required String explanationLanguageCode,
-  }) => caller.callServerEndpoint<_i16.WordListDetail?>(
+  }) => caller.callServerEndpoint<_i18.WordListDetail?>(
     'wordList',
     'getListDetail',
     {
@@ -589,8 +721,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i17.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i17.Greeting>(
+  _i3.Future<_i19.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i19.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -628,7 +760,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i18.Protocol(),
+         _i20.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
