@@ -1,0 +1,16 @@
+class: SubtitleToken
+table: subtitle_token
+
+fields:
+  cueId: int, relation(parent=subtitle_cue)
+
+  text: String
+  normalizedText: String?
+
+  startMs: int?
+  endMs: int?
+
+  position: int
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

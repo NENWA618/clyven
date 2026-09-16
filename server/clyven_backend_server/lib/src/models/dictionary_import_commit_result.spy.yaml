@@ -1,0 +1,19 @@
+class: DictionaryImportCommitResult
+fields:
+  # Excel 中检测到的总数据行
+  totalRows: int
+
+  # 成功创建的新词条
+  insertedEntries: int
+
+  # 已存在，因此合并/更新的词条
+  mergedEntries: int
+
+  # 缺少主词等尚未完成的行
+  skippedRows: int
+
+  # 真正导入失败的行
+  failedRows: int
+
+  # 给 Studio 显示的结果说明
+  messages: List<String>

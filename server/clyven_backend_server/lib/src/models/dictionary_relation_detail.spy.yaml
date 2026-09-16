@@ -1,0 +1,6 @@
+class: DictionaryRelationDetail
+
+fields:
+  relation: DictionaryRelation
+  targetEntry: DictionaryEntry
+  targetDefinitions: List<DictionaryDefinition>

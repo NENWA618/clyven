@@ -17,9 +17,28 @@ import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'dart:typed_data' as _i5;
-import 'package:clyven_backend_server/src/generated/video.dart' as _i6;
-import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+import 'package:clyven_backend_server/src/generated/dictionary_entry_detail.dart'
+    as _i6;
+import 'package:clyven_backend_server/src/generated/dictionary_import_profile.dart'
     as _i7;
+import 'package:clyven_backend_server/src/generated/dictionary_import_profile_detail.dart'
+    as _i8;
+import 'package:clyven_backend_server/src/generated/dictionary_import_preview.dart'
+    as _i9;
+import 'package:clyven_backend_server/src/generated/dictionary_import_commit_result.dart'
+    as _i10;
+import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
+    as _i11;
+import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
+    as _i12;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+    as _i13;
+import 'package:clyven_backend_server/src/generated/video.dart' as _i14;
+import 'package:clyven_backend_server/src/generated/word_list.dart' as _i15;
+import 'package:clyven_backend_server/src/generated/word_list_detail.dart'
+    as _i16;
+import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+    as _i17;
 import 'package:clyven_backend_server/src/generated/protocol.dart';
 import 'package:clyven_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -140,7 +159,17 @@ class TestEndpoints {
 
   late final _UserProfileEditEndpoint userProfileEdit;
 
+  late final _DictionaryEndpoint dictionary;
+
+  late final _DictionaryImportEndpoint dictionaryImport;
+
+  late final _KnownEntryEndpoint knownEntry;
+
+  late final _SubtitleEndpoint subtitle;
+
   late final _VideoEndpoint video;
+
+  late final _WordListEndpoint wordList;
 
   late final _GreetingEndpoint greeting;
 }
@@ -164,7 +193,27 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    dictionary = _DictionaryEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    dictionaryImport = _DictionaryImportEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    knownEntry = _KnownEntryEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    subtitle = _SubtitleEndpoint(
+      endpoints,
+      serializationManager,
+    );
     video = _VideoEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    wordList = _WordListEndpoint(
       endpoints,
       serializationManager,
     );
@@ -657,6 +706,456 @@ class _UserProfileEditEndpoint {
   }
 }
 
+class _DictionaryEndpoint {
+  _DictionaryEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i6.DictionaryEntryDetail?> lookup(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String languageCode,
+    required String normalizedText,
+    required String entryType,
+    required String explanationLanguageCode,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionary',
+            method: 'lookup',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionary',
+          methodName: 'lookup',
+          parameters: _i1.testObjectToJson({
+            'languageCode': languageCode,
+            'normalizedText': normalizedText,
+            'entryType': entryType,
+            'explanationLanguageCode': explanationLanguageCode,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i6.DictionaryEntryDetail?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DictionaryImportEndpoint {
+  _DictionaryImportEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i7.DictionaryImportProfile>> getProfiles(
+    _i1.TestSessionBuilder sessionBuilder, {
+    String? languageCode,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'getProfiles',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'getProfiles',
+          parameters: _i1.testObjectToJson({'languageCode': languageCode}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i7.DictionaryImportProfile>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.DictionaryImportProfileDetail?> getProfile(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'getProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'getProfile',
+          parameters: _i1.testObjectToJson({'profileId': profileId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.DictionaryImportProfileDetail?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.DictionaryImportProfileDetail>
+  createVietnameseVocabularyProfile(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'createVietnameseVocabularyProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'createVietnameseVocabularyProfile',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.DictionaryImportProfileDetail>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.DictionaryImportPreview?> previewRows(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required List<String> rowsJson,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'previewRows',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'previewRows',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'rowsJson': rowsJson,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i9.DictionaryImportPreview?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.DictionaryImportPreview?> previewExcelBase64(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String excelBase64,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'previewExcelBase64',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'previewExcelBase64',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'excelBase64': excelBase64,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i9.DictionaryImportPreview?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i10.DictionaryImportCommitResult> commitExcelBase64(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String excelBase64,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dictionaryImport',
+            method: 'commitExcelBase64',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dictionaryImport',
+          methodName: 'commitExcelBase64',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'excelBase64': excelBase64,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i10.DictionaryImportCommitResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _KnownEntryEndpoint {
+  _KnownEntryEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<int>> getKnownEntryIds(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required List<int> entryIds,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'knownEntry',
+            method: 'getKnownEntryIds',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'knownEntry',
+          methodName: 'getKnownEntryIds',
+          parameters: _i1.testObjectToJson({'entryIds': entryIds}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<int>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> setKnown(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int entryId,
+    required bool known,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'knownEntry',
+            method: 'setKnown',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'knownEntry',
+          methodName: 'setKnown',
+          parameters: _i1.testObjectToJson({
+            'entryId': entryId,
+            'known': known,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String> getKnowledgeState(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String languageCode,
+    required String normalizedText,
+    required String entryType,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'knownEntry',
+            method: 'getKnowledgeState',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'knownEntry',
+          methodName: 'getKnowledgeState',
+          parameters: _i1.testObjectToJson({
+            'languageCode': languageCode,
+            'normalizedText': normalizedText,
+            'entryType': entryType,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i11.KnowledgeStateResult>> getKnowledgeStates(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required List<_i12.KnowledgeStateQuery> queries,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'knownEntry',
+            method: 'getKnowledgeStates',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'knownEntry',
+          methodName: 'getKnowledgeStates',
+          parameters: _i1.testObjectToJson({'queries': queries}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i11.KnowledgeStateResult>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _SubtitleEndpoint {
+  _SubtitleEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i13.SubtitleCueDetail>> getCueDetails(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+    required String languageCode,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'subtitle',
+            method: 'getCueDetails',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'subtitle',
+          methodName: 'getCueDetails',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'languageCode': languageCode,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i13.SubtitleCueDetail>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _VideoEndpoint {
   _VideoEndpoint(
     this._endpointDispatch,
@@ -667,7 +1166,7 @@ class _VideoEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i6.Video> create(
+  _i3.Future<_i14.Video> create(
     _i1.TestSessionBuilder sessionBuilder, {
     required String authorId,
     required String authorName,
@@ -708,7 +1207,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i6.Video>);
+                as _i3.Future<_i14.Video>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -716,7 +1215,7 @@ class _VideoEndpoint {
     });
   }
 
-  _i3.Future<List<_i6.Video>> getVideos(
+  _i3.Future<List<_i14.Video>> getVideos(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -738,7 +1237,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i6.Video>>);
+                as _i3.Future<List<_i14.Video>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -746,7 +1245,7 @@ class _VideoEndpoint {
     });
   }
 
-  _i3.Future<_i6.Video?> getVideo(
+  _i3.Future<_i14.Video?> getVideo(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
   ) async {
@@ -769,7 +1268,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i6.Video?>);
+                as _i3.Future<_i14.Video?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -875,6 +1374,82 @@ class _VideoEndpoint {
   }
 }
 
+class _WordListEndpoint {
+  _WordListEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i15.WordList>> getLists(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'wordList',
+            method: 'getLists',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'wordList',
+          methodName: 'getLists',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i15.WordList>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i16.WordListDetail?> getListDetail(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int listId,
+    required String explanationLanguageCode,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'wordList',
+            method: 'getListDetail',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'wordList',
+          methodName: 'getListDetail',
+          parameters: _i1.testObjectToJson({
+            'listId': listId,
+            'explanationLanguageCode': explanationLanguageCode,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i16.WordListDetail?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _GreetingEndpoint {
   _GreetingEndpoint(
     this._endpointDispatch,
@@ -885,7 +1460,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.Greeting> hello(
+  _i3.Future<_i17.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -908,7 +1483,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.Greeting>);
+                as _i3.Future<_i17.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

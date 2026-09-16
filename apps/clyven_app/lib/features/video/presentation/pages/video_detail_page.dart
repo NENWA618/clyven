@@ -1,13 +1,9 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:clyven_app/core/localization/localized_labels.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../auth/presentation/utils/require_login.dart';
 import '../../../comments/presentation/pages/comments_page.dart';
@@ -17,7 +13,10 @@ import '../../../history/presentation/providers/watch_history_provider.dart';
 import '../../../video_interactions/presentation/providers/video_interaction_provider.dart';
 import '../../data/models/video_detail.dart';
 import '../providers/video_detail_provider.dart';
-
+import '../widgets/network_video_player.dart';
+import '../../../subtitle/presentation/providers/subtitle_provider.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart'
+    as serverpod;
 class VideoDetailPage extends ConsumerWidget {
   final String videoId;
 
@@ -109,6 +108,23 @@ class VideoDetailPage extends ConsumerWidget {
       watchHistoryItemProvider(video.id),
     );
 
+    final numericVideoId = int.tryParse(video.id);
+
+    final subtitleAsync = numericVideoId == null
+        ? null
+        : ref.watch(
+            subtitleProvider(
+              (
+                videoId: numericVideoId,
+                languageCode: 'vi',
+              ),
+            ),
+          );
+
+    final subtitles =
+        subtitleAsync?.value ??
+        <serverpod.SubtitleCueDetail>[];
+
     return SafeArea(
       bottom: false,
       child: CustomScrollView(
@@ -122,9 +138,10 @@ class VideoDetailPage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: 14,
               ),
-              child: _NetworkVideoPlayer(
+              child: NetworkVideoPlayer(
                 videoUrl: video.videoUrl,
                 coverUrl: video.coverUrl,
+                subtitles: subtitles,
                 initialPositionSeconds: historyItem?.positionSeconds ?? 0,
                 fallbackDurationSeconds: video.durationSeconds,
                 onProgress: (
@@ -147,6 +164,7 @@ class VideoDetailPage extends ConsumerWidget {
               ),
             ),
           ),
+
           SliverToBoxAdapter(
             child: _buildVideoInformation(
               context,
@@ -769,452 +787,6 @@ class VideoDetailPage extends ConsumerWidget {
   ) {
     final localeName = Localizations.localeOf(context).toString();
     return DateFormat.yMMMd(localeName).format(date);
-  }
-}
-
-class _NetworkVideoPlayer extends StatefulWidget {
-  final String videoUrl;
-  final String coverUrl;
-  final int initialPositionSeconds;
-  final int fallbackDurationSeconds;
-  final void Function(
-    Duration position,
-    Duration duration,
-  )? onProgress;
-
-  const _NetworkVideoPlayer({
-    required this.videoUrl,
-    required this.coverUrl,
-    required this.initialPositionSeconds,
-    required this.fallbackDurationSeconds,
-    this.onProgress,
-  });
-
-  @override
-  State<_NetworkVideoPlayer> createState() {
-    return _NetworkVideoPlayerState();
-  }
-}
-
-class _NetworkVideoPlayerState extends State<_NetworkVideoPlayer> {
-  late final VideoPlayerController _controller;
-  late final Future<void> _initializeFuture;
-
-  final Stopwatch _fallbackClock = Stopwatch();
-  Timer? _positionTicker;
-  Duration _fallbackBasePosition = Duration.zero;
-  int _lastSavedSecond = -1;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final isNetworkVideo = widget.videoUrl.startsWith('http://') ||
-        widget.videoUrl.startsWith('https://');
-
-    if (isNetworkVideo) {
-      _controller = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl),
-      );
-    } else {
-      _controller = VideoPlayerController.file(
-        File(widget.videoUrl),
-      );
-    }
-
-    _initializeFuture = _initializePlayer();
-    _controller.addListener(_handleProgress);
-  }
-
-  Future<void> _initializePlayer() async {
-    await _controller.initialize();
-    await _controller.setLooping(false);
-
-    final duration = _effectiveDuration();
-    final savedPosition = widget.initialPositionSeconds;
-
-    if (savedPosition <= 0) {
-      _fallbackBasePosition = Duration.zero;
-      return;
-    }
-
-    if (duration.inSeconds > 0 &&
-        savedPosition >= duration.inSeconds - 5) {
-      _fallbackBasePosition = Duration.zero;
-      return;
-    }
-
-    final position = Duration(
-      seconds: savedPosition,
-    );
-
-    _fallbackBasePosition = position;
-    await _controller.seekTo(position);
-  }
-
-  Duration _effectiveDuration() {
-    final controllerDuration = _controller.value.duration;
-
-    if (controllerDuration.inSeconds > 0) {
-      return controllerDuration;
-    }
-
-    return Duration(
-      seconds: widget.fallbackDurationSeconds,
-    );
-  }
-
-  bool get _needsFallbackPosition {
-    return _controller.value.duration.inSeconds <= 0 &&
-        widget.fallbackDurationSeconds > 0;
-  }
-
-  Duration _effectivePosition() {
-    if (!_needsFallbackPosition) {
-      return _controller.value.position;
-    }
-
-    final duration = _effectiveDuration();
-    final position = _fallbackBasePosition + _fallbackClock.elapsed;
-
-    if (position > duration) {
-      return duration;
-    }
-
-    return position;
-  }
-
-  void _startPositionTicker() {
-    _positionTicker ??= Timer.periodic(
-      const Duration(milliseconds: 250),
-      (_) {
-        if (!mounted || !_fallbackClock.isRunning) {
-          return;
-        }
-
-        final position = _effectivePosition();
-        _handleProgress();
-
-        if (position >= _effectiveDuration()) {
-          _fallbackClock.stop();
-        }
-
-        setState(() {});
-      },
-    );
-  }
-
-  void _handleProgress() {
-    if (!_controller.value.isInitialized) {
-      return;
-    }
-
-    final position = _effectivePosition();
-    final duration = _effectiveDuration();
-    final second = position.inSeconds;
-
-    if (second <= 0 || second == _lastSavedSecond || second % 5 != 0) {
-      return;
-    }
-
-    _lastSavedSecond = second;
-    widget.onProgress?.call(
-      position,
-      duration,
-    );
-  }
-
-  @override
-  void dispose() {
-    _positionTicker?.cancel();
-    _fallbackClock.stop();
-    _controller.removeListener(_handleProgress);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: FutureBuilder<void>(
-          future: _initializeFuture,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return _buildPlayerError();
-            }
-
-            if (snapshot.connectionState != ConnectionState.done) {
-              return _buildLoadingCover();
-            }
-
-            return ValueListenableBuilder<VideoPlayerValue>(
-              valueListenable: _controller,
-              builder: (
-                context,
-                value,
-                child,
-              ) {
-                final duration = _effectiveDuration();
-                final position = _effectivePosition();
-                final maxMilliseconds = duration.inMilliseconds;
-                final positionMilliseconds = position.inMilliseconds.clamp(
-                  0,
-                  maxMilliseconds > 0 ? maxMilliseconds : 0,
-                );
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(
-                      color: Colors.black,
-                      child: Center(
-                        child: AspectRatio(
-                          aspectRatio: value.aspectRatio == 0
-                              ? 16 / 9
-                              : value.aspectRatio,
-                          child: VideoPlayer(_controller),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _togglePlay,
-                      child: Container(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    if (!value.isPlaying)
-                      Center(
-                        child: GestureDetector(
-                          onTap: _togglePlay,
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.92),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              size: 42,
-                              color: Color(0xFF161616),
-                            ),
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      left: 14,
-                      right: 14,
-                      bottom: 10,
-                      child: Column(
-                        children: [
-                          if (maxMilliseconds > 0)
-                            SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 4,
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 5,
-                                ),
-                                overlayShape: const RoundSliderOverlayShape(
-                                  overlayRadius: 12,
-                                ),
-                              ),
-                              child: Slider(
-                                min: 0,
-                                max: maxMilliseconds.toDouble(),
-                                value: positionMilliseconds.toDouble(),
-                                activeColor: const Color(0xFFE5FF58),
-                                inactiveColor: Colors.white24,
-                                onChanged: (value) {
-                                  final position = Duration(
-                                    milliseconds: value.round(),
-                                  );
-
-                                  _fallbackBasePosition = position;
-                                  _fallbackClock
-                                    ..stop()
-                                    ..reset();
-
-                                  if (_controller.value.isPlaying &&
-                                      _needsFallbackPosition) {
-                                    _fallbackClock.start();
-                                    _startPositionTicker();
-                                  }
-
-                                  _controller.seekTo(position);
-                                  setState(() {});
-                                },
-                              ),
-                            )
-                          else
-                            const LinearProgressIndicator(
-                              value: 0,
-                              minHeight: 4,
-                              color: Color(0xFFE5FF58),
-                              backgroundColor: Colors.white24,
-                            ),
-                          Row(
-                            children: [
-                              Text(
-                                _playerTime(position),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Text(
-                                ' / ',
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Text(
-                                _playerTime(duration),
-                                style: const TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Spacer(),
-                              const Icon(
-                                Icons.fullscreen_rounded,
-                                color: Colors.white,
-                                size: 23,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingCover() {
-    final isNetworkCover = widget.coverUrl.startsWith('http://') ||
-        widget.coverUrl.startsWith('https://');
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        if (widget.coverUrl.isEmpty)
-          Container(
-            color: Colors.black,
-          )
-        else if (isNetworkCover)
-          Image.network(
-            widget.coverUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.black,
-              );
-            },
-          )
-        else
-          Image.file(
-            File(widget.coverUrl),
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.black,
-              );
-            },
-          ),
-        Container(
-          color: Colors.black38,
-        ),
-        const Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFFE5FF58),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlayerError() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      color: const Color(0xFF161616),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.play_disabled_rounded,
-              color: Colors.white54,
-              size: 38,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              l10n.videoCannotPlay,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _togglePlay() async {
-    if (_controller.value.isPlaying) {
-      if (_needsFallbackPosition) {
-        _fallbackBasePosition = _effectivePosition();
-        _fallbackClock
-          ..stop()
-          ..reset();
-      }
-
-      _handleProgress();
-      await _controller.pause();
-    } else {
-      if (_needsFallbackPosition) {
-        _fallbackClock
-          ..reset()
-          ..start();
-        _startPositionTicker();
-      }
-
-      await _controller.play();
-    }
-
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  String _playerTime(Duration duration) {
-    final minutes = duration.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    final seconds = duration.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-
-    if (duration.inHours > 0) {
-      return '${duration.inHours}:$minutes:$seconds';
-    }
-
-    return '$minutes:$seconds';
   }
 }
 

@@ -1,0 +1,24 @@
+import 'package:clyven_backend_client/clyven_backend_client.dart'
+    as serverpod;
+
+import 'subtitle_repository.dart';
+
+class ServerpodSubtitleRepository
+    implements SubtitleRepository {
+  final serverpod.Client client;
+
+  ServerpodSubtitleRepository({
+    required this.client,
+  });
+
+  @override
+  Future<List<serverpod.SubtitleCueDetail>> loadSubtitles({
+    required int videoId,
+    required String languageCode,
+  }) async {
+    return client.subtitle.getCueDetails(
+      videoId: videoId,
+      languageCode: languageCode,
+    );
+  }
+}

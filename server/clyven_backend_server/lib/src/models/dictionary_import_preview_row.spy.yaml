@@ -1,0 +1,21 @@
+class: DictionaryImportPreviewRow
+fields:
+  # Excel 原始行号
+  rowNumber: int
+
+  # 根据 Profile 找到的主词
+  headword: String?
+
+  # word / phrase ...
+  entryType: String?
+
+  # ok / warning / error
+  status: String
+
+  # Studio 中给用户看的说明
+  message: String?
+
+  # 这一整行经过 mapping 后的标准化结果。
+  # 暂时用 JSON 字符串保存，
+  # 因为不同语言的结构可以完全不同。
+  normalizedJson: String

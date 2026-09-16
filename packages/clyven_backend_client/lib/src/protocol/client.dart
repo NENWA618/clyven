@@ -17,10 +17,29 @@ import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
 import 'dart:typed_data' as _i5;
-import 'package:clyven_backend_client/src/protocol/video.dart' as _i6;
-import 'package:clyven_backend_client/src/protocol/greetings/greeting.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_entry_detail.dart'
+    as _i6;
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
     as _i7;
-import 'protocol.dart' as _i8;
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile_detail.dart'
+    as _i8;
+import 'package:clyven_backend_client/src/protocol/dictionary_import_preview.dart'
+    as _i9;
+import 'package:clyven_backend_client/src/protocol/dictionary_import_commit_result.dart'
+    as _i10;
+import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
+    as _i11;
+import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
+    as _i12;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+    as _i13;
+import 'package:clyven_backend_client/src/protocol/video.dart' as _i14;
+import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i15;
+import 'package:clyven_backend_client/src/protocol/word_list_detail.dart'
+    as _i16;
+import 'package:clyven_backend_client/src/protocol/greetings/greeting.dart'
+    as _i17;
+import 'protocol.dart' as _i18;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -299,13 +318,174 @@ class EndpointUserProfileEdit extends _i4.EndpointUserProfileEditBase {
 }
 
 /// {@category Endpoint}
+class EndpointDictionary extends _i2.EndpointRef {
+  EndpointDictionary(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'dictionary';
+
+  _i3.Future<_i6.DictionaryEntryDetail?> lookup({
+    required String languageCode,
+    required String normalizedText,
+    required String entryType,
+    required String explanationLanguageCode,
+  }) => caller.callServerEndpoint<_i6.DictionaryEntryDetail?>(
+    'dictionary',
+    'lookup',
+    {
+      'languageCode': languageCode,
+      'normalizedText': normalizedText,
+      'entryType': entryType,
+      'explanationLanguageCode': explanationLanguageCode,
+    },
+  );
+}
+
+/// {@category Endpoint}
+class EndpointDictionaryImport extends _i2.EndpointRef {
+  EndpointDictionaryImport(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'dictionaryImport';
+
+  _i3.Future<List<_i7.DictionaryImportProfile>> getProfiles({
+    String? languageCode,
+  }) => caller.callServerEndpoint<List<_i7.DictionaryImportProfile>>(
+    'dictionaryImport',
+    'getProfiles',
+    {'languageCode': languageCode},
+  );
+
+  _i3.Future<_i8.DictionaryImportProfileDetail?> getProfile({
+    required int profileId,
+  }) => caller.callServerEndpoint<_i8.DictionaryImportProfileDetail?>(
+    'dictionaryImport',
+    'getProfile',
+    {'profileId': profileId},
+  );
+
+  _i3.Future<_i8.DictionaryImportProfileDetail>
+  createVietnameseVocabularyProfile() =>
+      caller.callServerEndpoint<_i8.DictionaryImportProfileDetail>(
+        'dictionaryImport',
+        'createVietnameseVocabularyProfile',
+        {},
+      );
+
+  _i3.Future<_i9.DictionaryImportPreview?> previewRows({
+    required int profileId,
+    required List<String> rowsJson,
+  }) => caller.callServerEndpoint<_i9.DictionaryImportPreview?>(
+    'dictionaryImport',
+    'previewRows',
+    {
+      'profileId': profileId,
+      'rowsJson': rowsJson,
+    },
+  );
+
+  _i3.Future<_i9.DictionaryImportPreview?> previewExcelBase64({
+    required int profileId,
+    required String excelBase64,
+  }) => caller.callServerEndpoint<_i9.DictionaryImportPreview?>(
+    'dictionaryImport',
+    'previewExcelBase64',
+    {
+      'profileId': profileId,
+      'excelBase64': excelBase64,
+    },
+  );
+
+  _i3.Future<_i10.DictionaryImportCommitResult> commitExcelBase64({
+    required int profileId,
+    required String excelBase64,
+  }) => caller.callServerEndpoint<_i10.DictionaryImportCommitResult>(
+    'dictionaryImport',
+    'commitExcelBase64',
+    {
+      'profileId': profileId,
+      'excelBase64': excelBase64,
+    },
+  );
+}
+
+/// {@category Endpoint}
+class EndpointKnownEntry extends _i2.EndpointRef {
+  EndpointKnownEntry(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'knownEntry';
+
+  _i3.Future<List<int>> getKnownEntryIds({required List<int> entryIds}) =>
+      caller.callServerEndpoint<List<int>>(
+        'knownEntry',
+        'getKnownEntryIds',
+        {'entryIds': entryIds},
+      );
+
+  _i3.Future<bool> setKnown({
+    required int entryId,
+    required bool known,
+  }) => caller.callServerEndpoint<bool>(
+    'knownEntry',
+    'setKnown',
+    {
+      'entryId': entryId,
+      'known': known,
+    },
+  );
+
+  _i3.Future<String> getKnowledgeState({
+    required String languageCode,
+    required String normalizedText,
+    required String entryType,
+  }) => caller.callServerEndpoint<String>(
+    'knownEntry',
+    'getKnowledgeState',
+    {
+      'languageCode': languageCode,
+      'normalizedText': normalizedText,
+      'entryType': entryType,
+    },
+  );
+
+  _i3.Future<List<_i11.KnowledgeStateResult>> getKnowledgeStates({
+    required List<_i12.KnowledgeStateQuery> queries,
+  }) => caller.callServerEndpoint<List<_i11.KnowledgeStateResult>>(
+    'knownEntry',
+    'getKnowledgeStates',
+    {'queries': queries},
+  );
+}
+
+/// {@category Endpoint}
+class EndpointSubtitle extends _i2.EndpointRef {
+  EndpointSubtitle(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'subtitle';
+
+  _i3.Future<List<_i13.SubtitleCueDetail>> getCueDetails({
+    required int videoId,
+    required String languageCode,
+  }) => caller.callServerEndpoint<List<_i13.SubtitleCueDetail>>(
+    'subtitle',
+    'getCueDetails',
+    {
+      'videoId': videoId,
+      'languageCode': languageCode,
+    },
+  );
+}
+
+/// {@category Endpoint}
 class EndpointVideo extends _i2.EndpointRef {
   EndpointVideo(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'video';
 
-  _i3.Future<_i6.Video> create({
+  _i3.Future<_i14.Video> create({
     required String authorId,
     required String authorName,
     required String title,
@@ -315,7 +495,7 @@ class EndpointVideo extends _i2.EndpointRef {
     required String videoStorageKey,
     String? coverStorageKey,
     required int durationSeconds,
-  }) => caller.callServerEndpoint<_i6.Video>(
+  }) => caller.callServerEndpoint<_i14.Video>(
     'video',
     'create',
     {
@@ -331,15 +511,15 @@ class EndpointVideo extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i6.Video>> getVideos() =>
-      caller.callServerEndpoint<List<_i6.Video>>(
+  _i3.Future<List<_i14.Video>> getVideos() =>
+      caller.callServerEndpoint<List<_i14.Video>>(
         'video',
         'getVideos',
         {},
       );
 
-  _i3.Future<_i6.Video?> getVideo(int id) =>
-      caller.callServerEndpoint<_i6.Video?>(
+  _i3.Future<_i14.Video?> getVideo(int id) =>
+      caller.callServerEndpoint<_i14.Video?>(
         'video',
         'getVideo',
         {'id': id},
@@ -372,6 +552,33 @@ class EndpointVideo extends _i2.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointWordList extends _i2.EndpointRef {
+  EndpointWordList(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'wordList';
+
+  _i3.Future<List<_i15.WordList>> getLists() =>
+      caller.callServerEndpoint<List<_i15.WordList>>(
+        'wordList',
+        'getLists',
+        {},
+      );
+
+  _i3.Future<_i16.WordListDetail?> getListDetail({
+    required int listId,
+    required String explanationLanguageCode,
+  }) => caller.callServerEndpoint<_i16.WordListDetail?>(
+    'wordList',
+    'getListDetail',
+    {
+      'listId': listId,
+      'explanationLanguageCode': explanationLanguageCode,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -382,8 +589,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i7.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i7.Greeting>(
+  _i3.Future<_i17.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i17.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -421,7 +628,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i8.Protocol(),
+         _i18.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -433,7 +640,12 @@ class Client extends _i2.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     userProfileEdit = EndpointUserProfileEdit(this);
+    dictionary = EndpointDictionary(this);
+    dictionaryImport = EndpointDictionaryImport(this);
+    knownEntry = EndpointKnownEntry(this);
+    subtitle = EndpointSubtitle(this);
     video = EndpointVideo(this);
+    wordList = EndpointWordList(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -444,7 +656,17 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointUserProfileEdit userProfileEdit;
 
+  late final EndpointDictionary dictionary;
+
+  late final EndpointDictionaryImport dictionaryImport;
+
+  late final EndpointKnownEntry knownEntry;
+
+  late final EndpointSubtitle subtitle;
+
   late final EndpointVideo video;
+
+  late final EndpointWordList wordList;
 
   late final EndpointGreeting greeting;
 
@@ -455,7 +677,12 @@ class Client extends _i2.ServerpodClientShared {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
     'userProfileEdit': userProfileEdit,
+    'dictionary': dictionary,
+    'dictionaryImport': dictionaryImport,
+    'knownEntry': knownEntry,
+    'subtitle': subtitle,
     'video': video,
+    'wordList': wordList,
     'greeting': greeting,
   };
 

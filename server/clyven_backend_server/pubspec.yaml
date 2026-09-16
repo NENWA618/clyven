@@ -1,4 +1,4 @@
-﻿name: clyven_backend_server
+name: clyven_backend_server
 description: Starting point for a Serverpod server.
 # version: 1.0.0
 # homepage: https://www.example.com
@@ -13,6 +13,7 @@ dependencies:
   serverpod_auth_idp_server: 3.4.11
   mailer: ^7.2.0
   serverpod_cloud_storage_gcp: ^3.4.11
+  excel: ^4.0.6
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'

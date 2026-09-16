@@ -1,0 +1,36 @@
+class: DictionaryImportMapping
+table: dictionary_import_mapping
+fields:
+  profileId: int, relation(parent=dictionary_import_profile)
+
+  # Excel 原始列名
+  sourceColumn: String
+
+  # entry / form / definition / example / relation / morphology
+  targetType: String
+
+  # 目标字段，例如 text / gloss / partOfSpeech
+  targetField: String?
+
+  languageCode: String?
+  scriptCode: String?
+  relationType: String?
+
+  # 多个例句文字属于同一个 example group
+  groupKey: String?
+
+  # 可选转换器，例如：
+  # valueMap / trim / lowercase / uppercase / split
+  transformType: String?
+
+  # 转换器配置，使用 JSON 字符串保存
+  # 例如：
+  # {"代词":"pronoun","名词":"noun","动词":"verb"}
+  transformConfig: String?
+
+  position: int
+
+  required: bool, default=false
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

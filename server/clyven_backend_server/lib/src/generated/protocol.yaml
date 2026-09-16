@@ -15,6 +15,22 @@ userProfileEdit:
   - changeUserName:
   - changeFullName:
   - get:
+dictionary:
+  - lookup:
+dictionaryImport:
+  - getProfiles:
+  - getProfile:
+  - createVietnameseVocabularyProfile:
+  - previewRows:
+  - previewExcelBase64:
+  - commitExcelBase64:
+knownEntry:
+  - getKnownEntryIds:
+  - setKnown:
+  - getKnowledgeState:
+  - getKnowledgeStates:
+subtitle:
+  - getCueDetails:
 video:
   - create:
   - getVideos:
@@ -22,5 +38,8 @@ video:
   - createUploadDescription:
   - verifyUpload:
   - getVideoUrl:
+wordList:
+  - getLists:
+  - getListDetail:
 greeting:
   - hello:

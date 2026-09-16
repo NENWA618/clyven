@@ -1,0 +1,10 @@
+class: DictionaryRelation
+table: dictionary_relation
+
+fields:
+  sourceEntryId: int, relation(parent=dictionary_entry)
+  targetEntryId: int, relation(parent=dictionary_entry)
+  relationType: String
+  position: int?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

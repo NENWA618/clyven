@@ -1,0 +1,23 @@
+class: DictionaryExampleText
+table: dictionary_example_text
+fields:
+  exampleId: int, relation(parent=dictionary_example)
+
+  # vi / zh / en ...
+  languageCode: String
+
+  # latn = Quốc ngữ
+  # nom  = 喃字
+  # hans = 简体中文
+  # hant = 繁体中文
+  scriptCode: String
+
+  text: String
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  dictionary_example_text_unique_idx:
+    fields: exampleId, languageCode, scriptCode
+    unique: true

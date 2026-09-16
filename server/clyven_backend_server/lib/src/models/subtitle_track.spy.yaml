@@ -1,0 +1,13 @@
+class: SubtitleTrack
+table: subtitle_track
+
+fields:
+  videoId: int, relation(parent=video)
+
+  languageCode: String
+  label: String
+
+  isDefault: bool, default=false
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

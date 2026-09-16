@@ -1,0 +1,10 @@
+class: DictionaryExample
+table: dictionary_example
+fields:
+  entryId: int, relation(parent=dictionary_entry)
+
+  # 同一个词可以有多个例句
+  position: int
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

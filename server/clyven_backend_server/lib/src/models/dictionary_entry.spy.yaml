@@ -1,0 +1,35 @@
+class: DictionaryEntry
+table: dictionary_entry
+fields:
+  languageCode: String
+
+  # 当前词条的主显示形式
+  text: String
+
+  normalizedText: String
+  entryType: String
+
+  # 主显示形式使用的文字系统。
+  #
+  # 例如：
+  # vi + latn
+  # zh + hans
+  # zh + hant
+  # ru + cyrl
+  # ug + arab
+  # mn + mong
+  #
+  # 暂时允许为空，兼容现有数据。
+  primaryScriptCode: String?
+
+  # 词性使用语言无关代码：
+  # noun
+  # verb
+  # adjective
+  # pronoun
+  # adverb
+  # preposition
+  partOfSpeech: String?
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

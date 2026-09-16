@@ -1,0 +1,13 @@
+class: SubtitleCue
+table: subtitle_cue
+
+fields:
+  trackId: int, relation(parent=subtitle_track)
+
+  startMs: int
+  endMs: int
+
+  text: String
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

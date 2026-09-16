@@ -21,27 +21,36 @@ void run(List<String> args) async {
     Endpoints(),
   );
 
-  pod.addCloudStorage(
-    gcp.GoogleCloudStorage(
-      serverpod: pod,
-      storageId: 'public',
-      public: true,
-      region: 'auto',
-      bucket: 'glyphora-video-storage-11129163384',
-    ),
-  );
+  // 现在是不是数据库维护 / migration 模式
+  final isMaintenance = args.contains('maintenance');
 
-  pod.initializeAuthServices(
-    tokenManagerBuilders: [
-      JwtConfigFromPasswords(),
-    ],
-    identityProviderBuilders: [
-      EmailIdpConfigFromPasswords(
-        sendRegistrationVerificationCode: _sendRegistrationCode,
-        sendPasswordResetVerificationCode: _sendPasswordResetCode,
+  // 正常启动服务器时才需要 GCP Storage
+  if (!isMaintenance) {
+    pod.addCloudStorage(
+      gcp.GoogleCloudStorage(
+        serverpod: pod,
+        storageId: 'public',
+        public: true,
+        region: 'auto',
+        bucket: 'glyphora-video-storage-11129163384',
       ),
-    ],
-  );
+    );
+  }
+
+  // 正常启动服务器时才需要登录认证系统
+  if (!isMaintenance) {
+    pod.initializeAuthServices(
+      tokenManagerBuilders: [
+        JwtConfigFromPasswords(),
+      ],
+      identityProviderBuilders: [
+        EmailIdpConfigFromPasswords(
+          sendRegistrationVerificationCode: _sendRegistrationCode,
+          sendPasswordResetVerificationCode: _sendPasswordResetCode,
+        ),
+      ],
+    );
+  }
 
   pod.webServer.addRoute(
     RootRoute(),

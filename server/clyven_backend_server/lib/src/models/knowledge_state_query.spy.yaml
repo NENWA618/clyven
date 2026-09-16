@@ -1,0 +1,5 @@
+class: KnowledgeStateQuery
+fields:
+  languageCode: String
+  normalizedText: String
+  entryType: String

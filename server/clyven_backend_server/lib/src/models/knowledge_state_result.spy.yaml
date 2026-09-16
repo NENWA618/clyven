@@ -1,0 +1,6 @@
+class: KnowledgeStateResult
+fields:
+  languageCode: String
+  normalizedText: String
+  entryType: String
+  state: String

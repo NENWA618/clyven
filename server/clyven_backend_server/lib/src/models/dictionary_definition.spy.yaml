@@ -1,0 +1,10 @@
+class: DictionaryDefinition
+table: dictionary_definition
+
+fields:
+  entryId: int, relation(parent=dictionary_entry)
+  explanationLanguageCode: String
+  gloss: String
+  definition: String?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

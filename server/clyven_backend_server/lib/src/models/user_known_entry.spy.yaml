@@ -1,0 +1,13 @@
+class: UserKnownEntry
+table: user_known_entry
+
+fields:
+  userId: String
+  entryId: int, relation(parent=dictionary_entry)
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  user_known_entry_unique_idx:
+    fields: userId, entryId
+    unique: true

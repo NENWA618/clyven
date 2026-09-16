@@ -1,0 +1,6 @@
+class: SubtitleCueDetail
+
+fields:
+  cue: SubtitleCue
+  tokens: List<SubtitleToken>
+  phrases: List<SubtitlePhrase>

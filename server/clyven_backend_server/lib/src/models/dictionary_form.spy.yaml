@@ -1,0 +1,24 @@
+class: DictionaryForm
+table: dictionary_form
+fields:
+  entryId: int, relation(parent=dictionary_entry)
+
+  # latn = 国语字 / 拉丁字母
+  # nom = 喃字
+  scriptCode: String
+
+  text: String
+
+  # 用于搜索、匹配；喃字可以暂时与 text 相同
+  normalizedText: String
+
+  # 同一种文字以后可能有多个写法
+  isPrimary: bool, default=false
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  dictionary_form_unique_idx:
+    fields: entryId, scriptCode, text
+    unique: true

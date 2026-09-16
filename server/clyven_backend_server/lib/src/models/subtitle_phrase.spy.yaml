@@ -1,0 +1,14 @@
+class: SubtitlePhrase
+table: subtitle_phrase
+
+fields:
+  cueId: int, relation(parent=subtitle_cue)
+
+  text: String
+  normalizedText: String?
+
+  startPosition: int
+  endPosition: int
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

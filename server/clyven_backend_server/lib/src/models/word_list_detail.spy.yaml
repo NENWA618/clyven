@@ -1,0 +1,5 @@
+class: WordListDetail
+
+fields:
+  wordList: WordList
+  items: List<WordListItemDetail>

@@ -1,0 +1,4 @@
+class: DictionaryImportProfileDetail
+fields:
+  profile: DictionaryImportProfile
+  mappings: List<DictionaryImportMapping>

@@ -1,0 +1,30 @@
+class: DictionaryImportProfile
+table: dictionary_import_profile
+fields:
+  # 例如：
+  # 越南语主词表
+  # 俄语动词
+  # 吉尔吉斯语名词
+  name: String
+
+  # vi / ru / ky / mn ...
+  languageCode: String
+
+  # 对应 Excel Sheet 名称
+  # 例如：词汇 / 动词 / 名词
+  sheetName: String
+
+  # 这个 Sheet 默认产生什么词条
+  # word / phrase 等
+  defaultEntryType: String?
+
+  # 主词默认文字系统
+  # latn / cyrl / arab / nom / mong ...
+  primaryScriptCode: String?
+
+  description: String?
+
+  isActive: bool, default=true
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

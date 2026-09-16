@@ -1,0 +1,14 @@
+class: WordListItem
+table: word_list_item
+
+fields:
+  listId: int, relation(parent=word_list)
+  entryId: int, relation(parent=dictionary_entry)
+  position: int
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  word_list_item_unique_idx:
+    fields: listId, entryId
+    unique: true

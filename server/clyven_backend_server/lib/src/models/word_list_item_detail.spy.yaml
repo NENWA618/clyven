@@ -1,0 +1,6 @@
+class: WordListItemDetail
+
+fields:
+  item: WordListItem
+  entry: DictionaryEntry
+  definitions: List<DictionaryDefinition>

@@ -9,6 +9,7 @@ import '../../../creator/presentation/pages/following_creators_page.dart';
 import '../../../history/presentation/pages/watch_history_page.dart';
 import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../../video_interactions/presentation/pages/favorite_videos_page.dart';
+import '../../../word_list/presentation/pages/word_lists_page.dart';
 import '../../data/models/user_profile.dart';
 import '../providers/my_profile_provider.dart';
 import 'my_submissions_page.dart';
@@ -168,6 +169,7 @@ class MyProfilePage extends ConsumerWidget {
                   favoritesTap: login,
                   historyTap: login,
                   followingTap: login,
+                  wordListsTap: login,
                 ),
               ),
             ),
@@ -517,17 +519,28 @@ class MyProfilePage extends ConsumerWidget {
             ),
           );
         },
+        wordListsTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return const WordListsPage();
+      },
+    ),
+  );
+},
       ),
     );
   }
 
-  Widget _buildLibraryRow(
+Widget _buildLibraryRow(
   BuildContext context,
   AppLocalizations l10n, {
   required VoidCallback submissionsTap,
   required VoidCallback favoritesTap,
   required VoidCallback historyTap,
   required VoidCallback followingTap,
+  required VoidCallback wordListsTap,
 }) {
   return Column(
     children: [
@@ -574,6 +587,20 @@ class MyProfilePage extends ConsumerWidget {
           ),
         ],
       ),
+
+      const SizedBox(height: 10),
+Row(
+  children: [
+    Expanded(
+      child: _libraryItem(
+        icon: Icons.menu_book_rounded,
+        title: '词表',
+        subtitle: '我的词汇学习',
+        onTap: wordListsTap,
+      ),
+    ),
+  ],
+),
     ],
   );
 }
