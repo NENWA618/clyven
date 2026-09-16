@@ -31,6 +31,33 @@ class DictionaryEndpoint extends Endpoint {
           ),
     );
 
+    final forms = await DictionaryForm.db.find(
+  session,
+  where: (f) => f.entryId.equals(entry.id),
+);
+
+final examples = await DictionaryExample.db.find(
+  session,
+  where: (e) => e.entryId.equals(entry.id),
+  orderBy: (e) => e.position,
+);
+
+final exampleDetails = <DictionaryExampleDetail>[];
+
+for (final example in examples) {
+  final texts = await DictionaryExampleText.db.find(
+    session,
+    where: (t) => t.exampleId.equals(example.id),
+  );
+
+  exampleDetails.add(
+    DictionaryExampleDetail(
+      example: example,
+      texts: texts,
+    ),
+  );
+}
+
     final relations = await DictionaryRelation.db.find(
       session,
       where: (r) =>
@@ -72,9 +99,11 @@ class DictionaryEndpoint extends Endpoint {
     }
 
     return DictionaryEntryDetail(
-      entry: entry,
-      definitions: definitions,
-      relations: relationDetails,
-    );
+  entry: entry,
+  definitions: definitions,
+  forms: forms,
+  examples: exampleDetails,
+  relations: relationDetails,
+);
   }
 }

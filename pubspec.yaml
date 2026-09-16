@@ -6,7 +6,9 @@ environment:
 
 workspace:
   - apps/clyven_app
+  - apps/clyven_studio
   - packages/clyven_backend_client
   - server/clyven_backend_server
+  
 dependencies:
   serverpod_auth_core_client: 3.4.11

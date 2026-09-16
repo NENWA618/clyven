@@ -258,6 +258,8 @@ var validRows = 0;
 var warningRows = 0;
 var errorRows = 0;
 
+final seenHeadwordRows = <String, int>{};
+
   for (var i = 0; i < rowsJson.length; i++) {
     var rowNumber = i + 2;
 
@@ -469,7 +471,7 @@ switch (mapping.transformType) {
       }
     }
 
-    final headword =
+final headword =
     cleanValue(entry['text']);
 
 String status;
@@ -486,8 +488,28 @@ if (missingRequired.isNotEmpty) {
       '词条尚未完成：没有主词；正式导入时会跳过';
   warningRows++;
 } else {
-  status = 'ok';
-  validRows++;
+  final entryType =
+      entry['entryType']?.toString() ?? 'word';
+
+  final duplicateKey =
+      '$entryType|${headword.toLowerCase()}';
+
+  final firstRow =
+      seenHeadwordRows[duplicateKey];
+
+  if (firstRow != null) {
+    status = 'warning';
+    message =
+        '重复词条：国语字 "$headword" '
+        '已在 Row $firstRow 出现；'
+        '请先合并重复资料再正式导入';
+    warningRows++;
+  } else {
+    seenHeadwordRows[duplicateKey] = rowNumber;
+
+    status = 'ok';
+    validRows++;
+  }
 }
 
     final normalized = {

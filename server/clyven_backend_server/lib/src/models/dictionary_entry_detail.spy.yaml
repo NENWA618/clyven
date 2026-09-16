@@ -3,4 +3,6 @@ class: DictionaryEntryDetail
 fields:
   entry: DictionaryEntry
   definitions: List<DictionaryDefinition>
+  forms: List<DictionaryForm>
+  examples: List<DictionaryExampleDetail>
   relations: List<DictionaryRelationDetail>
