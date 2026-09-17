@@ -20,7 +20,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     this.explanationLanguageCode = 'zh',
   });
 
-    Color _knowledgeColor(String state) {
+  Color _knowledgeColor(String state) {
     switch (state) {
       case 'exactKnown':
         return const Color(0xFF7EE787);
@@ -39,178 +39,169 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     WidgetRef ref,
     serverpod.DictionaryEntryDetail data,
   ) {
-  final widgets = <Widget>[];
+    final widgets = <Widget>[];
 
-  if (data.definitions.isEmpty) {
-    widgets.add(
-      const Text(
-        '这个词条暂时没有当前语言的释义',
-        style: TextStyle(fontSize: 16),
-      ),
-    );
-  } else {
-    for (final definition in data.definitions) {
+    if (data.definitions.isEmpty) {
       widgets.add(
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                definition.gloss,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              if (definition.definition != null) ...[
-                const SizedBox(height: 8),
+        const Text(
+          '这个词条暂时没有当前语言的释义',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    } else {
+      for (final definition in data.definitions) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  definition.definition!,
+                  definition.gloss,
                   style: const TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
+                if (definition.definition != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    definition.definition!,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
+          ),
+        );
+      }
+    }
+
+    final components = data.relations
+        .where(
+          (item) => item.relation.relationType == 'component',
+        )
+        .toList();
+
+    if (components.isNotEmpty) {
+      widgets.add(const Divider());
+      widgets.add(const SizedBox(height: 8));
+
+      widgets.add(
+        const Text(
+          '组成',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey,
           ),
         ),
       );
-    }
-  }
 
-  final components = data.relations
-      .where(
-        (item) =>
-            item.relation.relationType == 'component',
-      )
-      .toList();
+      widgets.add(const SizedBox(height: 12));
 
-  if (components.isNotEmpty) {
-    widgets.add(const Divider());
-    widgets.add(const SizedBox(height: 8));
+      for (final component in components) {
+        final target = component.targetEntry;
 
-    widgets.add(
-      const Text(
-        '组成',
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: Colors.grey,
-        ),
-      ),
-    );
+        final meaning = component.targetDefinitions.isEmpty
+            ? '暂无释义'
+            : component.targetDefinitions.first.gloss;
 
-    widgets.add(const SizedBox(height: 12));
+        final knowledgeFuture = ref
+            .read(
+              knownEntryRepositoryProvider,
+            )
+            .getKnowledgeState(
+              languageCode: languageCode,
+              normalizedText: target.normalizedText,
+              entryType: target.entryType,
+            );
 
-for (final component in components) {
-  final target = component.targetEntry;
-
-  final meaning =
-      component.targetDefinitions.isEmpty
-          ? '暂无释义'
-          : component.targetDefinitions.first.gloss;
-
-  final knowledgeFuture = ref
-      .read(
-        knownEntryRepositoryProvider,
-      )
-      .getKnowledgeState(
-        languageCode: languageCode,
-        normalizedText: target.normalizedText,
-        entryType: target.entryType,
-      );
-
-  widgets.add(
-    InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: () {
-        _showDictionaryEntry(
-          context: context,
-          ref: ref,
-          text: target.text,
-          normalizedText: target.normalizedText,
-          entryType: target.entryType,
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-        ),
-        child: Row(
-          children: [
-            Text(
-              target.text,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
+        widgets.add(
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () {
+              _showDictionaryEntry(
+                context: context,
+                ref: ref,
+                text: target.text,
+                normalizedText: target.normalizedText,
+                entryType: target.entryType,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8,
               ),
-            ),
-
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: Text(
-                meaning,
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ),
-
-            FutureBuilder<String>(
-              future: knowledgeFuture,
-              builder: (context, snapshot) {
-                final state =
-                    snapshot.data ?? 'unknown';
-
-                if (state == 'exactKnown') {
-                  return const Row(
-                    mainAxisSize:
-                        MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 18,
-                      ),
-                      SizedBox(width: 4),
-                      Text('已会'),
-                    ],
-                  );
-                }
-
-                if (state == 'relatedKnown') {
-                  return const Text(
-                    '相关词已会',
-                  );
-                }
-
-                return const Text(
-                  '未标记',
-                  style: TextStyle(
-                    color: Colors.grey,
+              child: Row(
+                children: [
+                  Text(
+                    target.text,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                );
-              },
-            ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      meaning,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  FutureBuilder<String>(
+                    future: knowledgeFuture,
+                    builder: (context, snapshot) {
+                      final state = snapshot.data ?? 'unknown';
 
-            const SizedBox(width: 8),
+                      if (state == 'exactKnown') {
+                        return const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              size: 18,
+                            ),
+                            SizedBox(width: 4),
+                            Text('已会'),
+                          ],
+                        );
+                      }
 
-            const Icon(
-              Icons.chevron_right,
-              size: 20,
+                      if (state == 'relatedKnown') {
+                        return const Text(
+                          '相关词已会',
+                        );
+                      }
+
+                      return const Text(
+                        '未标记',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
+          ),
+        );
+      }
+    }
+
+    return widgets;
   }
-
-  return widgets;
-}
 
   serverpod.SubtitlePhrase? _findPhraseForToken(
     serverpod.SubtitleToken token,
@@ -237,22 +228,18 @@ for (final component in components) {
     );
 
     final lookupFuture = repository.lookup(
-  languageCode: languageCode,
-  normalizedText: normalizedText,
-  entryType: entryType,
-  explanationLanguageCode:
-      explanationLanguageCode,
-);
-
-
+      languageCode: languageCode,
+      normalizedText: normalizedText,
+      entryType: entryType,
+      explanationLanguageCode: explanationLanguageCode,
+    );
 
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (context) {
-        return FutureBuilder<
-            serverpod.DictionaryEntryDetail?>(
+        return FutureBuilder<serverpod.DictionaryEntryDetail?>(
           future: lookupFuture,
           builder: (context, snapshot) {
             return Padding(
@@ -264,13 +251,10 @@ for (final component in components) {
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    entryType == 'phrase'
-                        ? 'Phrase'
-                        : 'Token',
+                    entryType == 'phrase' ? 'Phrase' : 'Token',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -278,128 +262,101 @@ for (final component in components) {
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   Text(
-  text,
-  style: const TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.w900,
-  ),
-),
-
-const SizedBox(height: 8),
-
-Consumer(
-  builder: (
-    context,
-    sheetRef,
-    child,
-  ) {
-    final query = (
-      languageCode: languageCode,
-      normalizedText: normalizedText,
-      entryType: entryType,
-    );
-
-    final knowledgeAsync = sheetRef.watch(
-      knowledgeStateProvider(query),
-    );
-
-    final state =
-        knowledgeAsync.value ?? 'unknown';
-
-    final isKnown =
-        state == 'exactKnown';
-
-    final entryId =
-        snapshot.data?.entry.id;
-
-    String statusText;
-
-    if (state == 'exactKnown') {
-      statusText = '✓ 已会';
-    } else if (state == 'relatedKnown') {
-      statusText = '相关词已会';
-    } else {
-      statusText = '未标记';
-    }
-
-    return Row(
-      children: [
-        Text(
-          statusText,
-          style: TextStyle(
-            fontWeight:
-                state == 'unknown'
-                    ? FontWeight.normal
-                    : FontWeight.w700,
-            color:
-                state == 'unknown'
-                    ? Colors.grey
-                    : null,
-          ),
-        ),
-
-        const Spacer(),
-
-        TextButton.icon(
-          onPressed:
-              entryId == null
-                  ? null
-                  : () async {
-                      final repository =
-                          sheetRef.read(
-                        knownEntryRepositoryProvider,
+                    text,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Consumer(
+                    builder: (
+                      context,
+                      sheetRef,
+                      child,
+                    ) {
+                      final query = (
+                        languageCode: languageCode,
+                        normalizedText: normalizedText,
+                        entryType: entryType,
                       );
 
-                      await repository.setKnown(
-                        entryId: entryId,
-                        known: !isKnown,
+                      final knowledgeAsync = sheetRef.watch(
+                        knowledgeStateProvider(query),
                       );
 
-                      // 当前词以及所有相关词状态重新计算。
-                      sheetRef.invalidate(
-                        knowledgeStateProvider,
-                      );
+                      final state = knowledgeAsync.value ?? 'unknown';
+                      final isKnown = state == 'exactKnown';
+                      final entryId = snapshot.data?.entry.id;
 
-                      sheetRef.invalidate(
-                        knowledgeStatesProvider,
-                      );
+                      String statusText;
 
-                      // 回到词表时，✓ / ○ 也重新读取。
-                      sheetRef.invalidate(
-                        knownEntriesForListProvider,
+                      if (state == 'exactKnown') {
+                        statusText = '✓ 已会';
+                      } else if (state == 'relatedKnown') {
+                        statusText = '相关词已会';
+                      } else {
+                        statusText = '未标记';
+                      }
+
+                      return Row(
+                        children: [
+                          Text(
+                            statusText,
+                            style: TextStyle(
+                              fontWeight: state == 'unknown'
+                                  ? FontWeight.normal
+                                  : FontWeight.w700,
+                              color: state == 'unknown' ? Colors.grey : null,
+                            ),
+                          ),
+                          const Spacer(),
+                          TextButton.icon(
+                            onPressed: entryId == null
+                                ? null
+                                : () async {
+                                    final repository = sheetRef.read(
+                                      knownEntryRepositoryProvider,
+                                    );
+
+                                    await repository.setKnown(
+                                      entryId: entryId,
+                                      known: !isKnown,
+                                    );
+
+                                    sheetRef.invalidate(
+                                      knowledgeStateProvider,
+                                    );
+
+                                    sheetRef.invalidate(
+                                      knowledgeStatesProvider,
+                                    );
+
+                                    sheetRef.invalidate(
+                                      knownEntriesForListProvider,
+                                    );
+                                  },
+                            icon: Icon(
+                              isKnown
+                                  ? Icons.remove_circle_outline
+                                  : Icons.check_circle_outline,
+                            ),
+                            label: Text(
+                              isKnown ? '取消已会' : '标记已会',
+                            ),
+                          ),
+                        ],
                       );
                     },
-          icon: Icon(
-            isKnown
-                ? Icons
-                    .remove_circle_outline
-                : Icons
-                    .check_circle_outline,
-          ),
-          label: Text(
-            isKnown
-                ? '取消已会'
-                : '标记已会',
-          ),
-        ),
-      ],
-    );
-  },
-),
-
-const SizedBox(height: 18),
-
+                  ),
                   const SizedBox(height: 18),
-
-                  if (snapshot.connectionState ==
-                      ConnectionState.waiting)
+                  const SizedBox(height: 18),
+                  if (snapshot.connectionState == ConnectionState.waiting)
                     const Center(
                       child: Padding(
                         padding: EdgeInsets.all(16),
-                        child:
-                            CircularProgressIndicator(),
+                        child: CircularProgressIndicator(),
                       ),
                     )
                   else if (snapshot.hasError)
@@ -410,18 +367,18 @@ const SizedBox(height: 18),
                       ),
                     )
                   else if (snapshot.data == null)
-  const Text(
-    '暂时没有这个词条的释义',
-    style: TextStyle(
-      fontSize: 16,
-    ),
-  )
-else
-  ..._buildDictionaryContent(
-    context,
-    ref,
-    snapshot.data!,
-  ),
+                    const Text(
+                      '暂时没有这个词条的释义',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )
+                  else
+                    ..._buildDictionaryContent(
+                      context,
+                      ref,
+                      snapshot.data!,
+                    ),
                 ],
               ),
             );
@@ -449,91 +406,74 @@ else
     }
 
     final tokens = [...detail.tokens]
-  ..sort(
-    (a, b) => a.position.compareTo(b.position),
-  );
+      ..sort(
+        (a, b) => a.position.compareTo(b.position),
+      );
 
-// 先把这一条字幕真正会显示的 word / phrase
-// 全部整理成一个批量请求。
-final batchQueries = <KnowledgeStateRequest>[];
+    final batchQueries = <KnowledgeStateRequest>[];
 
-var queryIndex = 0;
+    var queryIndex = 0;
 
-while (queryIndex < tokens.length) {
-  final token = tokens[queryIndex];
+    while (queryIndex < tokens.length) {
+      final token = tokens[queryIndex];
+      final phrase = _findPhraseForToken(token);
 
-  final phrase = _findPhraseForToken(token);
+      if (phrase != null && phrase.startPosition == token.position) {
+        batchQueries.add(
+          KnowledgeStateRequest(
+            languageCode: languageCode,
+            normalizedText: phrase.normalizedText ?? phrase.text,
+            entryType: 'phrase',
+          ),
+        );
 
-  if (phrase != null &&
-      phrase.startPosition == token.position) {
-    batchQueries.add(
-      KnowledgeStateRequest(
-        languageCode: languageCode,
-        normalizedText:
-            phrase.normalizedText ?? phrase.text,
-        entryType: 'phrase',
-      ),
-    );
+        while (queryIndex < tokens.length &&
+            tokens[queryIndex].position <= phrase.endPosition) {
+          queryIndex++;
+        }
 
-    while (
-        queryIndex < tokens.length &&
-        tokens[queryIndex].position <=
-            phrase.endPosition) {
+        continue;
+      }
+
+      batchQueries.add(
+        KnowledgeStateRequest(
+          languageCode: languageCode,
+          normalizedText: token.normalizedText ?? token.text,
+          entryType: 'word',
+        ),
+      );
+
       queryIndex++;
     }
 
-    continue;
-  }
+    final batchStateAsync = ref.watch(
+      knowledgeStatesProvider(
+        KnowledgeBatchRequest(
+          queries: batchQueries,
+        ),
+      ),
+    );
 
-  batchQueries.add(
-    KnowledgeStateRequest(
-      languageCode: languageCode,
-      normalizedText:
-          token.normalizedText ?? token.text,
-      entryType: 'word',
-    ),
-  );
+    final batchStates = batchStateAsync.value ?? <String, String>{};
+    final children = <Widget>[];
 
-  queryIndex++;
-}
-
-final batchStateAsync = ref.watch(
-  knowledgeStatesProvider(
-    KnowledgeBatchRequest(
-      queries: batchQueries,
-    ),
-  ),
-);
-
-final batchStates =
-    batchStateAsync.value ??
-    <String, String>{};
-
-final children = <Widget>[];
-
-var index = 0;
+    var index = 0;
 
     while (index < tokens.length) {
       final token = tokens[index];
-
       final phrase = _findPhraseForToken(token);
 
-      // 如果当前位置是 phrase 开头，
-      // 整个 phrase 作为一个点击单位。
-      if (phrase != null &&
-          phrase.startPosition == token.position) {
-        final normalizedText =
-            phrase.normalizedText ?? phrase.text;
+      if (phrase != null && phrase.startPosition == token.position) {
+        final normalizedText = phrase.normalizedText ?? phrase.text;
 
-        final knowledgeState =
-          batchStates[
-            knowledgeStateKey(
-              languageCode: languageCode,
-              normalizedText: normalizedText,
-              entryType: 'phrase',
-            )
-          ] ??
-          'unknown';
+        final knowledgeState = batchStates[
+              knowledgeStateKey(
+                languageCode: languageCode,
+                normalizedText: normalizedText,
+                entryType: 'phrase',
+              )
+            ] ??
+            'unknown';
 
         children.add(
           GestureDetector(
@@ -552,10 +492,10 @@ var index = 0;
                 horizontal: 3,
                 vertical: 5,
               ),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Color(0xFFE5FF58),
+                    color: Theme.of(context).colorScheme.primary,
                     width: 2,
                   ),
                 ),
@@ -574,31 +514,24 @@ var index = 0;
           ),
         );
 
-        // phrase 已经包含这些 token，
-        // 所以直接跳过。
-        while (
-            index < tokens.length &&
-            tokens[index].position <=
-                phrase.endPosition) {
+        while (index < tokens.length &&
+            tokens[index].position <= phrase.endPosition) {
           index++;
         }
 
         continue;
       }
 
-      // 普通单词。
-      final normalizedText =
-          token.normalizedText ?? token.text;
+      final normalizedText = token.normalizedText ?? token.text;
 
-      final knowledgeState =
-    batchStates[
-      knowledgeStateKey(
-        languageCode: languageCode,
-        normalizedText: normalizedText,
-        entryType: 'word',
-      )
-    ] ??
-    'unknown';
+      final knowledgeState = batchStates[
+            knowledgeStateKey(
+              languageCode: languageCode,
+              normalizedText: normalizedText,
+              entryType: 'word',
+            )
+          ] ??
+          'unknown';
 
       children.add(
         GestureDetector(
