@@ -9,10 +9,7 @@ import '../providers/watch_history_provider.dart';
 class WatchHistoryPage extends ConsumerWidget {
   const WatchHistoryPage({super.key});
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -21,9 +18,10 @@ class WatchHistoryPage extends ConsumerWidget {
   ) {
     final historyAsync = ref.watch(watchHistoryProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,6 +87,8 @@ class WatchHistoryPage extends ConsumerWidget {
     List<WatchHistoryItem> history,
     AppLocalizations l10n,
   ) {
+    final secondary = Theme.of(context).colorScheme.secondary;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         16,
@@ -121,8 +121,8 @@ class WatchHistoryPage extends ConsumerWidget {
               children: [
                 Text(
                   l10n.tracesEyebrow,
-                  style: const TextStyle(
-                    color: _purple,
+                  style: TextStyle(
+                    color: secondary,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -147,8 +147,8 @@ class WatchHistoryPage extends ConsumerWidget {
               },
               child: Text(
                 l10n.clear,
-                style: const TextStyle(
-                  color: _purple,
+                style: TextStyle(
+                  color: secondary,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -163,6 +163,8 @@ class WatchHistoryPage extends ConsumerWidget {
     WidgetRef ref,
     WatchHistoryItem item,
   ) {
+    final colors = Theme.of(context).colorScheme;
+
     return Dismissible(
       key: ValueKey(item.videoId),
       direction: DismissDirection.endToStart,
@@ -229,7 +231,7 @@ class WatchHistoryPage extends ConsumerWidget {
                           minHeight: 5,
                           value: item.progress,
                           backgroundColor: Colors.black26,
-                          color: _acid,
+                          color: colors.primary,
                         ),
                       ),
                     ],
@@ -268,8 +270,8 @@ class WatchHistoryPage extends ConsumerWidget {
                       Text(
                         '${_duration(item.positionSeconds)} / '
                         '${_duration(item.durationSeconds)}',
-                        style: const TextStyle(
-                          color: _purple,
+                        style: TextStyle(
+                          color: colors.secondary,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                         ),
