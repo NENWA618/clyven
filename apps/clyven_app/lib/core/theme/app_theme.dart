@@ -84,8 +84,8 @@ class ClyvenTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: surface,
       canvasColor: surface,
-      splashColor: accent.withValues(alpha: 0.12),
-      highlightColor: accent.withValues(alpha: 0.08),
+      splashColor: accent.withOpacity(0.12),
+      highlightColor: accent.withOpacity(0.08),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: accent,
       ),
