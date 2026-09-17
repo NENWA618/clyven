@@ -12,10 +12,7 @@ import '../../../video/presentation/pages/video_detail_page.dart';
 class DiscoverPage extends ConsumerWidget {
   const DiscoverPage({super.key});
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -24,9 +21,10 @@ class DiscoverPage extends ConsumerWidget {
   ) {
     final homeAsync = ref.watch(homeProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: homeAsync.when(
           loading: () {
@@ -52,7 +50,7 @@ class DiscoverPage extends ConsumerWidget {
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
-                  child: _buildHeader(l10n),
+                  child: _buildHeader(context, l10n),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
@@ -128,7 +126,12 @@ class DiscoverPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    final secondary = Theme.of(context).colorScheme.secondary;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         20,
@@ -143,8 +146,8 @@ class DiscoverPage extends ConsumerWidget {
             children: [
               Text(
                 l10n.discoverEyebrow,
-                style: const TextStyle(
-                  color: _purple,
+                style: TextStyle(
+                  color: secondary,
                   fontSize: 9,
                   letterSpacing: 2,
                   fontWeight: FontWeight.w900,
@@ -186,6 +189,7 @@ class DiscoverPage extends ConsumerWidget {
           index,
         ) {
           final topic = HomeNotifier.topics[index + 1];
+          final colors = Theme.of(context).colorScheme;
 
           return Container(
             padding: const EdgeInsets.symmetric(
@@ -193,13 +197,13 @@ class DiscoverPage extends ConsumerWidget {
             ),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: index.isEven ? _acid : _purple,
+              color: index.isEven ? colors.primary : colors.secondary,
               borderRadius: BorderRadius.circular(22),
             ),
             child: Text(
               localizedTopicLabel(l10n, topic),
               style: TextStyle(
-                color: index.isEven ? _ink : Colors.white,
+                color: index.isEven ? colors.onPrimary : colors.onSecondary,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
               ),
@@ -215,6 +219,8 @@ class DiscoverPage extends ConsumerWidget {
     HomeVideo video,
     AppLocalizations l10n,
   ) {
+    final secondary = Theme.of(context).colorScheme.secondary;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -257,8 +263,8 @@ class DiscoverPage extends ConsumerWidget {
                   children: [
                     Text(
                       localizedTopicLabel(l10n, video.category),
-                      style: const TextStyle(
-                        color: _purple,
+                      style: TextStyle(
+                        color: secondary,
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
                       ),

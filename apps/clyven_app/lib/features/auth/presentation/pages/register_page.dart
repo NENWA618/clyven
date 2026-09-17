@@ -15,9 +15,7 @@ class RegisterPage extends ConsumerStatefulWidget {
 }
 
 class _RegisterPageState extends ConsumerState<RegisterPage> {
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _acid = Color(0xFFE5FF58);
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
@@ -143,7 +141,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
@@ -238,19 +236,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   Widget _buildBadge(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 7,
       ),
       decoration: BoxDecoration(
-        color: _acid,
+        color: scheme.primary,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
         l10n.newVoice,
-        style: const TextStyle(
-          color: _ink,
+        style: TextStyle(
+          color: scheme.onPrimary,
           fontSize: 11,
           fontWeight: FontWeight.w900,
           letterSpacing: 1.2,
@@ -303,7 +303,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           child: Text(
             '${index + 1}',
             style: TextStyle(
-              color: active ? _acid : _ink,
+              color: active
+                  ? Theme.of(context).colorScheme.primary
+                  : _ink,
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
@@ -616,6 +618,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     required bool loading,
     required Future<void> Function() onPressed,
   }) {
+    final accent = Theme.of(context).colorScheme.primary;
+
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -623,19 +627,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: _ink,
-          foregroundColor: _acid,
+          foregroundColor: accent,
           disabledBackgroundColor: _ink.withValues(alpha: 0.55),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
         ),
         child: loading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.4,
-                  color: _acid,
+                  color: accent,
                 ),
               )
             : Text(

@@ -11,10 +11,7 @@ class NotificationsPage extends ConsumerWidget {
     super.key,
   });
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -25,11 +22,11 @@ class NotificationsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(l10n),
+            _buildHeader(context, l10n),
             Expanded(
               child: notificationsAsync.when(
                 loading: () {
@@ -81,7 +78,10 @@ class NotificationsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         20,
@@ -96,8 +96,8 @@ class NotificationsPage extends ConsumerWidget {
             children: [
               Text(
                 l10n.echoesEyebrow,
-                style: const TextStyle(
-                  color: _purple,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
                   fontSize: 9,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 2,
@@ -125,6 +125,8 @@ class NotificationsPage extends ConsumerWidget {
     AppNotification notification,
     AppLocalizations l10n,
   ) {
+    final secondary = Theme.of(context).colorScheme.secondary;
+
     return GestureDetector(
       onTap: () async {
         await ref
@@ -158,7 +160,7 @@ class NotificationsPage extends ConsumerWidget {
           border: Border.all(
             color: notification.isRead
                 ? const Color(0xFFE3DED5)
-                : _purple,
+                : secondary,
           ),
         ),
         child: Row(
@@ -168,7 +170,7 @@ class NotificationsPage extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: _iconColor(notification.type),
+                color: _iconColor(context, notification.type),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
@@ -216,8 +218,8 @@ class NotificationsPage extends ConsumerWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: _purple,
+                decoration: BoxDecoration(
+                  color: secondary,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -267,12 +269,17 @@ class NotificationsPage extends ConsumerWidget {
     }
   }
 
-  Color _iconColor(AppNotificationType type) {
+  Color _iconColor(
+    BuildContext context,
+    AppNotificationType type,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+
     switch (type) {
       case AppNotificationType.like:
-        return _acid;
+        return scheme.primary;
       case AppNotificationType.comment:
-        return const Color(0xFFDCD3FF);
+        return scheme.secondary.withValues(alpha: 0.22);
       case AppNotificationType.follow:
         return const Color(0xFFD7EEE3);
     }

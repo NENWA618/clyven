@@ -19,8 +19,6 @@ class LoginDialog extends ConsumerStatefulWidget {
 
 class _LoginDialogState extends ConsumerState<LoginDialog> {
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _purpleColor = Color(0xFF7657FF);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   final TextEditingController _accountController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -130,9 +128,10 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
     BuildContext context,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      backgroundColor: const Color(0xFFF4F1EA),
+      backgroundColor: colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(26),
       ),
@@ -142,12 +141,12 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: _purpleColor,
+              color: colors.secondary,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.person_outline_rounded,
-              color: _acidColor,
+              color: colors.primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -240,16 +239,16 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
         FilledButton(
           style: FilledButton.styleFrom(
             backgroundColor: _inkColor,
-            foregroundColor: _acidColor,
+            foregroundColor: colors.primary,
           ),
           onPressed: _isSubmitting ? null : _login,
           child: _isSubmitting
-              ? const SizedBox(
+              ? SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: _acidColor,
+                    color: colors.primary,
                   ),
                 )
               : Text(

@@ -9,10 +9,7 @@ import '../providers/favorite_videos_provider.dart';
 class FavoriteVideosPage extends ConsumerWidget {
   const FavoriteVideosPage({super.key});
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -23,7 +20,7 @@ class FavoriteVideosPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,6 +79,8 @@ class FavoriteVideosPage extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       child: Row(
@@ -109,8 +108,8 @@ class FavoriteVideosPage extends ConsumerWidget {
               children: [
                 Text(
                   l10n.archiveEyebrow,
-                  style: const TextStyle(
-                    color: _purple,
+                  style: TextStyle(
+                    color: scheme.secondary,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -136,12 +135,12 @@ class FavoriteVideosPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: _acid,
+                color: scheme.primary,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.refresh_rounded,
-                color: _ink,
+                color: scheme.onPrimary,
                 size: 20,
               ),
             ),
@@ -236,8 +235,8 @@ class FavoriteVideosPage extends ConsumerWidget {
                   children: [
                     Text(
                       l10n.savedFrame,
-                      style: const TextStyle(
-                        color: _purple,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
                         fontSize: 8,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.4,

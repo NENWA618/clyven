@@ -10,13 +10,14 @@ import '../../../comments/presentation/pages/comments_page.dart';
 import '../../../creator/presentation/pages/creator_profile_page.dart';
 import '../../../creator/presentation/providers/creator_profile_provider.dart';
 import '../../../history/presentation/providers/watch_history_provider.dart';
+import '../../../subtitle/presentation/providers/subtitle_provider.dart';
 import '../../../video_interactions/presentation/providers/video_interaction_provider.dart';
 import '../../data/models/video_detail.dart';
 import '../providers/video_detail_provider.dart';
 import '../widgets/network_video_player.dart';
-import '../../../subtitle/presentation/providers/subtitle_provider.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart'
     as serverpod;
+
 class VideoDetailPage extends ConsumerWidget {
   final String videoId;
 
@@ -25,10 +26,7 @@ class VideoDetailPage extends ConsumerWidget {
     required this.videoId,
   });
 
-  static const Color _backgroundColor = Color(0xFFF4F1EA);
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _purpleColor = Color(0xFF7657FF);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,7 +36,7 @@ class VideoDetailPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: videoAsync.when(
         loading: () {
           return const Center(
@@ -164,7 +162,6 @@ class VideoDetailPage extends ConsumerWidget {
               ),
             ),
           ),
-
           SliverToBoxAdapter(
             child: _buildVideoInformation(
               context,
@@ -190,6 +187,7 @@ class VideoDetailPage extends ConsumerWidget {
           ),
           SliverToBoxAdapter(
             child: _buildDescription(
+              context,
               video,
               l10n,
             ),
@@ -266,6 +264,8 @@ class VideoDetailPage extends ConsumerWidget {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
@@ -279,13 +279,13 @@ class VideoDetailPage extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _acidColor,
+                  color: scheme.primary,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   localizedTopicLabel(l10n, video.category),
-                  style: const TextStyle(
-                    color: _inkColor,
+                  style: TextStyle(
+                    color: scheme.onPrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                   ),
@@ -479,6 +479,7 @@ class VideoDetailPage extends ConsumerWidget {
     final isFollowing = creatorState?.isFollowing ?? false;
     final isChangingFollow =
         creatorState?.isChangingFollow ?? creatorAsync.isLoading;
+    final scheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
@@ -510,7 +511,7 @@ class VideoDetailPage extends ConsumerWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: _purpleColor,
+                  color: scheme.secondary,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 alignment: Alignment.center,
@@ -518,8 +519,8 @@ class VideoDetailPage extends ConsumerWidget {
                   video.authorName.isEmpty
                       ? '?'
                       : video.authorName.substring(0, 1),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: scheme.onSecondary,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
@@ -579,7 +580,7 @@ class VideoDetailPage extends ConsumerWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: _acidColor,
+                    color: scheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -588,8 +589,8 @@ class VideoDetailPage extends ConsumerWidget {
                         : isFollowing
                             ? l10n.followingButton
                             : l10n.follow,
-                    style: const TextStyle(
-                      color: _inkColor,
+                    style: TextStyle(
+                      color: scheme.onPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
@@ -604,6 +605,7 @@ class VideoDetailPage extends ConsumerWidget {
   }
 
   Widget _buildDescription(
+    BuildContext context,
     VideoDetail video,
     AppLocalizations l10n,
   ) {
@@ -614,8 +616,8 @@ class VideoDetailPage extends ConsumerWidget {
         children: [
           Text(
             l10n.aboutThisFrame,
-            style: const TextStyle(
-              color: _purpleColor,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.secondary,
               fontSize: 10,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.7,
@@ -673,6 +675,8 @@ class VideoDetailPage extends ConsumerWidget {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 34, 20, 0),
       child: GestureDetector(
@@ -703,9 +707,9 @@ class VideoDetailPage extends ConsumerWidget {
                   color: _inkColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.forum_outlined,
-                  color: _acidColor,
+                  color: scheme.primary,
                   size: 20,
                 ),
               ),
@@ -814,7 +818,7 @@ class _ActionButton extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: const Color(0xFFE5FF58),
+              color: Theme.of(context).colorScheme.primary,
               size: 21,
             ),
             const SizedBox(height: 5),

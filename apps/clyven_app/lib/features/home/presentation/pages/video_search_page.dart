@@ -17,9 +17,7 @@ class VideoSearchPage extends ConsumerStatefulWidget {
 }
 
 class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -35,9 +33,10 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
   Widget build(BuildContext context) {
     final homeAsync = ref.watch(homeProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -213,6 +212,8 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
     HomeVideo video,
     AppLocalizations l10n,
   ) {
+    final colors = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -244,9 +245,9 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                 color: _ink,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.play_arrow_rounded,
-                color: Color(0xFFE5FF58),
+                color: colors.primary,
               ),
             ),
             const SizedBox(width: 14),
@@ -276,9 +277,9 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.arrow_forward_rounded,
-              color: _purple,
+              color: colors.secondary,
               size: 20,
             ),
           ],

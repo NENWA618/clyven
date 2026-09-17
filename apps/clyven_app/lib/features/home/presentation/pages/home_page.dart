@@ -21,10 +21,7 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  static const Color _backgroundColor = Color(0xFFF4F1EA);
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _purpleColor = Color(0xFF7657FF);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   Widget _buildCoverImage(String path) {
     if (path.isEmpty) {
@@ -80,9 +77,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final homeAsync = ref.watch(homeProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return ColoredBox(
-      color: _backgroundColor,
+      color: colors.surface,
       child: homeAsync.when(
         loading: () {
           return const Center(
@@ -233,6 +231,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'EEEE · dd MMM',
       localeName,
     ).format(now).toUpperCase();
+    final colors = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -291,14 +290,14 @@ class _HomePageState extends ConsumerState<HomePage> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: _purpleColor,
+                color: colors.secondary,
                 borderRadius: BorderRadius.circular(15),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'C',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: colors.onSecondary,
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                 ),
@@ -338,6 +337,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     HomeVideo video,
     AppLocalizations l10n,
   ) {
+    final colors = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
@@ -400,9 +401,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ),
                 ),
-                const Positioned.fill(
+                Positioned.fill(
                   child: CustomPaint(
-                    painter: _OrbitPainter(),
+                    painter: _OrbitPainter(colors.primary),
                   ),
                 ),
                 Positioned(
@@ -414,13 +415,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: _acidColor,
+                      color: colors.primary,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Text(
                       l10n.featuredToday,
-                      style: const TextStyle(
-                        color: _inkColor,
+                      style: TextStyle(
+                        color: colors.onPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                       ),
@@ -452,8 +453,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                           l10n,
                           video.category,
                         ).toUpperCase(),
-                        style: const TextStyle(
-                          color: _acidColor,
+                        style: TextStyle(
+                          color: colors.primary,
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1,
@@ -589,6 +590,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         itemBuilder: (context, index) {
           final topic = HomeNotifier.topics[index];
           final selected = homeState.selectedTopic == topic;
+          final accent = Theme.of(context).colorScheme.primary;
 
           return Transform.translate(
             offset: Offset(
@@ -620,7 +622,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   localizedTopicLabel(l10n, topic),
                   style: TextStyle(
                     color: selected
-                        ? _acidColor
+                        ? accent
                         : const Color(0xFF504D48),
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -690,6 +692,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     AppLocalizations l10n,
   ) {
     final reverse = index.isOdd;
+    final colors = Theme.of(context).colorScheme;
 
     final cover = Expanded(
       flex: 5,
@@ -756,13 +759,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                 vertical: 5,
               ),
               decoration: BoxDecoration(
-                color: index.isEven ? _acidColor : _purpleColor,
+                color: index.isEven ? colors.primary : colors.secondary,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 localizedTopicLabel(l10n, video.category),
                 style: TextStyle(
-                  color: index.isEven ? _inkColor : Colors.white,
+                  color: index.isEven ? colors.onPrimary : colors.onSecondary,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                 ),
@@ -875,7 +878,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 }
 
 class _OrbitPainter extends CustomPainter {
-  const _OrbitPainter();
+  final Color accent;
+
+  const _OrbitPainter(this.accent);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -885,7 +890,7 @@ class _OrbitPainter extends CustomPainter {
       ..strokeWidth = 1;
 
     final dotPaint = Paint()
-      ..color = const Color(0xFFE5FF58).withOpacity(0.85);
+      ..color = accent.withOpacity(0.85);
 
     final center = Offset(
       size.width * 0.83,
@@ -925,8 +930,8 @@ class _OrbitPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(
-    covariant CustomPainter oldDelegate,
+    covariant _OrbitPainter oldDelegate,
   ) {
-    return false;
+    return oldDelegate.accent != accent;
   }
 }

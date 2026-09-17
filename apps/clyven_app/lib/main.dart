@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/localization/app_locale_provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/app_theme_provider.dart';
 import 'features/auth/presentation/auth_gate.dart';
 import 'l10n/app_localizations.dart';
 
@@ -22,6 +24,7 @@ class ClyvenApp extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final locale = ref.watch(appLocaleProvider);
+    final themeSettings = ref.watch(appThemeProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -30,9 +33,7 @@ class ClyvenApp extends ConsumerWidget {
           AppLocalizations.localizationsDelegates,
       supportedLocales:
           AppLocalizations.supportedLocales,
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
+      theme: ClyvenTheme.build(themeSettings),
       home: const AuthGate(),
     );
   }

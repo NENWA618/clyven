@@ -16,11 +16,13 @@ class HomeNavigationDock extends StatelessWidget {
   });
 
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+    final accent = colors.primary;
+    final onAccent = colors.onPrimary;
 
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(
@@ -51,11 +53,15 @@ class HomeNavigationDock extends StatelessWidget {
               icon: Icons.blur_on_rounded,
               label: l10n.navHome,
               index: 0,
+              accent: accent,
+              onAccent: onAccent,
             ),
             _buildItem(
               icon: Icons.explore_outlined,
               label: l10n.navDiscover,
               index: 1,
+              accent: accent,
+              onAccent: onAccent,
             ),
             Expanded(
               child: GestureDetector(
@@ -67,12 +73,12 @@ class HomeNavigationDock extends StatelessWidget {
                     horizontal: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: _acidColor,
+                    color: accent,
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_rounded,
-                    color: _inkColor,
+                    color: onAccent,
                     size: 30,
                   ),
                 ),
@@ -83,11 +89,15 @@ class HomeNavigationDock extends StatelessWidget {
               label: l10n.navEchoes,
               index: 2,
               badgeCount: unreadCount,
+              accent: accent,
+              onAccent: onAccent,
             ),
             _buildItem(
               icon: Icons.person_outline_rounded,
               label: l10n.navProfile,
               index: 3,
+              accent: accent,
+              onAccent: onAccent,
             ),
           ],
         ),
@@ -99,6 +109,8 @@ class HomeNavigationDock extends StatelessWidget {
     required IconData icon,
     required String label,
     required int index,
+    required Color accent,
+    required Color onAccent,
     int badgeCount = 0,
   }) {
     final selected = selectedIndex == index;
@@ -118,7 +130,7 @@ class HomeNavigationDock extends StatelessWidget {
                 Icon(
                   icon,
                   size: 22,
-                  color: selected ? _acidColor : Colors.white54,
+                  color: selected ? accent : Colors.white54,
                 ),
                 if (badgeCount > 0)
                   Positioned(
@@ -133,14 +145,14 @@ class HomeNavigationDock extends StatelessWidget {
                         horizontal: 4,
                       ),
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
-                        color: _acidColor,
+                      decoration: BoxDecoration(
+                        color: accent,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         badgeCount > 99 ? '99+' : badgeCount.toString(),
-                        style: const TextStyle(
-                          color: _inkColor,
+                        style: TextStyle(
+                          color: onAccent,
                           fontSize: 8,
                           fontWeight: FontWeight.w900,
                         ),
@@ -155,7 +167,7 @@ class HomeNavigationDock extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: selected ? _acidColor : Colors.white54,
+                color: selected ? accent : Colors.white54,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
               ),
