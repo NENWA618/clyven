@@ -72,8 +72,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     for (final detail in widget.subtitles) {
       final cue = detail.cue;
 
-      if (currentMs >= cue.startMs &&
-          currentMs < cue.endMs) {
+      if (currentMs >= cue.startMs && currentMs < cue.endMs) {
         return detail;
       }
     }
@@ -93,8 +92,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       return;
     }
 
-    if (duration.inSeconds > 0 &&
-        savedPosition >= duration.inSeconds - 5) {
+    if (duration.inSeconds > 0 && savedPosition >= duration.inSeconds - 5) {
       _fallbackBasePosition = Duration.zero;
       return;
     }
@@ -190,6 +188,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: AspectRatio(
@@ -224,75 +224,68 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                 return Stack(
                   fit: StackFit.expand,
                   children: [
-                    // 1. 视频
-    Container(
-      color: Colors.black,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: value.aspectRatio == 0
-              ? 16 / 9
-              : value.aspectRatio,
-          child: VideoPlayer(_controller),
-        ),
-      ),
-    ),
-// 2. 整个视频区域：点空白处播放/暂停
-    Positioned.fill(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _togglePlay,
-        child: const SizedBox.expand(),
-      ),
-    ),
-                     // 3. 播放按钮
-    if (!value.isPlaying)
-      Center(
-        child: GestureDetector(
-          onTap: _togglePlay,
-          child: Container(
-            width: 68,
-            height: 68,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(
-                alpha: 0.92,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.play_arrow_rounded,
-              size: 42,
-              color: Color(0xFF161616),
-            ),
-          ),
-        ),
-      ),
-
-    // 4. 可点击字幕层
-    if (activeSubtitle != null)
-      Positioned(
-        left: 24,
-        right: 24,
-        bottom: 58,
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 7,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(
-                alpha: 0.65,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: InteractiveSubtitleOverlay(
-              detail: activeSubtitle,
-            ),
-          ),
-        ),
-      ),
-
-    // 5. 控制条
+                    Container(
+                      color: Colors.black,
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: value.aspectRatio == 0
+                              ? 16 / 9
+                              : value.aspectRatio,
+                          child: VideoPlayer(_controller),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _togglePlay,
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                    if (!value.isPlaying)
+                      Center(
+                        child: GestureDetector(
+                          onTap: _togglePlay,
+                          child: Container(
+                            width: 68,
+                            height: 68,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(
+                                alpha: 0.92,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 42,
+                              color: Color(0xFF161616),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (activeSubtitle != null)
+                      Positioned(
+                        left: 24,
+                        right: 24,
+                        bottom: 58,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(
+                                alpha: 0.65,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: InteractiveSubtitleOverlay(
+                              detail: activeSubtitle,
+                            ),
+                          ),
+                        ),
+                      ),
                     Positioned(
                       left: 14,
                       right: 14,
@@ -314,7 +307,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                                 min: 0,
                                 max: maxMilliseconds.toDouble(),
                                 value: positionMilliseconds.toDouble(),
-                                activeColor: const Color(0xFFE5FF58),
+                                activeColor: accent,
                                 inactiveColor: Colors.white24,
                                 onChanged: (value) {
                                   final position = Duration(
@@ -338,10 +331,10 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                               ),
                             )
                           else
-                            const LinearProgressIndicator(
+                            LinearProgressIndicator(
                               value: 0,
                               minHeight: 4,
-                              color: Color(0xFFE5FF58),
+                              color: accent,
                               backgroundColor: Colors.white24,
                             ),
                           Row(
@@ -393,6 +386,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   Widget _buildLoadingCover() {
     final isNetworkCover = widget.coverUrl.startsWith('http://') ||
         widget.coverUrl.startsWith('https://');
+    final accent = Theme.of(context).colorScheme.primary;
 
     return Stack(
       fit: StackFit.expand,
@@ -424,9 +418,9 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
         Container(
           color: Colors.black38,
         ),
-        const Center(
+        Center(
           child: CircularProgressIndicator(
-            color: Color(0xFFE5FF58),
+            color: accent,
           ),
         ),
       ],
@@ -505,4 +499,3 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     return '$minutes:$seconds';
   }
 }
-
