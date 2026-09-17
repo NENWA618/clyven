@@ -142,3 +142,9 @@ class ClyvenTheme {
         : Colors.white;
   }
 }
+
+extension ClyvenThemeContext on BuildContext {
+  Color get clyvenAccent => Theme.of(this).colorScheme.primary;
+  Color get clyvenSecondary => Theme.of(this).colorScheme.secondary;
+  Color get clyvenSurface => Theme.of(this).colorScheme.surface;
+}
