@@ -15,10 +15,7 @@ class CreatorProfilePage extends ConsumerWidget {
     required this.creatorId,
   });
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -31,7 +28,7 @@ class CreatorProfilePage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: creatorAsync.when(
         loading: () {
           return const Center(
@@ -132,6 +129,8 @@ class CreatorProfilePage extends ConsumerWidget {
     CreatorProfile creator,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 290,
       child: Stack(
@@ -142,7 +141,7 @@ class CreatorProfilePage extends ConsumerWidget {
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
-                color: _purple,
+                color: scheme.secondary,
               );
             },
           ),
@@ -191,13 +190,13 @@ class CreatorProfilePage extends ConsumerWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: _acid,
+                    color: scheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     l10n.creatorSpace,
-                    style: const TextStyle(
-                      color: _ink,
+                    style: TextStyle(
+                      color: scheme.onPrimary,
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1,
@@ -229,6 +228,7 @@ class CreatorProfilePage extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final creator = state.creator;
+    final scheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
@@ -248,14 +248,14 @@ class CreatorProfilePage extends ConsumerWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: _purple,
+                        color: scheme.secondary,
                         alignment: Alignment.center,
                         child: Text(
                           creator.name.isEmpty
                               ? '?'
                               : creator.name.substring(0, 1),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: scheme.onSecondary,
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
                           ),
@@ -272,8 +272,8 @@ class CreatorProfilePage extends ConsumerWidget {
                   children: [
                     Text(
                       l10n.voiceMaker,
-                      style: const TextStyle(
-                        color: _purple,
+                      style: TextStyle(
+                        color: scheme.secondary,
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.7,
@@ -308,7 +308,7 @@ class CreatorProfilePage extends ConsumerWidget {
                     vertical: 11,
                   ),
                   decoration: BoxDecoration(
-                    color: state.isFollowing ? _ink : _acid,
+                    color: state.isFollowing ? _ink : scheme.primary,
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Text(
@@ -316,7 +316,9 @@ class CreatorProfilePage extends ConsumerWidget {
                         ? l10n.followingButton
                         : l10n.follow,
                     style: TextStyle(
-                      color: state.isFollowing ? Colors.white : _ink,
+                      color: state.isFollowing
+                          ? Colors.white
+                          : scheme.onPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                     ),
@@ -356,16 +358,19 @@ class CreatorProfilePage extends ConsumerWidget {
         child: Row(
           children: [
             _stat(
+              context,
               _formatCount(context, creator.followerCount),
               l10n.followers,
             ),
             _divider(),
             _stat(
+              context,
               _formatCount(context, creator.videoCount),
               l10n.works,
             ),
             _divider(),
             _stat(
+              context,
               _formatCount(context, creator.totalViewCount),
               l10n.totalViews,
             ),
@@ -376,6 +381,7 @@ class CreatorProfilePage extends ConsumerWidget {
   }
 
   Widget _stat(
+    BuildContext context,
     String value,
     String label,
   ) {
@@ -385,8 +391,8 @@ class CreatorProfilePage extends ConsumerWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(
-              color: _acid,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
@@ -524,8 +530,8 @@ class CreatorProfilePage extends ConsumerWidget {
                   children: [
                     Text(
                       l10n.frameNumber(number),
-                      style: const TextStyle(
-                        color: _purple,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
                         fontSize: 8,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.3,
