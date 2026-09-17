@@ -236,19 +236,21 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   Widget _buildBadge(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
         vertical: 7,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
+        color: scheme.primary,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
         l10n.newVoice,
-        style: const TextStyle(
-          color: _ink,
+        style: TextStyle(
+          color: scheme.onPrimary,
           fontSize: 11,
           fontWeight: FontWeight.w900,
           letterSpacing: 1.2,
