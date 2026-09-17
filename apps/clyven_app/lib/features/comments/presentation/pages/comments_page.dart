@@ -22,10 +22,7 @@ class CommentsPage extends ConsumerStatefulWidget {
 }
 
 class _CommentsPageState extends ConsumerState<CommentsPage> {
-  static const Color _backgroundColor = Color(0xFFF4F1EA);
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _purpleColor = Color(0xFF7657FF);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -33,6 +30,10 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
 
   String? _replyCommentId;
   String? _replyUserName;
+
+  Color get _backgroundColor => Theme.of(context).colorScheme.surface;
+  Color get _purpleColor => Theme.of(context).colorScheme.secondary;
+  Color get _acidColor => Theme.of(context).colorScheme.primary;
 
   @override
   void initState() {
@@ -129,7 +130,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
               children: [
                 Text(
                   l10n.commentEyebrow,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: _purpleColor,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
@@ -151,7 +152,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
           Container(
             width: 10,
             height: 10,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: _acidColor,
               shape: BoxShape.circle,
             ),
@@ -349,7 +350,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
             },
             child: Text(
               l10n.reply,
-              style: const TextStyle(
+              style: TextStyle(
                 color: _purpleColor,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -570,7 +571,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
                     child: Container(
                       width: 46,
                       height: 46,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: _acidColor,
                         shape: BoxShape.circle,
                       ),
