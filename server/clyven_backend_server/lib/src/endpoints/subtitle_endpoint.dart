@@ -83,17 +83,9 @@ class SubtitleEndpoint extends Endpoint {
     required String content,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能导入字幕');
-    }
-
-    final track = await SubtitleTrack.db.findFirstRow(
-      session,
-      where: (t) =>
-          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
-    );
-
-    if (track == null) {
-      throw Exception('找不到字幕轨');
+      throw Exception(
+        '需要登录后才能导入字幕',
+      );
     }
 
     final video = await Video.db.findById(
@@ -106,14 +98,19 @@ class SubtitleEndpoint extends Endpoint {
     }
 
     final parser = SubtitleSrtParser();
-    final result = parser.parse(content);
+
+    final result = parser.parse(
+      content,
+    );
 
     final durationErrors = _validateCueDuration(
       result.cues,
       video.durationSeconds * 1000,
     );
 
-    result.errors.addAll(durationErrors);
+    result.errors.addAll(
+      durationErrors,
+    );
 
     return SubtitleSrtPreview(
       cueCount: result.cues.length,
@@ -130,7 +127,9 @@ class SubtitleEndpoint extends Endpoint {
     required String content,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能导入字幕');
+      throw Exception(
+        '需要登录后才能导入字幕',
+      );
     }
 
     final video = await Video.db.findById(
@@ -143,33 +142,53 @@ class SubtitleEndpoint extends Endpoint {
     }
 
     final parser = SubtitleSrtParser();
-    final result = parser.parse(content);
+
+    final result = parser.parse(
+      content,
+    );
 
     final durationErrors = _validateCueDuration(
       result.cues,
       video.durationSeconds * 1000,
     );
 
-    result.errors.addAll(durationErrors);
+    result.errors.addAll(
+      durationErrors,
+    );
 
     if (!result.canImport) {
       throw Exception(
-        'SRT 存在 ${result.errors.length} 个错误，无法导入',
+        'SRT 存在 '
+        '${result.errors.length} '
+        '个错误，无法导入',
       );
     }
 
     if (result.cues.isEmpty) {
-      throw Exception('SRT 中没有可导入的字幕');
+      throw Exception(
+        'SRT 中没有可导入的字幕',
+      );
     }
 
-    final track = await SubtitleTrack.db.findFirstRow(
+    var track = await SubtitleTrack.db.findFirstRow(
       session,
       where: (t) =>
-          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+          t.videoId.equals(videoId) &
+          t.languageCode.equals(
+            languageCode,
+          ),
     );
 
-    if (track == null || track.id == null) {
-      throw Exception('找不到字幕轨');
+    if (track == null) {
+      track = await SubtitleTrack.db.insertRow(
+        session,
+        SubtitleTrack(
+          videoId: videoId,
+          languageCode: languageCode,
+          label: languageCode.toUpperCase(),
+          isDefault: false,
+        ),
+      );
     }
 
     final trackId = track.id!;
@@ -234,13 +253,18 @@ class SubtitleEndpoint extends Endpoint {
     required String languageCode,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能导出字幕');
+      throw Exception(
+        '需要登录后才能导出字幕',
+      );
     }
 
     final track = await SubtitleTrack.db.findFirstRow(
       session,
       where: (t) =>
-          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+          t.videoId.equals(videoId) &
+          t.languageCode.equals(
+            languageCode,
+          ),
     );
 
     if (track == null || track.id == null) {
@@ -254,12 +278,16 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cues.isEmpty) {
-      throw Exception('当前字幕轨没有可导出的字幕');
+      throw Exception(
+        '当前字幕轨没有可导出的字幕',
+      );
     }
 
     final exporter = SubtitleSrtExporter();
 
-    return exporter.export(cues);
+    return exporter.export(
+      cues,
+    );
   }
 
   Future<SubtitleCue> updateCueText(
@@ -268,13 +296,17 @@ class SubtitleEndpoint extends Endpoint {
     required String text,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能修改字幕');
+      throw Exception(
+        '需要登录后才能修改字幕',
+      );
     }
 
     final normalizedText = text.trim();
 
     if (normalizedText.isEmpty) {
-      throw Exception('字幕内容不能为空');
+      throw Exception(
+        '字幕内容不能为空',
+      );
     }
 
     final cue = await SubtitleCue.db.findById(
@@ -314,15 +346,21 @@ class SubtitleEndpoint extends Endpoint {
     required int endMs,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能修改字幕时间');
+      throw Exception(
+        '需要登录后才能修改字幕时间',
+      );
     }
 
     if (startMs < 0) {
-      throw Exception('开始时间不能小于 0');
+      throw Exception(
+        '开始时间不能小于 0',
+      );
     }
 
     if (endMs <= startMs) {
-      throw Exception('结束时间必须大于开始时间');
+      throw Exception(
+        '结束时间必须大于开始时间',
+      );
     }
 
     final cue = await SubtitleCue.db.findById(
@@ -374,7 +412,8 @@ class SubtitleEndpoint extends Endpoint {
       if (overlaps) {
         throw Exception(
           '字幕时间与现有字幕重叠：'
-          '${existing.startMs}ms - ${existing.endMs}ms',
+          '${existing.startMs}ms - '
+          '${existing.endMs}ms',
         );
       }
     }
@@ -389,25 +428,36 @@ class SubtitleEndpoint extends Endpoint {
     required String text,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能新增字幕');
+      throw Exception(
+        '需要登录后才能新增字幕',
+      );
     }
 
     if (text.trim().isEmpty) {
-      throw Exception('字幕内容不能为空');
+      throw Exception(
+        '字幕内容不能为空',
+      );
     }
 
     if (startMs < 0) {
-      throw Exception('开始时间不能小于 0');
+      throw Exception(
+        '开始时间不能小于 0',
+      );
     }
 
     if (endMs <= startMs) {
-      throw Exception('结束时间必须大于开始时间');
+      throw Exception(
+        '结束时间必须大于开始时间',
+      );
     }
 
     final track = await SubtitleTrack.db.findFirstRow(
       session,
       where: (t) =>
-          t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
+          t.videoId.equals(videoId) &
+          t.languageCode.equals(
+            languageCode,
+          ),
     );
 
     if (track == null || track.id == null) {
@@ -439,7 +489,9 @@ class SubtitleEndpoint extends Endpoint {
     required int cueId,
   }) async {
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能删除字幕');
+      throw Exception(
+        '需要登录后才能删除字幕',
+      );
     }
 
     final cue = await SubtitleCue.db.findById(
@@ -476,14 +528,17 @@ class SubtitleEndpoint extends Endpoint {
     for (final cue in cues) {
       if (cue.startMs >= videoDurationMs) {
         errors.add(
-          '第 ${cue.sourceNumber} 条字幕开始时间超出视频时长',
+          '第 ${cue.sourceNumber} '
+          '条字幕开始时间超出视频时长',
         );
+
         continue;
       }
 
       if (cue.endMs > videoDurationMs) {
         errors.add(
-          '第 ${cue.sourceNumber} 条字幕结束时间超出视频时长',
+          '第 ${cue.sourceNumber} '
+          '条字幕结束时间超出视频时长',
         );
       }
     }
