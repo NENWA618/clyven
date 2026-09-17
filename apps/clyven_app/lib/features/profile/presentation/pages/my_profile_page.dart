@@ -18,10 +18,7 @@ import 'settings_page.dart';
 class MyProfilePage extends ConsumerWidget {
   const MyProfilePage({super.key});
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -30,11 +27,12 @@ class MyProfilePage extends ConsumerWidget {
   ) {
     final authAsync = ref.watch(authProvider);
     final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
 
     if (authAsync.isLoading) {
-      return const Scaffold(
-        backgroundColor: _background,
-        body: Center(
+      return Scaffold(
+        backgroundColor: scheme.surface,
+        body: const Center(
           child: CircularProgressIndicator(),
         ),
       );
@@ -53,7 +51,7 @@ class MyProfilePage extends ConsumerWidget {
     final profileAsync = ref.watch(myProfileProvider);
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: scheme.surface,
       body: profileAsync.when(
         loading: () {
           return const Center(
@@ -96,6 +94,8 @@ class MyProfilePage extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     Future<void> login() async {
       await requireLogin(
         context,
@@ -104,7 +104,7 @@ class MyProfilePage extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: scheme.surface,
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -122,12 +122,12 @@ class MyProfilePage extends ConsumerWidget {
                       width: 82,
                       height: 82,
                       decoration: BoxDecoration(
-                        color: _purple,
+                        color: scheme.secondary,
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person_outline_rounded,
-                        color: Colors.white,
+                        color: scheme.onSecondary,
                         size: 34,
                       ),
                     ),
@@ -182,7 +182,7 @@ class MyProfilePage extends ConsumerWidget {
                     onPressed: login,
                     style: FilledButton.styleFrom(
                       backgroundColor: _ink,
-                      foregroundColor: _acid,
+                      foregroundColor: scheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
@@ -227,7 +227,7 @@ class MyProfilePage extends ConsumerWidget {
               child: _buildTopBar(context, l10n),
             ),
             SliverToBoxAdapter(
-              child: _buildIdentity(profile),
+              child: _buildIdentity(context, profile),
             ),
             SliverToBoxAdapter(
               child: _buildStats(
@@ -314,8 +314,8 @@ class MyProfilePage extends ConsumerWidget {
               children: [
                 Text(
                   l10n.profileEyebrow,
-                  style: const TextStyle(
-                    color: _purple,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -363,7 +363,12 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentity(UserProfile profile) {
+  Widget _buildIdentity(
+    BuildContext context,
+    UserProfile profile,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
       child: Row(
@@ -374,7 +379,7 @@ class MyProfilePage extends ConsumerWidget {
             child: Container(
               width: 82,
               height: 82,
-              color: _purple,
+              color: scheme.secondary,
               child: profile.avatarUrl.isEmpty
                   ? Center(
                       child: Text(
@@ -383,8 +388,8 @@ class MyProfilePage extends ConsumerWidget {
                             : profile.displayName
                                 .substring(0, 1)
                                 .toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: scheme.onSecondary,
                           fontSize: 30,
                           fontWeight: FontWeight.w900,
                         ),
@@ -451,16 +456,19 @@ class MyProfilePage extends ConsumerWidget {
         child: Row(
           children: [
             _stat(
+              context,
               _count(context, profile.followerCount),
               l10n.followers,
             ),
             _line(),
             _stat(
+              context,
               _count(context, profile.followingCount),
               l10n.followingStat,
             ),
             _line(),
             _stat(
+              context,
               _count(context, profile.videoCount),
               l10n.submissionsStat,
             ),
@@ -520,154 +528,161 @@ class MyProfilePage extends ConsumerWidget {
           );
         },
         wordListsTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) {
-        return const WordListsPage();
-      },
-    ),
-  );
-},
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const WordListsPage();
+              },
+            ),
+          );
+        },
       ),
     );
   }
 
-Widget _buildLibraryRow(
-  BuildContext context,
-  AppLocalizations l10n, {
-  required VoidCallback submissionsTap,
-  required VoidCallback favoritesTap,
-  required VoidCallback historyTap,
-  required VoidCallback followingTap,
-  required VoidCallback wordListsTap,
-}) {
-  return Column(
-    children: [
-      Row(
-        children: [
-          Expanded(
-            child: _libraryItem(
-              icon: Icons.video_library_outlined,
-              title: l10n.submissions,
-              subtitle: l10n.myWorks,
-              onTap: submissionsTap,
+  Widget _buildLibraryRow(
+    BuildContext context,
+    AppLocalizations l10n, {
+    required VoidCallback submissionsTap,
+    required VoidCallback favoritesTap,
+    required VoidCallback historyTap,
+    required VoidCallback followingTap,
+    required VoidCallback wordListsTap,
+  }) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _libraryItem(
+                context: context,
+                icon: Icons.video_library_outlined,
+                title: l10n.submissions,
+                subtitle: l10n.myWorks,
+                onTap: submissionsTap,
+              ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _libraryItem(
-              icon: Icons.bookmark_border_rounded,
-              title: l10n.favorites,
-              subtitle: l10n.savedContent,
-              onTap: favoritesTap,
+            const SizedBox(width: 10),
+            Expanded(
+              child: _libraryItem(
+                context: context,
+                icon: Icons.bookmark_border_rounded,
+                title: l10n.favorites,
+                subtitle: l10n.savedContent,
+                onTap: favoritesTap,
+              ),
             ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 10),
-      Row(
-        children: [
-          Expanded(
-            child: _libraryItem(
-              icon: Icons.history_rounded,
-              title: l10n.history,
-              subtitle: l10n.watchHistory,
-              onTap: historyTap,
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _libraryItem(
+                context: context,
+                icon: Icons.history_rounded,
+                title: l10n.history,
+                subtitle: l10n.watchHistory,
+                onTap: historyTap,
+              ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _libraryItem(
-              icon: Icons.people_outline_rounded,
-              title: l10n.followingStat,
-              subtitle: l10n.myChannels,
-              onTap: followingTap,
+            const SizedBox(width: 10),
+            Expanded(
+              child: _libraryItem(
+                context: context,
+                icon: Icons.people_outline_rounded,
+                title: l10n.followingStat,
+                subtitle: l10n.myChannels,
+                onTap: followingTap,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _libraryItem(
+                context: context,
+                icon: Icons.menu_book_rounded,
+                title: '词表',
+                subtitle: '我的词汇学习',
+                onTap: wordListsTap,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
-      const SizedBox(height: 10),
-Row(
-  children: [
-    Expanded(
-      child: _libraryItem(
-        icon: Icons.menu_book_rounded,
-        title: '词表',
-        subtitle: '我的词汇学习',
-        onTap: wordListsTap,
-      ),
-    ),
-  ],
-),
-    ],
-  );
-}
+  Widget _libraryItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    final secondary = Theme.of(context).colorScheme.secondary;
 
-Widget _libraryItem({
-  required IconData icon,
-  required String title,
-  required String subtitle,
-  VoidCallback? onTap,
-}) {
-  return GestureDetector(
-    behavior: HitTestBehavior.opaque,
-    onTap: onTap,
-    child: Container(
-      height: 100,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFE3DED5),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 100,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: const Color(0xFFE3DED5),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: secondary.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(
+                icon,
+                color: secondary,
+                size: 20,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.clip,
+              softWrap: false,
+              style: const TextStyle(
+                color: _ink,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.clip,
+              softWrap: false,
+              style: const TextStyle(
+                color: Color(0xFF99938A),
+                fontSize: 9,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: _purple.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: Icon(
-              icon,
-              color: _purple,
-              size: 20,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.clip,
-            softWrap: false,
-            style: const TextStyle(
-              color: _ink,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            maxLines: 1,
-            overflow: TextOverflow.clip,
-            softWrap: false,
-            style: const TextStyle(
-              color: Color(0xFF99938A),
-              fontSize: 9,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildVideo(
     BuildContext context,
@@ -750,8 +765,8 @@ Widget _libraryItem({
                   children: [
                     Text(
                       l10n.frameNumber(number),
-                      style: const TextStyle(
-                        color: _purple,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
                         fontSize: 8,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.3,
@@ -791,6 +806,7 @@ Widget _libraryItem({
   }
 
   Widget _stat(
+    BuildContext context,
     String value,
     String label,
   ) {
@@ -800,8 +816,8 @@ Widget _libraryItem({
         children: [
           Text(
             value,
-            style: const TextStyle(
-              color: _acid,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontSize: 18,
               fontWeight: FontWeight.w900,
             ),
