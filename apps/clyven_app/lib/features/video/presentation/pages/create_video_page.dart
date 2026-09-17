@@ -20,10 +20,7 @@ class CreateVideoPage extends ConsumerStatefulWidget {
 }
 
 class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
@@ -42,6 +39,10 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     '城市',
     '纪录',
   ];
+
+  Color get _background => Theme.of(context).colorScheme.surface;
+  Color get _purple => Theme.of(context).colorScheme.secondary;
+  Color get _acid => Theme.of(context).colorScheme.primary;
 
   @override
   void dispose() {
@@ -238,7 +239,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               children: [
                 Text(
                   l10n.newFrame,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: _purple,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
@@ -275,7 +276,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.video_library_outlined,
                     color: _acid,
                     size: 42,
@@ -304,7 +305,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.check_circle_rounded,
                       color: _acid,
                       size: 42,
@@ -332,7 +333,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                     const SizedBox(height: 14),
                     Text(
                       l10n.tapToReselect,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: _acid,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -353,7 +354,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       children: [
         Text(
           eyebrow,
-          style: const TextStyle(
+          style: TextStyle(
             color: _purple,
             fontSize: 9,
             fontWeight: FontWeight.w900,
@@ -401,7 +402,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
+          borderSide: BorderSide(
             color: _purple,
             width: 1.5,
           ),
@@ -411,6 +412,8 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   }
 
   Widget _buildCategories(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Wrap(
       spacing: 8,
       runSpacing: 9,
@@ -433,19 +436,19 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               ),
               decoration: BoxDecoration(
                 color: selected
-                    ? _purple
+                    ? scheme.secondary
                     : Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: selected
-                      ? _purple
+                      ? scheme.secondary
                       : const Color(0xFFD9D4CB),
                 ),
               ),
               child: Text(
                 localizedTopicLabel(l10n, category),
                 style: TextStyle(
-                  color: selected ? Colors.white : _ink,
+                  color: selected ? scheme.onSecondary : _ink,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -458,26 +461,28 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   }
 
   Widget _buildPublishButton(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       height: 54,
       child: FilledButton(
         onPressed: _isPublishing ? null : _publish,
         style: FilledButton.styleFrom(
-          backgroundColor: _acid,
-          disabledBackgroundColor: _acid.withValues(alpha: 0.55),
-          foregroundColor: _ink,
-          disabledForegroundColor: _ink.withValues(alpha: 0.5),
+          backgroundColor: scheme.primary,
+          disabledBackgroundColor: scheme.primary.withValues(alpha: 0.55),
+          foregroundColor: scheme.onPrimary,
+          disabledForegroundColor: scheme.onPrimary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
         child: _isPublishing
-            ? const SizedBox(
+            ? SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: _ink,
+                  color: scheme.onPrimary,
                 ),
               )
             : Text(
