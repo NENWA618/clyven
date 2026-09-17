@@ -16,10 +16,7 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
-  static const Color _backgroundColor = Color(0xFFF4F1EA);
   static const Color _inkColor = Color(0xFF161616);
-  static const Color _purpleColor = Color(0xFF7657FF);
-  static const Color _acidColor = Color(0xFFE5FF58);
 
   final TextEditingController _accountController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -35,9 +32,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final authAsync = ref.watch(authProvider);
     final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -49,12 +47,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: _purpleColor,
+                  color: colors.secondary,
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.play_arrow_rounded,
-                  color: _acidColor,
+                  color: colors.primary,
                   size: 34,
                 ),
               ),
@@ -114,7 +112,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 child: FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: _inkColor,
-                    foregroundColor: _acidColor,
+                    foregroundColor: colors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
@@ -153,8 +151,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         },
                   child: Text(
                     l10n.createAccountPrompt,
-                    style: const TextStyle(
-                      color: _purpleColor,
+                    style: TextStyle(
+                      color: colors.secondary,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
