@@ -16,10 +16,7 @@ class MySubmissionsPage extends ConsumerWidget {
     super.key,
   });
 
-  static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
-  static const Color _acid = Color(0xFFE5FF58);
 
   @override
   Widget build(
@@ -37,7 +34,7 @@ class MySubmissionsPage extends ConsumerWidget {
         .toList();
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -80,6 +77,7 @@ class MySubmissionsPage extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         if (index < activeUploadTasks.length) {
                           return _buildUploadTask(
+                            context,
                             activeUploadTasks[index],
                             l10n,
                           );
@@ -137,8 +135,8 @@ class MySubmissionsPage extends ConsumerWidget {
               children: [
                 Text(
                   l10n.myFrames,
-                  style: const TextStyle(
-                    color: _purple,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -238,6 +236,7 @@ class MySubmissionsPage extends ConsumerWidget {
   }
 
   Widget _buildUploadTask(
+    BuildContext context,
     VideoUploadTask task,
     AppLocalizations l10n,
   ) {
@@ -262,6 +261,8 @@ class MySubmissionsPage extends ConsumerWidget {
         icon = Icons.check_circle_outline_rounded;
     }
 
+    final secondary = Theme.of(context).colorScheme.secondary;
+
     return Container(
       height: 130,
       padding: const EdgeInsets.all(18),
@@ -284,7 +285,7 @@ class MySubmissionsPage extends ConsumerWidget {
                   : Icon(
                       icon,
                       size: 34,
-                      color: _purple,
+                      color: secondary,
                     ),
             ),
           ),
@@ -310,7 +311,7 @@ class MySubmissionsPage extends ConsumerWidget {
                   style: TextStyle(
                     color: task.status == VideoUploadStatus.failed
                         ? Colors.red
-                        : _purple,
+                        : secondary,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -343,6 +344,7 @@ class MySubmissionsPage extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final number = (index + 1).toString().padLeft(2, '0');
+    final scheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () {
@@ -378,7 +380,7 @@ class MySubmissionsPage extends ConsumerWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _buildCover(video),
+                    _buildCover(context, video),
                     Positioned(
                       right: 8,
                       bottom: 8,
@@ -415,8 +417,8 @@ class MySubmissionsPage extends ConsumerWidget {
                       children: [
                         Text(
                           l10n.frameNumber(number),
-                          style: const TextStyle(
-                            color: _purple,
+                          style: TextStyle(
+                            color: scheme.secondary,
                             fontSize: 8,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.3,
@@ -429,13 +431,13 @@ class MySubmissionsPage extends ConsumerWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: _acid,
+                            color: scheme.primary,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             localizedTopicLabel(l10n, video.category),
-                            style: const TextStyle(
-                              color: _ink,
+                            style: TextStyle(
+                              color: scheme.onPrimary,
                               fontSize: 8,
                               fontWeight: FontWeight.w800,
                             ),
@@ -486,14 +488,17 @@ class MySubmissionsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCover(VideoDetail video) {
+  Widget _buildCover(
+    BuildContext context,
+    VideoDetail video,
+  ) {
     if (video.coverUrl.isEmpty) {
       return Container(
         color: _ink,
         alignment: Alignment.center,
-        child: const Icon(
+        child: Icon(
           Icons.play_circle_outline_rounded,
-          color: _acid,
+          color: Theme.of(context).colorScheme.primary,
           size: 38,
         ),
       );
