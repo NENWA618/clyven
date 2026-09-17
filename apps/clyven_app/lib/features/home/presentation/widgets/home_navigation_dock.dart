@@ -20,7 +20,9 @@ class HomeNavigationDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final accent = Theme.of(context).colorScheme.primary;
+    final colors = Theme.of(context).colorScheme;
+    final accent = colors.primary;
+    final onAccent = colors.onPrimary;
 
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(
@@ -52,12 +54,14 @@ class HomeNavigationDock extends StatelessWidget {
               label: l10n.navHome,
               index: 0,
               accent: accent,
+              onAccent: onAccent,
             ),
             _buildItem(
               icon: Icons.explore_outlined,
               label: l10n.navDiscover,
               index: 1,
               accent: accent,
+              onAccent: onAccent,
             ),
             Expanded(
               child: GestureDetector(
@@ -72,9 +76,9 @@ class HomeNavigationDock extends StatelessWidget {
                     color: accent,
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_rounded,
-                    color: _inkColor,
+                    color: onAccent,
                     size: 30,
                   ),
                 ),
@@ -86,12 +90,14 @@ class HomeNavigationDock extends StatelessWidget {
               index: 2,
               badgeCount: unreadCount,
               accent: accent,
+              onAccent: onAccent,
             ),
             _buildItem(
               icon: Icons.person_outline_rounded,
               label: l10n.navProfile,
               index: 3,
               accent: accent,
+              onAccent: onAccent,
             ),
           ],
         ),
@@ -104,6 +110,7 @@ class HomeNavigationDock extends StatelessWidget {
     required String label,
     required int index,
     required Color accent,
+    required Color onAccent,
     int badgeCount = 0,
   }) {
     final selected = selectedIndex == index;
@@ -144,8 +151,8 @@ class HomeNavigationDock extends StatelessWidget {
                       ),
                       child: Text(
                         badgeCount > 99 ? '99+' : badgeCount.toString(),
-                        style: const TextStyle(
-                          color: _inkColor,
+                        style: TextStyle(
+                          color: onAccent,
                           fontSize: 8,
                           fontWeight: FontWeight.w900,
                         ),
