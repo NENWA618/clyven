@@ -10,17 +10,13 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  static const Color _ink = Color(0xFF161616);
-
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final selectedLocale = ref.watch(appLocaleProvider);
     final themeSettings = ref.watch(appThemeProvider);
     final colors = Theme.of(context).colorScheme;
+    final isNight = themeSettings.displayMode == ClyvenDisplayMode.night;
     final isZh = Localizations.localeOf(context).languageCode == 'zh';
 
     return Scaffold(
@@ -29,19 +25,11 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           children: [
             _buildTopBar(context, l10n, colors),
-            const Divider(
-              height: 1,
-              color: Color(0xFFE3DED5),
-            ),
+            Divider(height: 1, color: colors.onSurface.withOpacity(0.12)),
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  24,
-                  20,
-                  30,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 30),
                 children: [
                   _buildSectionTitle(
                     l10n.accountSectionEyebrow,
@@ -76,17 +64,9 @@ class SettingsPage extends ConsumerWidget {
                   _SettingsItem(
                     icon: Icons.language_rounded,
                     title: l10n.language,
-                    subtitle: _languageLabel(
-                      selectedLocale,
-                      l10n,
-                    ),
+                    subtitle: _languageLabel(selectedLocale, l10n),
                     onTap: () {
-                      _showLanguageSheet(
-                        context,
-                        ref,
-                        l10n,
-                        selectedLocale,
-                      );
+                      _showLanguageSheet(context, ref, l10n, selectedLocale);
                     },
                   ),
                   const SizedBox(height: 10),
@@ -97,6 +77,41 @@ class SettingsPage extends ConsumerWidget {
                     onTap: () {
                       _showThemeSheet(context, isZh);
                     },
+                  ),
+                  const SizedBox(height: 10),
+                  _SettingsItem(
+                    icon: isNight
+                        ? Icons.dark_mode_rounded
+                        : Icons.light_mode_rounded,
+                    title: isZh ? '深夜模式' : 'Night mode',
+                    subtitle: isNight
+                        ? (isZh
+                              ? '已开启 · 使用 Clyven 深色背景'
+                              : 'On · Clyven dark background')
+                        : (isZh
+                              ? '白天模式 · 保持 F4F1EA 背景'
+                              : 'Day mode · Keep the F4F1EA background'),
+                    onTap: () {
+                      ref
+                          .read(appThemeProvider.notifier)
+                          .setDisplayMode(
+                            isNight
+                                ? ClyvenDisplayMode.day
+                                : ClyvenDisplayMode.night,
+                          );
+                    },
+                    trailing: Switch(
+                      value: isNight,
+                      onChanged: (enabled) {
+                        ref
+                            .read(appThemeProvider.notifier)
+                            .setDisplayMode(
+                              enabled
+                                  ? ClyvenDisplayMode.night
+                                  : ClyvenDisplayMode.day,
+                            );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 10),
                   _SettingsItem(
@@ -137,10 +152,8 @@ class SettingsPage extends ConsumerWidget {
                         Navigator.pop(context);
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: _ink,
-                        side: const BorderSide(
-                          color: Color(0xFFCAC5BB),
-                        ),
+                        foregroundColor: colors.onSurface,
+                        side: const BorderSide(color: Color(0xFFCAC5BB)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -148,16 +161,11 @@ class SettingsPage extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
-                            Icons.logout_rounded,
-                            size: 18,
-                          ),
+                          const Icon(Icons.logout_rounded, size: 18),
                           const SizedBox(width: 8),
                           Text(
                             l10n.logoutCurrentIdentity,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w800),
                           ),
                         ],
                       ),
@@ -167,7 +175,7 @@ class SettingsPage extends ConsumerWidget {
                   Center(
                     child: Text(
                       l10n.appName.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFFAAA49B),
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
@@ -184,10 +192,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  String _languageLabel(
-    Locale? locale,
-    AppLocalizations l10n,
-  ) {
+  String _languageLabel(Locale? locale, AppLocalizations l10n) {
     if (locale == null) {
       return l10n.languageSystem;
     }
@@ -199,25 +204,30 @@ class SettingsPage extends ConsumerWidget {
     };
   }
 
-  String _themeSummary(
-    ClyvenThemeSettings settings,
-    bool isZh,
-  ) {
+  String _themeSummary(ClyvenThemeSettings settings, bool isZh) {
     final mode = switch (settings.mode) {
       ClyvenThemeMode.accentOnly => isZh ? '只换强调色' : 'Accent only',
       ClyvenThemeMode.full => isZh ? '完整主题' : 'Full theme',
     };
-    return '$mode · ${_themeColorLabel(settings.color, isZh)}';
+
+    final primary = _themeColorLabel(settings.color, isZh);
+
+    if (settings.mode == ClyvenThemeMode.full &&
+        settings.color != ClyvenThemeColor.acid) {
+      final companion = _themeColorLabel(settings.companionColor, isZh);
+      return '$mode · $primary + $companion';
+    }
+
+    return '$mode · $primary';
   }
 
-  String _themeColorLabel(
-    ClyvenThemeColor color,
-    bool isZh,
-  ) {
+  String _themeColorLabel(ClyvenThemeColor color, bool isZh) {
     return switch (color) {
-      ClyvenThemeColor.acid => isZh
-          ? 'Clyven 黄 · E5FF58'
-          : 'Clyven Yellow · E5FF58',
+      ClyvenThemeColor.acid =>
+        isZh
+            ? 'Clyven 默认 · E5FF58 + 7657FF'
+            : 'Clyven Default · E5FF58 + 7657FF',
+      ClyvenThemeColor.yellow => isZh ? '黄色' : 'Yellow',
       ClyvenThemeColor.purple => isZh ? '紫色' : 'Purple',
       ClyvenThemeColor.blue => isZh ? '蓝色' : 'Blue',
       ClyvenThemeColor.green => isZh ? '绿色' : 'Green',
@@ -238,31 +248,23 @@ class SettingsPage extends ConsumerWidget {
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
+        final colors = Theme.of(sheetContext).colorScheme;
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              18,
-              18,
-              18,
-              24,
-            ),
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Text(
                     l10n.language,
-                    style: const TextStyle(
-                      color: _ink,
+                    style: TextStyle(
+                      color: colors.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
                     ),
@@ -273,9 +275,7 @@ class SettingsPage extends ConsumerWidget {
                   label: l10n.languageSystem,
                   selected: selectedLocale == null,
                   onTap: () {
-                    ref
-                        .read(appLocaleProvider.notifier)
-                        .useSystem();
+                    ref.read(appLocaleProvider.notifier).useSystem();
                     Navigator.pop(sheetContext);
                   },
                 ),
@@ -283,9 +283,7 @@ class SettingsPage extends ConsumerWidget {
                   label: l10n.languageEnglish,
                   selected: selectedLocale?.languageCode == 'en',
                   onTap: () {
-                    ref
-                        .read(appLocaleProvider.notifier)
-                        .useEnglish();
+                    ref.read(appLocaleProvider.notifier).useEnglish();
                     Navigator.pop(sheetContext);
                   },
                 ),
@@ -293,9 +291,7 @@ class SettingsPage extends ConsumerWidget {
                   label: l10n.languageChinese,
                   selected: selectedLocale?.languageCode == 'zh',
                   onTap: () {
-                    ref
-                        .read(appLocaleProvider.notifier)
-                        .useSimplifiedChinese();
+                    ref.read(appLocaleProvider.notifier).useSimplifiedChinese();
                     Navigator.pop(sheetContext);
                   },
                 ),
@@ -307,18 +303,13 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _showThemeSheet(
-    BuildContext context,
-    bool isZh,
-  ) async {
+  Future<void> _showThemeSheet(BuildContext context, bool isZh) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
         return Consumer(
@@ -337,8 +328,8 @@ class SettingsPage extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: Text(
                         isZh ? '主题颜色' : 'Theme color',
-                        style: const TextStyle(
-                          color: _ink,
+                        style: TextStyle(
+                          color: colors.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
                         ),
@@ -351,7 +342,7 @@ class SettingsPage extends ConsumerWidget {
                         isZh
                             ? 'E5FF58 永远保留为 Clyven 默认品牌色。'
                             : 'E5FF58 always remains the default Clyven brand color.',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFF777168),
                           fontSize: 11,
                           height: 1.4,
@@ -381,8 +372,8 @@ class SettingsPage extends ConsumerWidget {
                             subtitle: isZh
                                 ? '只替换原来的黄色部分'
                                 : 'Change the yellow accents only',
-                            selected: settings.mode ==
-                                ClyvenThemeMode.accentOnly,
+                            selected:
+                                settings.mode == ClyvenThemeMode.accentOnly,
                             onTap: () {
                               ref
                                   .read(appThemeProvider.notifier)
@@ -398,8 +389,7 @@ class SettingsPage extends ConsumerWidget {
                             subtitle: isZh
                                 ? '强调色、搭配色和背景一起变化'
                                 : 'Accent, companion and background change together',
-                            selected:
-                                settings.mode == ClyvenThemeMode.full,
+                            selected: settings.mode == ClyvenThemeMode.full,
                             onTap: () {
                               ref
                                   .read(appThemeProvider.notifier)
@@ -446,7 +436,7 @@ class SettingsPage extends ConsumerWidget {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: selected
-                                      ? _ink
+                                      ? colors.onSurface
                                       : Colors.white.withOpacity(0.9),
                                   width: selected ? 3 : 2,
                                 ),
@@ -462,7 +452,7 @@ class SettingsPage extends ConsumerWidget {
                                   ? Icon(
                                       Icons.check_rounded,
                                       color: value.computeLuminance() > 0.55
-                                          ? _ink
+                                          ? colors.onSurface
                                           : Colors.white,
                                       size: 23,
                                     )
@@ -472,6 +462,90 @@ class SettingsPage extends ConsumerWidget {
                         );
                       }).toList(),
                     ),
+                    if (settings.mode == ClyvenThemeMode.full &&
+                        settings.color != ClyvenThemeColor.acid) ...[
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Text(
+                          isZh ? '搭配色' : 'Companion color',
+                          style: TextStyle(
+                            color: colors.secondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.4,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Text(
+                          isZh
+                              ? '这里只显示 Clyven 允许的搭配，避免出现不协调的组合。'
+                              : 'Only Clyven-approved pairings are shown.',
+                          style: TextStyle(
+                            color: colors.onSurface.withOpacity(0.60),
+                            fontSize: 10,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children:
+                            ClyvenTheme.allowedCompanionsFor(
+                              settings.color,
+                            ).map((companion) {
+                              final value = ClyvenTheme.secondaryForPair(
+                                settings.color,
+                                companion,
+                              );
+                              final selected =
+                                  settings.companionColor == companion;
+
+                              return Tooltip(
+                                message: _themeColorLabel(companion, isZh),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    ref
+                                        .read(appThemeProvider.notifier)
+                                        .setCompanionColor(companion);
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 160),
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: value,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: selected
+                                            ? colors.onSurface
+                                            : colors.onSurface.withOpacity(
+                                                0.18,
+                                              ),
+                                        width: selected ? 3 : 1.5,
+                                      ),
+                                    ),
+                                    child: selected
+                                        ? Icon(
+                                            Icons.check_rounded,
+                                            color:
+                                                value.computeLuminance() > 0.55
+                                                ? colors.onSurface
+                                                : Colors.white,
+                                            size: 21,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                      ),
+                    ],
                     const SizedBox(height: 18),
                     Container(
                       width: double.infinity,
@@ -480,17 +554,21 @@ class SettingsPage extends ConsumerWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.62),
+                        color: colors.brightness == Brightness.dark
+                            ? Theme.of(context).cardColor
+                            : Colors.white.withOpacity(0.62),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFE3DED5),
+                          color: colors.brightness == Brightness.dark
+                              ? const Color(0xFF383838)
+                              : const Color(0xFFE3DED5),
                         ),
                       ),
                       child: Text(
                         _themeSummary(settings, isZh),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: _ink,
+                        style: TextStyle(
+                          color: colors.onSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                         ),
@@ -524,15 +602,19 @@ class SettingsPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.72),
+                color: colors.brightness == Brightness.dark
+                    ? Theme.of(context).cardColor
+                    : Colors.white.withOpacity(0.72),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: const Color(0xFFE3DED5),
+                  color: colors.brightness == Brightness.dark
+                      ? const Color(0xFF383838)
+                      : const Color(0xFFE3DED5),
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_back_rounded,
-                color: _ink,
+                color: colors.onSurface,
                 size: 21,
               ),
             ),
@@ -554,8 +636,8 @@ class SettingsPage extends ConsumerWidget {
                 const SizedBox(height: 3),
                 Text(
                   l10n.settings,
-                  style: const TextStyle(
-                    color: _ink,
+                  style: TextStyle(
+                    color: colors.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -576,11 +658,7 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(
-    String eyebrow,
-    String title,
-    ColorScheme colors,
-  ) {
+  Widget _buildSectionTitle(String eyebrow, String title, ColorScheme colors) {
     return Row(
       children: [
         Text(
@@ -595,8 +673,8 @@ class SettingsPage extends ConsumerWidget {
         const SizedBox(width: 10),
         Text(
           title,
-          style: const TextStyle(
-            color: _ink,
+          style: TextStyle(
+            color: colors.onSurface,
             fontSize: 17,
             fontWeight: FontWeight.w900,
           ),
@@ -622,22 +700,14 @@ class _LanguageOption extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return ListTile(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onTap: onTap,
       title: Text(
         label,
-        style: const TextStyle(
-          color: _ink,
-          fontWeight: FontWeight.w700,
-        ),
+        style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.w700),
       ),
       trailing: selected
-          ? Icon(
-              Icons.check_circle_rounded,
-              color: colors.secondary,
-            )
+          ? Icon(Icons.check_circle_rounded, color: colors.secondary)
           : null,
     );
   }
@@ -668,14 +738,15 @@ class _ThemeModeCard extends StatelessWidget {
         duration: const Duration(milliseconds: 160),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
+          // Unselected mode cards stay transparent.
           color: selected
               ? colors.primary.withOpacity(0.20)
-              : Colors.white.withOpacity(0.62),
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected
                 ? colors.primary
-                : const Color(0xFFE3DED5),
+                : colors.onSurface.withOpacity(0.24),
             width: selected ? 2 : 1,
           ),
         ),
@@ -684,14 +755,16 @@ class _ThemeModeCard extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: selected ? colors.secondary : const Color(0xFF777168),
+              color: selected
+                  ? colors.secondary
+                  : colors.secondary.withOpacity(0.78),
               size: 22,
             ),
             const SizedBox(height: 10),
             Text(
               title,
-              style: const TextStyle(
-                color: _ink,
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 13,
                 fontWeight: FontWeight.w900,
               ),
@@ -699,8 +772,8 @@ class _ThemeModeCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: const TextStyle(
-                color: Color(0xFF777168),
+              style: TextStyle(
+                color: colors.onSurface.withOpacity(0.62),
                 fontSize: 9,
                 height: 1.35,
               ),
@@ -717,12 +790,14 @@ class _SettingsItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   const _SettingsItem({
     required this.icon,
     required this.title,
     required this.subtitle,
     this.onTap,
+    this.trailing,
   });
 
   @override
@@ -733,15 +808,16 @@ class _SettingsItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: colors.brightness == Brightness.dark
+              ? Theme.of(context).cardColor
+              : Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFFE3DED5),
+            color: colors.brightness == Brightness.dark
+                ? const Color(0xFF383838)
+                : const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -753,11 +829,7 @@ class _SettingsItem extends StatelessWidget {
                 color: colors.secondary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(
-                icon,
-                color: colors.secondary,
-                size: 21,
-              ),
+              child: Icon(icon, color: colors.secondary, size: 21),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -766,8 +838,8 @@ class _SettingsItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: _ink,
+                    style: TextStyle(
+                      color: colors.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
                     ),
@@ -775,20 +847,18 @@ class _SettingsItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF99938A),
-                      fontSize: 10,
-                    ),
+                    style: TextStyle(color: Color(0xFF99938A), fontSize: 10),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFF99938A),
-              size: 21,
-            ),
+            trailing ??
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFF99938A),
+                  size: 21,
+                ),
           ],
         ),
       ),

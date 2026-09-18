@@ -1,0 +1,12 @@
+class: CommentReplyLike
+table: comment_reply_like
+
+fields:
+  replyId: int
+  userId: String
+  createdAt: DateTime, default=now
+
+indexes:
+  comment_reply_like_unique_idx:
+    fields: replyId, userId
+    unique: true

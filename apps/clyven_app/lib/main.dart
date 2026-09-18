@@ -7,33 +7,29 @@ import 'core/theme/app_theme_provider.dart';
 import 'features/auth/presentation/auth_gate.dart';
 import 'l10n/app_localizations.dart';
 
+import 'features/video/presentation/widgets/global_video_player_host.dart';
+
 void main() {
-  runApp(
-    const ProviderScope(
-      child: ClyvenApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: ClyvenApp()));
 }
 
 class ClyvenApp extends ConsumerWidget {
   const ClyvenApp({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(appLocaleProvider);
     final themeSettings = ref.watch(appThemeProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       locale: locale,
-      localizationsDelegates:
-          AppLocalizations.localizationsDelegates,
-      supportedLocales:
-          AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ClyvenTheme.build(themeSettings),
+      builder: (context, child) {
+        return GlobalVideoPlayerHost(child: child ?? const SizedBox.shrink());
+      },
       home: const AuthGate(),
     );
   }

@@ -76,6 +76,52 @@ class SubtitleEndpoint extends Endpoint {
     ];
   }
 
+  Future<List<SubtitleTrack>> getAvailableTracks(
+    Session session, {
+    required int videoId,
+  }) async {
+    final tracks = await SubtitleTrack.db.find(
+      session,
+      where: (t) => t.videoId.equals(videoId),
+    );
+
+    if (tracks.isEmpty) {
+      return [];
+    }
+
+    final trackIds = tracks.map((track) => track.id).whereType<int>().toSet();
+
+    if (trackIds.isEmpty) {
+      return [];
+    }
+
+    final cues = await SubtitleCue.db.find(
+      session,
+      where: (c) => c.trackId.inSet(trackIds),
+    );
+
+    if (cues.isEmpty) {
+      return [];
+    }
+
+    final trackIdsWithCues = cues.map((cue) => cue.trackId).toSet();
+
+    final available = tracks.where((track) {
+      final id = track.id;
+      return id != null && trackIdsWithCues.contains(id);
+    }).toList();
+
+    available.sort((a, b) {
+      if (a.isDefault != b.isDefault) {
+        return a.isDefault ? -1 : 1;
+      }
+
+      return a.languageCode.compareTo(b.languageCode);
+    });
+
+    return available;
+  }
+
   Future<SubtitleSrtPreview> previewSrtImport(
     Session session, {
     required int videoId,

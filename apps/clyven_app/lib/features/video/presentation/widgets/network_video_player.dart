@@ -14,17 +14,17 @@ class NetworkVideoPlayer extends StatefulWidget {
   final List<serverpod.SubtitleCueDetail> subtitles;
   final int initialPositionSeconds;
   final int fallbackDurationSeconds;
-  final void Function(
-    Duration position,
-    Duration duration,
-  )? onProgress;
+  final bool compact;
+  final void Function(Duration position, Duration duration)? onProgress;
 
   const NetworkVideoPlayer({
+    super.key,
     required this.videoUrl,
     required this.coverUrl,
     required this.subtitles,
     required this.initialPositionSeconds,
     required this.fallbackDurationSeconds,
+    this.compact = false,
     this.onProgress,
   });
 
@@ -47,7 +47,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   void initState() {
     super.initState();
 
-    final isNetworkVideo = widget.videoUrl.startsWith('http://') ||
+    final isNetworkVideo =
+        widget.videoUrl.startsWith('http://') ||
         widget.videoUrl.startsWith('https://');
 
     if (isNetworkVideo) {
@@ -55,18 +56,14 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
         Uri.parse(widget.videoUrl),
       );
     } else {
-      _controller = VideoPlayerController.file(
-        File(widget.videoUrl),
-      );
+      _controller = VideoPlayerController.file(File(widget.videoUrl));
     }
 
     _initializeFuture = _initializePlayer();
     _controller.addListener(_handleProgress);
   }
 
-  serverpod.SubtitleCueDetail? _findActiveSubtitle(
-    Duration position,
-  ) {
+  serverpod.SubtitleCueDetail? _findActiveSubtitle(Duration position) {
     final currentMs = position.inMilliseconds;
 
     for (final detail in widget.subtitles) {
@@ -97,9 +94,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       return;
     }
 
-    final position = Duration(
-      seconds: savedPosition,
-    );
+    final position = Duration(seconds: savedPosition);
 
     _fallbackBasePosition = position;
     await _controller.seekTo(position);
@@ -112,9 +107,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       return controllerDuration;
     }
 
-    return Duration(
-      seconds: widget.fallbackDurationSeconds,
-    );
+    return Duration(seconds: widget.fallbackDurationSeconds);
   }
 
   bool get _needsFallbackPosition {
@@ -138,23 +131,20 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   }
 
   void _startPositionTicker() {
-    _positionTicker ??= Timer.periodic(
-      const Duration(milliseconds: 250),
-      (_) {
-        if (!mounted || !_fallbackClock.isRunning) {
-          return;
-        }
+    _positionTicker ??= Timer.periodic(const Duration(milliseconds: 250), (_) {
+      if (!mounted || !_fallbackClock.isRunning) {
+        return;
+      }
 
-        final position = _effectivePosition();
-        _handleProgress();
+      final position = _effectivePosition();
+      _handleProgress();
 
-        if (position >= _effectiveDuration()) {
-          _fallbackClock.stop();
-        }
+      if (position >= _effectiveDuration()) {
+        _fallbackClock.stop();
+      }
 
-        setState(() {});
-      },
-    );
+      setState(() {});
+    });
   }
 
   void _handleProgress() {
@@ -171,10 +161,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     }
 
     _lastSavedSecond = second;
-    widget.onProgress?.call(
-      position,
-      duration,
-    );
+    widget.onProgress?.call(position, duration);
   }
 
   @override
@@ -190,102 +177,93 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   Widget build(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: FutureBuilder<void>(
-          future: _initializeFuture,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return _buildPlayerError();
-            }
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: FutureBuilder<void>(
+        future: _initializeFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return _buildPlayerError();
+          }
 
-            if (snapshot.connectionState != ConnectionState.done) {
-              return _buildLoadingCover();
-            }
+          if (snapshot.connectionState != ConnectionState.done) {
+            return _buildLoadingCover();
+          }
 
-            return ValueListenableBuilder<VideoPlayerValue>(
-              valueListenable: _controller,
-              builder: (
-                context,
-                value,
-                child,
-              ) {
-                final duration = _effectiveDuration();
-                final position = _effectivePosition();
-                final activeSubtitle = _findActiveSubtitle(position);
-                final maxMilliseconds = duration.inMilliseconds;
-                final positionMilliseconds = position.inMilliseconds.clamp(
-                  0,
-                  maxMilliseconds > 0 ? maxMilliseconds : 0,
-                );
+          return ValueListenableBuilder<VideoPlayerValue>(
+            valueListenable: _controller,
+            builder: (context, value, child) {
+              final duration = _effectiveDuration();
+              final position = _effectivePosition();
+              final activeSubtitle = _findActiveSubtitle(position);
+              final maxMilliseconds = duration.inMilliseconds;
+              final positionMilliseconds = position.inMilliseconds.clamp(
+                0,
+                maxMilliseconds > 0 ? maxMilliseconds : 0,
+              );
 
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(
-                      color: Colors.black,
-                      child: Center(
-                        child: AspectRatio(
-                          aspectRatio: value.aspectRatio == 0
-                              ? 16 / 9
-                              : value.aspectRatio,
-                          child: VideoPlayer(_controller),
-                        ),
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    color: Colors.black,
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: value.aspectRatio == 0
+                            ? 16 / 9
+                            : value.aspectRatio,
+                        child: VideoPlayer(_controller),
                       ),
                     ),
-                    Positioned.fill(
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _togglePlay,
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+                  if (!widget.compact && !value.isPlaying)
+                    Center(
                       child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
                         onTap: _togglePlay,
-                        child: const SizedBox.expand(),
+                        child: Container(
+                          width: 68,
+                          height: 68,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.92),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.play_arrow_rounded,
+                            size: 42,
+                            color: Color(0xFF161616),
+                          ),
+                        ),
                       ),
                     ),
-                    if (!value.isPlaying)
-                      Center(
-                        child: GestureDetector(
-                          onTap: _togglePlay,
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(
-                                alpha: 0.92,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              size: 42,
-                              color: Color(0xFF161616),
-                            ),
+                  if (!widget.compact && activeSubtitle != null)
+                    Positioned(
+                      left: 24,
+                      right: 24,
+                      bottom: 58,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.65),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: InteractiveSubtitleOverlay(
+                            detail: activeSubtitle,
                           ),
                         ),
                       ),
-                    if (activeSubtitle != null)
-                      Positioned(
-                        left: 24,
-                        right: 24,
-                        bottom: 58,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(
-                                alpha: 0.65,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: InteractiveSubtitleOverlay(
-                              detail: activeSubtitle,
-                            ),
-                          ),
-                        ),
-                      ),
+                    ),
+                  if (!widget.compact)
                     Positioned(
                       left: 14,
                       right: 14,
@@ -373,18 +351,34 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                         ],
                       ),
                     ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
+                  if (widget.compact)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: IgnorePointer(
+                        child: LinearProgressIndicator(
+                          value: maxMilliseconds > 0
+                              ? positionMilliseconds / maxMilliseconds
+                              : 0,
+                          minHeight: 2,
+                          color: accent,
+                          backgroundColor: Colors.white24,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
 
   Widget _buildLoadingCover() {
-    final isNetworkCover = widget.coverUrl.startsWith('http://') ||
+    final isNetworkCover =
+        widget.coverUrl.startsWith('http://') ||
         widget.coverUrl.startsWith('https://');
     final accent = Theme.of(context).colorScheme.primary;
 
@@ -392,17 +386,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       fit: StackFit.expand,
       children: [
         if (widget.coverUrl.isEmpty)
-          Container(
-            color: Colors.black,
-          )
+          Container(color: Colors.black)
         else if (isNetworkCover)
           Image.network(
             widget.coverUrl,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.black,
-              );
+              return Container(color: Colors.black);
             },
           )
         else
@@ -410,19 +400,11 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             File(widget.coverUrl),
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.black,
-              );
+              return Container(color: Colors.black);
             },
           ),
-        Container(
-          color: Colors.black38,
-        ),
-        Center(
-          child: CircularProgressIndicator(
-            color: accent,
-          ),
-        ),
+        Container(color: Colors.black38),
+        Center(child: CircularProgressIndicator(color: accent)),
       ],
     );
   }
@@ -444,10 +426,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             const SizedBox(height: 10),
             Text(
               l10n.videoCannotPlay,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
             ),
           ],
         ),
@@ -483,14 +462,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   }
 
   String _playerTime(Duration duration) {
-    final minutes = duration.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    final seconds = duration.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
 
     if (duration.inHours > 0) {
       return '${duration.inHours}:$minutes:$seconds';

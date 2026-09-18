@@ -7,7 +7,6 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/utils/require_login.dart';
 import '../../../creator/presentation/pages/following_creators_page.dart';
 import '../../../history/presentation/pages/watch_history_page.dart';
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../../video_interactions/presentation/pages/favorite_videos_page.dart';
 import '../../../word_list/presentation/pages/word_lists_page.dart';
 import '../../data/models/user_profile.dart';
@@ -15,16 +14,15 @@ import '../providers/my_profile_provider.dart';
 import 'my_submissions_page.dart';
 import 'settings_page.dart';
 
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
+
 class MyProfilePage extends ConsumerWidget {
   const MyProfilePage({super.key});
 
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final authAsync = ref.watch(authProvider);
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
@@ -32,20 +30,14 @@ class MyProfilePage extends ConsumerWidget {
     if (authAsync.isLoading) {
       return Scaffold(
         backgroundColor: scheme.surface,
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     final user = authAsync.value;
 
     if (user == null) {
-      return _buildGuestContent(
-        context,
-        ref,
-        l10n,
-      );
+      return _buildGuestContent(context, ref, l10n);
     }
 
     final profileAsync = ref.watch(myProfileProvider);
@@ -54,9 +46,7 @@ class MyProfilePage extends ConsumerWidget {
       backgroundColor: scheme.surface,
       body: profileAsync.when(
         loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
         error: (error, stackTrace) {
           return SafeArea(
@@ -78,12 +68,7 @@ class MyProfilePage extends ConsumerWidget {
           );
         },
         data: (profile) {
-          return _buildContent(
-            context,
-            ref,
-            profile,
-            l10n,
-          );
+          return _buildContent(context, ref, profile, l10n);
         },
       ),
     );
@@ -97,10 +82,7 @@ class MyProfilePage extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
 
     Future<void> login() async {
-      await requireLogin(
-        context,
-        ref,
-      );
+      await requireLogin(context, ref);
     }
 
     return Scaffold(
@@ -110,9 +92,7 @@ class MyProfilePage extends ConsumerWidget {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: _buildTopBar(context, l10n),
-            ),
+            SliverToBoxAdapter(child: _buildTopBar(context, l10n)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
@@ -138,8 +118,8 @@ class MyProfilePage extends ConsumerWidget {
                         children: [
                           Text(
                             l10n.guest,
-                            style: const TextStyle(
-                              color: _ink,
+                            style: TextStyle(
+                              color: scheme.onSurface,
                               fontSize: 27,
                               fontWeight: FontWeight.w900,
                             ),
@@ -147,8 +127,10 @@ class MyProfilePage extends ConsumerWidget {
                           const SizedBox(height: 6),
                           Text(
                             l10n.guestProfileSubtitle,
-                            style: const TextStyle(
-                              color: Color(0xFF77736C),
+                            style: TextStyle(
+                              color: scheme.brightness == Brightness.dark
+                                  ? const Color(0xFFBEB9B0)
+                                  : const Color(0xFF77736C),
                               fontSize: 12,
                             ),
                           ),
@@ -181,25 +163,25 @@ class MyProfilePage extends ConsumerWidget {
                   child: FilledButton(
                     onPressed: login,
                     style: FilledButton.styleFrom(
-                      backgroundColor: _ink,
-                      foregroundColor: scheme.primary,
+                      backgroundColor: scheme.brightness == Brightness.dark
+                          ? scheme.primary
+                          : _ink,
+                      foregroundColor: scheme.brightness == Brightness.dark
+                          ? scheme.onPrimary
+                          : scheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
                     child: Text(
                       l10n.loginOrRegister,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 60),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 60)),
           ],
         ),
       ),
@@ -223,25 +205,10 @@ class MyProfilePage extends ConsumerWidget {
             parent: BouncingScrollPhysics(),
           ),
           slivers: [
-            SliverToBoxAdapter(
-              child: _buildTopBar(context, l10n),
-            ),
-            SliverToBoxAdapter(
-              child: _buildIdentity(context, profile),
-            ),
-            SliverToBoxAdapter(
-              child: _buildStats(
-                context,
-                profile,
-                l10n,
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: _buildLibrary(
-                context,
-                l10n,
-              ),
-            ),
+            SliverToBoxAdapter(child: _buildTopBar(context, l10n)),
+            SliverToBoxAdapter(child: _buildIdentity(context, profile)),
+            SliverToBoxAdapter(child: _buildStats(context, profile, l10n)),
+            SliverToBoxAdapter(child: _buildLibrary(context, l10n)),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 32, 20, 15),
@@ -250,8 +217,8 @@ class MyProfilePage extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         l10n.myTrack,
-                        style: const TextStyle(
-                          color: _ink,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 25,
                           fontWeight: FontWeight.w900,
                         ),
@@ -259,8 +226,10 @@ class MyProfilePage extends ConsumerWidget {
                     ),
                     Text(
                       l10n.myFrames,
-                      style: const TextStyle(
-                        color: Color(0xFF99938A),
+                      style: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF9E9991)
+                            : const Color(0xFF99938A),
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.4,
@@ -273,37 +242,27 @@ class MyProfilePage extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final video = profile.videos[index];
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final video = profile.videos[index];
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: _buildVideo(
-                        context,
-                        video,
-                        index,
-                        l10n,
-                      ),
-                    );
-                  },
-                  childCount: profile.videos.length,
-                ),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: _buildVideo(context, video, index, l10n),
+                  );
+                }, childCount: profile.videos.length),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 50),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 50)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTopBar(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildTopBar(BuildContext context, AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 16, 10),
       child: Row(
@@ -315,7 +274,7 @@ class MyProfilePage extends ConsumerWidget {
                 Text(
                   l10n.profileEyebrow,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: scheme.secondary,
                     fontSize: 9,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -324,8 +283,8 @@ class MyProfilePage extends ConsumerWidget {
                 const SizedBox(height: 3),
                 Text(
                   l10n.navProfile,
-                  style: const TextStyle(
-                    color: _ink,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -349,13 +308,15 @@ class MyProfilePage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.72),
+                color: isDark
+                    ? const Color(0xFF222222)
+                    : Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
+                border: isDark
+                    ? Border.all(color: const Color(0xFF383838))
+                    : null,
               ),
-              child: const Icon(
-                Icons.settings_outlined,
-                size: 20,
-              ),
+              child: const Icon(Icons.settings_outlined, size: 20),
             ),
           ),
         ],
@@ -363,10 +324,7 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentity(
-    BuildContext context,
-    UserProfile profile,
-  ) {
+  Widget _buildIdentity(BuildContext context, UserProfile profile) {
     final scheme = Theme.of(context).colorScheme;
 
     return Padding(
@@ -385,9 +343,7 @@ class MyProfilePage extends ConsumerWidget {
                       child: Text(
                         profile.displayName.isEmpty
                             ? '?'
-                            : profile.displayName
-                                .substring(0, 1)
-                                .toUpperCase(),
+                            : profile.displayName.substring(0, 1).toUpperCase(),
                         style: TextStyle(
                           color: scheme.onSecondary,
                           fontSize: 30,
@@ -395,10 +351,7 @@ class MyProfilePage extends ConsumerWidget {
                         ),
                       ),
                     )
-                  : Image.network(
-                      profile.avatarUrl,
-                      fit: BoxFit.cover,
-                    ),
+                  : Image.network(profile.avatarUrl, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: 16),
@@ -408,8 +361,8 @@ class MyProfilePage extends ConsumerWidget {
               children: [
                 Text(
                   profile.displayName,
-                  style: const TextStyle(
-                    color: _ink,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 27,
                     fontWeight: FontWeight.w900,
                   ),
@@ -417,8 +370,10 @@ class MyProfilePage extends ConsumerWidget {
                 const SizedBox(height: 5),
                 Text(
                   '@${profile.username}',
-                  style: const TextStyle(
-                    color: Color(0xFF77736C),
+                  style: TextStyle(
+                    color: scheme.brightness == Brightness.dark
+                        ? const Color(0xFFBEB9B0)
+                        : const Color(0xFF77736C),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -426,8 +381,10 @@ class MyProfilePage extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Text(
                   profile.bio,
-                  style: const TextStyle(
-                    color: Color(0xFF4F4B45),
+                  style: TextStyle(
+                    color: scheme.brightness == Brightness.dark
+                        ? const Color(0xFFCFCAC2)
+                        : const Color(0xFF4F4B45),
                     fontSize: 13,
                     height: 1.5,
                   ),
@@ -445,12 +402,16 @@ class MyProfilePage extends ConsumerWidget {
     UserProfile profile,
     AppLocalizations l10n,
   ) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Container(
         height: 82,
         decoration: BoxDecoration(
-          color: _ink,
+          color: scheme.brightness == Brightness.dark
+              ? const Color(0xFF222222)
+              : _ink,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Row(
@@ -478,10 +439,7 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildLibrary(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildLibrary(BuildContext context, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: _buildLibraryRow(
@@ -624,7 +582,9 @@ class MyProfilePage extends ConsumerWidget {
     required String subtitle,
     VoidCallback? onTap,
   }) {
-    final secondary = Theme.of(context).colorScheme.secondary;
+    final scheme = Theme.of(context).colorScheme;
+    final secondary = scheme.secondary;
+    final isDark = scheme.brightness == Brightness.dark;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -633,10 +593,12 @@ class MyProfilePage extends ConsumerWidget {
         height: 100,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
+          color: isDark
+              ? const Color(0xFF222222)
+              : Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFFE3DED5),
+            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
           ),
         ),
         child: Column(
@@ -649,11 +611,7 @@ class MyProfilePage extends ConsumerWidget {
                 color: secondary.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(11),
               ),
-              child: Icon(
-                icon,
-                color: secondary,
-                size: 20,
-              ),
+              child: Icon(icon, color: secondary, size: 20),
             ),
             const Spacer(),
             Text(
@@ -661,8 +619,8 @@ class MyProfilePage extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.clip,
               softWrap: false,
-              style: const TextStyle(
-                color: _ink,
+              style: TextStyle(
+                color: scheme.onSurface,
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
               ),
@@ -673,8 +631,10 @@ class MyProfilePage extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.clip,
               softWrap: false,
-              style: const TextStyle(
-                color: Color(0xFF99938A),
+              style: TextStyle(
+                color: isDark
+                    ? const Color(0xFF9E9991)
+                    : const Color(0xFF99938A),
                 fontSize: 9,
               ),
             ),
@@ -691,28 +651,23 @@ class MyProfilePage extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final number = (index + 1).toString().padLeft(2, '0');
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 125,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
+          color: isDark
+              ? const Color(0xFF222222)
+              : Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(23),
           border: Border.all(
-            color: const Color(0xFFE3DED5),
+            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -727,10 +682,7 @@ class MyProfilePage extends ConsumerWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
-                      video.coverUrl,
-                      fit: BoxFit.cover,
-                    ),
+                    Image.network(video.coverUrl, fit: BoxFit.cover),
                     Positioned(
                       right: 8,
                       bottom: 8,
@@ -778,8 +730,8 @@ class MyProfilePage extends ConsumerWidget {
                         video.title,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _ink,
+                        style: TextStyle(
+                          color: scheme.onSurface,
                           fontSize: 15,
                           height: 1.25,
                           fontWeight: FontWeight.w800,
@@ -787,11 +739,11 @@ class MyProfilePage extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      l10n.viewsCount(
-                        _count(context, video.viewCount),
-                      ),
-                      style: const TextStyle(
-                        color: Color(0xFF908A81),
+                      l10n.viewsCount(_count(context, video.viewCount)),
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFF9E9991)
+                            : const Color(0xFF908A81),
                         fontSize: 10,
                       ),
                     ),
@@ -805,11 +757,7 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _stat(
-    BuildContext context,
-    String value,
-    String label,
-  ) {
+  Widget _stat(BuildContext context, String value, String label) {
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -827,10 +775,7 @@ class MyProfilePage extends ConsumerWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 9,
-            ),
+            style: const TextStyle(color: Colors.white54, fontSize: 9),
           ),
         ],
       ),
@@ -838,21 +783,12 @@ class MyProfilePage extends ConsumerWidget {
   }
 
   Widget _line() {
-    return Container(
-      width: 1,
-      height: 30,
-      color: Colors.white12,
-    );
+    return Container(width: 1, height: 30, color: Colors.white12);
   }
 
-  String _count(
-    BuildContext context,
-    int value,
-  ) {
+  String _count(BuildContext context, int value) {
     final localeName = Localizations.localeOf(context).toString();
-    return NumberFormat.compact(
-      locale: localeName,
-    ).format(value);
+    return NumberFormat.compact(locale: localeName).format(value);
   }
 
   static String _duration(int seconds) {

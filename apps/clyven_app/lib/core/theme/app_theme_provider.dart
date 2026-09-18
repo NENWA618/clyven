@@ -8,6 +8,8 @@ import 'app_theme.dart';
 class AppThemeNotifier extends Notifier<ClyvenThemeSettings> {
   static const String _modeKey = 'clyven.theme_mode';
   static const String _colorKey = 'clyven.theme_color';
+  static const String _companionKey = 'clyven.theme_companion_color';
+  static const String _displayModeKey = 'clyven.display_mode';
 
   final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
@@ -23,18 +25,49 @@ class AppThemeNotifier extends Notifier<ClyvenThemeSettings> {
   }
 
   void setColor(ClyvenThemeColor color) {
-    state = state.copyWith(color: color);
+    final companion =
+        ClyvenTheme.isCompanionAllowed(color, state.companionColor)
+        ? state.companionColor
+        : ClyvenTheme.defaultCompanionFor(color);
+
+    state = state.copyWith(color: color, companionColor: companion);
+
     unawaited(_saveColor(color));
+    unawaited(_saveCompanion(companion));
+  }
+
+  void setCompanionColor(ClyvenThemeColor companion) {
+    if (!ClyvenTheme.isCompanionAllowed(state.color, companion)) {
+      return;
+    }
+
+    state = state.copyWith(companionColor: companion);
+    unawaited(_saveCompanion(companion));
+  }
+
+  void setDisplayMode(ClyvenDisplayMode displayMode) {
+    state = state.copyWith(displayMode: displayMode);
+    unawaited(_saveDisplayMode(displayMode));
   }
 
   Future<void> _restore() async {
     try {
       final savedMode = await _preferences.getString(_modeKey);
       final savedColor = await _preferences.getString(_colorKey);
+      final savedCompanion = await _preferences.getString(_companionKey);
+      final savedDisplayMode = await _preferences.getString(_displayModeKey);
+
+      final color = _parseColor(savedColor);
+      final parsedCompanion = _parseColor(savedCompanion);
+      final companion = ClyvenTheme.isCompanionAllowed(color, parsedCompanion)
+          ? parsedCompanion
+          : ClyvenTheme.defaultCompanionFor(color);
 
       state = ClyvenThemeSettings(
         mode: _parseMode(savedMode),
-        color: _parseColor(savedColor),
+        color: color,
+        companionColor: companion,
+        displayMode: _parseDisplayMode(savedDisplayMode),
       );
     } catch (_) {
       state = const ClyvenThemeSettings();
@@ -59,6 +92,15 @@ class AppThemeNotifier extends Notifier<ClyvenThemeSettings> {
     return ClyvenThemeColor.acid;
   }
 
+  ClyvenDisplayMode _parseDisplayMode(String? value) {
+    for (final mode in ClyvenDisplayMode.values) {
+      if (mode.name == value) {
+        return mode;
+      }
+    }
+    return ClyvenDisplayMode.day;
+  }
+
   Future<void> _saveMode(ClyvenThemeMode mode) async {
     try {
       await _preferences.setString(_modeKey, mode.name);
@@ -74,9 +116,25 @@ class AppThemeNotifier extends Notifier<ClyvenThemeSettings> {
       // Keep the in-memory theme when local persistence is unavailable.
     }
   }
+
+  Future<void> _saveCompanion(ClyvenThemeColor companion) async {
+    try {
+      await _preferences.setString(_companionKey, companion.name);
+    } catch (_) {
+      // Keep the in-memory theme when local persistence is unavailable.
+    }
+  }
+
+  Future<void> _saveDisplayMode(ClyvenDisplayMode displayMode) async {
+    try {
+      await _preferences.setString(_displayModeKey, displayMode.name);
+    } catch (_) {
+      // Keep the in-memory theme when local persistence is unavailable.
+    }
+  }
 }
 
 final appThemeProvider =
     NotifierProvider<AppThemeNotifier, ClyvenThemeSettings>(
-  AppThemeNotifier.new,
-);
+      AppThemeNotifier.new,
+    );

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
-import '../../../video/presentation/pages/video_detail_page.dart';
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class VideoSearchPage extends ConsumerStatefulWidget {
   const VideoSearchPage({super.key});
@@ -44,17 +44,10 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
             Expanded(
               child: homeAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
-                error: (
-                  error,
-                  stackTrace,
-                ) {
-                  return Center(
-                    child: Text(l10n.searchLoadFailed),
-                  );
+                error: (error, stackTrace) {
+                  return Center(child: Text(l10n.searchLoadFailed));
                 },
                 data: (state) {
                   final videos = state.feed.videos;
@@ -64,9 +57,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                     return Center(
                       child: Text(
                         l10n.searchPrompt,
-                        style: const TextStyle(
-                          color: Color(0xFF908A81),
-                        ),
+                        style: const TextStyle(color: Color(0xFF908A81)),
                       ),
                     );
                   }
@@ -75,35 +66,19 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                     return Center(
                       child: Text(
                         l10n.searchNoResults,
-                        style: const TextStyle(
-                          color: Color(0xFF908A81),
-                        ),
+                        style: const TextStyle(color: Color(0xFF908A81)),
                       ),
                     );
                   }
 
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      18,
-                      12,
-                      18,
-                      40,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(18, 12, 18, 40),
                     itemCount: results.length,
-                    separatorBuilder: (
-                      context,
-                      index,
-                    ) {
+                    separatorBuilder: (context, index) {
                       return const SizedBox(height: 10);
                     },
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
-                      return _buildResult(
-                        results[index],
-                        l10n,
-                      );
+                    itemBuilder: (context, index) {
+                      return _buildResult(results[index], l10n);
                     },
                   );
                 },
@@ -117,12 +92,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
 
   Widget _buildHeader(AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        14,
-        12,
-        14,
-        12,
-      ),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Row(
         children: [
           GestureDetector(
@@ -136,9 +106,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                 color: Colors.white.withOpacity(0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 10),
@@ -153,9 +121,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
               },
               decoration: InputDecoration(
                 hintText: l10n.searchHint,
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                ),
+                prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: _keyword.isEmpty
                     ? null
                     : IconButton(
@@ -166,9 +132,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                             _keyword = '';
                           });
                         },
-                        icon: const Icon(
-                          Icons.close_rounded,
-                        ),
+                        icon: const Icon(Icons.close_rounded),
                       ),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.75),
@@ -184,57 +148,40 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
     );
   }
 
-  List<HomeVideo> _filterVideos(
-    List<HomeVideo> videos,
-    AppLocalizations l10n,
-  ) {
+  List<HomeVideo> _filterVideos(List<HomeVideo> videos, AppLocalizations l10n) {
     if (_keyword.isEmpty) {
       return const [];
     }
 
     final keyword = _keyword.toLowerCase();
 
-    return videos.where(
-      (video) {
-        final localizedCategory =
-            localizedTopicLabel(l10n, video.category).toLowerCase();
+    return videos.where((video) {
+      final localizedCategory = localizedTopicLabel(
+        l10n,
+        video.category,
+      ).toLowerCase();
 
-        return video.title.toLowerCase().contains(keyword) ||
-            video.authorName.toLowerCase().contains(keyword) ||
-            video.category.toLowerCase().contains(keyword) ||
-            localizedCategory.contains(keyword) ||
-            video.description.toLowerCase().contains(keyword);
-      },
-    ).toList();
+      return video.title.toLowerCase().contains(keyword) ||
+          video.authorName.toLowerCase().contains(keyword) ||
+          video.category.toLowerCase().contains(keyword) ||
+          localizedCategory.contains(keyword) ||
+          video.description.toLowerCase().contains(keyword);
+    }).toList();
   }
 
-  Widget _buildResult(
-    HomeVideo video,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildResult(HomeVideo video, AppLocalizations l10n) {
     final colors = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
+          border: Border.all(color: const Color(0xFFE3DED5)),
         ),
         child: Row(
           children: [
@@ -245,10 +192,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                 color: _ink,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: colors.primary,
-              ),
+              child: Icon(Icons.play_arrow_rounded, color: colors.primary),
             ),
             const SizedBox(width: 14),
             Expanded(

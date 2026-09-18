@@ -15,39 +15,84 @@ import '../../../video_interactions/presentation/providers/video_interaction_pro
 import '../../data/models/video_detail.dart';
 import '../providers/video_detail_provider.dart';
 import '../widgets/network_video_player.dart';
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
-class VideoDetailPage extends ConsumerWidget {
+class VideoDetailPage extends ConsumerStatefulWidget {
   final String videoId;
+  final bool hosted;
+  final bool miniMode;
+  final VoidCallback? onMinimize;
+  final VoidCallback? onExpand;
+  final VoidCallback? onClose;
 
   const VideoDetailPage({
     super.key,
     required this.videoId,
+    this.hosted = false,
+    this.miniMode = false,
+    this.onMinimize,
+    this.onExpand,
+    this.onClose,
   });
 
+  @override
+  ConsumerState<VideoDetailPage> createState() {
+    return _VideoDetailPageState();
+  }
+}
+
+class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
   static const Color _inkColor = Color(0xFF161616);
 
+  final GlobalKey _persistentPlayerKey = GlobalKey(
+    debugLabel: 'clyven-persistent-video-player',
+  );
+
+  bool _showComments = false;
+  bool _subtitlesEnabled = true;
+  String? _selectedSubtitleLanguageCode;
+
+  static const String _subtitleOffValue = '__subtitle_off__';
+
+  void _openComments() {
+    if (_showComments) {
+      return;
+    }
+
+    setState(() {
+      _showComments = true;
+    });
+  }
+
+  void _closeComments() {
+    if (!_showComments) {
+      return;
+    }
+
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    setState(() {
+      _showComments = false;
+    });
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final videoAsync = ref.watch(
-      videoDetailProvider(videoId),
-    );
+  Widget build(BuildContext context) {
+    final videoId = widget.videoId;
+
+    final videoAsync = ref.watch(videoDetailProvider(videoId));
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: videoAsync.when(
         loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
         error: (error, stackTrace) {
           return SafeArea(
             child: Column(
               children: [
-                _buildTopBar(context, l10n),
                 Expanded(
                   child: Center(
                     child: Column(
@@ -70,9 +115,7 @@ class VideoDetailPage extends ConsumerWidget {
                         const SizedBox(height: 16),
                         FilledButton(
                           onPressed: () {
-                            ref.invalidate(
-                              videoDetailProvider(videoId),
-                            );
+                            ref.invalidate(videoDetailProvider(videoId));
                           },
                           child: Text(l10n.reload),
                         ),
@@ -85,12 +128,11 @@ class VideoDetailPage extends ConsumerWidget {
           );
         },
         data: (video) {
-          return _buildContent(
-            context,
-            ref,
-            video,
-            l10n,
-          );
+          if (widget.miniMode) {
+            return _buildMiniContent(context, ref, video, l10n);
+          }
+
+          return _buildContent(context, ref, video, l10n);
         },
       ),
     );
@@ -102,118 +144,383 @@ class VideoDetailPage extends ConsumerWidget {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
-    final historyItem = ref.watch(
-      watchHistoryItemProvider(video.id),
-    );
+    final historyItem = ref.watch(watchHistoryItemProvider(video.id));
 
     final numericVideoId = int.tryParse(video.id);
 
-    final subtitleAsync = numericVideoId == null
+    final subtitleTracks = numericVideoId == null
+        ? <serverpod.SubtitleTrack>[]
+        : ref.watch(subtitleTracksProvider(numericVideoId)).value ??
+              <serverpod.SubtitleTrack>[];
+
+    final selectedSubtitleTrack = _resolveSubtitleTrack(subtitleTracks);
+
+    final subtitleAsync =
+        numericVideoId == null ||
+            !_subtitlesEnabled ||
+            selectedSubtitleTrack == null
         ? null
         : ref.watch(
-            subtitleProvider(
-              (
-                videoId: numericVideoId,
-                languageCode: 'vi',
-              ),
-            ),
+            subtitleProvider((
+              videoId: numericVideoId,
+              languageCode: selectedSubtitleTrack.languageCode,
+            )),
           );
 
-    final subtitles =
-        subtitleAsync?.value ??
-        <serverpod.SubtitleCueDetail>[];
+    final subtitles = subtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
 
     return SafeArea(
       bottom: false,
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: _buildTopBar(context, l10n),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-              ),
-              child: NetworkVideoPlayer(
-                videoUrl: video.videoUrl,
-                coverUrl: video.coverUrl,
-                subtitles: subtitles,
-                initialPositionSeconds: historyItem?.positionSeconds ?? 0,
-                fallbackDurationSeconds: video.durationSeconds,
-                onProgress: (
-                  position,
-                  duration,
-                ) {
-                  ref
-                      .read(watchHistoryProvider.notifier)
-                      .saveProgress(
-                        videoId: video.id,
-                        title: video.title,
-                        coverUrl: video.coverUrl,
-                        authorName: video.authorName,
-                        positionSeconds: position.inSeconds,
-                        durationSeconds: duration.inSeconds > 0
-                            ? duration.inSeconds
-                            : video.durationSeconds,
-                      );
-                },
-              ),
+      child: Column(
+        children: [
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onVerticalDragEnd: widget.hosted
+                ? (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+
+                    if (velocity > 450) {
+                      widget.onMinimize?.call();
+                    }
+                  }
+                : null,
+            child: Stack(
+              children: [
+                _buildPersistentPlayer(
+                  ref,
+                  video,
+                  subtitles,
+                  historyItem?.positionSeconds ?? 0,
+                ),
+                if (widget.hosted)
+                  Positioned(
+                    left: 10,
+                    top: 10,
+                    child: Material(
+                      color: Colors.black.withValues(alpha: 0.52),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: widget.onMinimize,
+                        child: const SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Colors.white,
+                            size: 29,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (subtitleTracks.isNotEmpty)
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: _buildSubtitleMenu(
+                      context,
+                      subtitleTracks,
+                      selectedSubtitleTrack,
+                    ),
+                  ),
+              ],
             ),
           ),
-          SliverToBoxAdapter(
-            child: _buildVideoInformation(
-              context,
-              video,
-              l10n,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildActions(
-              context,
-              ref,
-              video,
-              l10n,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildCreator(
-              context,
-              ref,
-              video,
-              l10n,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildDescription(
-              context,
-              video,
-              l10n,
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _buildTags(video),
-          ),
-          SliverToBoxAdapter(
-            child: _buildCommentEntry(
-              context,
-              video,
-              l10n,
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 70),
+          Expanded(
+            child: _showComments
+                ? CommentsPage(
+                    key: ValueKey('embedded-comments-${video.id}'),
+                    videoId: video.id,
+                    embedded: true,
+                    onClose: _closeComments,
+                  )
+                : CustomScrollView(
+                    key: const PageStorageKey<String>(
+                      'video-detail-information',
+                    ),
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _buildVideoInformation(context, video, l10n),
+                      ),
+                      SliverToBoxAdapter(
+                        child: _buildActions(context, ref, video, l10n),
+                      ),
+                      SliverToBoxAdapter(
+                        child: _buildCreator(context, ref, video, l10n),
+                      ),
+                      SliverToBoxAdapter(
+                        child: _buildDescription(context, video, l10n),
+                      ),
+                      SliverToBoxAdapter(child: _buildTags(video)),
+                      SliverToBoxAdapter(
+                        child: _buildCommentEntry(context, video, l10n),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 70)),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTopBar(
+  serverpod.SubtitleTrack? _resolveSubtitleTrack(
+    List<serverpod.SubtitleTrack> tracks,
+  ) {
+    if (tracks.isEmpty) {
+      return null;
+    }
+
+    final selectedCode = _selectedSubtitleLanguageCode;
+
+    if (selectedCode != null) {
+      for (final track in tracks) {
+        if (track.languageCode == selectedCode) {
+          return track;
+        }
+      }
+    }
+
+    for (final track in tracks) {
+      if (track.isDefault) {
+        return track;
+      }
+    }
+
+    return tracks.first;
+  }
+
+  String _subtitleTrackLabel(serverpod.SubtitleTrack track) {
+    final label = track.label.trim();
+
+    if (label.isNotEmpty) {
+      return label;
+    }
+
+    return track.languageCode.toUpperCase();
+  }
+
+  Widget _buildSubtitleMenu(
     BuildContext context,
+    List<serverpod.SubtitleTrack> tracks,
+    serverpod.SubtitleTrack? selectedTrack,
+  ) {
+    final selectedCode = _subtitlesEnabled ? selectedTrack?.languageCode : null;
+
+    return Material(
+      color: Colors.black.withValues(alpha: 0.52),
+      shape: const CircleBorder(),
+      child: PopupMenuButton<String>(
+        tooltip: 'Subtitles',
+        initialValue: _subtitlesEnabled
+            ? selectedTrack?.languageCode
+            : _subtitleOffValue,
+        onSelected: (value) {
+          setState(() {
+            if (value == _subtitleOffValue) {
+              _subtitlesEnabled = false;
+              return;
+            }
+
+            _subtitlesEnabled = true;
+            _selectedSubtitleLanguageCode = value;
+          });
+        },
+        itemBuilder: (context) {
+          return [
+            PopupMenuItem<String>(
+              value: _subtitleOffValue,
+              child: Row(
+                children: [
+                  Icon(
+                    selectedCode == null
+                        ? Icons.check_rounded
+                        : Icons.closed_caption_off_rounded,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text('Off'),
+                ],
+              ),
+            ),
+            for (final track in tracks)
+              PopupMenuItem<String>(
+                value: track.languageCode,
+                child: Row(
+                  children: [
+                    Icon(
+                      selectedCode == track.languageCode
+                          ? Icons.check_rounded
+                          : Icons.closed_caption_rounded,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(_subtitleTrackLabel(track)),
+                  ],
+                ),
+              ),
+          ];
+        },
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(
+            _subtitlesEnabled && selectedTrack != null
+                ? Icons.closed_caption_rounded
+                : Icons.closed_caption_off_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMiniContent(
+    BuildContext context,
+    WidgetRef ref,
+    VideoDetail video,
     AppLocalizations l10n,
   ) {
+    final historyItem = ref.watch(watchHistoryItemProvider(video.id));
+
+    final numericVideoId = int.tryParse(video.id);
+
+    final subtitleTracks = numericVideoId == null
+        ? <serverpod.SubtitleTrack>[]
+        : ref.watch(subtitleTracksProvider(numericVideoId)).value ??
+              <serverpod.SubtitleTrack>[];
+
+    final selectedSubtitleTrack = _resolveSubtitleTrack(subtitleTracks);
+
+    final subtitleAsync =
+        numericVideoId == null ||
+            !_subtitlesEnabled ||
+            selectedSubtitleTrack == null
+        ? null
+        : ref.watch(
+            subtitleProvider((
+              videoId: numericVideoId,
+              languageCode: selectedSubtitleTrack.languageCode,
+            )),
+          );
+
+    final subtitles = subtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
+
+    final colors = Theme.of(context).colorScheme;
+
+    return Material(
+      color: colors.surface,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 135,
+            height: 76,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                IgnorePointer(
+                  child: _buildPersistentPlayer(
+                    ref,
+                    video,
+                    subtitles,
+                    historyItem?.positionSeconds ?? 0,
+                    compact: true,
+                  ),
+                ),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: widget.onExpand,
+                  child: const SizedBox.expand(),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onExpand,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      video.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.onSurface,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      video.authorName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.onSurface.withValues(alpha: 0.55),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: widget.onExpand,
+            icon: const Icon(Icons.open_in_full_rounded, size: 19),
+          ),
+          IconButton(
+            onPressed: widget.onClose,
+            icon: const Icon(Icons.close_rounded, size: 21),
+          ),
+          const SizedBox(width: 3),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersistentPlayer(
+    WidgetRef ref,
+    VideoDetail video,
+    List<serverpod.SubtitleCueDetail> subtitles,
+    int initialPositionSeconds, {
+    bool compact = false,
+  }) {
+    return NetworkVideoPlayer(
+      key: _persistentPlayerKey,
+      videoUrl: video.videoUrl,
+      coverUrl: video.coverUrl,
+      subtitles: subtitles,
+      initialPositionSeconds: initialPositionSeconds,
+      fallbackDurationSeconds: video.durationSeconds,
+      compact: compact,
+      onProgress: (position, duration) {
+        ref
+            .read(watchHistoryProvider.notifier)
+            .saveProgress(
+              videoId: video.id,
+              title: video.title,
+              coverUrl: video.coverUrl,
+              authorName: video.authorName,
+              positionSeconds: position.inSeconds,
+              durationSeconds: duration.inSeconds > 0
+                  ? duration.inSeconds
+                  : video.durationSeconds,
+            );
+      },
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
       child: Row(
@@ -250,10 +557,7 @@ class VideoDetailPage extends ConsumerWidget {
               ],
             ),
           ),
-          _SquareButton(
-            icon: Icons.more_horiz_rounded,
-            onTap: () {},
-          ),
+          _SquareButton(icon: Icons.more_horiz_rounded, onTap: () {}),
         ],
       ),
     );
@@ -322,9 +626,7 @@ class VideoDetailPage extends ConsumerWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                l10n.viewsCount(
-                  _formatCount(context, video.viewCount),
-                ),
+                l10n.viewsCount(_formatCount(context, video.viewCount)),
                 style: const TextStyle(
                   color: Color(0xFF77736C),
                   fontSize: 12,
@@ -362,9 +664,7 @@ class VideoDetailPage extends ConsumerWidget {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
-    final interactionAsync = ref.watch(
-      videoInteractionProvider(video.id),
-    );
+    final interactionAsync = ref.watch(videoInteractionProvider(video.id));
     final interaction = interactionAsync.value;
     final likeCount = interaction?.likeCount ?? video.likeCount;
     final favoriteCount = interaction?.favoriteCount ?? video.favoriteCount;
@@ -394,10 +694,7 @@ class VideoDetailPage extends ConsumerWidget {
                   return;
                 }
 
-                final allowed = await requireLogin(
-                  context,
-                  ref,
-                );
+                final allowed = await requireLogin(context, ref);
 
                 if (!allowed || !context.mounted) {
                   return;
@@ -421,10 +718,7 @@ class VideoDetailPage extends ConsumerWidget {
                   return;
                 }
 
-                final allowed = await requireLogin(
-                  context,
-                  ref,
-                );
+                final allowed = await requireLogin(context, ref);
 
                 if (!allowed || !context.mounted) {
                   return;
@@ -439,18 +733,7 @@ class VideoDetailPage extends ConsumerWidget {
               icon: Icons.mode_comment_outlined,
               value: _formatCount(context, video.commentCount),
               label: l10n.discussion,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return CommentsPage(
-                        videoId: video.id,
-                      );
-                    },
-                  ),
-                );
-              },
+              onTap: _openComments,
             ),
             _ActionButton(
               icon: Icons.ios_share_rounded,
@@ -472,9 +755,7 @@ class VideoDetailPage extends ConsumerWidget {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
-    final creatorAsync = ref.watch(
-      creatorProfileProvider(video.authorId),
-    );
+    final creatorAsync = ref.watch(creatorProfileProvider(video.authorId));
     final creatorState = creatorAsync.value;
     final isFollowing = creatorState?.isFollowing ?? false;
     final isChangingFollow =
@@ -489,9 +770,7 @@ class VideoDetailPage extends ConsumerWidget {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return CreatorProfilePage(
-                  creatorId: video.authorId,
-                );
+                return CreatorProfilePage(creatorId: video.authorId);
               },
             ),
           );
@@ -501,9 +780,7 @@ class VideoDetailPage extends ConsumerWidget {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFFE3DED5),
-            ),
+            border: Border.all(color: const Color(0xFFE3DED5)),
           ),
           child: Row(
             children: [
@@ -559,19 +836,14 @@ class VideoDetailPage extends ConsumerWidget {
                     return;
                   }
 
-                  final allowed = await requireLogin(
-                    context,
-                    ref,
-                  );
+                  final allowed = await requireLogin(context, ref);
 
                   if (!allowed || !context.mounted) {
                     return;
                   }
 
                   await ref
-                      .read(
-                        creatorProfileProvider(video.authorId).notifier,
-                      )
+                      .read(creatorProfileProvider(video.authorId).notifier)
                       .toggleFollow();
                 },
                 child: Container(
@@ -587,8 +859,8 @@ class VideoDetailPage extends ConsumerWidget {
                     isChangingFollow
                         ? l10n.processing
                         : isFollowing
-                            ? l10n.followingButton
-                            : l10n.follow,
+                        ? l10n.followingButton
+                        : l10n.follow,
                     style: TextStyle(
                       color: scheme.onPrimary,
                       fontSize: 12,
@@ -646,14 +918,9 @@ class VideoDetailPage extends ConsumerWidget {
         runSpacing: 8,
         children: video.tags.map((tag) {
           return Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 7,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              border: Border.all(
-                color: const Color(0xFFCAC5BB),
-              ),
+              border: Border.all(color: const Color(0xFFCAC5BB)),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -680,18 +947,7 @@ class VideoDetailPage extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 34, 20, 0),
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return CommentsPage(
-                  videoId: video.id,
-                );
-              },
-            ),
-          );
-        },
+        onTap: _openComments,
         child: Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -739,10 +995,7 @@ class VideoDetailPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_rounded,
-                color: _inkColor,
-              ),
+              const Icon(Icons.arrow_forward_rounded, color: _inkColor),
             ],
           ),
         ),
@@ -760,23 +1013,19 @@ class VideoDetailPage extends ConsumerWidget {
     );
   }
 
-  String _formatCount(
-    BuildContext context,
-    int value,
-  ) {
+  String _formatCount(BuildContext context, int value) {
     final localeName = Localizations.localeOf(context).toString();
-    return NumberFormat.compact(
-      locale: localeName,
-    ).format(value);
+    return NumberFormat.compact(locale: localeName).format(value);
   }
 
   static String _formatDuration(int seconds) {
     final duration = Duration(seconds: seconds);
     final hours = duration.inHours;
-    final minutes =
-        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final remainingSeconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final remainingSeconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
     if (hours > 0) {
       return '$hours:$minutes:$remainingSeconds';
@@ -785,10 +1034,7 @@ class VideoDetailPage extends ConsumerWidget {
     return '${duration.inMinutes}:$remainingSeconds';
   }
 
-  String _formatDate(
-    BuildContext context,
-    DateTime date,
-  ) {
+  String _formatDate(BuildContext context, DateTime date) {
     final localeName = Localizations.localeOf(context).toString();
     return DateFormat.yMMMd(localeName).format(date);
   }
@@ -816,11 +1062,7 @@ class _ActionButton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 21,
-            ),
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 21),
             const SizedBox(height: 5),
             Text(
               value.isEmpty ? label : value,
@@ -852,10 +1094,7 @@ class _SquareButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _SquareButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _SquareButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -867,15 +1106,9 @@ class _SquareButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFE0DBD2),
-          ),
+          border: Border.all(color: const Color(0xFFE0DBD2)),
         ),
-        child: Icon(
-          icon,
-          color: const Color(0xFF161616),
-          size: 21,
-        ),
+        child: Icon(icon, color: const Color(0xFF161616), size: 21),
       ),
     );
   }

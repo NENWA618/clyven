@@ -1,0 +1,9 @@
+class: CommentReplyDto
+fields:
+  id: int
+  userId: String
+  userName: String
+  content: String
+  createdAt: DateTime
+  likeCount: int
+  isLiked: bool

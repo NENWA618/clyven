@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
 import 'video_search_page.dart';
+
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -23,33 +24,69 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   static const Color _inkColor = Color(0xFF161616);
 
+  String _selectedContentLanguageCode = 'all';
+
+  static const List<_ContentLanguageOption> _contentLanguages = [
+    _ContentLanguageOption(
+      code: 'all',
+      labelZh: '多语言',
+      labelEn: 'All languages',
+      nativeLabel: 'For you',
+      subtitleZh: '混合你的学习语言',
+      subtitleEn: 'A mix of your learning languages',
+    ),
+    _ContentLanguageOption(
+      code: 'vi',
+      labelZh: '越南语',
+      labelEn: 'Vietnamese',
+      nativeLabel: 'Tiếng Việt',
+      subtitleZh: '越南语内容',
+      subtitleEn: 'Vietnamese content',
+    ),
+    _ContentLanguageOption(
+      code: 'ru',
+      labelZh: '俄语',
+      labelEn: 'Russian',
+      nativeLabel: 'Русский',
+      subtitleZh: '俄语内容',
+      subtitleEn: 'Russian content',
+    ),
+    _ContentLanguageOption(
+      code: 'th',
+      labelZh: '泰语',
+      labelEn: 'Thai',
+      nativeLabel: 'ภาษาไทย',
+      subtitleZh: '泰语内容',
+      subtitleEn: 'Thai content',
+    ),
+    _ContentLanguageOption(
+      code: 'iba',
+      labelZh: '伊班语',
+      labelEn: 'Iban',
+      nativeLabel: 'Iban',
+      subtitleZh: '伊班语内容',
+      subtitleEn: 'Iban content',
+    ),
+  ];
+
   Widget _buildCoverImage(String path) {
     if (path.isEmpty) {
       return Container(
         color: const Color(0xFFD8D2C8),
-        child: const Icon(
-          Icons.image_not_supported_outlined,
-        ),
+        child: const Icon(Icons.image_not_supported_outlined),
       );
     }
 
-    final isNetwork =
-        path.startsWith('http://') || path.startsWith('https://');
+    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
 
     if (isNetwork) {
       return Image.network(
         path,
         fit: BoxFit.cover,
-        errorBuilder: (
-          context,
-          error,
-          stackTrace,
-        ) {
+        errorBuilder: (context, error, stackTrace) {
           return Container(
             color: const Color(0xFFD8D2C8),
-            child: const Icon(
-              Icons.image_not_supported_outlined,
-            ),
+            child: const Icon(Icons.image_not_supported_outlined),
           );
         },
       );
@@ -58,16 +95,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Image.file(
       File(path),
       fit: BoxFit.cover,
-      errorBuilder: (
-        context,
-        error,
-        stackTrace,
-      ) {
+      errorBuilder: (context, error, stackTrace) {
         return Container(
           color: const Color(0xFFD8D2C8),
-          child: const Icon(
-            Icons.image_not_supported_outlined,
-          ),
+          child: const Icon(Icons.image_not_supported_outlined),
         );
       },
     );
@@ -83,9 +114,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       color: colors.surface,
       child: homeAsync.when(
         loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
         error: (error, stackTrace) {
           return SafeArea(
@@ -126,12 +155,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildHome(
-    HomeState homeState,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildHome(HomeState homeState, AppLocalizations l10n) {
     final feed = homeState.feed;
     final videos = feed.videos;
+    final colors = Theme.of(context).colorScheme;
+    final isDark = colors.brightness == Brightness.dark;
 
     return SafeArea(
       bottom: false,
@@ -144,24 +172,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             parent: BouncingScrollPhysics(),
           ),
           slivers: [
+            SliverToBoxAdapter(child: _buildHeader(l10n)),
+            SliverToBoxAdapter(child: _buildLanguageContextBar()),
             SliverToBoxAdapter(
-              child: _buildHeader(l10n),
+              child: _buildFeaturedVideo(feed.featuredVideo, l10n),
             ),
-            SliverToBoxAdapter(
-              child: _buildFeaturedVideo(
-                feed.featuredVideo,
-                l10n,
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: _buildTopicOrbit(
-                homeState,
-                l10n,
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: _buildSectionHeader(l10n),
-            ),
+            SliverToBoxAdapter(child: _buildTopicOrbit(homeState, l10n)),
+            SliverToBoxAdapter(child: _buildSectionHeader(l10n)),
             if (videos.isEmpty)
               SliverToBoxAdapter(
                 child: Padding(
@@ -172,16 +189,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Center(
                     child: Column(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.blur_off_rounded,
                           size: 38,
-                          color: Color(0xFF908A81),
+                          color: isDark
+                              ? const Color(0xFF9E9991)
+                              : const Color(0xFF908A81),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           l10n.emptyTrack,
-                          style: const TextStyle(
-                            color: Color(0xFF77736C),
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFFBEB9B0)
+                                : const Color(0xFF77736C),
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -193,34 +214,309 @@ class _HomePageState extends ConsumerState<HomePage> {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  18,
-                  0,
-                  18,
-                  130,
-                ),
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 130),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, rawIndex) {
-                      if (rawIndex.isOdd) {
-                        return const SizedBox(height: 18);
-                      }
+                  delegate: SliverChildBuilderDelegate((context, rawIndex) {
+                    if (rawIndex.isOdd) {
+                      return const SizedBox(height: 18);
+                    }
 
-                      final index = rawIndex ~/ 2;
+                    final index = rawIndex ~/ 2;
 
-                      return _buildVideoTrackCard(
-                        index,
-                        videos[index],
-                        l10n,
-                      );
-                    },
-                    childCount: videos.length * 2 - 1,
-                  ),
+                    return _buildVideoTrackCard(index, videos[index], l10n);
+                  }, childCount: videos.length * 2 - 1),
                 ),
               ),
           ],
         ),
       ),
+    );
+  }
+
+  _ContentLanguageOption get _selectedContentLanguage {
+    return _contentLanguages.firstWhere(
+      (option) => option.code == _selectedContentLanguageCode,
+      orElse: () => _contentLanguages.first,
+    );
+  }
+
+  Widget _buildLanguageContextBar() {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = colors.brightness == Brightness.dark;
+    final isZh = Localizations.localeOf(context).languageCode == 'zh';
+    final selected = _selectedContentLanguage;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  selected.code == 'all' ? 'For you' : selected.nativeLabel,
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontSize: 19,
+                    height: 1.05,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  selected.code == 'all'
+                      ? (isZh ? '来自你的学习语言' : 'Across your learning languages')
+                      : (isZh ? selected.subtitleZh : selected.subtitleEn),
+                  style: TextStyle(
+                    color: colors.onSurface.withOpacity(0.58),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _showContentLanguageSheet,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 8, 9, 8),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Theme.of(context).cardColor
+                    : Colors.white.withOpacity(0.58),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: colors.onSurface.withOpacity(isDark ? 0.18 : 0.12),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  Text(
+                    isZh ? selected.labelZh : selected.labelEn,
+                    style: TextStyle(
+                      color: colors.onSurface.withOpacity(0.80),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 17,
+                    color: colors.onSurface.withOpacity(0.55),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showContentLanguageSheet() async {
+    final isZh = Localizations.localeOf(context).languageCode == 'zh';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        final colors = Theme.of(sheetContext).colorScheme;
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 4,
+                      margin: const EdgeInsets.only(left: 6, bottom: 18),
+                      decoration: BoxDecoration(
+                        color: colors.onSurface.withOpacity(0.16),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text(
+                        isZh ? '内容语言' : 'Content language',
+                        style: TextStyle(
+                          color: colors.onSurface,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text(
+                        isZh
+                            ? '语言只是内容上下文，不会抢走主页本身。'
+                            : 'Language stays a lightweight content context.',
+                        style: TextStyle(
+                          color: colors.onSurface.withOpacity(0.58),
+                          fontSize: 11,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    ..._contentLanguages.map((option) {
+                      final selected =
+                          option.code == _selectedContentLanguageCode;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: () {
+                            setState(() {
+                              _selectedContentLanguageCode = option.code;
+                            });
+                            setSheetState(() {});
+                            Navigator.pop(sheetContext);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 13,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? colors.primary.withOpacity(0.12)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: selected
+                                    ? colors.primary.withOpacity(0.72)
+                                    : colors.onSurface.withOpacity(0.10),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 34,
+                                  height: 34,
+                                  decoration: BoxDecoration(
+                                    color: selected
+                                        ? colors.primary.withOpacity(0.18)
+                                        : colors.onSurface.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    option.code == 'all'
+                                        ? '∞'
+                                        : option.code.toUpperCase(),
+                                    style: TextStyle(
+                                      color: selected
+                                          ? colors.primary
+                                          : colors.onSurface.withOpacity(0.64),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        option.nativeLabel,
+                                        style: TextStyle(
+                                          color: colors.onSurface,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        isZh ? option.labelZh : option.labelEn,
+                                        style: TextStyle(
+                                          color: colors.onSurface.withOpacity(
+                                            0.52,
+                                          ),
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (selected)
+                                  Icon(
+                                    Icons.check_circle_rounded,
+                                    color: colors.primary,
+                                    size: 21,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        color: colors.onSurface.withOpacity(0.045),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: colors.onSurface.withOpacity(0.48),
+                            size: 17,
+                          ),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Text(
+                              isZh
+                                  ? '当前先完成主页语言上下文设计。真正按语言筛选视频，会在 Video/HomeVideo 接入 languageCode 后启用。'
+                                  : 'This first pass establishes the language context UI. Real filtering will be enabled after Video/HomeVideo gets languageCode metadata.',
+                              style: TextStyle(
+                                color: colors.onSurface.withOpacity(0.55),
+                                fontSize: 10,
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -234,12 +530,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final colors = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        18,
-        20,
-        16,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
       child: Row(
         children: [
           Expanded(
@@ -248,21 +539,23 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Text(
                   dateText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.8,
-                    color: Color(0xFF77736C),
+                    color: colors.brightness == Brightness.dark
+                        ? const Color(0xFFBEB9B0)
+                        : const Color(0xFF77736C),
                   ),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   l10n.homeQuestion,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     height: 1.1,
                     fontWeight: FontWeight.w800,
-                    color: _inkColor,
+                    color: colors.onSurface,
                   ),
                 ),
               ],
@@ -313,48 +606,36 @@ class _HomePageState extends ConsumerState<HomePage> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = colors.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: isDark
+              ? Theme.of(context).cardColor
+              : Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: const Color(0xFFE0DBD2),
+            color: isDark ? const Color(0xFF383838) : const Color(0xFFE0DBD2),
           ),
         ),
-        child: Icon(
-          icon,
-          color: _inkColor,
-        ),
+        child: Icon(icon, color: colors.onSurface),
       ),
     );
   }
 
-  Widget _buildFeaturedVideo(
-    HomeVideo video,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildFeaturedVideo(HomeVideo video, AppLocalizations l10n) {
     final colors = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 18,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return VideoDetailPage(
-                  videoId: video.id,
-                );
-              },
-            ),
-          );
+          openGlobalVideo(video.id);
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30),
@@ -366,11 +647,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Image.network(
                   video.coverUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (
-                    context,
-                    error,
-                    stackTrace,
-                  ) {
+                  errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: const Color(0xFF373149),
                       child: const Center(
@@ -393,18 +670,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                         Color(0x44000000),
                         Color(0xE8000000),
                       ],
-                      stops: [
-                        0,
-                        0.52,
-                        1,
-                      ],
+                      stops: [0, 0.52, 1],
                     ),
                   ),
                 ),
                 Positioned.fill(
-                  child: CustomPaint(
-                    painter: _OrbitPainter(colors.primary),
-                  ),
+                  child: CustomPaint(painter: _OrbitPainter(colors.primary)),
                 ),
                 Positioned(
                   top: 22,
@@ -449,10 +720,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        localizedTopicLabel(
-                          l10n,
-                          video.category,
-                        ).toUpperCase(),
+                        localizedTopicLabel(l10n, video.category).toUpperCase(),
                         style: TextStyle(
                           color: colors.primary,
                           fontSize: 12,
@@ -540,9 +808,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 vertical: 9,
                               ),
                               decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white30,
-                                ),
+                                border: Border.all(color: Colors.white30),
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Text(
@@ -568,19 +834,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildTopicOrbit(
-    HomeState homeState,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildTopicOrbit(HomeState homeState, AppLocalizations l10n) {
     return SizedBox(
       height: 108,
       child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(
-          18,
-          24,
-          18,
-          16,
-        ),
+        padding: const EdgeInsets.fromLTRB(18, 24, 18, 16),
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: HomeNotifier.topics.length,
@@ -590,13 +848,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         itemBuilder: (context, index) {
           final topic = HomeNotifier.topics[index];
           final selected = homeState.selectedTopic == topic;
-          final accent = Theme.of(context).colorScheme.primary;
+          final colors = Theme.of(context).colorScheme;
+          final accent = colors.primary;
+          final isDark = colors.brightness == Brightness.dark;
 
           return Transform.translate(
-            offset: Offset(
-              0,
-              index.isEven ? 0 : 13,
-            ),
+            offset: Offset(0, index.isEven ? 0 : 13),
             child: GestureDetector(
               onTap: () {
                 ref.read(homeProvider.notifier).selectTopic(topic);
@@ -605,16 +862,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOut,
                 height: 47,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: selected ? _inkColor : Colors.transparent,
+                  color: selected
+                      ? (isDark ? const Color(0xFF222222) : _inkColor)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
                     color: selected
-                        ? _inkColor
-                        : const Color(0xFFCAC5BB),
+                        ? (isDark ? accent : _inkColor)
+                        : (isDark
+                              ? const Color(0xFF55514C)
+                              : const Color(0xFFCAC5BB)),
                   ),
                 ),
                 alignment: Alignment.center,
@@ -623,7 +882,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   style: TextStyle(
                     color: selected
                         ? accent
-                        : const Color(0xFF504D48),
+                        : (isDark
+                              ? const Color(0xFFBEB9B0)
+                              : const Color(0xFF504D48)),
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
@@ -637,21 +898,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildSectionHeader(AppLocalizations l10n) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = colors.brightness == Brightness.dark;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        15,
-        20,
-        16,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 15, 20, 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Text(
               l10n.continueByInterest,
-              style: const TextStyle(
-                color: _inkColor,
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 27,
                 height: 1.05,
                 fontWeight: FontWeight.w800,
@@ -666,17 +925,21 @@ class _HomePageState extends ConsumerState<HomePage> {
               children: [
                 Text(
                   l10n.rearrange,
-                  style: const TextStyle(
-                    color: Color(0xFF77736C),
+                  style: TextStyle(
+                    color: isDark
+                        ? const Color(0xFFBEB9B0)
+                        : const Color(0xFF77736C),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(width: 5),
-                const Icon(
+                Icon(
                   Icons.shuffle_rounded,
                   size: 17,
-                  color: Color(0xFF77736C),
+                  color: isDark
+                      ? const Color(0xFFBEB9B0)
+                      : const Color(0xFF77736C),
                 ),
               ],
             ),
@@ -707,10 +970,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Color(0x7A000000),
-                  ],
+                  colors: [Colors.transparent, Color(0x7A000000)],
                 ),
               ),
             ),
@@ -754,10 +1014,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 9,
-                vertical: 5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
               decoration: BoxDecoration(
                 color: index.isEven ? colors.primary : colors.secondary,
                 borderRadius: BorderRadius.circular(20),
@@ -776,8 +1033,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               video.title,
               maxLines: 4,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: _inkColor,
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 18,
                 height: 1.2,
                 fontWeight: FontWeight.w800,
@@ -788,8 +1045,10 @@ class _HomePageState extends ConsumerState<HomePage> {
               video.authorName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFF5E5A54),
+              style: TextStyle(
+                color: colors.brightness == Brightness.dark
+                    ? const Color(0xFFC4BFB7)
+                    : const Color(0xFF5E5A54),
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
@@ -797,8 +1056,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 5),
             Text(
               video.viewText,
-              style: const TextStyle(
-                color: Color(0xFF908A81),
+              style: TextStyle(
+                color: colors.brightness == Brightness.dark
+                    ? const Color(0xFF9E9991)
+                    : const Color(0xFF908A81),
                 fontSize: 11,
               ),
             ),
@@ -809,24 +1070,19 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 220,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: colors.brightness == Brightness.dark
+              ? const Color(0xFF222222)
+              : Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(26),
           border: Border.all(
-            color: const Color(0xFFE3DED5),
+            color: colors.brightness == Brightness.dark
+                ? const Color(0xFF383838)
+                : const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -859,14 +1115,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: reverse
-                      ? [
-                          information,
-                          cover,
-                        ]
-                      : [
-                          cover,
-                          information,
-                        ],
+                      ? [information, cover]
+                      : [cover, information],
                 ),
               ),
             ),
@@ -875,6 +1125,24 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
   }
+}
+
+class _ContentLanguageOption {
+  final String code;
+  final String labelZh;
+  final String labelEn;
+  final String nativeLabel;
+  final String subtitleZh;
+  final String subtitleEn;
+
+  const _ContentLanguageOption({
+    required this.code,
+    required this.labelZh,
+    required this.labelEn,
+    required this.nativeLabel,
+    required this.subtitleZh,
+    required this.subtitleEn,
+  });
 }
 
 class _OrbitPainter extends CustomPainter {
@@ -889,49 +1157,25 @@ class _OrbitPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    final dotPaint = Paint()
-      ..color = accent.withOpacity(0.85);
+    final dotPaint = Paint()..color = accent.withOpacity(0.85);
 
-    final center = Offset(
-      size.width * 0.83,
-      size.height * 0.25,
-    );
+    final center = Offset(size.width * 0.83, size.height * 0.25);
 
-    canvas.drawCircle(
-      center,
-      74,
-      linePaint,
-    );
+    canvas.drawCircle(center, 74, linePaint);
 
-    canvas.drawCircle(
-      center,
-      115,
-      linePaint,
-    );
+    canvas.drawCircle(center, 115, linePaint);
 
-    canvas.drawCircle(
-      center,
-      4,
-      dotPaint,
-    );
+    canvas.drawCircle(center, 4, dotPaint);
 
     canvas.drawLine(
-      Offset(
-        size.width * 0.1,
-        size.height * 0.48,
-      ),
-      Offset(
-        size.width * 0.88,
-        size.height * 0.48,
-      ),
+      Offset(size.width * 0.1, size.height * 0.48),
+      Offset(size.width * 0.88, size.height * 0.48),
       linePaint,
     );
   }
 
   @override
-  bool shouldRepaint(
-    covariant _OrbitPainter oldDelegate,
-  ) {
+  bool shouldRepaint(covariant _OrbitPainter oldDelegate) {
     return oldDelegate.accent != accent;
   }
 }

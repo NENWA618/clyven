@@ -7,30 +7,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../video/data/models/video_detail.dart';
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../../video/presentation/providers/video_upload_queue_provider.dart';
 
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
+
 class MySubmissionsPage extends ConsumerWidget {
-  const MySubmissionsPage({
-    super.key,
-  });
+  const MySubmissionsPage({super.key});
 
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final videosAsync = ref.watch(myPublishedVideosProvider);
     final uploadTasks = ref.watch(videoUploadQueueProvider);
     final l10n = AppLocalizations.of(context)!;
 
     final activeUploadTasks = uploadTasks
-        .where(
-          (task) => task.status != VideoUploadStatus.success,
-        )
+        .where((task) => task.status != VideoUploadStatus.success)
         .toList();
 
     return Scaffold(
@@ -42,22 +36,14 @@ class MySubmissionsPage extends ConsumerWidget {
             Expanded(
               child: videosAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
                 error: (error, stackTrace) {
-                  return _buildError(
-                    ref,
-                    l10n,
-                  );
+                  return _buildError(ref, l10n);
                 },
                 data: (videos) {
                   if (videos.isEmpty && activeUploadTasks.isEmpty) {
-                    return _buildEmpty(
-                      ref,
-                      l10n,
-                    );
+                    return _buildEmpty(ref, l10n);
                   }
 
                   return RefreshIndicator(
@@ -86,12 +72,7 @@ class MySubmissionsPage extends ConsumerWidget {
                         final videoIndex = index - activeUploadTasks.length;
                         final video = videos[videoIndex];
 
-                        return _buildVideo(
-                          context,
-                          video,
-                          videoIndex,
-                          l10n,
-                        );
+                        return _buildVideo(context, video, videoIndex, l10n);
                       },
                     ),
                   );
@@ -104,10 +85,7 @@ class MySubmissionsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       child: Row(
@@ -123,9 +101,7 @@ class MySubmissionsPage extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -159,10 +135,7 @@ class MySubmissionsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmpty(
-    WidgetRef ref,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildEmpty(WidgetRef ref, AppLocalizations l10n) {
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(myPublishedVideosProvider);
@@ -191,10 +164,7 @@ class MySubmissionsPage extends ConsumerWidget {
           Center(
             child: Text(
               l10n.publishFirstVideo,
-              style: const TextStyle(
-                color: Color(0xFFAAA49B),
-                fontSize: 11,
-              ),
+              style: const TextStyle(color: Color(0xFFAAA49B), fontSize: 11),
             ),
           ),
         ],
@@ -202,10 +172,7 @@ class MySubmissionsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildError(
-    WidgetRef ref,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildError(WidgetRef ref, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -218,10 +185,7 @@ class MySubmissionsPage extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             l10n.submissionsLoadFailed,
-            style: const TextStyle(
-              color: _ink,
-              fontWeight: FontWeight.w800,
-            ),
+            style: const TextStyle(color: _ink, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 16),
           FilledButton(
@@ -269,9 +233,7 @@ class MySubmissionsPage extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(23),
-        border: Border.all(
-          color: const Color(0xFFE3DED5),
-        ),
+        border: Border.all(color: const Color(0xFFE3DED5)),
       ),
       child: Row(
         children: [
@@ -279,14 +241,11 @@ class MySubmissionsPage extends ConsumerWidget {
             width: 72,
             height: 72,
             child: Center(
-              child: task.status == VideoUploadStatus.preparing ||
+              child:
+                  task.status == VideoUploadStatus.preparing ||
                       task.status == VideoUploadStatus.uploading
                   ? const CircularProgressIndicator()
-                  : Icon(
-                      icon,
-                      size: 34,
-                      color: secondary,
-                    ),
+                  : Icon(icon, size: 34, color: secondary),
             ),
           ),
           const SizedBox(width: 18),
@@ -348,25 +307,14 @@ class MySubmissionsPage extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 130,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(23),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
+          border: Border.all(color: const Color(0xFFE3DED5)),
         ),
         child: Row(
           children: [
@@ -468,9 +416,7 @@ class MySubmissionsPage extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          l10n.viewsCount(
-                            _count(context, video.viewCount),
-                          ),
+                          l10n.viewsCount(_count(context, video.viewCount)),
                           style: const TextStyle(
                             color: Color(0xFF908A81),
                             fontSize: 10,
@@ -488,10 +434,7 @@ class MySubmissionsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCover(
-    BuildContext context,
-    VideoDetail video,
-  ) {
+  Widget _buildCover(BuildContext context, VideoDetail video) {
     if (video.coverUrl.isEmpty) {
       return Container(
         color: _ink,
@@ -504,7 +447,8 @@ class MySubmissionsPage extends ConsumerWidget {
       );
     }
 
-    final isNetwork = video.coverUrl.startsWith('http://') ||
+    final isNetwork =
+        video.coverUrl.startsWith('http://') ||
         video.coverUrl.startsWith('https://');
 
     if (isNetwork) {
@@ -530,8 +474,10 @@ class MySubmissionsPage extends ConsumerWidget {
     final duration = Duration(seconds: seconds);
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final remainingSeconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final remainingSeconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
     if (hours > 0) {
       return '$hours:$minutes:$remainingSeconds';
@@ -540,13 +486,8 @@ class MySubmissionsPage extends ConsumerWidget {
     return '${duration.inMinutes}:$remainingSeconds';
   }
 
-  String _count(
-    BuildContext context,
-    int value,
-  ) {
+  String _count(BuildContext context, int value) {
     final localeName = Localizations.localeOf(context).toString();
-    return NumberFormat.compact(
-      locale: localeName,
-    ).format(value);
+    return NumberFormat.compact(locale: localeName).format(value);
   }
 }

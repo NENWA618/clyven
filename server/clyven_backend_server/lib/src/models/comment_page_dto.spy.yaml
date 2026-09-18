@@ -1,0 +1,5 @@
+class: CommentPageDto
+fields:
+  comments: List<VideoCommentDto>
+  page: int
+  hasMore: bool

@@ -9,9 +9,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/video_upload_queue_provider.dart';
 
 class CreateVideoPage extends ConsumerStatefulWidget {
-  const CreateVideoPage({
-    super.key,
-  });
+  const CreateVideoPage({super.key});
 
   @override
   ConsumerState<CreateVideoPage> createState() {
@@ -56,9 +54,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       return;
     }
 
-    final video = await _picker.pickVideo(
-      source: ImageSource.gallery,
-    );
+    final video = await _picker.pickVideo(source: ImageSource.gallery);
 
     if (video == null || !mounted) {
       return;
@@ -108,7 +104,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
         return;
       }
 
-      ref.read(videoUploadQueueProvider.notifier).enqueue(
+      ref
+          .read(videoUploadQueueProvider.notifier)
+          .enqueue(
             VideoUploadRequest(
               userId: user.id,
               authorName: user.displayName,
@@ -134,9 +132,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       });
 
       _showMessage(
-        l10n.enqueueUploadFailed(
-          localizedErrorMessage(l10n, error),
-        ),
+        l10n.enqueueUploadFailed(localizedErrorMessage(l10n, error)),
       );
     }
   }
@@ -146,11 +142,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -170,10 +164,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 children: [
                   _buildVideoSelector(l10n),
                   const SizedBox(height: 26),
-                  _buildLabel(
-                    l10n.titleEyebrow,
-                    l10n.titleLabel,
-                  ),
+                  _buildLabel(l10n.titleEyebrow, l10n.titleLabel),
                   const SizedBox(height: 10),
                   _buildTextField(
                     controller: _titleController,
@@ -181,10 +172,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                     maxLines: 2,
                   ),
                   const SizedBox(height: 24),
-                  _buildLabel(
-                    l10n.aboutEyebrow,
-                    l10n.descriptionLabel,
-                  ),
+                  _buildLabel(l10n.aboutEyebrow, l10n.descriptionLabel),
                   const SizedBox(height: 10),
                   _buildTextField(
                     controller: _descriptionController,
@@ -192,10 +180,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                     maxLines: 6,
                   ),
                   const SizedBox(height: 24),
-                  _buildLabel(
-                    l10n.channelEyebrow,
-                    l10n.categoryLabel,
-                  ),
+                  _buildLabel(l10n.channelEyebrow, l10n.categoryLabel),
                   const SizedBox(height: 12),
                   _buildCategories(l10n),
                   const SizedBox(height: 34),
@@ -210,6 +195,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   }
 
   Widget _buildHeader(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
@@ -224,12 +212,12 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.72),
+                color: isDark
+                    ? const Color(0xFF222222)
+                    : Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.close_rounded,
-              ),
+              child: const Icon(Icons.close_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -249,8 +237,8 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 const SizedBox(height: 3),
                 Text(
                   l10n.publishVideo,
-                  style: const TextStyle(
-                    color: _ink,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
@@ -264,23 +252,23 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   }
 
   Widget _buildVideoSelector(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: _isPublishing ? null : _pickVideo,
       child: Container(
         height: 210,
         decoration: BoxDecoration(
-          color: _ink,
+          color: isDark ? const Color(0xFF222222) : _ink,
           borderRadius: BorderRadius.circular(28),
+          border: isDark ? Border.all(color: const Color(0xFF383838)) : null,
         ),
         child: _video == null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.video_library_outlined,
-                    color: _acid,
-                    size: 42,
-                  ),
+                  Icon(Icons.video_library_outlined, color: _acid, size: 42),
                   const SizedBox(height: 14),
                   Text(
                     l10n.selectVideo,
@@ -293,10 +281,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                   const SizedBox(height: 5),
                   Text(
                     l10n.selectVideoFromDevice,
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 11,
-                    ),
+                    style: const TextStyle(color: Colors.white54, fontSize: 11),
                   ),
                 ],
               )
@@ -305,11 +290,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      color: _acid,
-                      size: 42,
-                    ),
+                    Icon(Icons.check_circle_rounded, color: _acid, size: 42),
                     const SizedBox(height: 12),
                     Text(
                       l10n.videoSelected,
@@ -346,10 +327,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     );
   }
 
-  Widget _buildLabel(
-    String eyebrow,
-    String label,
-  ) {
+  Widget _buildLabel(String eyebrow, String label) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Text(
@@ -364,8 +344,8 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
         const SizedBox(width: 10),
         Text(
           label,
-          style: const TextStyle(
-            color: _ink,
+          style: TextStyle(
+            color: scheme.onSurface,
             fontSize: 15,
             fontWeight: FontWeight.w800,
           ),
@@ -379,33 +359,36 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     required String hintText,
     required int maxLines,
   }) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
     return TextField(
       controller: controller,
+      style: TextStyle(color: scheme.onSurface),
       enabled: !_isPublishing,
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Color(0xFFAAA49B),
+        hintStyle: TextStyle(
+          color: isDark ? const Color(0xFF8F8A83) : const Color(0xFFAAA49B),
         ),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.72),
+        fillColor: isDark
+            ? const Color(0xFF222222)
+            : Colors.white.withValues(alpha: 0.72),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(
-            color: Color(0xFFE3DED5),
+          borderSide: BorderSide(
+            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(
-            color: _purple,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: _purple, width: 1.5),
         ),
       ),
     );
@@ -417,46 +400,45 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     return Wrap(
       spacing: 8,
       runSpacing: 9,
-      children: _categories.map(
-        (category) {
-          final selected = category == _category;
+      children: _categories.map((category) {
+        final selected = category == _category;
 
-          return GestureDetector(
-            onTap: _isPublishing
-                ? null
-                : () {
-                    setState(() {
-                      _category = category;
-                    });
-                  },
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 9,
-              ),
-              decoration: BoxDecoration(
+        return GestureDetector(
+          onTap: _isPublishing
+              ? null
+              : () {
+                  setState(() {
+                    _category = category;
+                  });
+                },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
+            decoration: BoxDecoration(
+              color: selected
+                  ? scheme.secondary
+                  : (scheme.brightness == Brightness.dark
+                        ? const Color(0xFF222222)
+                        : Colors.white.withValues(alpha: 0.72)),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
                 color: selected
                     ? scheme.secondary
-                    : Colors.white.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: selected
-                      ? scheme.secondary
-                      : const Color(0xFFD9D4CB),
-                ),
-              ),
-              child: Text(
-                localizedTopicLabel(l10n, category),
-                style: TextStyle(
-                  color: selected ? scheme.onSecondary : _ink,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
+                    : (scheme.brightness == Brightness.dark
+                          ? const Color(0xFF383838)
+                          : const Color(0xFFD9D4CB)),
               ),
             ),
-          );
-        },
-      ).toList(),
+            child: Text(
+              localizedTopicLabel(l10n, category),
+              style: TextStyle(
+                color: selected ? scheme.onSecondary : scheme.onSurface,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

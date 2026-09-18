@@ -22,7 +22,9 @@ void run(List<String> args) async {
   );
 
   // 现在是不是数据库维护 / migration 模式
-  final isMaintenance = args.contains('maintenance');
+  final isMaintenance = args.any(
+    (arg) => arg == 'maintenance' || arg == '--role=maintenance',
+  );
 
   // 正常启动服务器时才需要 GCP Storage
   if (!isMaintenance) {

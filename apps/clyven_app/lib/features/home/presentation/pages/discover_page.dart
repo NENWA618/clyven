@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
-import '../../../video/presentation/pages/video_detail_page.dart';
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class DiscoverPage extends ConsumerWidget {
   const DiscoverPage({super.key});
@@ -15,10 +15,7 @@ class DiscoverPage extends ConsumerWidget {
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final homeAsync = ref.watch(homeProvider);
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
@@ -28,14 +25,9 @@ class DiscoverPage extends ConsumerWidget {
       body: SafeArea(
         child: homeAsync.when(
           loading: () {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           },
-          error: (
-            error,
-            stackTrace,
-          ) {
+          error: (error, stackTrace) {
             return Center(
               child: FilledButton(
                 onPressed: () {
@@ -49,42 +41,28 @@ class DiscoverPage extends ConsumerWidget {
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                SliverToBoxAdapter(
-                  child: _buildHeader(context, l10n),
-                ),
+                SliverToBoxAdapter(child: _buildHeader(context, l10n)),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      20,
-                      20,
-                      20,
-                      12,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                     child: Text(
                       l10n.exploreTracks,
-                      style: const TextStyle(
-                        color: _ink,
+                      style: TextStyle(
+                        color: colors.onSurface,
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: _buildTopics(l10n),
-                ),
+                SliverToBoxAdapter(child: _buildTopics(l10n)),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      20,
-                      30,
-                      20,
-                      14,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(20, 30, 20, 14),
                     child: Text(
                       l10n.happeningNow,
-                      style: const TextStyle(
-                        color: _ink,
+                      style: TextStyle(
+                        color: colors.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                       ),
@@ -92,24 +70,13 @@ class DiscoverPage extends ConsumerWidget {
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    18,
-                    0,
-                    18,
-                    40,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 40),
                   sliver: SliverList.separated(
                     itemCount: state.feed.videos.length,
-                    separatorBuilder: (
-                      context,
-                      index,
-                    ) {
+                    separatorBuilder: (context, index) {
                       return const SizedBox(height: 14);
                     },
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
+                    itemBuilder: (context, index) {
                       return _buildVideo(
                         context,
                         state.feed.videos[index],
@@ -126,19 +93,12 @@ class DiscoverPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
-    final secondary = Theme.of(context).colorScheme.secondary;
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final secondary = scheme.secondary;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        22,
-        20,
-        8,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 8),
       child: Row(
         children: [
           Column(
@@ -156,8 +116,8 @@ class DiscoverPage extends ConsumerWidget {
               const SizedBox(height: 3),
               Text(
                 l10n.discoverTitle,
-                style: const TextStyle(
-                  color: _ink,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                 ),
@@ -173,28 +133,18 @@ class DiscoverPage extends ConsumerWidget {
     return SizedBox(
       height: 52,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 18,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         scrollDirection: Axis.horizontal,
         itemCount: HomeNotifier.topics.length - 1,
-        separatorBuilder: (
-          context,
-          index,
-        ) {
+        separatorBuilder: (context, index) {
           return const SizedBox(width: 8);
         },
-        itemBuilder: (
-          context,
-          index,
-        ) {
+        itemBuilder: (context, index) {
           final topic = HomeNotifier.topics[index + 1];
           final colors = Theme.of(context).colorScheme;
 
           return Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: index.isEven ? colors.primary : colors.secondary,
@@ -219,28 +169,23 @@ class DiscoverPage extends ConsumerWidget {
     HomeVideo video,
     AppLocalizations l10n,
   ) {
-    final secondary = Theme.of(context).colorScheme.secondary;
+    final scheme = Theme.of(context).colorScheme;
+    final secondary = scheme.secondary;
+    final isDark = scheme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 118,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: isDark
+              ? const Color(0xFF222222)
+              : Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: const Color(0xFFE3DED5),
+            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
           ),
         ),
         child: Row(
@@ -275,8 +220,8 @@ class DiscoverPage extends ConsumerWidget {
                         video.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _ink,
+                        style: TextStyle(
+                          color: scheme.onSurface,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
@@ -286,8 +231,10 @@ class DiscoverPage extends ConsumerWidget {
                       '${video.authorName} · ${video.viewText}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF908A81),
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFF9E9991)
+                            : const Color(0xFF908A81),
                         fontSize: 10,
                       ),
                     ),
@@ -303,24 +250,15 @@ class DiscoverPage extends ConsumerWidget {
 
   Widget _buildCover(String path) {
     if (path.isEmpty) {
-      return Container(
-        color: const Color(0xFFD8D2C8),
-      );
+      return Container(color: const Color(0xFFD8D2C8));
     }
 
-    final isNetwork =
-        path.startsWith('http://') || path.startsWith('https://');
+    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
 
     if (isNetwork) {
-      return Image.network(
-        path,
-        fit: BoxFit.cover,
-      );
+      return Image.network(path, fit: BoxFit.cover);
     }
 
-    return Image.file(
-      File(path),
-      fit: BoxFit.cover,
-    );
+    return Image.file(File(path), fit: BoxFit.cover);
   }
 }

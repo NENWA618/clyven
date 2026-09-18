@@ -3,37 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../data/models/creator_profile.dart';
 import '../providers/creator_profile_provider.dart';
+
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class CreatorProfilePage extends ConsumerWidget {
   final String creatorId;
 
-  const CreatorProfilePage({
-    super.key,
-    required this.creatorId,
-  });
+  const CreatorProfilePage({super.key, required this.creatorId});
 
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    final creatorAsync = ref.watch(
-      creatorProfileProvider(creatorId),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final creatorAsync = ref.watch(creatorProfileProvider(creatorId));
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: creatorAsync.when(
         loading: () {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
         error: (error, stackTrace) {
           return SafeArea(
@@ -41,23 +32,14 @@ class CreatorProfilePage extends ConsumerWidget {
               children: [
                 _buildBackButton(context),
                 Expanded(
-                  child: Center(
-                    child: Text(
-                      l10n.creatorProfileLoadFailed,
-                    ),
-                  ),
+                  child: Center(child: Text(l10n.creatorProfileLoadFailed)),
                 ),
               ],
             ),
           );
         },
         data: (state) {
-          return _buildPage(
-            context,
-            ref,
-            state,
-            l10n,
-          );
+          return _buildPage(context, ref, state, l10n);
         },
       ),
     );
@@ -74,50 +56,21 @@ class CreatorProfilePage extends ConsumerWidget {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        SliverToBoxAdapter(
-          child: _buildHero(
-            context,
-            creator,
-            l10n,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildIdentity(
-            context,
-            ref,
-            state,
-            l10n,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildStatistics(
-            context,
-            creator,
-            l10n,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: _buildSectionHeader(l10n),
-        ),
+        SliverToBoxAdapter(child: _buildHero(context, creator, l10n)),
+        SliverToBoxAdapter(child: _buildIdentity(context, ref, state, l10n)),
+        SliverToBoxAdapter(child: _buildStatistics(context, creator, l10n)),
+        SliverToBoxAdapter(child: _buildSectionHeader(l10n)),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(18, 0, 18, 60),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final video = creator.videos[index];
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final video = creator.videos[index];
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: _buildVideoCard(
-                    context,
-                    video,
-                    index,
-                    l10n,
-                  ),
-                );
-              },
-              childCount: creator.videos.length,
-            ),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: _buildVideoCard(context, video, index, l10n),
+              );
+            }, childCount: creator.videos.length),
           ),
         ),
       ],
@@ -140,9 +93,7 @@ class CreatorProfilePage extends ConsumerWidget {
             creator.bannerUrl,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: scheme.secondary,
-              );
+              return Container(color: scheme.secondary);
             },
           ),
           const DecoratedBox(
@@ -173,10 +124,7 @@ class CreatorProfilePage extends ConsumerWidget {
                 color: Colors.black38,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.more_horiz_rounded,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.more_horiz_rounded, color: Colors.white),
             ),
           ),
           Positioned(
@@ -296,9 +244,7 @@ class CreatorProfilePage extends ConsumerWidget {
                     ? null
                     : () {
                         ref
-                            .read(
-                              creatorProfileProvider(creator.id).notifier,
-                            )
+                            .read(creatorProfileProvider(creator.id).notifier)
                             .toggleFollow();
                       },
                 child: AnimatedContainer(
@@ -312,9 +258,7 @@ class CreatorProfilePage extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Text(
-                    state.isFollowing
-                        ? l10n.followingButton
-                        : l10n.follow,
+                    state.isFollowing ? l10n.followingButton : l10n.follow,
                     style: TextStyle(
                       color: state.isFollowing
                           ? Colors.white
@@ -380,11 +324,7 @@ class CreatorProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _stat(
-    BuildContext context,
-    String value,
-    String label,
-  ) {
+  Widget _stat(BuildContext context, String value, String label) {
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -414,11 +354,7 @@ class CreatorProfilePage extends ConsumerWidget {
   }
 
   Widget _divider() {
-    return Container(
-      width: 1,
-      height: 30,
-      color: Colors.white12,
-    );
+    return Container(width: 1, height: 30, color: Colors.white12);
   }
 
   Widget _buildSectionHeader(AppLocalizations l10n) {
@@ -460,25 +396,14 @@ class CreatorProfilePage extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 125,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(23),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
+          border: Border.all(color: const Color(0xFFE3DED5)),
         ),
         child: Row(
           children: [
@@ -492,10 +417,7 @@ class CreatorProfilePage extends ConsumerWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.network(
-                      video.coverUrl,
-                      fit: BoxFit.cover,
-                    ),
+                    Image.network(video.coverUrl, fit: BoxFit.cover),
                     Positioned(
                       left: 9,
                       bottom: 9,
@@ -552,9 +474,7 @@ class CreatorProfilePage extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      l10n.viewsCount(
-                        _formatCount(context, video.viewCount),
-                      ),
+                      l10n.viewsCount(_formatCount(context, video.viewCount)),
                       style: const TextStyle(
                         color: Color(0xFF908A81),
                         fontSize: 10,
@@ -582,29 +502,23 @@ class CreatorProfilePage extends ConsumerWidget {
           color: Colors.black38,
           borderRadius: BorderRadius.circular(14),
         ),
-        child: const Icon(
-          Icons.arrow_back_rounded,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
       ),
     );
   }
 
-  String _formatCount(
-    BuildContext context,
-    int value,
-  ) {
+  String _formatCount(BuildContext context, int value) {
     final localeName = Localizations.localeOf(context).toString();
-    return NumberFormat.compact(
-      locale: localeName,
-    ).format(value);
+    return NumberFormat.compact(locale: localeName).format(value);
   }
 
   static String _duration(int seconds) {
     final duration = Duration(seconds: seconds);
     final minutes = duration.inMinutes;
-    final remainingSeconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final remainingSeconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
     return '$minutes:$remainingSeconds';
   }

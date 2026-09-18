@@ -9,10 +9,14 @@ import '../providers/comments_provider.dart';
 
 class CommentsPage extends ConsumerStatefulWidget {
   final String videoId;
+  final bool embedded;
+  final VoidCallback? onClose;
 
   const CommentsPage({
     super.key,
     required this.videoId,
+    this.embedded = false,
+    this.onClose,
   });
 
   @override
@@ -61,39 +65,40 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
   Widget build(BuildContext context) {
     final commentsAsync = ref.watch(commentsProvider(widget.videoId));
 
+    final content = Column(
+      children: [
+        _buildHeader(),
+        Expanded(
+          child: commentsAsync.when(
+            loading: () {
+              return const Center(child: CircularProgressIndicator());
+            },
+            error: (error, stackTrace) {
+              return _buildError();
+            },
+            data: (state) {
+              return RefreshIndicator(
+                onRefresh: () {
+                  return ref
+                      .read(commentsProvider(widget.videoId).notifier)
+                      .refresh();
+                },
+                child: _buildComments(state),
+              );
+            },
+          ),
+        ),
+        _buildComposer(commentsAsync.value),
+      ],
+    );
+
+    if (widget.embedded) {
+      return Material(color: _backgroundColor, child: content);
+    }
+
     return Scaffold(
       backgroundColor: _backgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: commentsAsync.when(
-                loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                },
-                error: (error, stackTrace) {
-                  return _buildError();
-                },
-                data: (state) {
-                  return RefreshIndicator(
-                    onRefresh: () {
-                      return ref
-                          .read(commentsProvider(widget.videoId).notifier)
-                          .refresh();
-                    },
-                    child: _buildComments(state),
-                  );
-                },
-              ),
-            ),
-            _buildComposer(commentsAsync.value),
-          ],
-        ),
-      ),
+      body: SafeArea(bottom: false, child: content),
     );
   }
 
@@ -106,6 +111,11 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
         children: [
           GestureDetector(
             onTap: () {
+              if (widget.embedded) {
+                widget.onClose?.call();
+                return;
+              }
+
               Navigator.pop(context);
             },
             child: Container(
@@ -114,13 +124,9 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFFE0DBD2),
-                ),
+                border: Border.all(color: const Color(0xFFE0DBD2)),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -170,11 +176,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const SizedBox(height: 170),
-          const Icon(
-            Icons.forum_outlined,
-            size: 42,
-            color: Color(0xFFAAA49B),
-          ),
+          const Icon(Icons.forum_outlined, size: 42, color: Color(0xFFAAA49B)),
           const SizedBox(height: 12),
           Center(
             child: Text(
@@ -208,9 +210,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
                   ? const SizedBox(
                       width: 22,
                       height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ),
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const SizedBox(height: 22),
             ),
@@ -227,10 +227,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
     );
   }
 
-  Widget _buildCommentCard(
-    VideoComment comment,
-    int index,
-  ) {
+  Widget _buildCommentCard(VideoComment comment, int index) {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -238,9 +235,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: const Color(0xFFE3DED5),
-        ),
+        border: Border.all(color: const Color(0xFFE3DED5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,10 +286,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  final allowed = await requireLogin(
-                    context,
-                    ref,
-                  );
+                  final allowed = await requireLogin(context, ref);
 
                   if (!allowed || !mounted) {
                     return;
@@ -367,14 +359,9 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(
-                children: comment.replies.map(
-                  (reply) {
-                    return _buildReply(
-                      comment.id,
-                      reply,
-                    );
-                  },
-                ).toList(),
+                children: comment.replies.map((reply) {
+                  return _buildReply(comment.id, reply);
+                }).toList(),
               ),
             ),
           ],
@@ -383,10 +370,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
     );
   }
 
-  Widget _buildReply(
-    String commentId,
-    CommentReply reply,
-  ) {
+  Widget _buildReply(String commentId, CommentReply reply) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
@@ -438,10 +422,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () async {
-              final allowed = await requireLogin(
-                context,
-                ref,
-              );
+              final allowed = await requireLogin(context, ref);
 
               if (!allowed || !mounted) {
                 return;
@@ -449,10 +430,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
 
               await ref
                   .read(commentsProvider(widget.videoId).notifier)
-                  .toggleReplyLike(
-                    commentId: commentId,
-                    replyId: reply.id,
-                  );
+                  .toggleReplyLike(commentId: commentId, replyId: reply.id);
             },
             child: Padding(
               padding: const EdgeInsets.all(5),
@@ -492,9 +470,7 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
     return Container(
       decoration: const BoxDecoration(
         color: _inkColor,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(28),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
         top: false,
@@ -541,17 +517,12 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
                       focusNode: _focusNode,
                       maxLines: 4,
                       minLines: 1,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                       decoration: InputDecoration(
                         hintText: replying
                             ? l10n.writeReplyHint
                             : l10n.leaveEchoHint,
-                        hintStyle: const TextStyle(
-                          color: Colors.white38,
-                        ),
+                        hintStyle: const TextStyle(color: Colors.white38),
                         filled: true,
                         fillColor: Colors.white10,
                         contentPadding: const EdgeInsets.symmetric(
@@ -605,24 +576,16 @@ class _CommentsPageState extends ConsumerState<CommentsPage> {
       return;
     }
 
-    final allowed = await requireLogin(
-      context,
-      ref,
-    );
+    final allowed = await requireLogin(context, ref);
 
     if (!allowed || !mounted) {
       return;
     }
 
-    final notifier = ref.read(
-      commentsProvider(widget.videoId).notifier,
-    );
+    final notifier = ref.read(commentsProvider(widget.videoId).notifier);
 
     if (_replyCommentId != null) {
-      await notifier.submitReply(
-        commentId: _replyCommentId!,
-        content: text,
-      );
+      await notifier.submitReply(commentId: _replyCommentId!, content: text);
     } else {
       await notifier.submitComment(text);
     }

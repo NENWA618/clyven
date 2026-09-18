@@ -2,9 +2,10 @@ import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../data/models/watch_history_item.dart';
 import '../providers/watch_history_provider.dart';
+
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class WatchHistoryPage extends ConsumerWidget {
   const WatchHistoryPage({super.key});
@@ -12,10 +13,7 @@ class WatchHistoryPage extends ConsumerWidget {
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(watchHistoryProvider);
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
@@ -25,18 +23,11 @@ class WatchHistoryPage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(
-              context,
-              ref,
-              historyAsync.value ?? const [],
-              l10n,
-            ),
+            _buildHeader(context, ref, historyAsync.value ?? const [], l10n),
             Expanded(
               child: historyAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
                 error: (error, stackTrace) {
                   return Center(
@@ -54,22 +45,13 @@ class WatchHistoryPage extends ConsumerWidget {
                   }
 
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      10,
-                      16,
-                      40,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 40),
                     itemCount: history.length,
                     separatorBuilder: (context, index) {
                       return const SizedBox(height: 12);
                     },
                     itemBuilder: (context, index) {
-                      return _buildHistoryCard(
-                        context,
-                        ref,
-                        history[index],
-                      );
+                      return _buildHistoryCard(context, ref, history[index]);
                     },
                   );
                 },
@@ -90,12 +72,7 @@ class WatchHistoryPage extends ConsumerWidget {
     final secondary = Theme.of(context).colorScheme.secondary;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        16,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       child: Row(
         children: [
           GestureDetector(
@@ -109,9 +86,7 @@ class WatchHistoryPage extends ConsumerWidget {
                 color: Colors.white.withOpacity(0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -147,10 +122,7 @@ class WatchHistoryPage extends ConsumerWidget {
               },
               child: Text(
                 l10n.clear,
-                style: TextStyle(
-                  color: secondary,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: TextStyle(color: secondary, fontWeight: FontWeight.w800),
               ),
             ),
         ],
@@ -173,39 +145,23 @@ class WatchHistoryPage extends ConsumerWidget {
       },
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(
-          right: 24,
-        ),
+        padding: const EdgeInsets.only(right: 24),
         decoration: BoxDecoration(
           color: const Color(0xFFDF5A5A),
           borderRadius: BorderRadius.circular(24),
         ),
-        child: const Icon(
-          Icons.delete_outline_rounded,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
       ),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return VideoDetailPage(
-                  videoId: item.videoId,
-                );
-              },
-            ),
-          );
+          openGlobalVideo(item.videoId);
         },
         child: Container(
           height: 130,
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.72),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFFE3DED5),
-            ),
+            border: Border.all(color: const Color(0xFFE3DED5)),
           ),
           child: Row(
             children: [
@@ -219,10 +175,7 @@ class WatchHistoryPage extends ConsumerWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(
-                        item.coverUrl,
-                        fit: BoxFit.cover,
-                      ),
+                      Image.network(item.coverUrl, fit: BoxFit.cover),
                       Positioned(
                         left: 0,
                         right: 0,
@@ -292,11 +245,7 @@ class WatchHistoryPage extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.history_rounded,
-            size: 45,
-            color: Color(0xFFAAA49B),
-          ),
+          const Icon(Icons.history_rounded, size: 45, color: Color(0xFFAAA49B)),
           const SizedBox(height: 13),
           Text(
             l10n.noWatchHistory,

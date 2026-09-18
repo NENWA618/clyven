@@ -5,8 +5,8 @@ steps:
       - -f
       - server/clyven_backend_server/Dockerfile
       - -t
-      - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:subtitle-delete-20260917
+      - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:real-comments-20260917
       - .
 
 images:
-  - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:subtitle-delete-20260917
+  - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:real-comments-20260917

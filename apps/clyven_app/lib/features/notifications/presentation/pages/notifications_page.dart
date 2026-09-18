@@ -2,22 +2,18 @@ import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../../data/models/app_notification.dart';
 import '../providers/notification_provider.dart';
 
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
+
 class NotificationsPage extends ConsumerWidget {
-  const NotificationsPage({
-    super.key,
-  });
+  const NotificationsPage({super.key});
 
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(notificationProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -30,37 +26,19 @@ class NotificationsPage extends ConsumerWidget {
             Expanded(
               child: notificationsAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
-                error: (
-                  error,
-                  stackTrace,
-                ) {
-                  return Center(
-                    child: Text(l10n.notificationsLoadFailed),
-                  );
+                error: (error, stackTrace) {
+                  return Center(child: Text(l10n.notificationsLoadFailed));
                 },
                 data: (notifications) {
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      18,
-                      10,
-                      18,
-                      40,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(18, 10, 18, 40),
                     itemCount: notifications.length,
-                    separatorBuilder: (
-                      context,
-                      index,
-                    ) {
+                    separatorBuilder: (context, index) {
                       return const SizedBox(height: 12);
                     },
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
+                    itemBuilder: (context, index) {
                       return _buildItem(
                         context,
                         ref,
@@ -78,17 +56,11 @@ class NotificationsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        22,
-        20,
-        18,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
       child: Row(
         children: [
           Column(
@@ -97,7 +69,7 @@ class NotificationsPage extends ConsumerWidget {
               Text(
                 l10n.echoesEyebrow,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: scheme.secondary,
                   fontSize: 9,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 2,
@@ -106,8 +78,8 @@ class NotificationsPage extends ConsumerWidget {
               const SizedBox(height: 3),
               Text(
                 l10n.navEchoes,
-                style: const TextStyle(
-                  color: _ink,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                 ),
@@ -125,7 +97,10 @@ class NotificationsPage extends ConsumerWidget {
     AppNotification notification,
     AppLocalizations l10n,
   ) {
-    final secondary = Theme.of(context).colorScheme.secondary;
+    final scheme = Theme.of(context).colorScheme;
+    final secondary = scheme.secondary;
+    final isDark = scheme.brightness == Brightness.dark;
+    final nightCardColor = Theme.of(context).cardColor;
 
     return GestureDetector(
       onTap: () async {
@@ -138,28 +113,26 @@ class NotificationsPage extends ConsumerWidget {
         }
 
         if (notification.videoId != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return VideoDetailPage(
-                  videoId: notification.videoId!,
-                );
-              },
-            ),
-          );
+          openGlobalVideo(notification.videoId!);
         }
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: notification.isRead
-              ? Colors.white.withOpacity(0.65)
-              : Colors.white,
+          color: isDark
+              ? (notification.isRead
+                    ? nightCardColor
+                    : Color.alphaBlend(
+                        secondary.withValues(alpha: 0.055),
+                        nightCardColor,
+                      ))
+              : (notification.isRead
+                    ? Colors.white.withOpacity(0.65)
+                    : Colors.white),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: notification.isRead
-                ? const Color(0xFFE3DED5)
+                ? (isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5))
                 : secondary,
           ),
         ),
@@ -175,7 +148,7 @@ class NotificationsPage extends ConsumerWidget {
               ),
               child: Icon(
                 _icon(notification.type),
-                color: _ink,
+                color: isDark ? scheme.onSurface : _ink,
               ),
             ),
             const SizedBox(width: 14),
@@ -185,8 +158,8 @@ class NotificationsPage extends ConsumerWidget {
                 children: [
                   Text(
                     _title(notification.type, l10n),
-                    style: const TextStyle(
-                      color: _ink,
+                    style: TextStyle(
+                      color: scheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
                     ),
@@ -194,20 +167,21 @@ class NotificationsPage extends ConsumerWidget {
                   const SizedBox(height: 5),
                   Text(
                     _message(notification, l10n),
-                    style: const TextStyle(
-                      color: Color(0xFF77736C),
+                    style: TextStyle(
+                      color: isDark
+                          ? const Color(0xFFBEB9B0)
+                          : const Color(0xFF77736C),
                       fontSize: 12,
                       height: 1.4,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _formatTime(
-                      notification.createdAt,
-                      l10n,
-                    ),
-                    style: const TextStyle(
-                      color: Color(0xFFAAA49B),
+                    _formatTime(notification.createdAt, l10n),
+                    style: TextStyle(
+                      color: isDark
+                          ? const Color(0xFF8F8A83)
+                          : const Color(0xFFAAA49B),
                       fontSize: 10,
                     ),
                   ),
@@ -229,10 +203,7 @@ class NotificationsPage extends ConsumerWidget {
     );
   }
 
-  String _title(
-    AppNotificationType type,
-    AppLocalizations l10n,
-  ) {
+  String _title(AppNotificationType type, AppLocalizations l10n) {
     return switch (type) {
       AppNotificationType.comment => l10n.notificationCommentTitle,
       AppNotificationType.like => l10n.notificationLikeTitle,
@@ -240,21 +211,18 @@ class NotificationsPage extends ConsumerWidget {
     };
   }
 
-  String _message(
-    AppNotification notification,
-    AppLocalizations l10n,
-  ) {
+  String _message(AppNotification notification, AppLocalizations l10n) {
     return switch (notification.type) {
       AppNotificationType.comment => l10n.notificationCommentMessage(
-          notification.actorName,
-          notification.contentPreview ?? '',
-        ),
+        notification.actorName,
+        notification.contentPreview ?? '',
+      ),
       AppNotificationType.like => l10n.notificationLikeMessage(
-          notification.actorName,
-        ),
+        notification.actorName,
+      ),
       AppNotificationType.follow => l10n.notificationFollowMessage(
-          notification.actorName,
-        ),
+        notification.actorName,
+      ),
     };
   }
 
@@ -269,11 +237,29 @@ class NotificationsPage extends ConsumerWidget {
     }
   }
 
-  Color _iconColor(
-    BuildContext context,
-    AppNotificationType type,
-  ) {
+  Color _iconColor(BuildContext context, AppNotificationType type) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
+    // Dark notification icon backgrounds stay subdued in night mode.
+    if (isDark) {
+      final darkBase = Theme.of(context).cardColor;
+
+      switch (type) {
+        case AppNotificationType.like:
+          return Color.alphaBlend(
+            scheme.primary.withValues(alpha: 0.34),
+            darkBase,
+          );
+        case AppNotificationType.comment:
+          return Color.alphaBlend(
+            scheme.secondary.withValues(alpha: 0.38),
+            darkBase,
+          );
+        case AppNotificationType.follow:
+          return const Color(0xFF29463E);
+      }
+    }
 
     switch (type) {
       case AppNotificationType.like:
@@ -285,10 +271,7 @@ class NotificationsPage extends ConsumerWidget {
     }
   }
 
-  String _formatTime(
-    DateTime time,
-    AppLocalizations l10n,
-  ) {
+  String _formatTime(DateTime time, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(time);
 

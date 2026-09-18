@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../video/data/models/video_detail.dart';
-import '../../../video/presentation/pages/video_detail_page.dart';
 import '../providers/favorite_videos_provider.dart';
+
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
 class FavoriteVideosPage extends ConsumerWidget {
   const FavoriteVideosPage({super.key});
@@ -12,10 +13,7 @@ class FavoriteVideosPage extends ConsumerWidget {
   static const Color _ink = Color(0xFF161616);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final favoritesAsync = ref.watch(favoriteVideosProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -24,17 +22,11 @@ class FavoriteVideosPage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildTopBar(
-              context,
-              ref,
-              l10n,
-            ),
+            _buildTopBar(context, ref, l10n),
             Expanded(
               child: favoritesAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
                 error: (error, stackTrace) {
                   return Center(
@@ -58,11 +50,7 @@ class FavoriteVideosPage extends ConsumerWidget {
                       return const SizedBox(height: 12);
                     },
                     itemBuilder: (context, index) {
-                      return _buildVideoCard(
-                        context,
-                        videos[index],
-                        l10n,
-                      );
+                      return _buildVideoCard(context, videos[index], l10n);
                     },
                   );
                 },
@@ -96,9 +84,7 @@ class FavoriteVideosPage extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -157,25 +143,14 @@ class FavoriteVideosPage extends ConsumerWidget {
   ) {
     return GestureDetector(
       onTap: () async {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return VideoDetailPage(
-                videoId: video.id,
-              );
-            },
-          ),
-        );
+        openGlobalVideo(video.id);
       },
       child: Container(
         height: 135,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
+          border: Border.all(color: const Color(0xFFE3DED5)),
         ),
         child: Row(
           children: [
@@ -195,9 +170,7 @@ class FavoriteVideosPage extends ConsumerWidget {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: const Color(0xFFE3DED5),
-                          child: const Icon(
-                            Icons.image_outlined,
-                          ),
+                          child: const Icon(Icons.image_outlined),
                         );
                       },
                     ),
@@ -302,8 +275,10 @@ class FavoriteVideosPage extends ConsumerWidget {
   static String _duration(int seconds) {
     final duration = Duration(seconds: seconds);
     final minutes = duration.inMinutes;
-    final remainingSeconds =
-        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final remainingSeconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
     return '$minutes:$remainingSeconds';
   }

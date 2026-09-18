@@ -1,0 +1,14 @@
+class: CommentReplyRow
+table: comment_reply
+
+fields:
+  commentId: int
+  userId: String
+  userName: String
+  content: String
+  likeCount: int, default=0
+  createdAt: DateTime, default=now
+
+indexes:
+  comment_reply_comment_idx:
+    fields: commentId

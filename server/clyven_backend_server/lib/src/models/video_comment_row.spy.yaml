@@ -1,0 +1,14 @@
+class: VideoCommentRow
+table: video_comment
+
+fields:
+  videoId: int
+  userId: String
+  userName: String
+  content: String
+  likeCount: int, default=0
+  createdAt: DateTime, default=now
+
+indexes:
+  video_comment_video_idx:
+    fields: videoId
