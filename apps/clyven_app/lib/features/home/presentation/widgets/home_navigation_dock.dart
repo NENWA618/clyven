@@ -25,17 +25,10 @@ class HomeNavigationDock extends StatelessWidget {
     final onAccent = colors.onPrimary;
 
     return SafeArea(
-      minimum: const EdgeInsets.fromLTRB(
-        18,
-        0,
-        18,
-        12,
-      ),
+      minimum: const EdgeInsets.fromLTRB(18, 0, 18, 12),
       child: Container(
         height: 68,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: _inkColor,
           borderRadius: BorderRadius.circular(25),
@@ -69,18 +62,12 @@ class HomeNavigationDock extends StatelessWidget {
                 onTap: onCreate,
                 child: Container(
                   height: 48,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     color: accent,
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: Icon(
-                    Icons.add_rounded,
-                    color: onAccent,
-                    size: 30,
-                  ),
+                  child: Icon(Icons.add_rounded, color: onAccent, size: 30),
                 ),
               ),
             ),
@@ -127,11 +114,7 @@ class HomeNavigationDock extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(
-                  icon,
-                  size: 22,
-                  color: selected ? accent : Colors.white54,
-                ),
+                Icon(icon, size: 22, color: selected ? accent : Colors.white54),
                 if (badgeCount > 0)
                   Positioned(
                     right: -9,
@@ -141,9 +124,7 @@ class HomeNavigationDock extends StatelessWidget {
                         minWidth: 17,
                         minHeight: 17,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: accent,

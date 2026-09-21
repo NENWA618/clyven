@@ -6,13 +6,10 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 //这里是这件房子的wifi路由器
 
 final serverpodClientProvider = Provider<Client>((ref) {
-  final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-  )
-    ..connectivityMonitor =
-        FlutterConnectivityMonitor()
-    ..authSessionManager =
-        FlutterAuthSessionManager();
+  final client =
+      Client('https://glyphora-server-11129163384.asia-southeast1.run.app/')
+        ..connectivityMonitor = FlutterConnectivityMonitor()
+        ..authSessionManager = FlutterAuthSessionManager();
 
   return client;
 });

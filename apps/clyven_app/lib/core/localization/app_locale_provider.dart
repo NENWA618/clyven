@@ -7,8 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppLocaleNotifier extends Notifier<Locale?> {
   static const String _localeKey = 'clyven.app_locale';
 
-  final SharedPreferencesAsync _preferences =
-      SharedPreferencesAsync();
+  final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
   @override
   Locale? build() {
@@ -33,8 +32,7 @@ class AppLocaleNotifier extends Notifier<Locale?> {
 
   Future<void> _restore() async {
     try {
-      final languageCode =
-          await _preferences.getString(_localeKey);
+      final languageCode = await _preferences.getString(_localeKey);
 
       state = switch (languageCode) {
         'en' => const Locale('en'),
@@ -47,14 +45,9 @@ class AppLocaleNotifier extends Notifier<Locale?> {
     }
   }
 
-  Future<void> _saveLocale(
-    String languageCode,
-  ) async {
+  Future<void> _saveLocale(String languageCode) async {
     try {
-      await _preferences.setString(
-        _localeKey,
-        languageCode,
-      );
+      await _preferences.setString(_localeKey, languageCode);
     } catch (_) {
       // Keep the in-memory selection even if persistence is unavailable.
     }
@@ -69,7 +62,6 @@ class AppLocaleNotifier extends Notifier<Locale?> {
   }
 }
 
-final appLocaleProvider =
-    NotifierProvider<AppLocaleNotifier, Locale?>(
+final appLocaleProvider = NotifierProvider<AppLocaleNotifier, Locale?>(
   AppLocaleNotifier.new,
 );

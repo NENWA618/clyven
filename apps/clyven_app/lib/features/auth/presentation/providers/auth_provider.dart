@@ -9,28 +9,21 @@ import '../../data/repositories/serverpod_auth_repository.dart';
 // true  = 使用本地 Mock 账号
 // false = 使用真正 Serverpod 账号
 const bool _useMockAuth = false;
-
-final authRepositoryProvider =
-    Provider<AuthRepository>((ref) {
+//创建一个 Provider，名字叫 authRepositoryProvider，它提供的类型必须是 AuthRepository。
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
   if (_useMockAuth) {
     return MockAuthRepository();
   }
 
-  final client = ref.read(
-    serverpodClientProvider,
-  );
+  final client = ref.read(serverpodClientProvider);
 
-  return ServerpodAuthRepository(
-    client: client,
-  );
+  return ServerpodAuthRepository(client: client);
 });
 
-class AuthNotifier
-    extends AsyncNotifier<AppUser?> {
+class AuthNotifier extends AsyncNotifier<AppUser?> {
+  //每次我访问 _repository，就去 authRepositoryProvider 那里拿一个 AuthRepository 给我。
   AuthRepository get _repository {
-    return ref.read(
-      authRepositoryProvider,
-    );
+    return ref.read(authRepositoryProvider);
   }
 
   @override
@@ -44,14 +37,9 @@ class AuthNotifier
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-      () {
-        return _repository.login(
-          account: account,
-          password: password,
-        );
-      },
-    );
+    state = await AsyncValue.guard(() {
+      return _repository.login(account: account, password: password);
+    });
   }
 
   // 暂时兼容旧 RegisterPage。
@@ -62,66 +50,46 @@ class AuthNotifier
   }) async {
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
-      () {
-        return _repository.register(
-          username: username,
-          displayName: displayName,
-          password: password,
-        );
-      },
-    );
+    state = await AsyncValue.guard(() {
+      return _repository.register(
+        username: username,
+        displayName: displayName,
+        password: password,
+      );
+    });
   }
 
-  Future<bool> startRegistration({
-    required String email,
-  }) async {
+  Future<bool> startRegistration({required String email}) async {
     final previousUser = state.value;
 
     state = const AsyncLoading();
 
     try {
-      await _repository.startRegistration(
-        email: email,
-      );
+      await _repository.startRegistration(email: email);
 
-      state = AsyncData(
-        previousUser,
-      );
+      state = AsyncData(previousUser);
 
       return true;
     } catch (error, stackTrace) {
-      state = AsyncError(
-        error,
-        stackTrace,
-      );
+      state = AsyncError(error, stackTrace);
 
       return false;
     }
   }
 
-  Future<bool> verifyRegistrationCode({
-    required String code,
-  }) async {
+  Future<bool> verifyRegistrationCode({required String code}) async {
     final previousUser = state.value;
 
     state = const AsyncLoading();
 
     try {
-      await _repository.verifyRegistrationCode(
-        code: code,
-      );
+      await _repository.verifyRegistrationCode(code: code);
 
-      state = AsyncData(
-        previousUser,
-      );
+      state = AsyncData(previousUser);
 
       return true;
     } catch (error, stackTrace) {
-      state = AsyncError(
-        error,
-        stackTrace,
-      );
+      state = AsyncError(error, stackTrace);
 
       return false;
     }
@@ -135,8 +103,7 @@ class AuthNotifier
     state = const AsyncLoading();
 
     try {
-      final user =
-          await _repository.finishRegistration(
+      final user = await _repository.finishRegistration(
         username: username,
         displayName: displayName,
         password: password,
@@ -146,10 +113,7 @@ class AuthNotifier
 
       return true;
     } catch (error, stackTrace) {
-      state = AsyncError(
-        error,
-        stackTrace,
-      );
+      state = AsyncError(error, stackTrace);
 
       return false;
     }
@@ -165,10 +129,7 @@ class AuthNotifier
 
       state = const AsyncData(null);
     } catch (error, stackTrace) {
-      state = AsyncError(
-        error,
-        stackTrace,
-      );
+      state = AsyncError(error, stackTrace);
 
       if (previous != null) {
         state = AsyncData(previous);
@@ -177,9 +138,6 @@ class AuthNotifier
   }
 }
 
-final authProvider =
-    AsyncNotifierProvider<
-        AuthNotifier,
-        AppUser?>(
+final authProvider = AsyncNotifierProvider<AuthNotifier, AppUser?>(
   AuthNotifier.new,
 );

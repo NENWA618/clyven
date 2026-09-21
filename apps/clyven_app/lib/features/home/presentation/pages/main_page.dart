@@ -34,12 +34,10 @@ class _MainPageState extends ConsumerState<MainPage> {
         : ref.watch(notificationProvider);
 
     final unreadCount =
-        notificationsAsync?.value
-                ?.where((notification) {
-                  return !notification.isRead;
-                })
-                .length ??
-            0;
+        notificationsAsync?.value?.where((notification) {
+          return !notification.isRead;
+        }).length ??
+        0;
 
     return Scaffold(
       body: IndexedStack(
@@ -67,10 +65,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         // “发布”属于真正的账号操作，
         // 所以这里仍然要求登录。
         onCreate: () async {
-          final allowed = await requireLogin(
-            context,
-            ref,
-          );
+          final allowed = await requireLogin(context, ref);
 
           if (!allowed || !mounted) {
             return;

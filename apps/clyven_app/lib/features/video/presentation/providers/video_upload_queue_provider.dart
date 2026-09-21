@@ -11,13 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/video_upload_draft.dart';
 import 'video_detail_provider.dart';
 
-enum VideoUploadStatus {
-  waiting,
-  preparing,
-  uploading,
-  success,
-  failed,
-}
+enum VideoUploadStatus { waiting, preparing, uploading, success, failed }
 
 class VideoUploadRequest {
   final String userId;
@@ -67,18 +61,14 @@ class VideoUploadTask {
   }
 }
 
-class VideoUploadQueueNotifier
-    extends Notifier<List<VideoUploadTask>> {
+class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
   @override
   List<VideoUploadTask> build() {
     return const [];
   }
 
-  void enqueue(
-    VideoUploadRequest request,
-  ) {
-    final taskId =
-        DateTime.now().microsecondsSinceEpoch.toString();
+  void enqueue(VideoUploadRequest request) {
+    final taskId = DateTime.now().microsecondsSinceEpoch.toString();
 
     final task = VideoUploadTask(
       id: taskId,
@@ -86,17 +76,9 @@ class VideoUploadQueueNotifier
       status: VideoUploadStatus.waiting,
     );
 
-    state = [
-      task,
-      ...state,
-    ];
+    state = [task, ...state];
 
-    unawaited(
-      _runUpload(
-        taskId: taskId,
-        request: request,
-      ),
-    );
+    unawaited(_runUpload(taskId: taskId, request: request));
   }
 
   Future<void> _runUpload({
@@ -104,38 +86,23 @@ class VideoUploadQueueNotifier
     required VideoUploadRequest request,
   }) async {
     try {
-      _updateTask(
-        taskId,
-        status: VideoUploadStatus.preparing,
-      );
+      _updateTask(taskId, status: VideoUploadStatus.preparing);
 
       // 1. 整理视频。
-      final normalizedPath =
-          await _normalizeVideo(
-        request.videoPath,
-      );
+      final normalizedPath = await _normalizeVideo(request.videoPath);
 
       // 2. 读取视频时长。
-      final durationSeconds =
-          await _readVideoDuration(
-        normalizedPath,
-      );
+      final durationSeconds = await _readVideoDuration(normalizedPath);
 
       if (durationSeconds <= 0) {
-        throw const AppException(
-          AppErrorCode.videoDurationUnreadable,
-        );
+        throw const AppException(AppErrorCode.videoDurationUnreadable);
       }
 
       // 3. 生成封面。
-      final coverPath =
-          await _createVideoCover(
-        normalizedPath,
-      );
+      final coverPath = await _createVideoCover(normalizedPath);
 
       // 4. 构造上传资料。
-      final draft =
-          VideoUploadDraft(
+      final draft = VideoUploadDraft(
         videoPath: normalizedPath,
         coverPath: coverPath,
         title: request.title,
@@ -144,48 +111,28 @@ class VideoUploadQueueNotifier
         durationSeconds: durationSeconds,
       );
 
-      _updateTask(
-        taskId,
-        status: VideoUploadStatus.uploading,
-      );
+      _updateTask(taskId, status: VideoUploadStatus.uploading);
 
       // 5. 上传 MP4、封面，
       // 并写入 Serverpod Video。
-      final repository =
-          ref.read(
-        videoRepositoryProvider,
-      );
+      final repository = ref.read(videoRepositoryProvider);
 
-      final video =
-          await repository.createVideo(
+      final video = await repository.createVideo(
         userId: request.userId,
         authorName: request.authorName,
         draft: draft,
       );
 
-      _updateTask(
-        taskId,
-        status: VideoUploadStatus.success,
-        videoId: video.id,
-      );
+      _updateTask(taskId, status: VideoUploadStatus.success, videoId: video.id);
 
       // 上传完成后重新读取投稿列表。
-      ref.invalidate(
-        myPublishedVideosProvider,
-      );
+      ref.invalidate(myPublishedVideosProvider);
     } catch (error, stackTrace) {
-      debugPrint(
-        'Video upload failed: $error',
-      );
+      debugPrint('Video upload failed: $error');
 
-      debugPrintStack(
-        stackTrace: stackTrace,
-      );
+      debugPrintStack(stackTrace: stackTrace);
 
-      _updateTask(
-        taskId,
-        status: VideoUploadStatus.failed,
-      );
+      _updateTask(taskId, status: VideoUploadStatus.failed);
     }
   }
 
@@ -208,89 +155,64 @@ class VideoUploadQueueNotifier
     ];
   }
 
-  Future<String> _normalizeVideo(
-    String inputPath,
-  ) async {
-    final inputFile =
-        File(inputPath);
+  Future<String> _normalizeVideo(String inputPath) async {
+    final inputFile = File(inputPath);
 
     final outputPath =
         '${inputFile.parent.path}/'
         'normalized-'
         '${DateTime.now().microsecondsSinceEpoch}.mp4';
 
-    final session =
-        await FFmpegKit.executeWithArguments(
-      [
-        '-y',
-        '-fflags',
-        '+genpts',
-        '-i',
-        inputPath,
-        '-map',
-        '0:v:0',
-        '-map',
-        '0:a?',
-        '-c',
-        'copy',
-        '-avoid_negative_ts',
-        'make_zero',
-        '-movflags',
-        '+faststart',
-        outputPath,
-      ],
-    );
+    final session = await FFmpegKit.executeWithArguments([
+      '-y',
+      '-fflags',
+      '+genpts',
+      '-i',
+      inputPath,
+      '-map',
+      '0:v:0',
+      '-map',
+      '0:a?',
+      '-c',
+      'copy',
+      '-avoid_negative_ts',
+      'make_zero',
+      '-movflags',
+      '+faststart',
+      outputPath,
+    ]);
 
-    final returnCode =
-        await session.getReturnCode();
+    final returnCode = await session.getReturnCode();
 
-    if (!ReturnCode.isSuccess(
-      returnCode,
-    )) {
-      throw const AppException(
-        AppErrorCode.videoNormalizeFailed,
-      );
+    if (!ReturnCode.isSuccess(returnCode)) {
+      throw const AppException(AppErrorCode.videoNormalizeFailed);
     }
 
-    final outputFile =
-        File(outputPath);
+    final outputFile = File(outputPath);
 
     if (!await outputFile.exists()) {
-      throw const AppException(
-        AppErrorCode.normalizedVideoMissing,
-      );
+      throw const AppException(AppErrorCode.normalizedVideoMissing);
     }
 
     return outputPath;
   }
 
-  Future<int> _readVideoDuration(
-    String path,
-  ) async {
-    final session =
-        await FFprobeKit
-            .getMediaInformation(
-      path,
-    );
+  Future<int> _readVideoDuration(String path) async {
+    final session = await FFprobeKit.getMediaInformation(path);
 
-    final information =
-        session.getMediaInformation();
+    final information = session.getMediaInformation();
 
     if (information == null) {
       return 0;
     }
 
-    final rawDuration =
-        information.getDuration();
+    final rawDuration = information.getDuration();
 
     if (rawDuration == null) {
       return 0;
     }
 
-    final seconds =
-        double.tryParse(
-      rawDuration,
-    );
+    final seconds = double.tryParse(rawDuration);
 
     if (seconds == null) {
       return 0;
@@ -299,60 +221,43 @@ class VideoUploadQueueNotifier
     return seconds.round();
   }
 
-  Future<String> _createVideoCover(
-    String videoPath,
-  ) async {
-    final videoFile =
-        File(videoPath);
+  Future<String> _createVideoCover(String videoPath) async {
+    final videoFile = File(videoPath);
 
     final outputPath =
         '${videoFile.parent.path}/'
         'cover-'
         '${DateTime.now().microsecondsSinceEpoch}.jpg';
 
-    final session =
-        await FFmpegKit.executeWithArguments(
-      [
-        '-y',
-        '-ss',
-        '1',
-        '-i',
-        videoPath,
-        '-frames:v',
-        '1',
-        '-q:v',
-        '2',
-        outputPath,
-      ],
-    );
+    final session = await FFmpegKit.executeWithArguments([
+      '-y',
+      '-ss',
+      '1',
+      '-i',
+      videoPath,
+      '-frames:v',
+      '1',
+      '-q:v',
+      '2',
+      outputPath,
+    ]);
 
-    final returnCode =
-        await session.getReturnCode();
+    final returnCode = await session.getReturnCode();
 
-    if (!ReturnCode.isSuccess(
-      returnCode,
-    )) {
-      throw const AppException(
-        AppErrorCode.coverGenerationFailed,
-      );
+    if (!ReturnCode.isSuccess(returnCode)) {
+      throw const AppException(AppErrorCode.coverGenerationFailed);
     }
 
-    final coverFile =
-        File(outputPath);
+    final coverFile = File(outputPath);
 
     if (!await coverFile.exists()) {
-      throw const AppException(
-        AppErrorCode.generatedCoverMissing,
-      );
+      throw const AppException(AppErrorCode.generatedCoverMissing);
     }
 
-    final length =
-        await coverFile.length();
+    final length = await coverFile.length();
 
     if (length <= 0) {
-      throw const AppException(
-        AppErrorCode.generatedCoverEmpty,
-      );
+      throw const AppException(AppErrorCode.generatedCoverEmpty);
     }
 
     return outputPath;
@@ -360,8 +265,6 @@ class VideoUploadQueueNotifier
 }
 
 final videoUploadQueueProvider =
-    NotifierProvider<
-        VideoUploadQueueNotifier,
-        List<VideoUploadTask>>(
-  VideoUploadQueueNotifier.new,
-);
+    NotifierProvider<VideoUploadQueueNotifier, List<VideoUploadTask>>(
+      VideoUploadQueueNotifier.new,
+    );

@@ -1,5 +1,4 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,10 +42,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
     if (data.definitions.isEmpty) {
       widgets.add(
-        const Text(
-          '这个词条暂时没有当前语言的释义',
-          style: TextStyle(fontSize: 16),
-        ),
+        const Text('这个词条暂时没有当前语言的释义', style: TextStyle(fontSize: 16)),
       );
     } else {
       for (final definition in data.definitions) {
@@ -67,10 +63,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     definition.definition!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: const TextStyle(fontSize: 16, height: 1.5),
                   ),
                 ],
               ],
@@ -81,9 +74,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     }
 
     final components = data.relations
-        .where(
-          (item) => item.relation.relationType == 'component',
-        )
+        .where((item) => item.relation.relationType == 'component')
         .toList();
 
     if (components.isNotEmpty) {
@@ -111,9 +102,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
             : component.targetDefinitions.first.gloss;
 
         final knowledgeFuture = ref
-            .read(
-              knownEntryRepositoryProvider,
-            )
+            .read(knownEntryRepositoryProvider)
             .getKnowledgeState(
               languageCode: languageCode,
               normalizedText: target.normalizedText,
@@ -133,9 +122,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Row(
                 children: [
                   Text(
@@ -147,12 +134,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      meaning,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: Text(meaning, style: const TextStyle(fontSize: 16)),
                   ),
                   FutureBuilder<String>(
                     future: knowledgeFuture,
@@ -163,10 +145,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                         return const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.check_circle,
-                              size: 18,
-                            ),
+                            Icon(Icons.check_circle, size: 18),
                             SizedBox(width: 4),
                             Text('已会'),
                           ],
@@ -174,24 +153,17 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                       }
 
                       if (state == 'relatedKnown') {
-                        return const Text(
-                          '相关词已会',
-                        );
+                        return const Text('相关词已会');
                       }
 
                       return const Text(
                         '未标记',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(color: Colors.grey),
                       );
                     },
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                  ),
+                  const Icon(Icons.chevron_right, size: 20),
                 ],
               ),
             ),
@@ -203,9 +175,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     return widgets;
   }
 
-  serverpod.SubtitlePhrase? _findPhraseForToken(
-    serverpod.SubtitleToken token,
-  ) {
+  serverpod.SubtitlePhrase? _findPhraseForToken(serverpod.SubtitleToken token) {
     for (final phrase in detail.phrases) {
       if (token.position >= phrase.startPosition &&
           token.position <= phrase.endPosition) {
@@ -223,9 +193,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     required String normalizedText,
     required String entryType,
   }) {
-    final repository = ref.read(
-      dictionaryRepositoryProvider,
-    );
+    final repository = ref.read(dictionaryRepositoryProvider);
 
     final lookupFuture = repository.lookup(
       languageCode: languageCode,
@@ -243,12 +211,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
           future: lookupFuture,
           builder: (context, snapshot) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(
-                24,
-                8,
-                24,
-                32,
-              ),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,11 +234,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Consumer(
-                    builder: (
-                      context,
-                      sheetRef,
-                      child,
-                    ) {
+                    builder: (context, sheetRef, child) {
                       final query = (
                         languageCode: languageCode,
                         normalizedText: normalizedText,
@@ -325,9 +284,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                                       known: !isKnown,
                                     );
 
-                                    sheetRef.invalidate(
-                                      knowledgeStateProvider,
-                                    );
+                                    sheetRef.invalidate(knowledgeStateProvider);
 
                                     sheetRef.invalidate(
                                       knowledgeStatesProvider,
@@ -342,9 +299,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                                   ? Icons.remove_circle_outline
                                   : Icons.check_circle_outline,
                             ),
-                            label: Text(
-                              isKnown ? '取消已会' : '标记已会',
-                            ),
+                            label: Text(isKnown ? '取消已会' : '标记已会'),
                           ),
                         ],
                       );
@@ -362,23 +317,12 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   else if (snapshot.hasError)
                     Text(
                       '查询失败：${snapshot.error}',
-                      style: const TextStyle(
-                        color: Colors.red,
-                      ),
+                      style: const TextStyle(color: Colors.red),
                     )
                   else if (snapshot.data == null)
-                    const Text(
-                      '暂时没有这个词条的释义',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    )
+                    const Text('暂时没有这个词条的释义', style: TextStyle(fontSize: 16))
                   else
-                    ..._buildDictionaryContent(
-                      context,
-                      ref,
-                      snapshot.data!,
-                    ),
+                    ..._buildDictionaryContent(context, ref, snapshot.data!),
                 ],
               ),
             );
@@ -389,10 +333,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   }
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (detail.tokens.isEmpty) {
       return Text(
         detail.cue.text,
@@ -406,9 +347,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     }
 
     final tokens = [...detail.tokens]
-      ..sort(
-        (a, b) => a.position.compareTo(b.position),
-      );
+      ..sort((a, b) => a.position.compareTo(b.position));
 
     final batchQueries = <KnowledgeStateRequest>[];
 
@@ -447,11 +386,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     }
 
     final batchStateAsync = ref.watch(
-      knowledgeStatesProvider(
-        KnowledgeBatchRequest(
-          queries: batchQueries,
-        ),
-      ),
+      knowledgeStatesProvider(KnowledgeBatchRequest(queries: batchQueries)),
     );
 
     final batchStates = batchStateAsync.value ?? <String, String>{};
@@ -466,13 +401,12 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       if (phrase != null && phrase.startPosition == token.position) {
         final normalizedText = phrase.normalizedText ?? phrase.text;
 
-        final knowledgeState = batchStates[
-              knowledgeStateKey(
-                languageCode: languageCode,
-                normalizedText: normalizedText,
-                entryType: 'phrase',
-              )
-            ] ??
+        final knowledgeState =
+            batchStates[knowledgeStateKey(
+              languageCode: languageCode,
+              normalizedText: normalizedText,
+              entryType: 'phrase',
+            )] ??
             'unknown';
 
         children.add(
@@ -488,10 +422,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 3,
-                vertical: 5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
@@ -503,9 +434,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               child: Text(
                 phrase.text,
                 style: TextStyle(
-                  color: _knowledgeColor(
-                    knowledgeState,
-                  ),
+                  color: _knowledgeColor(knowledgeState),
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                 ),
@@ -524,13 +453,12 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
       final normalizedText = token.normalizedText ?? token.text;
 
-      final knowledgeState = batchStates[
-            knowledgeStateKey(
-              languageCode: languageCode,
-              normalizedText: normalizedText,
-              entryType: 'word',
-            )
-          ] ??
+      final knowledgeState =
+          batchStates[knowledgeStateKey(
+            languageCode: languageCode,
+            normalizedText: normalizedText,
+            entryType: 'word',
+          )] ??
           'unknown';
 
       children.add(
@@ -546,16 +474,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
             );
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 3,
-              vertical: 5,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
             child: Text(
               token.text,
               style: TextStyle(
-                color: _knowledgeColor(
-                  knowledgeState,
-                ),
+                color: _knowledgeColor(knowledgeState),
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
               ),

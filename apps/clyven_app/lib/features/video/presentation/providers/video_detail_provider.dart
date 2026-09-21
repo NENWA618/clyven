@@ -7,39 +7,24 @@ import '../../data/models/video_detail.dart';
 import '../../data/repositories/video_repository.dart';
 import '../../data/repositories/serverpod_video_repository.dart';
 
-final videoRepositoryProvider =
-    Provider<VideoRepository>(
-  (ref) {
-    final client = ref.watch(
-      serverpodClientProvider,
-    );
+final videoRepositoryProvider = Provider<VideoRepository>((ref) {
+  final client = ref.watch(serverpodClientProvider);
 
-    return ServerpodVideoRepository(
-      client: client,
-    );
-  },
-);
+  return ServerpodVideoRepository(client: client);
+});
 
 // ============================================================
 // 单个视频详情
 // ============================================================
 
-final videoDetailProvider =
-    FutureProvider.family<
-        VideoDetail,
-        String>(
-  (ref, videoId) async {
-    final repository =
-        ref.watch(
-      videoRepositoryProvider,
-    );
+final videoDetailProvider = FutureProvider.family<VideoDetail, String>((
+  ref,
+  videoId,
+) async {
+  final repository = ref.watch(videoRepositoryProvider);
 
-    return repository
-        .loadVideoDetail(
-      videoId,
-    );
-  },
-);
+  return repository.loadVideoDetail(videoId);
+});
 
 // ============================================================
 // 所有用户发布的视频
@@ -48,19 +33,13 @@ final videoDetailProvider =
 // 不根据当前登录账号过滤。
 // ============================================================
 
-final allPublishedVideosProvider =
-    FutureProvider<
-        List<VideoDetail>>(
-  (ref) async {
-    final repository =
-        ref.watch(
-      videoRepositoryProvider,
-    );
+final allPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
+  ref,
+) async {
+  final repository = ref.watch(videoRepositoryProvider);
 
-    return repository
-        .loadPublishedVideos();
-  },
-);
+  return repository.loadPublishedVideos();
+});
 
 // ============================================================
 // 当前用户发布的视频
@@ -68,27 +47,16 @@ final allPublishedVideosProvider =
 // “我的投稿”使用。
 // ============================================================
 
-final myPublishedVideosProvider =
-    FutureProvider<
-        List<VideoDetail>>(
-  (ref) async {
-    final user =
-        await ref.watch(
-      authProvider.future,
-    );
+final myPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
+  ref,
+) async {
+  final user = await ref.watch(authProvider.future);
 
-    if (user == null) {
-      return const [];
-    }
+  if (user == null) {
+    return const [];
+  }
 
-    final repository =
-        ref.watch(
-      videoRepositoryProvider,
-    );
+  final repository = ref.watch(videoRepositoryProvider);
 
-    return repository
-        .loadUserVideos(
-      userId: user.id,
-    );
-  },
-);
+  return repository.loadUserVideos(userId: user.id);
+});

@@ -24,8 +24,7 @@ class WatchHistoryItem {
       return 0;
     }
 
-    return (positionSeconds / durationSeconds)
-        .clamp(0.0, 1.0);
+    return (positionSeconds / durationSeconds).clamp(0.0, 1.0);
   }
 
   WatchHistoryItem copyWith({
@@ -41,16 +40,10 @@ class WatchHistoryItem {
       videoId: videoId ?? this.videoId,
       title: title ?? this.title,
       coverUrl: coverUrl ?? this.coverUrl,
-      authorName:
-          authorName ?? this.authorName,
-      positionSeconds:
-          positionSeconds ??
-          this.positionSeconds,
-      durationSeconds:
-          durationSeconds ??
-          this.durationSeconds,
-      watchedAt:
-          watchedAt ?? this.watchedAt,
+      authorName: authorName ?? this.authorName,
+      positionSeconds: positionSeconds ?? this.positionSeconds,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      watchedAt: watchedAt ?? this.watchedAt,
     );
   }
 }

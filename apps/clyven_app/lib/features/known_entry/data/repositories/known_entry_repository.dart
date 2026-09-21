@@ -25,14 +25,9 @@ class KnowledgeStateValue {
 }
 
 abstract class KnownEntryRepository {
-  Future<List<int>> getKnownEntryIds({
-    required List<int> entryIds,
-  });
+  Future<List<int>> getKnownEntryIds({required List<int> entryIds});
 
-  Future<bool> setKnown({
-    required int entryId,
-    required bool known,
-  });
+  Future<bool> setKnown({required int entryId, required bool known});
 
   Future<String> getKnowledgeState({
     required String languageCode,
@@ -40,8 +35,7 @@ abstract class KnownEntryRepository {
     required String entryType,
   });
 
-  Future<List<KnowledgeStateValue>>
-      getKnowledgeStates({
+  Future<List<KnowledgeStateValue>> getKnowledgeStates({
     required List<KnowledgeStateRequest> queries,
   });
 }

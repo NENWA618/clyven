@@ -9,8 +9,7 @@ abstract class ProfileRepository {
   });
 }
 
-class MockProfileRepository
-    implements ProfileRepository {
+class MockProfileRepository implements ProfileRepository {
   const MockProfileRepository();
 
   @override
@@ -20,9 +19,7 @@ class MockProfileRepository
     required String displayName,
     required String avatarUrl,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 350),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 350));
 
     return UserProfile(
       id: userId,

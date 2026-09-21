@@ -69,10 +69,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               const SizedBox(height: 12),
               Text(
                 l10n.loginSubtitle,
-                style: const TextStyle(
-                  color: Color(0xFF77736C),
-                  fontSize: 14,
-                ),
+                style: const TextStyle(color: Color(0xFF77736C), fontSize: 14),
               ),
               const SizedBox(height: 36),
               TextField(
@@ -96,10 +93,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: Text(
-                    localizedErrorMessage(
-                      l10n,
-                      authAsync.error,
-                    ),
+                    localizedErrorMessage(l10n, authAsync.error),
                     style: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 12,
@@ -122,15 +116,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
                           l10n.enter,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                 ),
               ),
@@ -166,10 +156,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  InputDecoration _inputDecoration(
-    String hint,
-    IconData icon,
-  ) {
+  InputDecoration _inputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
       prefixIcon: Icon(icon),
@@ -181,15 +168,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color: Color(0xFFE3DED5),
-        ),
+        borderSide: const BorderSide(color: Color(0xFFE3DED5)),
       ),
     );
   }
 
   Future<void> _login() async {
-    await ref.read(authProvider.notifier).login(
+    await ref
+        .read(authProvider.notifier)
+        .login(
           account: _accountController.text,
           password: _passwordController.text,
         );

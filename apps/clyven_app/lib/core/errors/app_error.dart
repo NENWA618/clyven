@@ -41,10 +41,7 @@ class AppException implements Exception {
   final AppErrorCode code;
   final String? technicalDetails;
 
-  const AppException(
-    this.code, {
-    this.technicalDetails,
-  });
+  const AppException(this.code, {this.technicalDetails});
 
   @override
   String toString() {

@@ -7,9 +7,7 @@ import '../pages/register_page.dart';
 import '../providers/auth_provider.dart';
 
 class LoginDialog extends ConsumerStatefulWidget {
-  const LoginDialog({
-    super.key,
-  });
+  const LoginDialog({super.key});
 
   @override
   ConsumerState<LoginDialog> createState() {
@@ -46,10 +44,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
       return;
     }
 
-    Navigator.pop(
-      context,
-      true,
-    );
+    Navigator.pop(context, true);
   }
 
   @override
@@ -81,10 +76,9 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
     });
 
     try {
-      await ref.read(authProvider.notifier).login(
-            account: account,
-            password: password,
-          );
+      await ref
+          .read(authProvider.notifier)
+          .login(account: account, password: password);
 
       if (!mounted) {
         return;
@@ -96,18 +90,12 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
       if (user == null) {
         setState(() {
           _isSubmitting = false;
-          _errorMessage = localizedErrorMessage(
-            l10n,
-            authState.error,
-          );
+          _errorMessage = localizedErrorMessage(l10n, authState.error);
         });
         return;
       }
 
-      Navigator.pop(
-        context,
-        true,
-      );
+      Navigator.pop(context, true);
     } catch (error) {
       if (!mounted) {
         return;
@@ -115,26 +103,19 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
 
       setState(() {
         _isSubmitting = false;
-        _errorMessage = localizedErrorMessage(
-          l10n,
-          error,
-        );
+        _errorMessage = localizedErrorMessage(l10n, error);
       });
     }
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
 
     return AlertDialog(
       backgroundColor: colors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(26),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
       title: Row(
         children: [
           Container(
@@ -144,10 +125,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               color: colors.secondary,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(
-              Icons.person_outline_rounded,
-              color: colors.primary,
-            ),
+            child: Icon(Icons.person_outline_rounded, color: colors.primary),
           ),
           const SizedBox(width: 12),
           Text(
@@ -171,9 +149,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 hintText: l10n.account,
-                prefixIcon: const Icon(
-                  Icons.person_outline_rounded,
-                ),
+                prefixIcon: const Icon(Icons.person_outline_rounded),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -193,9 +169,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               },
               decoration: InputDecoration(
                 hintText: l10n.password,
-                prefixIcon: const Icon(
-                  Icons.lock_outline_rounded,
-                ),
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -210,10 +184,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(
-                    color: Colors.redAccent,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 12),
                 ),
               ),
             ],
@@ -229,10 +200,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
           onPressed: _isSubmitting
               ? null
               : () {
-                  Navigator.pop(
-                    context,
-                    false,
-                  );
+                  Navigator.pop(context, false);
                 },
           child: Text(l10n.cancel),
         ),
@@ -253,9 +221,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
                 )
               : Text(
                   l10n.login,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
         ),
       ],

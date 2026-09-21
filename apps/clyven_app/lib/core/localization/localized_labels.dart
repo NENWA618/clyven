@@ -1,9 +1,6 @@
 import 'package:clyven_app/l10n/app_localizations.dart';
 
-String localizedTopicLabel(
-  AppLocalizations l10n,
-  String topic,
-) {
+String localizedTopicLabel(AppLocalizations l10n, String topic) {
   return switch (topic) {
     '全部' => l10n.topicAll,
     '影像' => l10n.topicImage,

@@ -5,77 +5,57 @@ import '../../../word_list/presentation/providers/word_list_provider.dart';
 import '../../data/repositories/known_entry_repository.dart';
 import '../../data/repositories/serverpod_known_entry_repository.dart';
 
-final knownEntryRepositoryProvider =
-    Provider<KnownEntryRepository>((ref) {
-  final client = ref.watch(
-    serverpodClientProvider,
-  );
+final knownEntryRepositoryProvider = Provider<KnownEntryRepository>((ref) {
+  final client = ref.watch(serverpodClientProvider);
 
-  return ServerpodKnownEntryRepository(
-    client: client,
-  );
+  return ServerpodKnownEntryRepository(client: client);
 });
 
 final knownEntriesForListProvider =
     FutureProvider.family<
-        Set<int>,
-        ({
-          int listId,
-          String explanationLanguageCode,
-        })>((ref, query) async {
-  final detail = await ref.watch(
-    wordListDetailProvider(
-      (
-        listId: query.listId,
-        explanationLanguageCode:
-            query.explanationLanguageCode,
-      ),
-    ).future,
-  );
+      Set<int>,
+      ({int listId, String explanationLanguageCode})
+    >((ref, query) async {
+      final detail = await ref.watch(
+        wordListDetailProvider((
+          listId: query.listId,
+          explanationLanguageCode: query.explanationLanguageCode,
+        )).future,
+      );
 
-  if (detail == null) {
-    return <int>{};
-  }
+      if (detail == null) {
+        return <int>{};
+      }
 
-  final entryIds = detail.items
-      .map((item) => item.entry.id)
-      .whereType<int>()
-      .toList();
+      final entryIds = detail.items
+          .map((item) => item.entry.id)
+          .whereType<int>()
+          .toList();
 
-  if (entryIds.isEmpty) {
-    return <int>{};
-  }
+      if (entryIds.isEmpty) {
+        return <int>{};
+      }
 
-  final repository = ref.watch(
-    knownEntryRepositoryProvider,
-  );
+      final repository = ref.watch(knownEntryRepositoryProvider);
 
-  final knownIds =
-      await repository.getKnownEntryIds(
-    entryIds: entryIds,
-  );
+      final knownIds = await repository.getKnownEntryIds(entryIds: entryIds);
 
-  return knownIds.toSet();
-});
+      return knownIds.toSet();
+    });
 
 final knowledgeStateProvider =
     FutureProvider.family<
-        String,
-        ({
-          String languageCode,
-          String normalizedText,
-          String entryType,
-        })>((ref, query) async {
-  final repository = ref.watch(
-    knownEntryRepositoryProvider,
-  );
+      String,
+      ({String languageCode, String normalizedText, String entryType})
+    >((ref, query) async {
+      final repository = ref.watch(knownEntryRepositoryProvider);
 
-  return repository.getKnowledgeState(
-    languageCode: query.languageCode,
-    normalizedText: query.normalizedText,
-    entryType: query.entryType,
-  );
-});
+      return repository.getKnowledgeState(
+        languageCode: query.languageCode,
+        normalizedText: query.normalizedText,
+        entryType: query.entryType,
+      );
+    });
 
 String knowledgeStateKey({
   required String languageCode,
@@ -94,21 +74,17 @@ class KnowledgeBatchRequest {
       .map(
         (query) => knowledgeStateKey(
           languageCode: query.languageCode,
-          normalizedText:
-              query.normalizedText,
+          normalizedText: query.normalizedText,
           entryType: query.entryType,
         ),
       )
       .join('\u0001');
 
-  KnowledgeBatchRequest({
-    required this.queries,
-  });
+  KnowledgeBatchRequest({required this.queries});
 
   @override
   bool operator ==(Object other) {
-    return other is KnowledgeBatchRequest &&
-        other.signature == signature;
+    return other is KnowledgeBatchRequest && other.signature == signature;
   }
 
   @override
@@ -116,31 +92,26 @@ class KnowledgeBatchRequest {
 }
 
 final knowledgeStatesProvider =
-    FutureProvider.family<
-        Map<String, String>,
-        KnowledgeBatchRequest>(
-  (ref, request) async {
-    if (request.queries.isEmpty) {
-      return <String, String>{};
-    }
+    FutureProvider.family<Map<String, String>, KnowledgeBatchRequest>((
+      ref,
+      request,
+    ) async {
+      if (request.queries.isEmpty) {
+        return <String, String>{};
+      }
 
-    final repository = ref.watch(
-      knownEntryRepositoryProvider,
-    );
+      final repository = ref.watch(knownEntryRepositoryProvider);
 
-    final results =
-        await repository.getKnowledgeStates(
-      queries: request.queries,
-    );
+      final results = await repository.getKnowledgeStates(
+        queries: request.queries,
+      );
 
-    return {
-      for (final result in results)
-        knowledgeStateKey(
-          languageCode: result.languageCode,
-          normalizedText:
-              result.normalizedText,
-          entryType: result.entryType,
-        ): result.state,
-    };
-  },
-);
+      return {
+        for (final result in results)
+          knowledgeStateKey(
+            languageCode: result.languageCode,
+            normalizedText: result.normalizedText,
+            entryType: result.entryType,
+          ): result.state,
+      };
+    });

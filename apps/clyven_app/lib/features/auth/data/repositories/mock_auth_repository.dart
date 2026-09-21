@@ -9,9 +9,7 @@ class MockAuthRepository implements AuthRepository {
   String? _pendingEmail;
   bool _registrationVerified = false;
 
-  final Map<String, String> _passwords = {
-    'cheng': '123456',
-  };
+  final Map<String, String> _passwords = {'cheng': '123456'};
 
   final Map<String, AppUser> _users = {
     'cheng': const AppUser(
@@ -24,9 +22,7 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<AppUser?> restoreSession() async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 300),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 300));
 
     return _currentUser;
   }
@@ -36,25 +32,19 @@ class MockAuthRepository implements AuthRepository {
     required String account,
     required String password,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     final normalizedAccount = account.trim().toLowerCase();
 
     if (normalizedAccount.isEmpty || password.isEmpty) {
-      throw const AppException(
-        AppErrorCode.accountAndPasswordRequired,
-      );
+      throw const AppException(AppErrorCode.accountAndPasswordRequired);
     }
 
     final savedPassword = _passwords[normalizedAccount];
     final user = _users[normalizedAccount];
 
     if (savedPassword == null || user == null || savedPassword != password) {
-      throw const AppException(
-        AppErrorCode.invalidCredentials,
-      );
+      throw const AppException(AppErrorCode.invalidCredentials);
     }
 
     _currentUser = user;
@@ -75,15 +65,11 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> startRegistration({
-    required String email,
-  }) async {
+  Future<void> startRegistration({required String email}) async {
     final normalizedEmail = email.trim().toLowerCase();
 
     if (normalizedEmail.isEmpty || !normalizedEmail.contains('@')) {
-      throw const AppException(
-        AppErrorCode.invalidEmail,
-      );
+      throw const AppException(AppErrorCode.invalidEmail);
     }
 
     _pendingEmail = normalizedEmail;
@@ -93,19 +79,13 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> verifyRegistrationCode({
-    required String code,
-  }) async {
+  Future<void> verifyRegistrationCode({required String code}) async {
     if (_pendingEmail == null) {
-      throw const AppException(
-        AppErrorCode.registrationNotStarted,
-      );
+      throw const AppException(AppErrorCode.registrationNotStarted);
     }
 
     if (code.trim() != '123456') {
-      throw const AppException(
-        AppErrorCode.invalidVerificationCode,
-      );
+      throw const AppException(AppErrorCode.invalidVerificationCode);
     }
 
     _registrationVerified = true;
@@ -118,15 +98,11 @@ class MockAuthRepository implements AuthRepository {
     required String password,
   }) async {
     if (_pendingEmail == null) {
-      throw const AppException(
-        AppErrorCode.registrationEmailRequired,
-      );
+      throw const AppException(AppErrorCode.registrationEmailRequired);
     }
 
     if (!_registrationVerified) {
-      throw const AppException(
-        AppErrorCode.emailVerificationPending,
-      );
+      throw const AppException(AppErrorCode.emailVerificationPending);
     }
 
     final user = await _createUser(
@@ -148,35 +124,25 @@ class MockAuthRepository implements AuthRepository {
     required String password,
     String? email,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     final normalizedUsername = username.trim().toLowerCase();
     final normalizedDisplayName = displayName.trim();
 
     if (normalizedUsername.isEmpty) {
-      throw const AppException(
-        AppErrorCode.usernameRequired,
-      );
+      throw const AppException(AppErrorCode.usernameRequired);
     }
 
     if (normalizedDisplayName.isEmpty) {
-      throw const AppException(
-        AppErrorCode.displayNameRequired,
-      );
+      throw const AppException(AppErrorCode.displayNameRequired);
     }
 
     if (password.length < 6) {
-      throw const AppException(
-        AppErrorCode.passwordTooShort6,
-      );
+      throw const AppException(AppErrorCode.passwordTooShort6);
     }
 
     if (_users.containsKey(normalizedUsername)) {
-      throw const AppException(
-        AppErrorCode.usernameTaken,
-      );
+      throw const AppException(AppErrorCode.usernameTaken);
     }
 
     final user = AppUser(
@@ -201,9 +167,7 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 200),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
     _currentUser = null;
   }

@@ -8,19 +8,12 @@ class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final authAsync = ref.watch(authProvider);
 
     return authAsync.when(
       loading: () {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
 
       // 登录状态读取失败，也允许以游客身份进入

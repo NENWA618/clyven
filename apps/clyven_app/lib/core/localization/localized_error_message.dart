@@ -1,10 +1,7 @@
 import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 
-String localizedErrorMessage(
-  AppLocalizations l10n,
-  Object? error,
-) {
+String localizedErrorMessage(AppLocalizations l10n, Object? error) {
   if (error is! AppException) {
     return l10n.unexpectedError;
   }

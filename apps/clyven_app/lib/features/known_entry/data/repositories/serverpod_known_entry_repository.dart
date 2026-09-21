@@ -1,34 +1,20 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import 'known_entry_repository.dart';
 
-class ServerpodKnownEntryRepository
-    implements KnownEntryRepository {
+class ServerpodKnownEntryRepository implements KnownEntryRepository {
   final serverpod.Client client;
 
-  ServerpodKnownEntryRepository({
-    required this.client,
-  });
+  ServerpodKnownEntryRepository({required this.client});
 
   @override
-  Future<List<int>> getKnownEntryIds({
-    required List<int> entryIds,
-  }) {
-    return client.knownEntry.getKnownEntryIds(
-      entryIds: entryIds,
-    );
+  Future<List<int>> getKnownEntryIds({required List<int> entryIds}) {
+    return client.knownEntry.getKnownEntryIds(entryIds: entryIds);
   }
 
   @override
-  Future<bool> setKnown({
-    required int entryId,
-    required bool known,
-  }) {
-    return client.knownEntry.setKnown(
-      entryId: entryId,
-      known: known,
-    );
+  Future<bool> setKnown({required int entryId, required bool known}) {
+    return client.knownEntry.setKnown(entryId: entryId, known: known);
   }
 
   @override
@@ -45,8 +31,7 @@ class ServerpodKnownEntryRepository
   }
 
   @override
-  Future<List<KnowledgeStateValue>>
-      getKnowledgeStates({
+  Future<List<KnowledgeStateValue>> getKnowledgeStates({
     required List<KnowledgeStateRequest> queries,
   }) async {
     if (queries.isEmpty) {
@@ -57,15 +42,13 @@ class ServerpodKnownEntryRepository
         .map(
           (query) => serverpod.KnowledgeStateQuery(
             languageCode: query.languageCode,
-            normalizedText:
-                query.normalizedText,
+            normalizedText: query.normalizedText,
             entryType: query.entryType,
           ),
         )
         .toList();
 
-    final results =
-        await client.knownEntry.getKnowledgeStates(
+    final results = await client.knownEntry.getKnowledgeStates(
       queries: serverpodQueries,
     );
 
@@ -73,8 +56,7 @@ class ServerpodKnownEntryRepository
         .map(
           (result) => KnowledgeStateValue(
             languageCode: result.languageCode,
-            normalizedText:
-                result.normalizedText,
+            normalizedText: result.normalizedText,
             entryType: result.entryType,
             state: result.state,
           ),

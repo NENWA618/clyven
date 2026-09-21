@@ -13,9 +13,7 @@ class ServerpodAuthRepository implements AuthRepository {
     startScreen: EmailFlowScreen.login,
   );
 
-  ServerpodAuthRepository({
-    required this.client,
-  });
+  ServerpodAuthRepository({required this.client});
 
   @override
   Future<AppUser?> restoreSession() async {
@@ -36,20 +34,14 @@ class ServerpodAuthRepository implements AuthRepository {
     final email = account.trim().toLowerCase();
 
     if (email.isEmpty) {
-      throw const AppException(
-        AppErrorCode.emailRequired,
-      );
+      throw const AppException(AppErrorCode.emailRequired);
     }
 
     if (password.isEmpty) {
-      throw const AppException(
-        AppErrorCode.passwordRequired,
-      );
+      throw const AppException(AppErrorCode.passwordRequired);
     }
 
-    _emailController.navigateTo(
-      EmailFlowScreen.login,
-    );
+    _emailController.navigateTo(EmailFlowScreen.login);
 
     _emailController.emailController.text = email;
     _emailController.passwordController.text = password;
@@ -74,26 +66,18 @@ class ServerpodAuthRepository implements AuthRepository {
     required String displayName,
     required String password,
   }) {
-    throw const AppException(
-      AppErrorCode.emailVerificationRequired,
-    );
+    throw const AppException(AppErrorCode.emailVerificationRequired);
   }
 
   @override
-  Future<void> startRegistration({
-    required String email,
-  }) async {
+  Future<void> startRegistration({required String email}) async {
     final normalizedEmail = email.trim().toLowerCase();
 
     if (normalizedEmail.isEmpty || !normalizedEmail.contains('@')) {
-      throw const AppException(
-        AppErrorCode.invalidEmail,
-      );
+      throw const AppException(AppErrorCode.invalidEmail);
     }
 
-    _emailController.navigateTo(
-      EmailFlowScreen.startRegistration,
-    );
+    _emailController.navigateTo(EmailFlowScreen.startRegistration);
 
     _emailController.emailController.text = normalizedEmail;
 
@@ -110,15 +94,11 @@ class ServerpodAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> verifyRegistrationCode({
-    required String code,
-  }) async {
+  Future<void> verifyRegistrationCode({required String code}) async {
     final normalizedCode = code.trim();
 
     if (normalizedCode.isEmpty) {
-      throw const AppException(
-        AppErrorCode.verificationCodeRequired,
-      );
+      throw const AppException(AppErrorCode.verificationCodeRequired);
     }
 
     _emailController.verificationCodeController.text = normalizedCode;
@@ -145,21 +125,15 @@ class ServerpodAuthRepository implements AuthRepository {
     final normalizedDisplayName = displayName.trim();
 
     if (normalizedUsername.isEmpty) {
-      throw const AppException(
-        AppErrorCode.usernameRequired,
-      );
+      throw const AppException(AppErrorCode.usernameRequired);
     }
 
     if (normalizedDisplayName.isEmpty) {
-      throw const AppException(
-        AppErrorCode.displayNameRequired,
-      );
+      throw const AppException(AppErrorCode.displayNameRequired);
     }
 
     if (password.length < 8) {
-      throw const AppException(
-        AppErrorCode.passwordTooShort8,
-      );
+      throw const AppException(AppErrorCode.passwordTooShort8);
     }
 
     _emailController.passwordController.text = password;
@@ -173,13 +147,9 @@ class ServerpodAuthRepository implements AuthRepository {
       );
     }
 
-    await client.userProfileEdit.changeUserName(
-      normalizedUsername,
-    );
+    await client.userProfileEdit.changeUserName(normalizedUsername);
 
-    await client.userProfileEdit.changeFullName(
-      normalizedDisplayName,
-    );
+    await client.userProfileEdit.changeFullName(normalizedDisplayName);
 
     return _loadCurrentUser();
   }

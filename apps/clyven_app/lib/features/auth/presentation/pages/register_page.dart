@@ -109,7 +109,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return;
     }
 
-    final success = await ref.read(authProvider.notifier).finishRegistration(
+    final success = await ref
+        .read(authProvider.notifier)
+        .finishRegistration(
           username: username,
           displayName: displayName,
           password: password,
@@ -120,19 +122,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     if (success) {
-      Navigator.pop(
-        context,
-        true,
-      );
+      Navigator.pop(context, true);
     }
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -144,12 +141,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            24,
-            18,
-            24,
-            30,
-          ),
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -182,10 +174,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               const SizedBox(height: 26),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 220),
-                child: _buildCurrentStep(
-                  authAsync,
-                  l10n,
-                ),
+                child: _buildCurrentStep(authAsync, l10n),
               ),
             ],
           ),
@@ -227,10 +216,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           color: Colors.white.withValues(alpha: 0.68),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
-          Icons.arrow_back_rounded,
-          color: _ink,
-        ),
+        child: const Icon(Icons.arrow_back_rounded, color: _ink),
       ),
     );
   }
@@ -239,10 +225,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 7,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         color: scheme.primary,
         borderRadius: BorderRadius.circular(30),
@@ -262,28 +245,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Widget _buildStepIndicator(AppLocalizations l10n) {
     return Row(
       children: [
-        _stepDot(
-          index: 0,
-          text: l10n.email,
-        ),
+        _stepDot(index: 0, text: l10n.email),
         _stepLine(active: _step >= 1),
-        _stepDot(
-          index: 1,
-          text: l10n.verification,
-        ),
+        _stepDot(index: 1, text: l10n.verification),
         _stepLine(active: _step >= 2),
-        _stepDot(
-          index: 2,
-          text: l10n.identity,
-        ),
+        _stepDot(index: 2, text: l10n.identity),
       ],
     );
   }
 
-  Widget _stepDot({
-    required int index,
-    required String text,
-  }) {
+  Widget _stepDot({required int index, required String text}) {
     final active = _step >= index;
 
     return Column(
@@ -296,16 +267,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           decoration: BoxDecoration(
             color: active ? _ink : Colors.white,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: active ? _ink : const Color(0xFFD8D2C9),
-            ),
+            border: Border.all(color: active ? _ink : const Color(0xFFD8D2C9)),
           ),
           child: Text(
             '${index + 1}',
             style: TextStyle(
-              color: active
-                  ? Theme.of(context).colorScheme.primary
-                  : _ink,
+              color: active ? Theme.of(context).colorScheme.primary : _ink,
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
@@ -324,51 +291,30 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _stepLine({
-    required bool active,
-  }) {
+  Widget _stepLine({required bool active}) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 8,
-          right: 8,
-          bottom: 20,
-        ),
+        margin: const EdgeInsets.only(left: 8, right: 8, bottom: 20),
         height: 2,
         color: active ? _ink : const Color(0xFFD8D2C9),
       ),
     );
   }
 
-  Widget _buildCurrentStep(
-    AsyncValue authAsync,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildCurrentStep(AsyncValue authAsync, AppLocalizations l10n) {
     switch (_step) {
       case 0:
-        return _buildEmailStep(
-          authAsync,
-          l10n,
-        );
+        return _buildEmailStep(authAsync, l10n);
       case 1:
-        return _buildCodeStep(
-          authAsync,
-          l10n,
-        );
+        return _buildCodeStep(authAsync, l10n);
       case 2:
-        return _buildIdentityStep(
-          authAsync,
-          l10n,
-        );
+        return _buildIdentityStep(authAsync, l10n);
       default:
         return const SizedBox();
     }
   }
 
-  Widget _buildEmailStep(
-    AsyncValue authAsync,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildEmailStep(AsyncValue authAsync, AppLocalizations l10n) {
     return Column(
       key: const ValueKey('email'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,10 +337,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _buildCodeStep(
-    AsyncValue authAsync,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildCodeStep(AsyncValue authAsync, AppLocalizations l10n) {
     return Column(
       key: const ValueKey('code'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -430,10 +373,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _buildIdentityStep(
-    AsyncValue authAsync,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildIdentityStep(AsyncValue authAsync, AppLocalizations l10n) {
     return Column(
       key: const ValueKey('identity'),
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,13 +429,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
-          color: _ink.withValues(alpha: 0.38),
-        ),
-        prefixIcon: Icon(
-          icon,
-          color: _ink,
-        ),
+        hintStyle: TextStyle(color: _ink.withValues(alpha: 0.38)),
+        prefixIcon: Icon(icon, color: _ink),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.72),
         contentPadding: const EdgeInsets.symmetric(
@@ -508,16 +443,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Color(0xFFE3DED5),
-          ),
+          borderSide: const BorderSide(color: Color(0xFFE3DED5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: _ink,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: _ink, width: 1.5),
         ),
       ),
     );
@@ -538,13 +468,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       ),
       decoration: InputDecoration(
         hintText: l10n.password,
-        hintStyle: TextStyle(
-          color: _ink.withValues(alpha: 0.38),
-        ),
-        prefixIcon: const Icon(
-          Icons.lock_outline_rounded,
-          color: _ink,
-        ),
+        hintStyle: TextStyle(color: _ink.withValues(alpha: 0.38)),
+        prefixIcon: const Icon(Icons.lock_outline_rounded, color: _ink),
         suffixIcon: IconButton(
           onPressed: () {
             setState(() {
@@ -569,16 +494,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Color(0xFFE3DED5),
-          ),
+          borderSide: const BorderSide(color: Color(0xFFE3DED5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: _ink,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: _ink, width: 1.5),
         ),
       ),
     );
@@ -590,10 +510,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final message = localizedErrorMessage(
-      l10n,
-      authAsync.error,
-    );
+    final message = localizedErrorMessage(l10n, authAsync.error);
 
     return Container(
       width: double.infinity,

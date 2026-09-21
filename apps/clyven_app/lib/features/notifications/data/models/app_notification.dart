@@ -1,8 +1,4 @@
-enum AppNotificationType {
-  like,
-  comment,
-  follow,
-}
+enum AppNotificationType { like, comment, follow }
 
 class AppNotification {
   final String id;
@@ -23,9 +19,7 @@ class AppNotification {
     this.videoId,
   });
 
-  AppNotification copyWith({
-    bool? isRead,
-  }) {
+  AppNotification copyWith({bool? isRead}) {
     return AppNotification(
       id: id,
       type: type,

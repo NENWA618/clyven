@@ -2,40 +2,34 @@ import '../models/home_feed.dart';
 import '../models/home_video.dart';
 
 abstract class HomeRepository {
-  Future<HomeFeed> loadHomeFeed({
-    required String topic,
-  });
+  Future<HomeFeed> loadHomeFeed({required String topic});
 }
 
 class MockHomeRepository implements HomeRepository {
   const MockHomeRepository();
 
   @override
-  Future<HomeFeed> loadHomeFeed({
-    required String topic,
-  }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<HomeFeed> loadHomeFeed({required String topic}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
 
     const featuredVideo = HomeVideo(
-    id: 'featured-en-001',
-    title: 'The Last Voices Along the Old Railway',
-    description:
-        'A journey through language, memory, migration and the communities that still keep these voices alive.',
-    authorName: 'Atlas of Voices',
+      id: 'featured-en-001',
+      title: 'The Last Voices Along the Old Railway',
+      description:
+          'A journey through language, memory, migration and the communities that still keep these voices alive.',
+      authorName: 'Atlas of Voices',
 
-    // 这里继续用内部稳定分类值，不要改成 Documentary
-    category: '纪录',
-    topic: '纪录',
+      // 这里继续用内部稳定分类值，不要改成 Documentary
+      category: '纪录',
+      topic: '纪录',
 
-    duration: '24:18',
-    viewText: '328000',
-    coverUrl:
-        'https://images.unsplash.com/photo-1473445361085-b9a07f55608b'
-        '?auto=format&fit=crop&w=1400&q=85',
-    videoUrl: '',
-  );
+      duration: '24:18',
+      viewText: '328000',
+      coverUrl:
+          'https://images.unsplash.com/photo-1473445361085-b9a07f55608b'
+          '?auto=format&fit=crop&w=1400&q=85',
+      videoUrl: '',
+    );
 
     const allVideos = <HomeVideo>[
       HomeVideo(
@@ -113,10 +107,10 @@ class MockHomeRepository implements HomeRepository {
     final videos = topic == '全部'
         ? allVideos
         : allVideos
-            .where((video) {
-              return video.topic == topic;
-            })
-            .toList(growable: false);
+              .where((video) {
+                return video.topic == topic;
+              })
+              .toList(growable: false);
 
     return HomeFeed(
       featuredVideo: featuredVideo,

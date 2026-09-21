@@ -4,13 +4,8 @@ import '../../../../core/serverpod/serverpod_client_provider.dart';
 import '../../data/repositories/dictionary_repository.dart';
 import '../../data/repositories/serverpod_dictionary_repository.dart';
 
-final dictionaryRepositoryProvider =
-    Provider<DictionaryRepository>((ref) {
-  final client = ref.watch(
-    serverpodClientProvider,
-  );
+final dictionaryRepositoryProvider = Provider<DictionaryRepository>((ref) {
+  final client = ref.watch(serverpodClientProvider);
 
-  return ServerpodDictionaryRepository(
-    client: client,
-  );
+  return ServerpodDictionaryRepository(client: client);
 });

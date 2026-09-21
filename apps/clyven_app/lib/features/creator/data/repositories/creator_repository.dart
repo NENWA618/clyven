@@ -1,18 +1,11 @@
 import '../models/creator_profile.dart';
 
 abstract class CreatorRepository {
-  Future<CreatorProfile> loadCreatorProfile(
-    String creatorId,
-  );
+  Future<CreatorProfile> loadCreatorProfile(String creatorId);
 
-  Future<bool> isFollowing({
-    required String userId,
-    required String creatorId,
-  });
+  Future<bool> isFollowing({required String userId, required String creatorId});
 
-  Future<List<String>> loadFollowingCreatorIds({
-    required String userId,
-  });
+  Future<List<String>> loadFollowingCreatorIds({required String userId});
 
   Future<bool> toggleFollow({
     required String userId,
@@ -21,24 +14,16 @@ abstract class CreatorRepository {
   });
 }
 
-class MockCreatorRepository
-    implements CreatorRepository {
+class MockCreatorRepository implements CreatorRepository {
   final Set<String> _following = {};
 
-  String _followKey({
-    required String userId,
-    required String creatorId,
-  }) {
+  String _followKey({required String userId, required String creatorId}) {
     return '$userId::$creatorId';
   }
 
   @override
-  Future<CreatorProfile> loadCreatorProfile(
-    String creatorId,
-  ) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 300),
-    );
+  Future<CreatorProfile> loadCreatorProfile(String creatorId) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
 
     switch (creatorId) {
       case 'creator-001':
@@ -189,25 +174,16 @@ class MockCreatorRepository
     required String userId,
     required String creatorId,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 100),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 100));
 
     return _following.contains(
-      _followKey(
-        userId: userId,
-        creatorId: creatorId,
-      ),
+      _followKey(userId: userId, creatorId: creatorId),
     );
   }
 
   @override
-  Future<List<String>> loadFollowingCreatorIds({
-    required String userId,
-  }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 150),
-    );
+  Future<List<String>> loadFollowingCreatorIds({required String userId}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 150));
 
     final prefix = '$userId::';
 
@@ -216,9 +192,7 @@ class MockCreatorRepository
           return key.startsWith(prefix);
         })
         .map((key) {
-          return key.substring(
-            prefix.length,
-          );
+          return key.substring(prefix.length);
         })
         .toList(growable: false);
   }
@@ -229,14 +203,9 @@ class MockCreatorRepository
     required String creatorId,
     required bool currentlyFollowing,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 200),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final key = _followKey(
-      userId: userId,
-      creatorId: creatorId,
-    );
+    final key = _followKey(userId: userId, creatorId: creatorId);
 
     if (currentlyFollowing) {
       _following.remove(key);

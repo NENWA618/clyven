@@ -1,15 +1,11 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import 'dictionary_repository.dart';
 
-class ServerpodDictionaryRepository
-    implements DictionaryRepository {
+class ServerpodDictionaryRepository implements DictionaryRepository {
   final serverpod.Client client;
 
-  ServerpodDictionaryRepository({
-    required this.client,
-  });
+  ServerpodDictionaryRepository({required this.client});
 
   @override
   Future<serverpod.DictionaryEntryDetail?> lookup({
@@ -22,8 +18,7 @@ class ServerpodDictionaryRepository
       languageCode: languageCode,
       normalizedText: normalizedText,
       entryType: entryType,
-      explanationLanguageCode:
-          explanationLanguageCode,
+      explanationLanguageCode: explanationLanguageCode,
     );
   }
 }

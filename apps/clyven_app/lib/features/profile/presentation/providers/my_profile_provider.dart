@@ -5,27 +5,21 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/user_profile.dart';
 import '../../data/repositories/profile_repository.dart';
 
-final profileRepositoryProvider =
-    Provider<ProfileRepository>((ref) {
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return const MockProfileRepository();
 });
 
-class MyProfileNotifier
-    extends AsyncNotifier<UserProfile> {
+class MyProfileNotifier extends AsyncNotifier<UserProfile> {
   ProfileRepository get _repository {
     return ref.read(profileRepositoryProvider);
   }
 
   @override
   Future<UserProfile> build() async {
-    final user = await ref.watch(
-      authProvider.future,
-    );
+    final user = await ref.watch(authProvider.future);
 
     if (user == null) {
-      throw const AppException(
-        AppErrorCode.notLoggedIn,
-      );
+      throw const AppException(AppErrorCode.notLoggedIn);
     }
 
     return _repository.loadProfile(
@@ -37,9 +31,7 @@ class MyProfileNotifier
   }
 
   Future<void> refresh() async {
-    final user = await ref.read(
-      authProvider.future,
-    );
+    final user = await ref.read(authProvider.future);
 
     if (user == null) {
       return;
@@ -58,9 +50,6 @@ class MyProfileNotifier
   }
 }
 
-final myProfileProvider =
-    AsyncNotifierProvider<
-        MyProfileNotifier,
-        UserProfile>(
+final myProfileProvider = AsyncNotifierProvider<MyProfileNotifier, UserProfile>(
   MyProfileNotifier.new,
 );

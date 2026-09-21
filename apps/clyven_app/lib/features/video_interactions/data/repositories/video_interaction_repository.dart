@@ -20,23 +20,17 @@ abstract class VideoInteractionRepository {
     required bool currentlyFavorited,
   });
 
-  Future<List<String>> loadFavoriteVideoIds({
-    required String userId,
-  });
+  Future<List<String>> loadFavoriteVideoIds({required String userId});
 }
 
-class MockVideoInteractionRepository
-    implements VideoInteractionRepository {
+class MockVideoInteractionRepository implements VideoInteractionRepository {
   final Set<String> _likes = {};
   final Set<String> _favorites = {};
 
   final Map<String, int> _likeCounts = {};
   final Map<String, int> _favoriteCounts = {};
 
-  String _key({
-    required String userId,
-    required String videoId,
-  }) {
+  String _key({required String userId, required String videoId}) {
     return '$userId::$videoId';
   }
 
@@ -47,34 +41,19 @@ class MockVideoInteractionRepository
     required int initialLikeCount,
     required int initialFavoriteCount,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 180),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 180));
 
-    _likeCounts.putIfAbsent(
-      videoId,
-      () => initialLikeCount,
-    );
+    _likeCounts.putIfAbsent(videoId, () => initialLikeCount);
 
-    _favoriteCounts.putIfAbsent(
-      videoId,
-      () => initialFavoriteCount,
-    );
+    _favoriteCounts.putIfAbsent(videoId, () => initialFavoriteCount);
 
-    final key = _key(
-      userId: userId,
-      videoId: videoId,
-    );
+    final key = _key(userId: userId, videoId: videoId);
 
     return VideoInteractionState(
-      likeCount:
-          _likeCounts[videoId] ?? 0,
-      favoriteCount:
-          _favoriteCounts[videoId] ?? 0,
-      isLiked:
-          _likes.contains(key),
-      isFavorited:
-          _favorites.contains(key),
+      likeCount: _likeCounts[videoId] ?? 0,
+      favoriteCount: _favoriteCounts[videoId] ?? 0,
+      isLiked: _likes.contains(key),
+      isFavorited: _favorites.contains(key),
     );
   }
 
@@ -84,33 +63,23 @@ class MockVideoInteractionRepository
     required String userId,
     required bool currentlyLiked,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 150),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 150));
 
-    final key = _key(
-      userId: userId,
-      videoId: videoId,
-    );
+    final key = _key(userId: userId, videoId: videoId);
 
-    final currentCount =
-        _likeCounts[videoId] ?? 0;
+    final currentCount = _likeCounts[videoId] ?? 0;
 
     if (currentlyLiked) {
       _likes.remove(key);
 
-      _likeCounts[videoId] =
-          currentCount > 0
-              ? currentCount - 1
-              : 0;
+      _likeCounts[videoId] = currentCount > 0 ? currentCount - 1 : 0;
 
       return false;
     }
 
     _likes.add(key);
 
-    _likeCounts[videoId] =
-        currentCount + 1;
+    _likeCounts[videoId] = currentCount + 1;
 
     return true;
   }
@@ -121,54 +90,40 @@ class MockVideoInteractionRepository
     required String userId,
     required bool currentlyFavorited,
   }) async {
-    await Future<void>.delayed(
-      const Duration(milliseconds: 150),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 150));
 
-    final key = _key(
-      userId: userId,
-      videoId: videoId,
-    );
+    final key = _key(userId: userId, videoId: videoId);
 
-    final currentCount =
-        _favoriteCounts[videoId] ?? 0;
+    final currentCount = _favoriteCounts[videoId] ?? 0;
 
     if (currentlyFavorited) {
       _favorites.remove(key);
 
-      _favoriteCounts[videoId] =
-          currentCount > 0
-              ? currentCount - 1
-              : 0;
+      _favoriteCounts[videoId] = currentCount > 0 ? currentCount - 1 : 0;
 
       return false;
     }
 
     _favorites.add(key);
 
-    _favoriteCounts[videoId] =
-        currentCount + 1;
+    _favoriteCounts[videoId] = currentCount + 1;
 
     return true;
   }
 
   @override
-Future<List<String>> loadFavoriteVideoIds({
-  required String userId,
-}) async {
-  await Future<void>.delayed(
-    const Duration(milliseconds: 150),
-  );
+  Future<List<String>> loadFavoriteVideoIds({required String userId}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 150));
 
-  final prefix = '$userId::';
+    final prefix = '$userId::';
 
-  return _favorites
-      .where((key) {
-        return key.startsWith(prefix);
-      })
-      .map((key) {
-        return key.substring(prefix.length);
-      })
-      .toList(growable: false);
-}
+    return _favorites
+        .where((key) {
+          return key.startsWith(prefix);
+        })
+        .map((key) {
+          return key.substring(prefix.length);
+        })
+        .toList(growable: false);
+  }
 }

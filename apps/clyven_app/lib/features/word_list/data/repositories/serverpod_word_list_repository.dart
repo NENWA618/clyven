@@ -1,15 +1,11 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import 'word_list_repository.dart';
 
-class ServerpodWordListRepository
-    implements WordListRepository {
+class ServerpodWordListRepository implements WordListRepository {
   final serverpod.Client client;
 
-  ServerpodWordListRepository({
-    required this.client,
-  });
+  ServerpodWordListRepository({required this.client});
 
   @override
   Future<List<serverpod.WordList>> getLists() {
@@ -23,8 +19,7 @@ class ServerpodWordListRepository
   }) {
     return client.wordList.getListDetail(
       listId: listId,
-      explanationLanguageCode:
-          explanationLanguageCode,
+      explanationLanguageCode: explanationLanguageCode,
     );
   }
 }

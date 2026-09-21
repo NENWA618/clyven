@@ -5,28 +5,20 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/creator_profile.dart';
 import '../../data/repositories/creator_repository.dart';
 
-final creatorRepositoryProvider =
-    Provider<CreatorRepository>((ref) {
+final creatorRepositoryProvider = Provider<CreatorRepository>((ref) {
   return MockCreatorRepository();
 });
 
-final followingCreatorIdsProvider =
-    FutureProvider<List<String>>((ref) async {
-  final user = await ref.watch(
-    authProvider.future,
-  );
+final followingCreatorIdsProvider = FutureProvider<List<String>>((ref) async {
+  final user = await ref.watch(authProvider.future);
 
   if (user == null) {
     return const [];
   }
 
-  final repository = ref.read(
-    creatorRepositoryProvider,
-  );
+  final repository = ref.read(creatorRepositoryProvider);
 
-  return repository.loadFollowingCreatorIds(
-    userId: user.id,
-  );
+  return repository.loadFollowingCreatorIds(userId: user.id);
 });
 
 class CreatorProfileState {
@@ -48,53 +40,33 @@ class CreatorProfileState {
     bool? isChangingFollow,
   }) {
     return CreatorProfileState(
-      creator:
-          creator ?? this.creator,
-      isFollowing:
-          isFollowing ?? this.isFollowing,
-      isChangingFollow:
-          isChangingFollow ??
-          this.isChangingFollow,
+      creator: creator ?? this.creator,
+      isFollowing: isFollowing ?? this.isFollowing,
+      isChangingFollow: isChangingFollow ?? this.isChangingFollow,
     );
   }
 }
 
-class CreatorProfileNotifier
-    extends AsyncNotifier<
-        CreatorProfileState> {
+class CreatorProfileNotifier extends AsyncNotifier<CreatorProfileState> {
   final String creatorId;
 
-  CreatorProfileNotifier(
-    this.creatorId,
-  );
+  CreatorProfileNotifier(this.creatorId);
 
   CreatorRepository get _repository {
-    return ref.read(
-      creatorRepositoryProvider,
-    );
+    return ref.read(creatorRepositoryProvider);
   }
 
   @override
-  Future<CreatorProfileState>
-      build() async {
-    final user = await ref.watch(
-      authProvider.future,
-    );
+  Future<CreatorProfileState> build() async {
+    final user = await ref.watch(authProvider.future);
 
     if (user == null) {
-      throw const AppException(
-        AppErrorCode.notLoggedIn,
-      );
+      throw const AppException(AppErrorCode.notLoggedIn);
     }
 
-    final creator =
-        await _repository
-            .loadCreatorProfile(
-      creatorId,
-    );
+    final creator = await _repository.loadCreatorProfile(creatorId);
 
-    final isFollowing =
-        await _repository.isFollowing(
+    final isFollowing = await _repository.isFollowing(
       userId: user.id,
       creatorId: creatorId,
     );
@@ -117,62 +89,40 @@ class CreatorProfileNotifier
       return;
     }
 
-    final user = await ref.read(
-      authProvider.future,
-    );
+    final user = await ref.read(authProvider.future);
 
     if (user == null) {
       return;
     }
 
-    state = AsyncData(
-      current.copyWith(
-        isChangingFollow: true,
-      ),
-    );
+    state = AsyncData(current.copyWith(isChangingFollow: true));
 
     try {
-      final following =
-          await _repository.toggleFollow(
+      final following = await _repository.toggleFollow(
         userId: user.id,
         creatorId: creatorId,
-        currentlyFollowing:
-            current.isFollowing,
+        currentlyFollowing: current.isFollowing,
       );
 
-      final oldFollowerCount =
-          current.creator.followerCount;
+      final oldFollowerCount = current.creator.followerCount;
 
-      final newFollowerCount =
-          following
-              ? oldFollowerCount + 1
-              : oldFollowerCount > 0
-                  ? oldFollowerCount - 1
-                  : 0;
+      final newFollowerCount = following
+          ? oldFollowerCount + 1
+          : oldFollowerCount > 0
+          ? oldFollowerCount - 1
+          : 0;
 
-      final updatedCreator =
-          CreatorProfile(
+      final updatedCreator = CreatorProfile(
         id: current.creator.id,
         name: current.creator.name,
         bio: current.creator.bio,
-        avatarUrl:
-            current.creator.avatarUrl,
-        bannerUrl:
-            current.creator.bannerUrl,
-        followerCount:
-            newFollowerCount,
-        followingCount:
-            current
-                .creator
-                .followingCount,
-        videoCount:
-            current.creator.videoCount,
-        totalViewCount:
-            current
-                .creator
-                .totalViewCount,
-        videos:
-            current.creator.videos,
+        avatarUrl: current.creator.avatarUrl,
+        bannerUrl: current.creator.bannerUrl,
+        followerCount: newFollowerCount,
+        followingCount: current.creator.followingCount,
+        videoCount: current.creator.videoCount,
+        totalViewCount: current.creator.totalViewCount,
+        videos: current.creator.videos,
       );
 
       state = AsyncData(
@@ -183,22 +133,14 @@ class CreatorProfileNotifier
         ),
       );
 
-      ref.invalidate(
-        followingCreatorIdsProvider,
-      );
+      ref.invalidate(followingCreatorIdsProvider);
     } catch (_) {
-      state = AsyncData(
-        current.copyWith(
-          isChangingFollow: false,
-        ),
-      );
+      state = AsyncData(current.copyWith(isChangingFollow: false));
     }
   }
 
   Future<void> refresh() async {
-    final user = await ref.read(
-      authProvider.future,
-    );
+    final user = await ref.read(authProvider.future);
 
     if (user == null) {
       return;
@@ -209,14 +151,9 @@ class CreatorProfileNotifier
     state = const AsyncLoading();
 
     try {
-      final creator =
-          await _repository
-              .loadCreatorProfile(
-        creatorId,
-      );
+      final creator = await _repository.loadCreatorProfile(creatorId);
 
-      final isFollowing =
-          await _repository.isFollowing(
+      final isFollowing = await _repository.isFollowing(
         userId: user.id,
         creatorId: creatorId,
       );
@@ -234,18 +171,14 @@ class CreatorProfileNotifier
         return;
       }
 
-      state = AsyncError(
-        error,
-        stackTrace,
-      );
+      state = AsyncError(error, stackTrace);
     }
   }
 }
 
 final creatorProfileProvider =
     AsyncNotifierProvider.family<
-        CreatorProfileNotifier,
-        CreatorProfileState,
-        String>(
-  CreatorProfileNotifier.new,
-);
+      CreatorProfileNotifier,
+      CreatorProfileState,
+      String
+    >(CreatorProfileNotifier.new);

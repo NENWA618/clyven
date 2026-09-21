@@ -8,19 +8,14 @@ import '../providers/following_creators_provider.dart';
 import 'creator_profile_page.dart';
 
 class FollowingCreatorsPage extends ConsumerWidget {
-  const FollowingCreatorsPage({
-    super.key,
-  });
+  const FollowingCreatorsPage({super.key});
 
   static const Color _background = Color(0xFFF4F1EA);
   static const Color _ink = Color(0xFF161616);
   static const Color _purple = Color(0xFF7657FF);
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final creatorsAsync = ref.watch(followingCreatorsProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -33,14 +28,9 @@ class FollowingCreatorsPage extends ConsumerWidget {
             Expanded(
               child: creatorsAsync.when(
                 loading: () {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 },
-                error: (
-                  error,
-                  stackTrace,
-                ) {
+                error: (error, stackTrace) {
                   return Center(
                     child: FilledButton(
                       onPressed: () {
@@ -83,23 +73,12 @@ class FollowingCreatorsPage extends ConsumerWidget {
                       physics: const AlwaysScrollableScrollPhysics(
                         parent: BouncingScrollPhysics(),
                       ),
-                      padding: const EdgeInsets.fromLTRB(
-                        18,
-                        8,
-                        18,
-                        40,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
                       itemCount: creators.length,
-                      separatorBuilder: (
-                        context,
-                        index,
-                      ) {
+                      separatorBuilder: (context, index) {
                         return const SizedBox(height: 12);
                       },
-                      itemBuilder: (
-                        context,
-                        index,
-                      ) {
+                      itemBuilder: (context, index) {
                         return _buildCreatorCard(
                           context,
                           creators[index],
@@ -117,17 +96,9 @@ class FollowingCreatorsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTopBar(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildTopBar(BuildContext context, AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        18,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       child: Row(
         children: [
           GestureDetector(
@@ -141,9 +112,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
                 color: Colors.white.withOpacity(0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-              ),
+              child: const Icon(Icons.arrow_back_rounded),
             ),
           ),
           const SizedBox(width: 14),
@@ -193,9 +162,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return CreatorProfilePage(
-                creatorId: creator.id,
-              );
+              return CreatorProfilePage(creatorId: creator.id);
             },
           ),
         );
@@ -205,9 +172,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.72),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: const Color(0xFFE3DED5),
-          ),
+          border: Border.all(color: const Color(0xFFE3DED5)),
         ),
         child: Row(
           children: [
@@ -221,9 +186,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
               ),
               child: creator.avatarUrl.isEmpty
                   ? Text(
-                      creator.name.isEmpty
-                          ? '?'
-                          : creator.name.substring(0, 1),
+                      creator.name.isEmpty ? '?' : creator.name.substring(0, 1),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -278,11 +241,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(
-              Icons.arrow_forward_rounded,
-              color: _ink,
-              size: 21,
-            ),
+            const Icon(Icons.arrow_forward_rounded, color: _ink, size: 21),
           ],
         ),
       ),

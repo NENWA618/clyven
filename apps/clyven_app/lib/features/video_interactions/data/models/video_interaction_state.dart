@@ -26,22 +26,12 @@ class VideoInteractionState {
     bool? isChangingFavorite,
   }) {
     return VideoInteractionState(
-      likeCount:
-          likeCount ?? this.likeCount,
-      favoriteCount:
-          favoriteCount ??
-          this.favoriteCount,
-      isLiked:
-          isLiked ?? this.isLiked,
-      isFavorited:
-          isFavorited ??
-          this.isFavorited,
-      isChangingLike:
-          isChangingLike ??
-          this.isChangingLike,
-      isChangingFavorite:
-          isChangingFavorite ??
-          this.isChangingFavorite,
+      likeCount: likeCount ?? this.likeCount,
+      favoriteCount: favoriteCount ?? this.favoriteCount,
+      isLiked: isLiked ?? this.isLiked,
+      isFavorited: isFavorited ?? this.isFavorited,
+      isChangingLike: isChangingLike ?? this.isChangingLike,
+      isChangingFavorite: isChangingFavorite ?? this.isChangingFavorite,
     );
   }
 }
