@@ -29,11 +29,13 @@ class SubtitleEditorPage extends StatefulComponent {
   const SubtitleEditorPage({
     required this.videoId,
     required this.languageCode,
+    this.scriptCode,
     super.key,
   });
 
   final int videoId;
   final String languageCode;
+  final String? scriptCode;
 
   @override
   State<SubtitleEditorPage> createState() => _SubtitleEditorPageState();
@@ -85,6 +87,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
 
     _cueService = SubtitleCueService(
       client: client,
+      scriptCode: component.scriptCode,
     );
 
     _workspaceService = SubtitleWorkspaceService(
@@ -127,9 +130,11 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
         await _workspaceController.load(
           videoId: component.videoId,
           languageCode: component.languageCode,
+          scriptCode: component.scriptCode,
         );
       },
     );
+    _srtImportController.scriptCode = component.scriptCode ?? '';
 
     _srtExportController = SubtitleSrtExportController(
       client: client,
@@ -320,6 +325,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     _workspaceController.load(
       videoId: component.videoId,
       languageCode: component.languageCode,
+      scriptCode: component.scriptCode,
     );
   }
 
@@ -395,6 +401,23 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
           return _cueController.editedTexts[cueId];
         }
 
+        final scriptCode = component.scriptCode;
+        if (scriptCode != null) {
+          final texts = detail.texts;
+
+          if (texts != null) {
+            for (final item in texts) {
+              if (item.scriptCode == scriptCode) {
+                return item.text;
+              }
+            }
+          }
+
+          // The selected script has no text for this cue yet.
+          // Do not show the primary text from another script.
+          return '';
+        }
+
         return detail.cue.text;
       }
     }
@@ -424,6 +447,11 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
                   classes: 'subtitle-language-badge',
                   [.text(component.languageCode.toUpperCase())],
                 ),
+                if (component.scriptCode != null)
+                  span(
+                    classes: 'subtitle-script-badge',
+                    [.text(component.scriptCode!)],
+                  ),
               ],
             ),
           ],
@@ -466,7 +494,8 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
                   p([
                     .text(
                       'Video #${component.videoId} · '
-                      '${component.languageCode.toUpperCase()}',
+                      '${component.languageCode.toUpperCase()}'
+                      '${component.scriptCode == null ? '' : ' · ${component.scriptCode}'}',
                     ),
                   ]),
                 ],
@@ -640,6 +669,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               ),
               SubtitleSidePanel(
                 languageCode: component.languageCode,
+                scriptCode: component.scriptCode,
                 cueCount: cues.length,
               ),
             ],

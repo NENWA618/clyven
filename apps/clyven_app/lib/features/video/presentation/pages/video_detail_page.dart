@@ -11,6 +11,9 @@ import '../../../creator/presentation/pages/creator_profile_page.dart';
 import '../../../creator/presentation/providers/creator_profile_provider.dart';
 import '../../../history/presentation/providers/watch_history_provider.dart';
 import '../../../subtitle/presentation/providers/subtitle_provider.dart';
+import '../../../subtitle/data/models/subtitle_playback_state.dart';
+import '../../../subtitle/presentation/providers/subtitle_playback_provider.dart';
+import '../../../subtitle/presentation/widgets/subtitle_settings_sheet.dart';
 import '../../../video_interactions/presentation/providers/video_interaction_provider.dart';
 import '../../data/models/video_detail.dart';
 import '../providers/video_detail_provider.dart';
@@ -49,10 +52,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
   );
 
   bool _showComments = false;
-  bool _subtitlesEnabled = true;
-  String? _selectedSubtitleTrackKey;
-
-  static const String _subtitleOffValue = '__subtitle_off__';
 
   void _openComments() {
     if (_showComments) {
@@ -148,27 +147,59 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
 
     final numericVideoId = int.tryParse(video.id);
 
-    final subtitleTracks = numericVideoId == null
-        ? <serverpod.SubtitleTrack>[]
-        : ref.watch(subtitleTracksProvider(numericVideoId)).value ??
-              <serverpod.SubtitleTrack>[];
+    final subtitleAvailability = numericVideoId == null
+        ? <SubtitleTrackAvailability>[]
+        : ref.watch(subtitleTrackAvailabilityProvider(numericVideoId)).value ??
+              <SubtitleTrackAvailability>[];
 
-    final selectedSubtitleTrack = _resolveSubtitleTrack(subtitleTracks);
+    final subtitleTracks = [
+      for (final item in subtitleAvailability) item.track,
+    ];
 
-    final subtitleAsync =
-        numericVideoId == null ||
-            !_subtitlesEnabled ||
-            selectedSubtitleTrack == null
+    final subtitleState = ref.watch(subtitlePlaybackProvider(video.id));
+
+    final primarySelection = _normalizeSubtitleSelection(
+      resolvePrimarySubtitleSelection(
+        subtitleTracks,
+        subtitleState,
+      ),
+      subtitleAvailability,
+    );
+
+    final secondarySelection = _normalizeSubtitleSelection(
+      resolveSecondarySubtitleSelection(
+        subtitleTracks,
+        subtitleState,
+      ),
+      subtitleAvailability,
+    );
+
+    final primarySubtitleAsync =
+        numericVideoId == null || primarySelection == null
         ? null
         : ref.watch(
             subtitleProvider((
               videoId: numericVideoId,
-              languageCode: selectedSubtitleTrack.languageCode,
-              scriptCode: selectedSubtitleTrack.defaultScriptCode,
+              languageCode: primarySelection.languageCode,
+              scriptCode: primarySelection.scriptCode,
             )),
           );
 
-    final subtitles = subtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
+    final secondarySubtitleAsync =
+        numericVideoId == null || secondarySelection == null
+        ? null
+        : ref.watch(
+            subtitleProvider((
+              videoId: numericVideoId,
+              languageCode: secondarySelection.languageCode,
+              scriptCode: secondarySelection.scriptCode,
+            )),
+          );
+
+    final subtitles =
+        primarySubtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
+    final secondarySubtitles =
+        secondarySubtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
 
     return SafeArea(
       bottom: false,
@@ -192,8 +223,23 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   video,
                   subtitles,
                   historyItem?.positionSeconds ?? 0,
-                  subtitleLanguageCode: selectedSubtitleTrack?.languageCode,
-                  subtitleScriptCode: selectedSubtitleTrack?.defaultScriptCode,
+                  secondarySubtitles: secondarySubtitles,
+                  subtitleLanguageCode: primarySelection?.languageCode,
+                  subtitleScriptCode: primarySelection?.scriptCode,
+                  secondarySubtitleLanguageCode:
+                      secondarySelection?.languageCode,
+                  secondarySubtitleScriptCode: secondarySelection?.scriptCode,
+                  subtitlesEnabled:
+                      subtitleState.enabled && primarySelection != null,
+                  onSubtitlesPressed: subtitleAvailability.isEmpty
+                      ? null
+                      : () {
+                          showClyvenSubtitleSettingsSheet(
+                            context: context,
+                            videoId: video.id,
+                            availability: subtitleAvailability,
+                          );
+                        },
                 ),
                 if (widget.hosted)
                   Positioned(
@@ -220,112 +266,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
               ],
             ),
           ),
-          if (subtitleTracks.isNotEmpty)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                child: PopupMenuButton<String>(
-                  tooltip: 'Subtitles',
-                  position: PopupMenuPosition.under,
-                  initialValue: !_subtitlesEnabled
-                      ? _subtitleOffValue
-                      : selectedSubtitleTrack == null
-                      ? null
-                      : _subtitleTrackKey(selectedSubtitleTrack),
-                  onSelected: (value) {
-                    if (value == _subtitleOffValue) {
-                      setState(() {
-                        _subtitlesEnabled = false;
-                      });
-                      return;
-                    }
-
-                    for (final track in subtitleTracks) {
-                      if (_subtitleTrackKey(track) != value) {
-                        continue;
-                      }
-
-                      setState(() {
-                        _subtitlesEnabled = true;
-                        _selectedSubtitleTrackKey = value;
-                      });
-
-                      return;
-                    }
-                  },
-                  itemBuilder: (context) {
-                    final selectedKey = !_subtitlesEnabled
-                        ? _subtitleOffValue
-                        : selectedSubtitleTrack == null
-                        ? null
-                        : _subtitleTrackKey(selectedSubtitleTrack);
-
-                    return [
-                      PopupMenuItem<String>(
-                        value: _subtitleOffValue,
-                        child: Row(
-                          children: [
-                            Icon(
-                              selectedKey == _subtitleOffValue
-                                  ? Icons.check_rounded
-                                  : Icons.closed_caption_off_rounded,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            const Text('Off'),
-                          ],
-                        ),
-                      ),
-                      for (final track in subtitleTracks)
-                        PopupMenuItem<String>(
-                          value: _subtitleTrackKey(track),
-                          child: Row(
-                            children: [
-                              Icon(
-                                selectedKey == _subtitleTrackKey(track)
-                                    ? Icons.check_rounded
-                                    : Icons.closed_caption_rounded,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(_subtitleTrackLabel(track)),
-                                  Text(
-                                    [
-                                      track.languageCode,
-                                      if (track.variantCode != null)
-                                        track.variantCode!,
-                                      if (track.defaultScriptCode != null)
-                                        track.defaultScriptCode!,
-                                    ].join(' · '),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                    ];
-                  },
-                  child: Container(
-                    width: 44,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.closed_caption_rounded, size: 23),
-                  ),
-                ),
-              ),
-            ),
           Expanded(
             child: _showComments
                 ? CommentsPage(
@@ -365,175 +305,46 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     );
   }
 
-  String _subtitleTrackKey(serverpod.SubtitleTrack track) {
-    final id = track.id;
-
-    if (id != null) {
-      return 'id:$id';
-    }
-
-    return 'language:${track.languageCode}|variant:${track.variantCode ?? ''}';
-  }
-
-  serverpod.SubtitleTrack? _resolveSubtitleTrack(
-    List<serverpod.SubtitleTrack> tracks,
+  SubtitlePlaybackSelection? _normalizeSubtitleSelection(
+    SubtitlePlaybackSelection? selection,
+    List<SubtitleTrackAvailability> availability,
   ) {
-    if (tracks.isEmpty) {
+    if (selection == null) {
       return null;
     }
 
-    final selectedKey = _selectedSubtitleTrackKey;
+    SubtitleTrackAvailability? item;
 
-    if (selectedKey != null) {
-      for (final track in tracks) {
-        if (_subtitleTrackKey(track) == selectedKey) {
-          return track;
-        }
+    for (final candidate in availability) {
+      if (subtitleSelectionMatchesTrack(selection, candidate.track)) {
+        item = candidate;
+        break;
       }
     }
 
-    for (final track in tracks) {
-      if (track.isDefault) {
-        return track;
-      }
+    if (item == null || item.scriptCodes.isEmpty) {
+      return null;
     }
 
-    final tracksWithIds = tracks.where((track) => track.id != null).toList();
-
-    if (tracksWithIds.isNotEmpty) {
-      tracksWithIds.sort((a, b) => a.id!.compareTo(b.id!));
-      return tracksWithIds.first;
+    if (selection.scriptCode != null &&
+        item.scriptCodes.contains(selection.scriptCode)) {
+      return selection;
     }
 
-    return tracks.first;
-  }
+    final defaultScript = item.track.defaultScriptCode?.trim();
 
-  String _subtitleTrackLabel(serverpod.SubtitleTrack track) {
-    final label = track.label.trim();
-
-    if (label.isNotEmpty) {
-      return label;
+    if (defaultScript != null &&
+        defaultScript.isNotEmpty &&
+        item.scriptCodes.contains(defaultScript)) {
+      return subtitleSelectionFromTrack(
+        item.track,
+        scriptCode: defaultScript,
+      );
     }
 
-    return track.languageCode.toUpperCase();
-  }
-
-  void _showSubtitleMenu(
-    BuildContext context,
-    List<serverpod.SubtitleTrack> tracks,
-  ) {
-    if (tracks.isEmpty) {
-      return;
-    }
-
-    final selectedTrack = _resolveSubtitleTrack(tracks);
-    final selectedKey = _subtitlesEnabled && selectedTrack != null
-        ? _subtitleTrackKey(selectedTrack)
-        : _subtitleOffValue;
-
-    showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 18),
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(12, 2, 12, 10),
-                child: Text(
-                  'Subtitles',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  selectedKey == _subtitleOffValue
-                      ? Icons.check_rounded
-                      : Icons.closed_caption_off_rounded,
-                ),
-                title: const Text('Off'),
-                onTap: () {
-                  Navigator.pop(sheetContext, _subtitleOffValue);
-                },
-              ),
-              for (final track in tracks)
-                ListTile(
-                  leading: Icon(
-                    selectedKey == _subtitleTrackKey(track)
-                        ? Icons.check_rounded
-                        : Icons.closed_caption_rounded,
-                  ),
-                  title: Text(_subtitleTrackLabel(track)),
-                  subtitle: Text(
-                    [
-                      track.languageCode,
-                      if (track.variantCode != null) track.variantCode!,
-                      if (track.defaultScriptCode != null)
-                        track.defaultScriptCode!,
-                    ].join(' · '),
-                  ),
-                  onTap: () {
-                    Navigator.pop(sheetContext, _subtitleTrackKey(track));
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    ).then((result) {
-      if (!mounted || result == null) {
-        return;
-      }
-
-      if (result == _subtitleOffValue) {
-        setState(() {
-          _subtitlesEnabled = false;
-        });
-        return;
-      }
-
-      for (final track in tracks) {
-        if (_subtitleTrackKey(track) != result) {
-          continue;
-        }
-
-        setState(() {
-          _subtitlesEnabled = true;
-          _selectedSubtitleTrackKey = result;
-        });
-
-        return;
-      }
-    });
-  }
-
-  Widget _buildSubtitleMenu(
-    BuildContext context,
-    List<serverpod.SubtitleTrack> tracks,
-    serverpod.SubtitleTrack? selectedTrack,
-  ) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.52),
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: () {
-          _showSubtitleMenu(context, tracks);
-        },
-        child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Icon(
-            _subtitlesEnabled && selectedTrack != null
-                ? Icons.closed_caption_rounded
-                : Icons.closed_caption_off_rounded,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-      ),
+    return subtitleSelectionFromTrack(
+      item.track,
+      scriptCode: item.scriptCodes.first,
     );
   }
 
@@ -544,31 +355,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     AppLocalizations l10n,
   ) {
     final historyItem = ref.watch(watchHistoryItemProvider(video.id));
-
-    final numericVideoId = int.tryParse(video.id);
-
-    final subtitleTracks = numericVideoId == null
-        ? <serverpod.SubtitleTrack>[]
-        : ref.watch(subtitleTracksProvider(numericVideoId)).value ??
-              <serverpod.SubtitleTrack>[];
-
-    final selectedSubtitleTrack = _resolveSubtitleTrack(subtitleTracks);
-
-    final subtitleAsync =
-        numericVideoId == null ||
-            !_subtitlesEnabled ||
-            selectedSubtitleTrack == null
-        ? null
-        : ref.watch(
-            subtitleProvider((
-              videoId: numericVideoId,
-              languageCode: selectedSubtitleTrack.languageCode,
-              scriptCode: selectedSubtitleTrack.defaultScriptCode,
-            )),
-          );
-
-    final subtitles = subtitleAsync?.value ?? <serverpod.SubtitleCueDetail>[];
-
     final colors = Theme.of(context).colorScheme;
 
     return Material(
@@ -585,11 +371,8 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   child: _buildPersistentPlayer(
                     ref,
                     video,
-                    subtitles,
+                    const <serverpod.SubtitleCueDetail>[],
                     historyItem?.positionSeconds ?? 0,
-                    subtitleLanguageCode: selectedSubtitleTrack?.languageCode,
-                    subtitleScriptCode:
-                        selectedSubtitleTrack?.defaultScriptCode,
                     compact: true,
                   ),
                 ),
@@ -656,8 +439,13 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     VideoDetail video,
     List<serverpod.SubtitleCueDetail> subtitles,
     int initialPositionSeconds, {
+    List<serverpod.SubtitleCueDetail> secondarySubtitles =
+        const <serverpod.SubtitleCueDetail>[],
     String? subtitleLanguageCode,
     String? subtitleScriptCode,
+    String? secondarySubtitleLanguageCode,
+    String? secondarySubtitleScriptCode,
+    bool subtitlesEnabled = true,
     VoidCallback? onSubtitlesPressed,
     bool compact = false,
   }) {
@@ -666,8 +454,12 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       videoUrl: video.videoUrl,
       coverUrl: video.coverUrl,
       subtitles: subtitles,
+      secondarySubtitles: secondarySubtitles,
       subtitleLanguageCode: subtitleLanguageCode,
       subtitleScriptCode: subtitleScriptCode,
+      secondarySubtitleLanguageCode: secondarySubtitleLanguageCode,
+      secondarySubtitleScriptCode: secondarySubtitleScriptCode,
+      subtitlesEnabled: subtitlesEnabled,
       onSubtitlesPressed: onSubtitlesPressed,
       initialPositionSeconds: initialPositionSeconds,
       fallbackDurationSeconds: video.durationSeconds,

@@ -565,6 +565,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  glyphora_language_core:
+    dependency: transitive
+    description:
+      path: "."
+      ref: main
+      resolved-ref: ff9aab0ccfe92b0180a9ee77c161ba6ffef69d4a
+      url: "https://github.com/chengyang1017/flutter-languages-config.git"
+    source: git
+    version: "0.1.0"
   google_cloud:
     dependency: transitive
     description:

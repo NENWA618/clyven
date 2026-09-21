@@ -12,8 +12,12 @@ class NetworkVideoPlayer extends StatefulWidget {
   final String videoUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
+  final List<serverpod.SubtitleCueDetail> secondarySubtitles;
   final String? subtitleLanguageCode;
   final String? subtitleScriptCode;
+  final String? secondarySubtitleLanguageCode;
+  final String? secondarySubtitleScriptCode;
+  final bool subtitlesEnabled;
   final VoidCallback? onSubtitlesPressed;
   final int initialPositionSeconds;
   final int fallbackDurationSeconds;
@@ -25,8 +29,12 @@ class NetworkVideoPlayer extends StatefulWidget {
     required this.videoUrl,
     required this.coverUrl,
     required this.subtitles,
+    this.secondarySubtitles = const <serverpod.SubtitleCueDetail>[],
     this.subtitleLanguageCode,
     this.subtitleScriptCode,
+    this.secondarySubtitleLanguageCode,
+    this.secondarySubtitleScriptCode,
+    this.subtitlesEnabled = true,
     this.onSubtitlesPressed,
     required this.initialPositionSeconds,
     required this.fallbackDurationSeconds,
@@ -69,10 +77,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     _controller.addListener(_handleProgress);
   }
 
-  serverpod.SubtitleCueDetail? _findActiveSubtitle(Duration position) {
+  serverpod.SubtitleCueDetail? _findActiveSubtitle(
+    List<serverpod.SubtitleCueDetail> subtitles,
+    Duration position,
+  ) {
     final currentMs = position.inMilliseconds;
 
-    for (final detail in widget.subtitles) {
+    for (final detail in subtitles) {
       final cue = detail.cue;
 
       if (currentMs >= cue.startMs && currentMs < cue.endMs) {
@@ -201,7 +212,14 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             builder: (context, value, child) {
               final duration = _effectiveDuration();
               final position = _effectivePosition();
-              final activeSubtitle = _findActiveSubtitle(position);
+              final activeSubtitle = _findActiveSubtitle(
+                widget.subtitles,
+                position,
+              );
+              final activeSecondarySubtitle = _findActiveSubtitle(
+                widget.secondarySubtitles,
+                position,
+              );
               final maxMilliseconds = duration.inMilliseconds;
               final positionMilliseconds = position.inMilliseconds.clamp(
                 0,
@@ -241,11 +259,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                           onPointerDown: (_) {
                             widget.onSubtitlesPressed?.call();
                           },
-                          child: const SizedBox(
+                          child: SizedBox(
                             width: 44,
                             height: 44,
                             child: Icon(
-                              Icons.closed_caption_rounded,
+                              widget.subtitlesEnabled
+                                  ? Icons.closed_caption_rounded
+                                  : Icons.closed_caption_off_rounded,
                               color: Colors.white,
                               size: 25,
                             ),
@@ -272,7 +292,9 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                         ),
                       ),
                     ),
-                  if (!widget.compact && activeSubtitle != null)
+                  if (!widget.compact &&
+                      widget.subtitlesEnabled &&
+                      (activeSubtitle != null || activeSecondarySubtitle != null))
                     Positioned(
                       left: 24,
                       right: 24,
@@ -281,16 +303,38 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
-                            vertical: 7,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.65),
-                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.black.withValues(alpha: 0.68),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          child: InteractiveSubtitleOverlay(
-                            detail: activeSubtitle,
-                            languageCode: widget.subtitleLanguageCode ?? 'und',
-                            scriptCode: widget.subtitleScriptCode,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (activeSubtitle != null)
+                                InteractiveSubtitleOverlay(
+                                  detail: activeSubtitle,
+                                  languageCode:
+                                      widget.subtitleLanguageCode ?? 'und',
+                                  scriptCode: widget.subtitleScriptCode,
+                                ),
+                              if (activeSubtitle != null &&
+                                  activeSecondarySubtitle != null)
+                                const SizedBox(height: 4),
+                              if (activeSecondarySubtitle != null)
+                                Opacity(
+                                  opacity: 0.82,
+                                  child: InteractiveSubtitleOverlay(
+                                    detail: activeSecondarySubtitle,
+                                    languageCode:
+                                        widget.secondarySubtitleLanguageCode ??
+                                        'und',
+                                    scriptCode:
+                                        widget.secondarySubtitleScriptCode,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
