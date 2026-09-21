@@ -26,7 +26,7 @@ final subtitleProvider =
     // 视频 ID + 语言代码。
     FutureProvider.family<
       List<serverpod.SubtitleCueDetail>,
-      ({int videoId, String languageCode})
+      ({int videoId, String languageCode, String? scriptCode})
     >((ref, query) {
       // Provider 最后异步返回的数据类型：字幕详情列表。
       // 从 subtitleRepositoryProvider 取得字幕 Repository。
@@ -38,6 +38,7 @@ final subtitleProvider =
       return repository.loadSubtitles(
         videoId: query.videoId,
         languageCode: query.languageCode,
+        scriptCode: query.scriptCode,
       );
     });
 

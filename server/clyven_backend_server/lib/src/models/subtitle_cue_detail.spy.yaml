@@ -2,5 +2,10 @@ class: SubtitleCueDetail
 
 fields:
   cue: SubtitleCue
+
+  # Optional during migration. Later the endpoint will return every
+  # available script representation for the same timed cue.
+  texts: List<SubtitleCueText>?
+
   tokens: List<SubtitleToken>
   phrases: List<SubtitlePhrase>

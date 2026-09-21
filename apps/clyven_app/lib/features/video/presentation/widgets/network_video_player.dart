@@ -12,6 +12,9 @@ class NetworkVideoPlayer extends StatefulWidget {
   final String videoUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
+  final String? subtitleLanguageCode;
+  final String? subtitleScriptCode;
+  final VoidCallback? onSubtitlesPressed;
   final int initialPositionSeconds;
   final int fallbackDurationSeconds;
   final bool compact;
@@ -22,6 +25,9 @@ class NetworkVideoPlayer extends StatefulWidget {
     required this.videoUrl,
     required this.coverUrl,
     required this.subtitles,
+    this.subtitleLanguageCode,
+    this.subtitleScriptCode,
+    this.onSubtitlesPressed,
     required this.initialPositionSeconds,
     required this.fallbackDurationSeconds,
     this.compact = false,
@@ -223,6 +229,30 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                       child: const SizedBox.expand(),
                     ),
                   ),
+                  if (!widget.compact && widget.onSubtitlesPressed != null)
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: Material(
+                        color: Colors.black.withValues(alpha: 0.52),
+                        shape: const CircleBorder(),
+                        child: Listener(
+                          behavior: HitTestBehavior.opaque,
+                          onPointerDown: (_) {
+                            widget.onSubtitlesPressed?.call();
+                          },
+                          child: const SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Icon(
+                              Icons.closed_caption_rounded,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   if (!widget.compact && !value.isPlaying)
                     Center(
                       child: GestureDetector(
@@ -259,6 +289,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                           ),
                           child: InteractiveSubtitleOverlay(
                             detail: activeSubtitle,
+                            languageCode: widget.subtitleLanguageCode ?? 'und',
+                            scriptCode: widget.subtitleScriptCode,
                           ),
                         ),
                       ),

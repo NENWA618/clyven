@@ -103,6 +103,107 @@ class DictionaryEndpoint extends Endpoint {
     );
   }
 
+  Future<DictionaryEntryDetail?> getById(
+    Session session, {
+    required int entryId,
+    required String explanationLanguageCode,
+  }) async {
+    final entry = await DictionaryEntry.db.findById(
+      session,
+      entryId,
+    );
+
+    if (entry == null) {
+      return null;
+    }
+
+    final definitions = await DictionaryDefinition.db.find(
+      session,
+      where: (definition) =>
+          definition.entryId.equals(entryId) &
+          definition.explanationLanguageCode.equals(
+            explanationLanguageCode,
+          ),
+    );
+
+    final forms = await DictionaryForm.db.find(
+      session,
+      where: (form) => form.entryId.equals(entryId),
+    );
+
+    final examples = await DictionaryExample.db.find(
+      session,
+      where: (example) => example.entryId.equals(entryId),
+      orderBy: (example) => example.position,
+    );
+
+    final exampleDetails = <DictionaryExampleDetail>[];
+
+    for (final example in examples) {
+      final exampleId = example.id;
+
+      if (exampleId == null) {
+        continue;
+      }
+
+      final texts = await DictionaryExampleText.db.find(
+        session,
+        where: (text) => text.exampleId.equals(exampleId),
+      );
+
+      exampleDetails.add(
+        DictionaryExampleDetail(
+          example: example,
+          texts: texts,
+        ),
+      );
+    }
+
+    final relations = await DictionaryRelation.db.find(
+      session,
+      where: (relation) => relation.sourceEntryId.equals(entryId),
+      orderBy: (relation) => relation.position,
+    );
+
+    final relationDetails = <DictionaryRelationDetail>[];
+
+    for (final relation in relations) {
+      final targetEntry = await DictionaryEntry.db.findById(
+        session,
+        relation.targetEntryId,
+      );
+
+      if (targetEntry == null) {
+        continue;
+      }
+
+      final targetDefinitions = await DictionaryDefinition.db.find(
+        session,
+        where: (definition) =>
+            definition.entryId.equals(targetEntry.id) &
+            definition.explanationLanguageCode.equals(
+              explanationLanguageCode,
+            ),
+      );
+
+      relationDetails.add(
+        DictionaryRelationDetail(
+          relation: relation,
+          targetEntry: targetEntry,
+          targetDefinitions: targetDefinitions,
+        ),
+      );
+    }
+
+    return DictionaryEntryDetail(
+      entry: entry,
+      definitions: definitions,
+      forms: forms,
+      examples: exampleDetails,
+      relations: relationDetails,
+    );
+  }
+
   Future<List<DictionaryEntryDetail>> listEntries(
     Session session, {
     required String languageCode,

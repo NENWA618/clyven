@@ -21,6 +21,7 @@ class SubtitleSrtImportController {
 
   String? fileName;
   String? content;
+  String scriptCode = '';
 
   SubtitleSrtPreview? preview;
 
@@ -31,7 +32,10 @@ class SubtitleSrtImportController {
 
   bool get hasFile => content != null && content!.isNotEmpty;
 
-  bool get canImport => preview?.canImport == true && !importing;
+  bool get canImport =>
+      preview?.canImport == true &&
+      scriptCode.trim().isNotEmpty &&
+      !importing;
 
   Future<void> pickFile() async {
     final input = html.FileUploadInputElement()..accept = '.srt';
@@ -134,6 +138,14 @@ class SubtitleSrtImportController {
       return;
     }
 
+    final cleanScriptCode = scriptCode.trim();
+
+    if (cleanScriptCode.isEmpty) {
+      error = '请输入 script code';
+      onChanged();
+      return;
+    }
+
     importing = true;
     error = null;
 
@@ -144,6 +156,7 @@ class SubtitleSrtImportController {
         videoId: videoId,
         languageCode: languageCode,
         content: currentContent,
+        scriptCode: cleanScriptCode,
       );
 
       importing = false;

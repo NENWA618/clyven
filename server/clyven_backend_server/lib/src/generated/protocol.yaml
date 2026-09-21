@@ -23,6 +23,7 @@ comment:
   - toggleReplyLike:
 dictionary:
   - lookup:
+  - getById:
   - listEntries:
   - updateEntryRow:
 dictionaryImport:
@@ -35,6 +36,7 @@ dictionaryImport:
 knownEntry:
   - getKnownEntryIds:
   - setKnown:
+  - getKnowledgeStatesByEntryIds:
   - getKnowledgeState:
   - getKnowledgeStates:
 subtitle:
@@ -44,6 +46,7 @@ subtitle:
   - confirmReplaceSrtImport:
   - exportSrt:
   - updateCueText:
+  - upsertCueScriptText:
   - updateCueTiming:
   - createCue:
   - deleteCue:

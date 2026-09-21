@@ -1,0 +1,4 @@
+class: EntryKnowledgeState
+fields:
+  entryId: int
+  state: String

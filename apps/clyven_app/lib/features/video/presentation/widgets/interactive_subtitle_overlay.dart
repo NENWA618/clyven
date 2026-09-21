@@ -10,14 +10,42 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   final serverpod.SubtitleCueDetail detail;
 
   final String languageCode;
+  final String? scriptCode;
   final String explanationLanguageCode;
 
   const InteractiveSubtitleOverlay({
     super.key,
     required this.detail,
-    this.languageCode = 'vi',
+    required this.languageCode,
+    this.scriptCode,
     this.explanationLanguageCode = 'zh',
   });
+
+  String _displayText() {
+    final texts = detail.texts ?? const <serverpod.SubtitleCueText>[];
+
+    final requestedScript = scriptCode?.trim();
+
+    if (requestedScript != null && requestedScript.isNotEmpty) {
+      for (final text in texts) {
+        if (text.scriptCode == requestedScript) {
+          return text.text;
+        }
+      }
+    }
+
+    for (final text in texts) {
+      if (text.isPrimary) {
+        return text.text;
+      }
+    }
+
+    if (texts.isNotEmpty) {
+      return texts.first.text;
+    }
+
+    return detail.cue.text;
+  }
 
   Color _knowledgeColor(String state) {
     switch (state) {
@@ -101,13 +129,20 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
             ? '暂无释义'
             : component.targetDefinitions.first.gloss;
 
-        final knowledgeFuture = ref
-            .read(knownEntryRepositoryProvider)
-            .getKnowledgeState(
-              languageCode: languageCode,
-              normalizedText: target.normalizedText,
-              entryType: target.entryType,
-            );
+        final targetEntryId = target.id;
+
+        final knowledgeFuture = targetEntryId == null
+            ? ref
+                  .read(knownEntryRepositoryProvider)
+                  .getKnowledgeState(
+                    languageCode: languageCode,
+                    normalizedText: target.normalizedText,
+                    entryType: target.entryType,
+                  )
+            : ref
+                  .read(knownEntryRepositoryProvider)
+                  .getKnowledgeStatesByEntryIds(entryIds: [targetEntryId])
+                  .then((states) => states[targetEntryId] ?? 'unknown');
 
         widgets.add(
           InkWell(
@@ -119,6 +154,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                 text: target.text,
                 normalizedText: target.normalizedText,
                 entryType: target.entryType,
+                entryId: target.id,
               );
             },
             child: Padding(
@@ -192,15 +228,21 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     required String text,
     required String normalizedText,
     required String entryType,
+    int? entryId,
   }) {
     final repository = ref.read(dictionaryRepositoryProvider);
 
-    final lookupFuture = repository.lookup(
-      languageCode: languageCode,
-      normalizedText: normalizedText,
-      entryType: entryType,
-      explanationLanguageCode: explanationLanguageCode,
-    );
+    final lookupFuture = entryId == null
+        ? repository.lookup(
+            languageCode: languageCode,
+            normalizedText: normalizedText,
+            entryType: entryType,
+            explanationLanguageCode: explanationLanguageCode,
+          )
+        : repository.getById(
+            entryId: entryId,
+            explanationLanguageCode: explanationLanguageCode,
+          );
 
     showModalBottomSheet<void>(
       context: context,
@@ -235,19 +277,38 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Consumer(
                     builder: (context, sheetRef, child) {
-                      final query = (
-                        languageCode: languageCode,
-                        normalizedText: normalizedText,
-                        entryType: entryType,
-                      );
+                      final resolvedEntryId =
+                          entryId ?? snapshot.data?.entry.id;
 
-                      final knowledgeAsync = sheetRef.watch(
-                        knowledgeStateProvider(query),
-                      );
+                      String state;
 
-                      final state = knowledgeAsync.value ?? 'unknown';
+                      if (resolvedEntryId != null) {
+                        final entryStatesAsync = sheetRef.watch(
+                          entryKnowledgeStatesProvider(
+                            EntryKnowledgeBatchRequest(
+                              entryIds: [resolvedEntryId],
+                            ),
+                          ),
+                        );
+
+                        state =
+                            entryStatesAsync.value?[resolvedEntryId] ??
+                            'unknown';
+                      } else {
+                        final query = (
+                          languageCode: languageCode,
+                          normalizedText: normalizedText,
+                          entryType: entryType,
+                        );
+
+                        final knowledgeAsync = sheetRef.watch(
+                          knowledgeStateProvider(query),
+                        );
+
+                        state = knowledgeAsync.value ?? 'unknown';
+                      }
+
                       final isKnown = state == 'exactKnown';
-                      final entryId = snapshot.data?.entry.id;
 
                       String statusText;
 
@@ -272,7 +333,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                           ),
                           const Spacer(),
                           TextButton.icon(
-                            onPressed: entryId == null
+                            onPressed: resolvedEntryId == null
                                 ? null
                                 : () async {
                                     final repository = sheetRef.read(
@@ -280,8 +341,12 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                                     );
 
                                     await repository.setKnown(
-                                      entryId: entryId,
+                                      entryId: resolvedEntryId,
                                       known: !isKnown,
+                                    );
+
+                                    sheetRef.invalidate(
+                                      entryKnowledgeStatesProvider,
                                     );
 
                                     sheetRef.invalidate(knowledgeStateProvider);
@@ -336,7 +401,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (detail.tokens.isEmpty) {
       return Text(
-        detail.cue.text,
+        _displayText(),
         textAlign: TextAlign.center,
         style: const TextStyle(
           color: Colors.white,
@@ -349,7 +414,8 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     final tokens = [...detail.tokens]
       ..sort((a, b) => a.position.compareTo(b.position));
 
-    final batchQueries = <KnowledgeStateRequest>[];
+    final entryIds = <int>[];
+    final fallbackQueries = <KnowledgeStateRequest>[];
 
     var queryIndex = 0;
 
@@ -358,13 +424,19 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       final phrase = _findPhraseForToken(token);
 
       if (phrase != null && phrase.startPosition == token.position) {
-        batchQueries.add(
-          KnowledgeStateRequest(
-            languageCode: languageCode,
-            normalizedText: phrase.normalizedText ?? phrase.text,
-            entryType: 'phrase',
-          ),
-        );
+        final phraseEntryId = phrase.entryId;
+
+        if (phraseEntryId != null) {
+          entryIds.add(phraseEntryId);
+        } else {
+          fallbackQueries.add(
+            KnowledgeStateRequest(
+              languageCode: languageCode,
+              normalizedText: phrase.normalizedText ?? phrase.text,
+              entryType: 'phrase',
+            ),
+          );
+        }
 
         while (queryIndex < tokens.length &&
             tokens[queryIndex].position <= phrase.endPosition) {
@@ -374,22 +446,37 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
         continue;
       }
 
-      batchQueries.add(
-        KnowledgeStateRequest(
-          languageCode: languageCode,
-          normalizedText: token.normalizedText ?? token.text,
-          entryType: 'word',
-        ),
-      );
+      final tokenEntryId = token.entryId;
+
+      if (tokenEntryId != null) {
+        entryIds.add(tokenEntryId);
+      } else {
+        fallbackQueries.add(
+          KnowledgeStateRequest(
+            languageCode: languageCode,
+            normalizedText: token.normalizedText ?? token.text,
+            entryType: 'word',
+          ),
+        );
+      }
 
       queryIndex++;
     }
 
-    final batchStateAsync = ref.watch(
-      knowledgeStatesProvider(KnowledgeBatchRequest(queries: batchQueries)),
+    final uniqueEntryIds = entryIds.toSet().toList();
+
+    final entryStateAsync = ref.watch(
+      entryKnowledgeStatesProvider(
+        EntryKnowledgeBatchRequest(entryIds: uniqueEntryIds),
+      ),
     );
 
-    final batchStates = batchStateAsync.value ?? <String, String>{};
+    final fallbackStateAsync = ref.watch(
+      knowledgeStatesProvider(KnowledgeBatchRequest(queries: fallbackQueries)),
+    );
+
+    final entryStates = entryStateAsync.value ?? <int, String>{};
+    final fallbackStates = fallbackStateAsync.value ?? <String, String>{};
     final children = <Widget>[];
 
     var index = 0;
@@ -401,13 +488,16 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       if (phrase != null && phrase.startPosition == token.position) {
         final normalizedText = phrase.normalizedText ?? phrase.text;
 
-        final knowledgeState =
-            batchStates[knowledgeStateKey(
-              languageCode: languageCode,
-              normalizedText: normalizedText,
-              entryType: 'phrase',
-            )] ??
-            'unknown';
+        final phraseEntryId = phrase.entryId;
+
+        final knowledgeState = phraseEntryId == null
+            ? fallbackStates[knowledgeStateKey(
+                    languageCode: languageCode,
+                    normalizedText: normalizedText,
+                    entryType: 'phrase',
+                  )] ??
+                  'unknown'
+            : entryStates[phraseEntryId] ?? 'unknown';
 
         children.add(
           GestureDetector(
@@ -419,6 +509,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                 text: phrase.text,
                 normalizedText: normalizedText,
                 entryType: 'phrase',
+                entryId: phrase.entryId,
               );
             },
             child: Container(
@@ -453,13 +544,16 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
       final normalizedText = token.normalizedText ?? token.text;
 
-      final knowledgeState =
-          batchStates[knowledgeStateKey(
-            languageCode: languageCode,
-            normalizedText: normalizedText,
-            entryType: 'word',
-          )] ??
-          'unknown';
+      final tokenEntryId = token.entryId;
+
+      final knowledgeState = tokenEntryId == null
+          ? fallbackStates[knowledgeStateKey(
+                  languageCode: languageCode,
+                  normalizedText: normalizedText,
+                  entryType: 'word',
+                )] ??
+                'unknown'
+          : entryStates[tokenEntryId] ?? 'unknown';
 
       children.add(
         GestureDetector(
@@ -471,6 +565,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               text: token.text,
               normalizedText: normalizedText,
               entryType: 'word',
+              entryId: token.entryId,
             );
           },
           child: Padding(

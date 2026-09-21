@@ -3,12 +3,16 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 import '../services/subtitle_srt_parser.dart';
 import '../services/subtitle_srt_exporter.dart';
+import '../services/subtitle_analysis_service.dart';
 
 class SubtitleEndpoint extends Endpoint {
+  static const _analysisService = SubtitleAnalysisService();
+
   Future<List<SubtitleCueDetail>> getCueDetails(
     Session session, {
     required int videoId,
     required String languageCode,
+    String? scriptCode,
   }) async {
     final track = await SubtitleTrack.db.findFirstRow(
       session,
@@ -19,6 +23,13 @@ class SubtitleEndpoint extends Endpoint {
     if (track == null) {
       return [];
     }
+
+    final selectedScriptCode = await _analysisService.resolveScriptCode(
+      session,
+      languageCode: languageCode,
+      requestedScriptCode: scriptCode,
+      trackDefaultScriptCode: track.defaultScriptCode,
+    );
 
     final cues = await SubtitleCue.db.find(
       session,
@@ -32,6 +43,11 @@ class SubtitleEndpoint extends Endpoint {
 
     final cueIds = cues.map((cue) => cue.id).whereType<int>().toSet();
 
+    final texts = await SubtitleCueText.db.find(
+      session,
+      where: (t) => t.cueId.inSet(cueIds),
+    );
+
     final tokens = await SubtitleToken.db.find(
       session,
       where: (t) => t.cueId.inSet(cueIds),
@@ -44,9 +60,26 @@ class SubtitleEndpoint extends Endpoint {
       orderBy: (p) => p.startPosition,
     );
 
+    final textsByCueId = <int, List<SubtitleCueText>>{};
+
+    for (final text in texts) {
+      textsByCueId
+          .putIfAbsent(
+            text.cueId,
+            () => [],
+          )
+          .add(text);
+    }
+
     final tokensByCueId = <int, List<SubtitleToken>>{};
 
     for (final token in tokens) {
+      if (selectedScriptCode != null &&
+          token.scriptCode != null &&
+          token.scriptCode != selectedScriptCode) {
+        continue;
+      }
+
       tokensByCueId
           .putIfAbsent(
             token.cueId,
@@ -58,6 +91,12 @@ class SubtitleEndpoint extends Endpoint {
     final phrasesByCueId = <int, List<SubtitlePhrase>>{};
 
     for (final phrase in phrases) {
+      if (selectedScriptCode != null &&
+          phrase.scriptCode != null &&
+          phrase.scriptCode != selectedScriptCode) {
+        continue;
+      }
+
       phrasesByCueId
           .putIfAbsent(
             phrase.cueId,
@@ -70,6 +109,7 @@ class SubtitleEndpoint extends Endpoint {
       for (final cue in cues)
         SubtitleCueDetail(
           cue: cue,
+          texts: cue.id == null ? [] : textsByCueId[cue.id!] ?? [],
           tokens: cue.id == null ? [] : tokensByCueId[cue.id!] ?? [],
           phrases: cue.id == null ? [] : phrasesByCueId[cue.id!] ?? [],
         ),
@@ -171,6 +211,7 @@ class SubtitleEndpoint extends Endpoint {
     required int videoId,
     required String languageCode,
     required String content,
+    String? scriptCode,
   }) async {
     if (session.authenticated == null) {
       throw Exception(
@@ -237,15 +278,76 @@ class SubtitleEndpoint extends Endpoint {
       );
     }
 
-    final trackId = track.id!;
+    final resolvedScriptCode = await _analysisService.resolveScriptCode(
+      session,
+      languageCode: languageCode,
+      requestedScriptCode: scriptCode,
+      trackDefaultScriptCode: track.defaultScriptCode,
+    );
+
+    final lexicon = resolvedScriptCode == null
+        ? null
+        : await _analysisService.loadLexicon(
+            session,
+            languageCode: languageCode,
+            scriptCode: resolvedScriptCode,
+          );
+
+    final importTrack = track;
+    final trackId = importTrack.id!;
 
     await session.db.transaction(
       (transaction) async {
+        if (importTrack.defaultScriptCode == null &&
+            resolvedScriptCode != null) {
+          importTrack.defaultScriptCode = resolvedScriptCode;
+          importTrack.updatedAt = DateTime.now();
+
+          await SubtitleTrack.db.updateRow(
+            session,
+            importTrack,
+            transaction: transaction,
+          );
+        }
+
         final existingCues = await SubtitleCue.db.find(
           session,
           where: (c) => c.trackId.equals(trackId),
           transaction: transaction,
         );
+
+        final existingCueIds = existingCues
+            .map((cue) => cue.id)
+            .whereType<int>()
+            .toSet();
+
+        if (existingCueIds.isNotEmpty) {
+          final existingTexts = await SubtitleCueText.db.find(
+            session,
+            where: (text) => text.cueId.inSet(existingCueIds),
+            transaction: transaction,
+          );
+
+          if (existingTexts.isNotEmpty) {
+            if (resolvedScriptCode == null) {
+              throw Exception(
+                'Cannot replace a multi-script subtitle timeline without a script code.',
+              );
+            }
+
+            final otherScripts = existingTexts
+                .map((text) => text.scriptCode)
+                .where((code) => code != resolvedScriptCode)
+                .toSet();
+
+            if (otherScripts.isNotEmpty) {
+              throw Exception(
+                'Legacy SRT replacement is blocked because this track already '
+                'contains other script variants.',
+              );
+            }
+          }
+        }
 
         for (final cue in existingCues) {
           final cueId = cue.id;
@@ -253,6 +355,12 @@ class SubtitleEndpoint extends Endpoint {
           if (cueId == null) {
             continue;
           }
+
+          await SubtitleCueText.db.deleteWhere(
+            session,
+            where: (t) => t.cueId.equals(cueId),
+            transaction: transaction,
+          );
 
           await SubtitleToken.db.deleteWhere(
             session,
@@ -281,11 +389,26 @@ class SubtitleEndpoint extends Endpoint {
             text: parsedCue.text,
           );
 
-          await SubtitleCue.db.insertRow(
+          final insertedCue = await SubtitleCue.db.insertRow(
             session,
             cue,
             transaction: transaction,
           );
+
+          final cueId = insertedCue.id;
+
+          if (cueId != null && resolvedScriptCode != null) {
+            await _analysisService.upsertAndAnalyzeCueText(
+              session,
+              cueId: cueId,
+              languageCode: languageCode,
+              scriptCode: resolvedScriptCode,
+              text: parsedCue.text,
+              isPrimary: true,
+              lexicon: lexicon,
+              transaction: transaction,
+            );
+          }
         }
       },
     );
@@ -340,6 +463,7 @@ class SubtitleEndpoint extends Endpoint {
     Session session, {
     required int cueId,
     required String text,
+    String? scriptCode,
   }) async {
     if (session.authenticated == null) {
       throw Exception(
@@ -364,7 +488,44 @@ class SubtitleEndpoint extends Endpoint {
       throw Exception('找不到字幕');
     }
 
-    cue.text = normalizedText;
+    final track = await SubtitleTrack.db.findById(
+      session,
+      cue.trackId,
+    );
+
+    if (track == null) {
+      throw Exception('Subtitle track not found.');
+    }
+
+    final resolvedScriptCode = await _analysisService.resolveScriptCode(
+      session,
+      languageCode: track.languageCode,
+      requestedScriptCode: scriptCode,
+      trackDefaultScriptCode: track.defaultScriptCode,
+    );
+
+    var isPrimary = false;
+
+    if (resolvedScriptCode != null) {
+      if (track.defaultScriptCode == null) {
+        track.defaultScriptCode = resolvedScriptCode;
+        track.updatedAt = DateTime.now();
+
+        await SubtitleTrack.db.updateRow(
+          session,
+          track,
+        );
+
+        isPrimary = true;
+      } else {
+        isPrimary = track.defaultScriptCode == resolvedScriptCode;
+      }
+    }
+
+    if (isPrimary || resolvedScriptCode == null) {
+      cue.text = normalizedText;
+    }
+
     cue.updatedAt = DateTime.now();
 
     final updatedCue = await SubtitleCue.db.updateRow(
@@ -372,17 +533,110 @@ class SubtitleEndpoint extends Endpoint {
       cue,
     );
 
-    await SubtitleToken.db.deleteWhere(
-      session,
-      where: (t) => t.cueId.equals(cueId),
-    );
+    if (resolvedScriptCode == null) {
+      await SubtitleToken.db.deleteWhere(
+        session,
+        where: (t) => t.cueId.equals(cueId),
+      );
 
-    await SubtitlePhrase.db.deleteWhere(
-      session,
-      where: (p) => p.cueId.equals(cueId),
-    );
+      await SubtitlePhrase.db.deleteWhere(
+        session,
+        where: (p) => p.cueId.equals(cueId),
+      );
+    } else {
+      await _analysisService.upsertAndAnalyzeCueText(
+        session,
+        cueId: cueId,
+        languageCode: track.languageCode,
+        scriptCode: resolvedScriptCode,
+        text: normalizedText,
+        isPrimary: isPrimary,
+      );
+    }
 
     return updatedCue;
+  }
+
+  Future<SubtitleCueText> upsertCueScriptText(
+    Session session, {
+    required int cueId,
+    required String scriptCode,
+    required String text,
+    bool isPrimary = false,
+  }) async {
+    if (session.authenticated == null) {
+      throw Exception('Login required to edit subtitles.');
+    }
+
+    final cleanScriptCode = scriptCode.trim();
+    final cleanText = text.trim();
+
+    if (cleanScriptCode.isEmpty) {
+      throw Exception('scriptCode cannot be empty.');
+    }
+
+    if (cleanText.isEmpty) {
+      throw Exception('Subtitle text cannot be empty.');
+    }
+
+    final cue = await SubtitleCue.db.findById(
+      session,
+      cueId,
+    );
+
+    if (cue == null) {
+      throw Exception('Subtitle cue not found.');
+    }
+
+    final track = await SubtitleTrack.db.findById(
+      session,
+      cue.trackId,
+    );
+
+    if (track == null) {
+      throw Exception('Subtitle track not found.');
+    }
+
+    final effectivePrimary = isPrimary || track.defaultScriptCode == null;
+
+    if (effectivePrimary) {
+      track.defaultScriptCode = cleanScriptCode;
+      track.updatedAt = DateTime.now();
+
+      await SubtitleTrack.db.updateRow(
+        session,
+        track,
+      );
+
+      cue.text = cleanText;
+      cue.updatedAt = DateTime.now();
+
+      await SubtitleCue.db.updateRow(
+        session,
+        cue,
+      );
+    }
+
+    await _analysisService.upsertAndAnalyzeCueText(
+      session,
+      cueId: cueId,
+      languageCode: track.languageCode,
+      scriptCode: cleanScriptCode,
+      text: cleanText,
+      isPrimary: effectivePrimary,
+    );
+
+    final row = await SubtitleCueText.db.findFirstRow(
+      session,
+      where: (item) =>
+          item.cueId.equals(cueId) & item.scriptCode.equals(cleanScriptCode),
+    );
+
+    if (row == null) {
+      throw Exception('Failed to save subtitle script text.');
+    }
+
+    return row;
   }
 
   Future<SubtitleCue> updateCueTiming(
@@ -472,6 +726,7 @@ class SubtitleEndpoint extends Endpoint {
     required int startMs,
     required int endMs,
     required String text,
+    String? scriptCode,
   }) async {
     if (session.authenticated == null) {
       throw Exception(
@@ -517,6 +772,23 @@ class SubtitleEndpoint extends Endpoint {
       endMs: endMs,
     );
 
+    final resolvedScriptCode = await _analysisService.resolveScriptCode(
+      session,
+      languageCode: languageCode,
+      requestedScriptCode: scriptCode,
+      trackDefaultScriptCode: track.defaultScriptCode,
+    );
+
+    if (track.defaultScriptCode == null && resolvedScriptCode != null) {
+      track.defaultScriptCode = resolvedScriptCode;
+      track.updatedAt = DateTime.now();
+
+      await SubtitleTrack.db.updateRow(
+        session,
+        track,
+      );
+    }
+
     final cue = SubtitleCue(
       trackId: track.id!,
       startMs: startMs,
@@ -524,10 +796,23 @@ class SubtitleEndpoint extends Endpoint {
       text: text.trim(),
     );
 
-    return SubtitleCue.db.insertRow(
+    final insertedCue = await SubtitleCue.db.insertRow(
       session,
       cue,
     );
+
+    if (insertedCue.id != null && resolvedScriptCode != null) {
+      await _analysisService.upsertAndAnalyzeCueText(
+        session,
+        cueId: insertedCue.id!,
+        languageCode: languageCode,
+        scriptCode: resolvedScriptCode,
+        text: text.trim(),
+        isPrimary: true,
+      );
+    }
+
+    return insertedCue;
   }
 
   Future<void> deleteCue(
@@ -548,6 +833,11 @@ class SubtitleEndpoint extends Endpoint {
     if (cue == null) {
       throw Exception('找不到字幕');
     }
+
+    await SubtitleCueText.db.deleteWhere(
+      session,
+      where: (t) => t.cueId.equals(cueId),
+    );
 
     await SubtitleToken.db.deleteWhere(
       session,

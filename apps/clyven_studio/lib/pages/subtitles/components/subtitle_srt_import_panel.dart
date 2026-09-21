@@ -75,6 +75,34 @@ class SubtitleSrtImportPanel extends StatelessComponent {
           ],
         ),
 
+        div(
+          classes: 'subtitle-srt-script-field',
+          [
+            label([
+              text('Script code'),
+            ]),
+            input(
+              attributes: {
+                'type': 'text',
+                'value': controller.scriptCode,
+                'placeholder': 'script code',
+                'autocomplete': 'off',
+              },
+              events: events<String>(
+                onInput: (value) {
+                  controller.scriptCode = value;
+                  controller.onChanged();
+                },
+              ),
+            ),
+            span([
+              text(
+                'Required for SRT import. The value is stored as an opaque script identifier.',
+              ),
+            ]),
+          ],
+        ),
+
         if (controller.fileName != null)
           div(
             classes: 'subtitle-srt-file',

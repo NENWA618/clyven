@@ -12,32 +12,40 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'subtitle_cue.dart' as _i2;
-import 'subtitle_token.dart' as _i3;
-import 'subtitle_phrase.dart' as _i4;
-import 'package:clyven_backend_client/src/protocol/protocol.dart' as _i5;
+import 'subtitle_cue_text.dart' as _i3;
+import 'subtitle_token.dart' as _i4;
+import 'subtitle_phrase.dart' as _i5;
+import 'package:clyven_backend_client/src/protocol/protocol.dart' as _i6;
 
 abstract class SubtitleCueDetail implements _i1.SerializableModel {
   SubtitleCueDetail._({
     required this.cue,
+    this.texts,
     required this.tokens,
     required this.phrases,
   });
 
   factory SubtitleCueDetail({
     required _i2.SubtitleCue cue,
-    required List<_i3.SubtitleToken> tokens,
-    required List<_i4.SubtitlePhrase> phrases,
+    List<_i3.SubtitleCueText>? texts,
+    required List<_i4.SubtitleToken> tokens,
+    required List<_i5.SubtitlePhrase> phrases,
   }) = _SubtitleCueDetailImpl;
 
   factory SubtitleCueDetail.fromJson(Map<String, dynamic> jsonSerialization) {
     return SubtitleCueDetail(
-      cue: _i5.Protocol().deserialize<_i2.SubtitleCue>(
+      cue: _i6.Protocol().deserialize<_i2.SubtitleCue>(
         jsonSerialization['cue'],
       ),
-      tokens: _i5.Protocol().deserialize<List<_i3.SubtitleToken>>(
+      texts: jsonSerialization['texts'] == null
+          ? null
+          : _i6.Protocol().deserialize<List<_i3.SubtitleCueText>>(
+              jsonSerialization['texts'],
+            ),
+      tokens: _i6.Protocol().deserialize<List<_i4.SubtitleToken>>(
         jsonSerialization['tokens'],
       ),
-      phrases: _i5.Protocol().deserialize<List<_i4.SubtitlePhrase>>(
+      phrases: _i6.Protocol().deserialize<List<_i5.SubtitlePhrase>>(
         jsonSerialization['phrases'],
       ),
     );
@@ -45,23 +53,27 @@ abstract class SubtitleCueDetail implements _i1.SerializableModel {
 
   _i2.SubtitleCue cue;
 
-  List<_i3.SubtitleToken> tokens;
+  List<_i3.SubtitleCueText>? texts;
 
-  List<_i4.SubtitlePhrase> phrases;
+  List<_i4.SubtitleToken> tokens;
+
+  List<_i5.SubtitlePhrase> phrases;
 
   /// Returns a shallow copy of this [SubtitleCueDetail]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   SubtitleCueDetail copyWith({
     _i2.SubtitleCue? cue,
-    List<_i3.SubtitleToken>? tokens,
-    List<_i4.SubtitlePhrase>? phrases,
+    List<_i3.SubtitleCueText>? texts,
+    List<_i4.SubtitleToken>? tokens,
+    List<_i5.SubtitlePhrase>? phrases,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'SubtitleCueDetail',
       'cue': cue.toJson(),
+      if (texts != null) 'texts': texts?.toJson(valueToJson: (v) => v.toJson()),
       'tokens': tokens.toJson(valueToJson: (v) => v.toJson()),
       'phrases': phrases.toJson(valueToJson: (v) => v.toJson()),
     };
@@ -73,13 +85,17 @@ abstract class SubtitleCueDetail implements _i1.SerializableModel {
   }
 }
 
+class _Undefined {}
+
 class _SubtitleCueDetailImpl extends SubtitleCueDetail {
   _SubtitleCueDetailImpl({
     required _i2.SubtitleCue cue,
-    required List<_i3.SubtitleToken> tokens,
-    required List<_i4.SubtitlePhrase> phrases,
+    List<_i3.SubtitleCueText>? texts,
+    required List<_i4.SubtitleToken> tokens,
+    required List<_i5.SubtitlePhrase> phrases,
   }) : super._(
          cue: cue,
+         texts: texts,
          tokens: tokens,
          phrases: phrases,
        );
@@ -90,11 +106,15 @@ class _SubtitleCueDetailImpl extends SubtitleCueDetail {
   @override
   SubtitleCueDetail copyWith({
     _i2.SubtitleCue? cue,
-    List<_i3.SubtitleToken>? tokens,
-    List<_i4.SubtitlePhrase>? phrases,
+    Object? texts = _Undefined,
+    List<_i4.SubtitleToken>? tokens,
+    List<_i5.SubtitlePhrase>? phrases,
   }) {
     return SubtitleCueDetail(
       cue: cue ?? this.cue.copyWith(),
+      texts: texts is List<_i3.SubtitleCueText>?
+          ? texts
+          : this.texts?.map((e0) => e0.copyWith()).toList(),
       tokens: tokens ?? this.tokens.map((e0) => e0.copyWith()).toList(),
       phrases: phrases ?? this.phrases.map((e0) => e0.copyWith()).toList(),
     );

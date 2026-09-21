@@ -115,3 +115,35 @@ final knowledgeStatesProvider =
           ): result.state,
       };
     });
+
+class EntryKnowledgeBatchRequest {
+  final List<int> entryIds;
+
+  late final String signature = ([...entryIds]..sort()).join(',');
+
+  EntryKnowledgeBatchRequest({required this.entryIds});
+
+  @override
+  bool operator ==(Object other) {
+    return other is EntryKnowledgeBatchRequest && other.signature == signature;
+  }
+
+  @override
+  int get hashCode => signature.hashCode;
+}
+
+final entryKnowledgeStatesProvider =
+    FutureProvider.family<Map<int, String>, EntryKnowledgeBatchRequest>((
+      ref,
+      request,
+    ) async {
+      if (request.entryIds.isEmpty) {
+        return <int, String>{};
+      }
+
+      final repository = ref.watch(knownEntryRepositoryProvider);
+
+      return repository.getKnowledgeStatesByEntryIds(
+        entryIds: request.entryIds,
+      );
+    });

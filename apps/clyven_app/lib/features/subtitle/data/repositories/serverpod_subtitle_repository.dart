@@ -11,10 +11,12 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
   Future<List<serverpod.SubtitleCueDetail>> loadSubtitles({
     required int videoId,
     required String languageCode,
+    String? scriptCode,
   }) async {
     return client.subtitle.getCueDetails(
       videoId: videoId,
       languageCode: languageCode,
+      scriptCode: scriptCode,
     );
   }
 

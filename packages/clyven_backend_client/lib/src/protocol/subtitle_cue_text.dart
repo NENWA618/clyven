@@ -12,44 +12,41 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
-abstract class SubtitlePhrase implements _i1.SerializableModel {
-  SubtitlePhrase._({
+abstract class SubtitleCueText implements _i1.SerializableModel {
+  SubtitleCueText._({
     this.id,
     required this.cueId,
-    this.scriptCode,
+    required this.scriptCode,
     required this.text,
     this.normalizedText,
-    this.entryId,
-    required this.startPosition,
-    required this.endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) : createdAt = createdAt ?? DateTime.now(),
+  }) : isPrimary = isPrimary ?? false,
+       createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
-  factory SubtitlePhrase({
+  factory SubtitleCueText({
     int? id,
     required int cueId,
-    String? scriptCode,
+    required String scriptCode,
     required String text,
     String? normalizedText,
-    int? entryId,
-    required int startPosition,
-    required int endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) = _SubtitlePhraseImpl;
+  }) = _SubtitleCueTextImpl;
 
-  factory SubtitlePhrase.fromJson(Map<String, dynamic> jsonSerialization) {
-    return SubtitlePhrase(
+  factory SubtitleCueText.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SubtitleCueText(
       id: jsonSerialization['id'] as int?,
       cueId: jsonSerialization['cueId'] as int,
-      scriptCode: jsonSerialization['scriptCode'] as String?,
+      scriptCode: jsonSerialization['scriptCode'] as String,
       text: jsonSerialization['text'] as String,
       normalizedText: jsonSerialization['normalizedText'] as String?,
-      entryId: jsonSerialization['entryId'] as int?,
-      startPosition: jsonSerialization['startPosition'] as int,
-      endPosition: jsonSerialization['endPosition'] as int,
+      isPrimary: jsonSerialization['isPrimary'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isPrimary']),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -66,49 +63,41 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
 
   int cueId;
 
-  String? scriptCode;
+  String scriptCode;
 
   String text;
 
   String? normalizedText;
 
-  int? entryId;
-
-  int startPosition;
-
-  int endPosition;
+  bool isPrimary;
 
   DateTime createdAt;
 
   DateTime updatedAt;
 
-  /// Returns a shallow copy of this [SubtitlePhrase]
+  /// Returns a shallow copy of this [SubtitleCueText]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  SubtitlePhrase copyWith({
+  SubtitleCueText copyWith({
     int? id,
     int? cueId,
     String? scriptCode,
     String? text,
     String? normalizedText,
-    int? entryId,
-    int? startPosition,
-    int? endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'SubtitlePhrase',
+      '__className__': 'SubtitleCueText',
       if (id != null) 'id': id,
       'cueId': cueId,
-      if (scriptCode != null) 'scriptCode': scriptCode,
+      'scriptCode': scriptCode,
       'text': text,
       if (normalizedText != null) 'normalizedText': normalizedText,
-      if (entryId != null) 'entryId': entryId,
-      'startPosition': startPosition,
-      'endPosition': endPosition,
+      'isPrimary': isPrimary,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
@@ -122,16 +111,14 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
 
 class _Undefined {}
 
-class _SubtitlePhraseImpl extends SubtitlePhrase {
-  _SubtitlePhraseImpl({
+class _SubtitleCueTextImpl extends SubtitleCueText {
+  _SubtitleCueTextImpl({
     int? id,
     required int cueId,
-    String? scriptCode,
+    required String scriptCode,
     required String text,
     String? normalizedText,
-    int? entryId,
-    required int startPosition,
-    required int endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : super._(
@@ -140,40 +127,34 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
          scriptCode: scriptCode,
          text: text,
          normalizedText: normalizedText,
-         entryId: entryId,
-         startPosition: startPosition,
-         endPosition: endPosition,
+         isPrimary: isPrimary,
          createdAt: createdAt,
          updatedAt: updatedAt,
        );
 
-  /// Returns a shallow copy of this [SubtitlePhrase]
+  /// Returns a shallow copy of this [SubtitleCueText]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  SubtitlePhrase copyWith({
+  SubtitleCueText copyWith({
     Object? id = _Undefined,
     int? cueId,
-    Object? scriptCode = _Undefined,
+    String? scriptCode,
     String? text,
     Object? normalizedText = _Undefined,
-    Object? entryId = _Undefined,
-    int? startPosition,
-    int? endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return SubtitlePhrase(
+    return SubtitleCueText(
       id: id is int? ? id : this.id,
       cueId: cueId ?? this.cueId,
-      scriptCode: scriptCode is String? ? scriptCode : this.scriptCode,
+      scriptCode: scriptCode ?? this.scriptCode,
       text: text ?? this.text,
       normalizedText: normalizedText is String?
           ? normalizedText
           : this.normalizedText,
-      entryId: entryId is int? ? entryId : this.entryId,
-      startPosition: startPosition ?? this.startPosition,
-      endPosition: endPosition ?? this.endPosition,
+      isPrimary: isPrimary ?? this.isPrimary,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

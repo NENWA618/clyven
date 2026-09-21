@@ -12,45 +12,42 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class SubtitlePhrase
+abstract class SubtitleCueText
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
-  SubtitlePhrase._({
+  SubtitleCueText._({
     this.id,
     required this.cueId,
-    this.scriptCode,
+    required this.scriptCode,
     required this.text,
     this.normalizedText,
-    this.entryId,
-    required this.startPosition,
-    required this.endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) : createdAt = createdAt ?? DateTime.now(),
+  }) : isPrimary = isPrimary ?? false,
+       createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
-  factory SubtitlePhrase({
+  factory SubtitleCueText({
     int? id,
     required int cueId,
-    String? scriptCode,
+    required String scriptCode,
     required String text,
     String? normalizedText,
-    int? entryId,
-    required int startPosition,
-    required int endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) = _SubtitlePhraseImpl;
+  }) = _SubtitleCueTextImpl;
 
-  factory SubtitlePhrase.fromJson(Map<String, dynamic> jsonSerialization) {
-    return SubtitlePhrase(
+  factory SubtitleCueText.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SubtitleCueText(
       id: jsonSerialization['id'] as int?,
       cueId: jsonSerialization['cueId'] as int,
-      scriptCode: jsonSerialization['scriptCode'] as String?,
+      scriptCode: jsonSerialization['scriptCode'] as String,
       text: jsonSerialization['text'] as String,
       normalizedText: jsonSerialization['normalizedText'] as String?,
-      entryId: jsonSerialization['entryId'] as int?,
-      startPosition: jsonSerialization['startPosition'] as int,
-      endPosition: jsonSerialization['endPosition'] as int,
+      isPrimary: jsonSerialization['isPrimary'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isPrimary']),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -60,26 +57,22 @@ abstract class SubtitlePhrase
     );
   }
 
-  static final t = SubtitlePhraseTable();
+  static final t = SubtitleCueTextTable();
 
-  static const db = SubtitlePhraseRepository._();
+  static const db = SubtitleCueTextRepository._();
 
   @override
   int? id;
 
   int cueId;
 
-  String? scriptCode;
+  String scriptCode;
 
   String text;
 
   String? normalizedText;
 
-  int? entryId;
-
-  int startPosition;
-
-  int endPosition;
+  bool isPrimary;
 
   DateTime createdAt;
 
@@ -88,33 +81,29 @@ abstract class SubtitlePhrase
   @override
   _i1.Table<int?> get table => t;
 
-  /// Returns a shallow copy of this [SubtitlePhrase]
+  /// Returns a shallow copy of this [SubtitleCueText]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  SubtitlePhrase copyWith({
+  SubtitleCueText copyWith({
     int? id,
     int? cueId,
     String? scriptCode,
     String? text,
     String? normalizedText,
-    int? entryId,
-    int? startPosition,
-    int? endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'SubtitlePhrase',
+      '__className__': 'SubtitleCueText',
       if (id != null) 'id': id,
       'cueId': cueId,
-      if (scriptCode != null) 'scriptCode': scriptCode,
+      'scriptCode': scriptCode,
       'text': text,
       if (normalizedText != null) 'normalizedText': normalizedText,
-      if (entryId != null) 'entryId': entryId,
-      'startPosition': startPosition,
-      'endPosition': endPosition,
+      'isPrimary': isPrimary,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
@@ -123,40 +112,38 @@ abstract class SubtitlePhrase
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'SubtitlePhrase',
+      '__className__': 'SubtitleCueText',
       if (id != null) 'id': id,
       'cueId': cueId,
-      if (scriptCode != null) 'scriptCode': scriptCode,
+      'scriptCode': scriptCode,
       'text': text,
       if (normalizedText != null) 'normalizedText': normalizedText,
-      if (entryId != null) 'entryId': entryId,
-      'startPosition': startPosition,
-      'endPosition': endPosition,
+      'isPrimary': isPrimary,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
   }
 
-  static SubtitlePhraseInclude include() {
-    return SubtitlePhraseInclude._();
+  static SubtitleCueTextInclude include() {
+    return SubtitleCueTextInclude._();
   }
 
-  static SubtitlePhraseIncludeList includeList({
-    _i1.WhereExpressionBuilder<SubtitlePhraseTable>? where,
+  static SubtitleCueTextIncludeList includeList({
+    _i1.WhereExpressionBuilder<SubtitleCueTextTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<SubtitlePhraseTable>? orderBy,
+    _i1.OrderByBuilder<SubtitleCueTextTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<SubtitlePhraseTable>? orderByList,
-    SubtitlePhraseInclude? include,
+    _i1.OrderByListBuilder<SubtitleCueTextTable>? orderByList,
+    SubtitleCueTextInclude? include,
   }) {
-    return SubtitlePhraseIncludeList._(
+    return SubtitleCueTextIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(SubtitlePhrase.t),
+      orderBy: orderBy?.call(SubtitleCueText.t),
       orderDescending: orderDescending,
-      orderByList: orderByList?.call(SubtitlePhrase.t),
+      orderByList: orderByList?.call(SubtitleCueText.t),
       include: include,
     );
   }
@@ -169,16 +156,14 @@ abstract class SubtitlePhrase
 
 class _Undefined {}
 
-class _SubtitlePhraseImpl extends SubtitlePhrase {
-  _SubtitlePhraseImpl({
+class _SubtitleCueTextImpl extends SubtitleCueText {
+  _SubtitleCueTextImpl({
     int? id,
     required int cueId,
-    String? scriptCode,
+    required String scriptCode,
     required String text,
     String? normalizedText,
-    int? entryId,
-    required int startPosition,
-    required int endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) : super._(
@@ -187,55 +172,49 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
          scriptCode: scriptCode,
          text: text,
          normalizedText: normalizedText,
-         entryId: entryId,
-         startPosition: startPosition,
-         endPosition: endPosition,
+         isPrimary: isPrimary,
          createdAt: createdAt,
          updatedAt: updatedAt,
        );
 
-  /// Returns a shallow copy of this [SubtitlePhrase]
+  /// Returns a shallow copy of this [SubtitleCueText]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  SubtitlePhrase copyWith({
+  SubtitleCueText copyWith({
     Object? id = _Undefined,
     int? cueId,
-    Object? scriptCode = _Undefined,
+    String? scriptCode,
     String? text,
     Object? normalizedText = _Undefined,
-    Object? entryId = _Undefined,
-    int? startPosition,
-    int? endPosition,
+    bool? isPrimary,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return SubtitlePhrase(
+    return SubtitleCueText(
       id: id is int? ? id : this.id,
       cueId: cueId ?? this.cueId,
-      scriptCode: scriptCode is String? ? scriptCode : this.scriptCode,
+      scriptCode: scriptCode ?? this.scriptCode,
       text: text ?? this.text,
       normalizedText: normalizedText is String?
           ? normalizedText
           : this.normalizedText,
-      entryId: entryId is int? ? entryId : this.entryId,
-      startPosition: startPosition ?? this.startPosition,
-      endPosition: endPosition ?? this.endPosition,
+      isPrimary: isPrimary ?? this.isPrimary,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
 
-class SubtitlePhraseUpdateTable extends _i1.UpdateTable<SubtitlePhraseTable> {
-  SubtitlePhraseUpdateTable(super.table);
+class SubtitleCueTextUpdateTable extends _i1.UpdateTable<SubtitleCueTextTable> {
+  SubtitleCueTextUpdateTable(super.table);
 
   _i1.ColumnValue<int, int> cueId(int value) => _i1.ColumnValue(
     table.cueId,
     value,
   );
 
-  _i1.ColumnValue<String, String> scriptCode(String? value) => _i1.ColumnValue(
+  _i1.ColumnValue<String, String> scriptCode(String value) => _i1.ColumnValue(
     table.scriptCode,
     value,
   );
@@ -251,18 +230,8 @@ class SubtitlePhraseUpdateTable extends _i1.UpdateTable<SubtitlePhraseTable> {
         value,
       );
 
-  _i1.ColumnValue<int, int> entryId(int? value) => _i1.ColumnValue(
-    table.entryId,
-    value,
-  );
-
-  _i1.ColumnValue<int, int> startPosition(int value) => _i1.ColumnValue(
-    table.startPosition,
-    value,
-  );
-
-  _i1.ColumnValue<int, int> endPosition(int value) => _i1.ColumnValue(
-    table.endPosition,
+  _i1.ColumnValue<bool, bool> isPrimary(bool value) => _i1.ColumnValue(
+    table.isPrimary,
     value,
   );
 
@@ -279,10 +248,10 @@ class SubtitlePhraseUpdateTable extends _i1.UpdateTable<SubtitlePhraseTable> {
       );
 }
 
-class SubtitlePhraseTable extends _i1.Table<int?> {
-  SubtitlePhraseTable({super.tableRelation})
-    : super(tableName: 'subtitle_phrase') {
-    updateTable = SubtitlePhraseUpdateTable(this);
+class SubtitleCueTextTable extends _i1.Table<int?> {
+  SubtitleCueTextTable({super.tableRelation})
+    : super(tableName: 'subtitle_cue_text') {
+    updateTable = SubtitleCueTextUpdateTable(this);
     cueId = _i1.ColumnInt(
       'cueId',
       this,
@@ -299,17 +268,10 @@ class SubtitlePhraseTable extends _i1.Table<int?> {
       'normalizedText',
       this,
     );
-    entryId = _i1.ColumnInt(
-      'entryId',
+    isPrimary = _i1.ColumnBool(
+      'isPrimary',
       this,
-    );
-    startPosition = _i1.ColumnInt(
-      'startPosition',
-      this,
-    );
-    endPosition = _i1.ColumnInt(
-      'endPosition',
-      this,
+      hasDefault: true,
     );
     createdAt = _i1.ColumnDateTime(
       'createdAt',
@@ -323,7 +285,7 @@ class SubtitlePhraseTable extends _i1.Table<int?> {
     );
   }
 
-  late final SubtitlePhraseUpdateTable updateTable;
+  late final SubtitleCueTextUpdateTable updateTable;
 
   late final _i1.ColumnInt cueId;
 
@@ -333,11 +295,7 @@ class SubtitlePhraseTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString normalizedText;
 
-  late final _i1.ColumnInt entryId;
-
-  late final _i1.ColumnInt startPosition;
-
-  late final _i1.ColumnInt endPosition;
+  late final _i1.ColumnBool isPrimary;
 
   late final _i1.ColumnDateTime createdAt;
 
@@ -350,27 +308,25 @@ class SubtitlePhraseTable extends _i1.Table<int?> {
     scriptCode,
     text,
     normalizedText,
-    entryId,
-    startPosition,
-    endPosition,
+    isPrimary,
     createdAt,
     updatedAt,
   ];
 }
 
-class SubtitlePhraseInclude extends _i1.IncludeObject {
-  SubtitlePhraseInclude._();
+class SubtitleCueTextInclude extends _i1.IncludeObject {
+  SubtitleCueTextInclude._();
 
   @override
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => SubtitlePhrase.t;
+  _i1.Table<int?> get table => SubtitleCueText.t;
 }
 
-class SubtitlePhraseIncludeList extends _i1.IncludeList {
-  SubtitlePhraseIncludeList._({
-    _i1.WhereExpressionBuilder<SubtitlePhraseTable>? where,
+class SubtitleCueTextIncludeList extends _i1.IncludeList {
+  SubtitleCueTextIncludeList._({
+    _i1.WhereExpressionBuilder<SubtitleCueTextTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
@@ -378,20 +334,20 @@ class SubtitlePhraseIncludeList extends _i1.IncludeList {
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(SubtitlePhrase.t);
+    super.where = where?.call(SubtitleCueText.t);
   }
 
   @override
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => SubtitlePhrase.t;
+  _i1.Table<int?> get table => SubtitleCueText.t;
 }
 
-class SubtitlePhraseRepository {
-  const SubtitlePhraseRepository._();
+class SubtitleCueTextRepository {
+  const SubtitleCueTextRepository._();
 
-  /// Returns a list of [SubtitlePhrase]s matching the given query parameters.
+  /// Returns a list of [SubtitleCueText]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -413,22 +369,22 @@ class SubtitlePhraseRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<SubtitlePhrase>> find(
+  Future<List<SubtitleCueText>> find(
     _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<SubtitlePhraseTable>? where,
+    _i1.WhereExpressionBuilder<SubtitleCueTextTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<SubtitlePhraseTable>? orderBy,
+    _i1.OrderByBuilder<SubtitleCueTextTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<SubtitlePhraseTable>? orderByList,
+    _i1.OrderByListBuilder<SubtitleCueTextTable>? orderByList,
     _i1.Transaction? transaction,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
-    return session.db.find<SubtitlePhrase>(
-      where: where?.call(SubtitlePhrase.t),
-      orderBy: orderBy?.call(SubtitlePhrase.t),
-      orderByList: orderByList?.call(SubtitlePhrase.t),
+    return session.db.find<SubtitleCueText>(
+      where: where?.call(SubtitleCueText.t),
+      orderBy: orderBy?.call(SubtitleCueText.t),
+      orderByList: orderByList?.call(SubtitleCueText.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
@@ -438,7 +394,7 @@ class SubtitlePhraseRepository {
     );
   }
 
-  /// Returns the first matching [SubtitlePhrase] matching the given query parameters.
+  /// Returns the first matching [SubtitleCueText] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -455,21 +411,21 @@ class SubtitlePhraseRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<SubtitlePhrase?> findFirstRow(
+  Future<SubtitleCueText?> findFirstRow(
     _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<SubtitlePhraseTable>? where,
+    _i1.WhereExpressionBuilder<SubtitleCueTextTable>? where,
     int? offset,
-    _i1.OrderByBuilder<SubtitlePhraseTable>? orderBy,
+    _i1.OrderByBuilder<SubtitleCueTextTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<SubtitlePhraseTable>? orderByList,
+    _i1.OrderByListBuilder<SubtitleCueTextTable>? orderByList,
     _i1.Transaction? transaction,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findFirstRow<SubtitlePhrase>(
-      where: where?.call(SubtitlePhrase.t),
-      orderBy: orderBy?.call(SubtitlePhrase.t),
-      orderByList: orderByList?.call(SubtitlePhrase.t),
+    return session.db.findFirstRow<SubtitleCueText>(
+      where: where?.call(SubtitleCueText.t),
+      orderBy: orderBy?.call(SubtitleCueText.t),
+      orderByList: orderByList?.call(SubtitleCueText.t),
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
@@ -478,15 +434,15 @@ class SubtitlePhraseRepository {
     );
   }
 
-  /// Finds a single [SubtitlePhrase] by its [id] or null if no such row exists.
-  Future<SubtitlePhrase?> findById(
+  /// Finds a single [SubtitleCueText] by its [id] or null if no such row exists.
+  Future<SubtitleCueText?> findById(
     _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findById<SubtitlePhrase>(
+    return session.db.findById<SubtitleCueText>(
       id,
       transaction: transaction,
       lockMode: lockMode,
@@ -494,9 +450,9 @@ class SubtitlePhraseRepository {
     );
   }
 
-  /// Inserts all [SubtitlePhrase]s in the list and returns the inserted rows.
+  /// Inserts all [SubtitleCueText]s in the list and returns the inserted rows.
   ///
-  /// The returned [SubtitlePhrase]s will have their `id` fields set.
+  /// The returned [SubtitleCueText]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
@@ -504,141 +460,143 @@ class SubtitlePhraseRepository {
   /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
   /// rows are silently skipped, and only the successfully inserted rows are
   /// returned.
-  Future<List<SubtitlePhrase>> insert(
+  Future<List<SubtitleCueText>> insert(
     _i1.DatabaseSession session,
-    List<SubtitlePhrase> rows, {
+    List<SubtitleCueText> rows, {
     _i1.Transaction? transaction,
     bool ignoreConflicts = false,
   }) async {
-    return session.db.insert<SubtitlePhrase>(
+    return session.db.insert<SubtitleCueText>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
     );
   }
 
-  /// Inserts a single [SubtitlePhrase] and returns the inserted row.
+  /// Inserts a single [SubtitleCueText] and returns the inserted row.
   ///
-  /// The returned [SubtitlePhrase] will have its `id` field set.
-  Future<SubtitlePhrase> insertRow(
+  /// The returned [SubtitleCueText] will have its `id` field set.
+  Future<SubtitleCueText> insertRow(
     _i1.DatabaseSession session,
-    SubtitlePhrase row, {
+    SubtitleCueText row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<SubtitlePhrase>(
+    return session.db.insertRow<SubtitleCueText>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Updates all [SubtitlePhrase]s in the list and returns the updated rows. If
+  /// Updates all [SubtitleCueText]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
-  Future<List<SubtitlePhrase>> update(
+  Future<List<SubtitleCueText>> update(
     _i1.DatabaseSession session,
-    List<SubtitlePhrase> rows, {
-    _i1.ColumnSelections<SubtitlePhraseTable>? columns,
+    List<SubtitleCueText> rows, {
+    _i1.ColumnSelections<SubtitleCueTextTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<SubtitlePhrase>(
+    return session.db.update<SubtitleCueText>(
       rows,
-      columns: columns?.call(SubtitlePhrase.t),
+      columns: columns?.call(SubtitleCueText.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [SubtitlePhrase]. The row needs to have its id set.
+  /// Updates a single [SubtitleCueText]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<SubtitlePhrase> updateRow(
+  Future<SubtitleCueText> updateRow(
     _i1.DatabaseSession session,
-    SubtitlePhrase row, {
-    _i1.ColumnSelections<SubtitlePhraseTable>? columns,
+    SubtitleCueText row, {
+    _i1.ColumnSelections<SubtitleCueTextTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<SubtitlePhrase>(
+    return session.db.updateRow<SubtitleCueText>(
       row,
-      columns: columns?.call(SubtitlePhrase.t),
+      columns: columns?.call(SubtitleCueText.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [SubtitlePhrase] by its [id] with the specified [columnValues].
+  /// Updates a single [SubtitleCueText] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
-  Future<SubtitlePhrase?> updateById(
+  Future<SubtitleCueText?> updateById(
     _i1.DatabaseSession session,
     int id, {
-    required _i1.ColumnValueListBuilder<SubtitlePhraseUpdateTable> columnValues,
+    required _i1.ColumnValueListBuilder<SubtitleCueTextUpdateTable>
+    columnValues,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateById<SubtitlePhrase>(
+    return session.db.updateById<SubtitleCueText>(
       id,
-      columnValues: columnValues(SubtitlePhrase.t.updateTable),
+      columnValues: columnValues(SubtitleCueText.t.updateTable),
       transaction: transaction,
     );
   }
 
-  /// Updates all [SubtitlePhrase]s matching the [where] expression with the specified [columnValues].
+  /// Updates all [SubtitleCueText]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
-  Future<List<SubtitlePhrase>> updateWhere(
+  Future<List<SubtitleCueText>> updateWhere(
     _i1.DatabaseSession session, {
-    required _i1.ColumnValueListBuilder<SubtitlePhraseUpdateTable> columnValues,
-    required _i1.WhereExpressionBuilder<SubtitlePhraseTable> where,
+    required _i1.ColumnValueListBuilder<SubtitleCueTextUpdateTable>
+    columnValues,
+    required _i1.WhereExpressionBuilder<SubtitleCueTextTable> where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<SubtitlePhraseTable>? orderBy,
-    _i1.OrderByListBuilder<SubtitlePhraseTable>? orderByList,
+    _i1.OrderByBuilder<SubtitleCueTextTable>? orderBy,
+    _i1.OrderByListBuilder<SubtitleCueTextTable>? orderByList,
     bool orderDescending = false,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateWhere<SubtitlePhrase>(
-      columnValues: columnValues(SubtitlePhrase.t.updateTable),
-      where: where(SubtitlePhrase.t),
+    return session.db.updateWhere<SubtitleCueText>(
+      columnValues: columnValues(SubtitleCueText.t.updateTable),
+      where: where(SubtitleCueText.t),
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(SubtitlePhrase.t),
-      orderByList: orderByList?.call(SubtitlePhrase.t),
+      orderBy: orderBy?.call(SubtitleCueText.t),
+      orderByList: orderByList?.call(SubtitleCueText.t),
       orderDescending: orderDescending,
       transaction: transaction,
     );
   }
 
-  /// Deletes all [SubtitlePhrase]s in the list and returns the deleted rows.
+  /// Deletes all [SubtitleCueText]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
-  Future<List<SubtitlePhrase>> delete(
+  Future<List<SubtitleCueText>> delete(
     _i1.DatabaseSession session,
-    List<SubtitlePhrase> rows, {
+    List<SubtitleCueText> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<SubtitlePhrase>(
+    return session.db.delete<SubtitleCueText>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Deletes a single [SubtitlePhrase].
-  Future<SubtitlePhrase> deleteRow(
+  /// Deletes a single [SubtitleCueText].
+  Future<SubtitleCueText> deleteRow(
     _i1.DatabaseSession session,
-    SubtitlePhrase row, {
+    SubtitleCueText row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<SubtitlePhrase>(
+    return session.db.deleteRow<SubtitleCueText>(
       row,
       transaction: transaction,
     );
   }
 
   /// Deletes all rows matching the [where] expression.
-  Future<List<SubtitlePhrase>> deleteWhere(
+  Future<List<SubtitleCueText>> deleteWhere(
     _i1.DatabaseSession session, {
-    required _i1.WhereExpressionBuilder<SubtitlePhraseTable> where,
+    required _i1.WhereExpressionBuilder<SubtitleCueTextTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<SubtitlePhrase>(
-      where: where(SubtitlePhrase.t),
+    return session.db.deleteWhere<SubtitleCueText>(
+      where: where(SubtitleCueText.t),
       transaction: transaction,
     );
   }
@@ -647,27 +605,27 @@ class SubtitlePhraseRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<SubtitlePhraseTable>? where,
+    _i1.WhereExpressionBuilder<SubtitleCueTextTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<SubtitlePhrase>(
-      where: where?.call(SubtitlePhrase.t),
+    return session.db.count<SubtitleCueText>(
+      where: where?.call(SubtitleCueText.t),
       limit: limit,
       transaction: transaction,
     );
   }
 
-  /// Acquires row-level locks on [SubtitlePhrase] rows matching the [where] expression.
+  /// Acquires row-level locks on [SubtitleCueText] rows matching the [where] expression.
   Future<void> lockRows(
     _i1.DatabaseSession session, {
-    required _i1.WhereExpressionBuilder<SubtitlePhraseTable> where,
+    required _i1.WhereExpressionBuilder<SubtitleCueTextTable> where,
     required _i1.LockMode lockMode,
     required _i1.Transaction transaction,
     _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
   }) async {
-    return session.db.lockRows<SubtitlePhrase>(
-      where: where(SubtitlePhrase.t),
+    return session.db.lockRows<SubtitleCueText>(
+      where: where(SubtitleCueText.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
       transaction: transaction,

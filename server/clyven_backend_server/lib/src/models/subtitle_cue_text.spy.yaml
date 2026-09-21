@@ -1,0 +1,24 @@
+class: SubtitleCueText
+table: subtitle_cue_text
+
+fields:
+  # All script representations share the same timed cue.
+  cueId: int, relation(parent=subtitle_cue)
+
+  # Opaque script code supplied by the shared language library.
+  # Clyven must not hardcode supported scripts.
+  scriptCode: String
+
+  text: String
+  normalizedText: String?
+
+  # One representation can be selected as the fallback display form.
+  isPrimary: bool, default=false
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  subtitle_cue_text_unique_idx:
+    fields: cueId, scriptCode
+    unique: true

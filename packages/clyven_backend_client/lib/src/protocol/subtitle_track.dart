@@ -17,7 +17,9 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
     this.id,
     required this.videoId,
     required this.languageCode,
+    this.variantCode,
     required this.label,
+    this.defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -29,7 +31,9 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
     int? id,
     required int videoId,
     required String languageCode,
+    String? variantCode,
     required String label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -40,7 +44,9 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       videoId: jsonSerialization['videoId'] as int,
       languageCode: jsonSerialization['languageCode'] as String,
+      variantCode: jsonSerialization['variantCode'] as String?,
       label: jsonSerialization['label'] as String,
+      defaultScriptCode: jsonSerialization['defaultScriptCode'] as String?,
       isDefault: jsonSerialization['isDefault'] == null
           ? null
           : _i1.BoolJsonExtension.fromJson(jsonSerialization['isDefault']),
@@ -62,7 +68,11 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
 
   String languageCode;
 
+  String? variantCode;
+
   String label;
+
+  String? defaultScriptCode;
 
   bool isDefault;
 
@@ -77,7 +87,9 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
     int? id,
     int? videoId,
     String? languageCode,
+    String? variantCode,
     String? label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -89,7 +101,9 @@ abstract class SubtitleTrack implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'videoId': videoId,
       'languageCode': languageCode,
+      if (variantCode != null) 'variantCode': variantCode,
       'label': label,
+      if (defaultScriptCode != null) 'defaultScriptCode': defaultScriptCode,
       'isDefault': isDefault,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -109,7 +123,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
     int? id,
     required int videoId,
     required String languageCode,
+    String? variantCode,
     required String label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -117,7 +133,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
          id: id,
          videoId: videoId,
          languageCode: languageCode,
+         variantCode: variantCode,
          label: label,
+         defaultScriptCode: defaultScriptCode,
          isDefault: isDefault,
          createdAt: createdAt,
          updatedAt: updatedAt,
@@ -131,7 +149,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
     Object? id = _Undefined,
     int? videoId,
     String? languageCode,
+    Object? variantCode = _Undefined,
     String? label,
+    Object? defaultScriptCode = _Undefined,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -140,7 +160,11 @@ class _SubtitleTrackImpl extends SubtitleTrack {
       id: id is int? ? id : this.id,
       videoId: videoId ?? this.videoId,
       languageCode: languageCode ?? this.languageCode,
+      variantCode: variantCode is String? ? variantCode : this.variantCode,
       label: label ?? this.label,
+      defaultScriptCode: defaultScriptCode is String?
+          ? defaultScriptCode
+          : this.defaultScriptCode,
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

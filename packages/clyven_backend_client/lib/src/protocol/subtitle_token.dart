@@ -16,8 +16,10 @@ abstract class SubtitleToken implements _i1.SerializableModel {
   SubtitleToken._({
     this.id,
     required this.cueId,
+    this.scriptCode,
     required this.text,
     this.normalizedText,
+    this.entryId,
     this.startMs,
     this.endMs,
     required this.position,
@@ -29,8 +31,10 @@ abstract class SubtitleToken implements _i1.SerializableModel {
   factory SubtitleToken({
     int? id,
     required int cueId,
+    String? scriptCode,
     required String text,
     String? normalizedText,
+    int? entryId,
     int? startMs,
     int? endMs,
     required int position,
@@ -42,8 +46,10 @@ abstract class SubtitleToken implements _i1.SerializableModel {
     return SubtitleToken(
       id: jsonSerialization['id'] as int?,
       cueId: jsonSerialization['cueId'] as int,
+      scriptCode: jsonSerialization['scriptCode'] as String?,
       text: jsonSerialization['text'] as String,
       normalizedText: jsonSerialization['normalizedText'] as String?,
+      entryId: jsonSerialization['entryId'] as int?,
       startMs: jsonSerialization['startMs'] as int?,
       endMs: jsonSerialization['endMs'] as int?,
       position: jsonSerialization['position'] as int,
@@ -63,9 +69,13 @@ abstract class SubtitleToken implements _i1.SerializableModel {
 
   int cueId;
 
+  String? scriptCode;
+
   String text;
 
   String? normalizedText;
+
+  int? entryId;
 
   int? startMs;
 
@@ -83,8 +93,10 @@ abstract class SubtitleToken implements _i1.SerializableModel {
   SubtitleToken copyWith({
     int? id,
     int? cueId,
+    String? scriptCode,
     String? text,
     String? normalizedText,
+    int? entryId,
     int? startMs,
     int? endMs,
     int? position,
@@ -97,8 +109,10 @@ abstract class SubtitleToken implements _i1.SerializableModel {
       '__className__': 'SubtitleToken',
       if (id != null) 'id': id,
       'cueId': cueId,
+      if (scriptCode != null) 'scriptCode': scriptCode,
       'text': text,
       if (normalizedText != null) 'normalizedText': normalizedText,
+      if (entryId != null) 'entryId': entryId,
       if (startMs != null) 'startMs': startMs,
       if (endMs != null) 'endMs': endMs,
       'position': position,
@@ -119,8 +133,10 @@ class _SubtitleTokenImpl extends SubtitleToken {
   _SubtitleTokenImpl({
     int? id,
     required int cueId,
+    String? scriptCode,
     required String text,
     String? normalizedText,
+    int? entryId,
     int? startMs,
     int? endMs,
     required int position,
@@ -129,8 +145,10 @@ class _SubtitleTokenImpl extends SubtitleToken {
   }) : super._(
          id: id,
          cueId: cueId,
+         scriptCode: scriptCode,
          text: text,
          normalizedText: normalizedText,
+         entryId: entryId,
          startMs: startMs,
          endMs: endMs,
          position: position,
@@ -145,8 +163,10 @@ class _SubtitleTokenImpl extends SubtitleToken {
   SubtitleToken copyWith({
     Object? id = _Undefined,
     int? cueId,
+    Object? scriptCode = _Undefined,
     String? text,
     Object? normalizedText = _Undefined,
+    Object? entryId = _Undefined,
     Object? startMs = _Undefined,
     Object? endMs = _Undefined,
     int? position,
@@ -156,10 +176,12 @@ class _SubtitleTokenImpl extends SubtitleToken {
     return SubtitleToken(
       id: id is int? ? id : this.id,
       cueId: cueId ?? this.cueId,
+      scriptCode: scriptCode is String? ? scriptCode : this.scriptCode,
       text: text ?? this.text,
       normalizedText: normalizedText is String?
           ? normalizedText
           : this.normalizedText,
+      entryId: entryId is int? ? entryId : this.entryId,
       startMs: startMs is int? ? startMs : this.startMs,
       endMs: endMs is int? ? endMs : this.endMs,
       position: position ?? this.position,

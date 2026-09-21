@@ -595,6 +595,31 @@ class Endpoints extends _i1.EndpointDispatch {
                     explanationLanguageCode: params['explanationLanguageCode'],
                   ),
         ),
+        'getById': _i1.MethodConnector(
+          name: 'getById',
+          params: {
+            'entryId': _i1.ParameterDescription(
+              name: 'entryId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'explanationLanguageCode': _i1.ParameterDescription(
+              name: 'explanationLanguageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['dictionary'] as _i6.DictionaryEndpoint).getById(
+                    session,
+                    entryId: params['entryId'],
+                    explanationLanguageCode: params['explanationLanguageCode'],
+                  ),
+        ),
         'listEntries': _i1.MethodConnector(
           name: 'listEntries',
           params: {
@@ -878,6 +903,25 @@ class Endpoints extends _i1.EndpointDispatch {
                     known: params['known'],
                   ),
         ),
+        'getKnowledgeStatesByEntryIds': _i1.MethodConnector(
+          name: 'getKnowledgeStatesByEntryIds',
+          params: {
+            'entryIds': _i1.ParameterDescription(
+              name: 'entryIds',
+              type: _i1.getType<List<int>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['knownEntry'] as _i8.KnownEntryEndpoint)
+                  .getKnowledgeStatesByEntryIds(
+                    session,
+                    entryIds: params['entryIds'],
+                  ),
+        ),
         'getKnowledgeState': _i1.MethodConnector(
           name: 'getKnowledgeState',
           params: {
@@ -947,6 +991,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'scriptCode': _i1.ParameterDescription(
+              name: 'scriptCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -957,6 +1006,7 @@ class Endpoints extends _i1.EndpointDispatch {
                     session,
                     videoId: params['videoId'],
                     languageCode: params['languageCode'],
+                    scriptCode: params['scriptCode'],
                   ),
         ),
         'getAvailableTracks': _i1.MethodConnector(
@@ -1027,6 +1077,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'scriptCode': _i1.ParameterDescription(
+              name: 'scriptCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -1038,6 +1093,7 @@ class Endpoints extends _i1.EndpointDispatch {
                     videoId: params['videoId'],
                     languageCode: params['languageCode'],
                     content: params['content'],
+                    scriptCode: params['scriptCode'],
                   ),
         ),
         'exportSrt': _i1.MethodConnector(
@@ -1078,6 +1134,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'scriptCode': _i1.ParameterDescription(
+              name: 'scriptCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -1088,6 +1149,44 @@ class Endpoints extends _i1.EndpointDispatch {
                     session,
                     cueId: params['cueId'],
                     text: params['text'],
+                    scriptCode: params['scriptCode'],
+                  ),
+        ),
+        'upsertCueScriptText': _i1.MethodConnector(
+          name: 'upsertCueScriptText',
+          params: {
+            'cueId': _i1.ParameterDescription(
+              name: 'cueId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'scriptCode': _i1.ParameterDescription(
+              name: 'scriptCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'text': _i1.ParameterDescription(
+              name: 'text',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'isPrimary': _i1.ParameterDescription(
+              name: 'isPrimary',
+              type: _i1.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['subtitle'] as _i9.SubtitleEndpoint)
+                  .upsertCueScriptText(
+                    session,
+                    cueId: params['cueId'],
+                    scriptCode: params['scriptCode'],
+                    text: params['text'],
+                    isPrimary: params['isPrimary'],
                   ),
         ),
         'updateCueTiming': _i1.MethodConnector(
@@ -1149,6 +1248,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'scriptCode': _i1.ParameterDescription(
+              name: 'scriptCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call:
               (
@@ -1162,6 +1266,7 @@ class Endpoints extends _i1.EndpointDispatch {
                     startMs: params['startMs'],
                     endMs: params['endMs'],
                     text: params['text'],
+                    scriptCode: params['scriptCode'],
                   ),
         ),
         'deleteCue': _i1.MethodConnector(

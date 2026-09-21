@@ -30,14 +30,10 @@ class KnownEntryEndpoint extends Endpoint {
 
     final rows = await UserKnownEntry.db.find(
       session,
-      where: (k) =>
-          k.userId.equals(userId) &
-          k.entryId.inSet(entryIds.toSet()),
+      where: (k) => k.userId.equals(userId) & k.entryId.inSet(entryIds.toSet()),
     );
 
-    return rows
-        .map((row) => row.entryId)
-        .toList();
+    return rows.map((row) => row.entryId).toList();
   }
 
   Future<bool> setKnown(
@@ -47,12 +43,9 @@ class KnownEntryEndpoint extends Endpoint {
   }) async {
     final userId = _userId(session);
 
-    final existing =
-        await UserKnownEntry.db.findFirstRow(
+    final existing = await UserKnownEntry.db.findFirstRow(
       session,
-      where: (k) =>
-          k.userId.equals(userId) &
-          k.entryId.equals(entryId),
+      where: (k) => k.userId.equals(userId) & k.entryId.equals(entryId),
     );
 
     if (known) {
@@ -79,6 +72,71 @@ class KnownEntryEndpoint extends Endpoint {
     return false;
   }
 
+  Future<List<EntryKnowledgeState>> getKnowledgeStatesByEntryIds(
+    Session session, {
+    required List<int> entryIds,
+  }) async {
+    if (entryIds.isEmpty) {
+      return [];
+    }
+
+    final requestedIds = <int>[];
+
+    for (final entryId in entryIds) {
+      if (!requestedIds.contains(entryId)) {
+        requestedIds.add(entryId);
+      }
+    }
+
+    final requestedSet = requestedIds.toSet();
+    final userId = _userId(session);
+
+    final relations = await DictionaryRelation.db.find(
+      session,
+      where: (relation) =>
+          relation.sourceEntryId.inSet(requestedSet) |
+          relation.targetEntryId.inSet(requestedSet),
+    );
+
+    final relevantIds = <int>{...requestedSet};
+
+    for (final relation in relations) {
+      relevantIds.add(relation.sourceEntryId);
+      relevantIds.add(relation.targetEntryId);
+    }
+
+    final knownRows = await UserKnownEntry.db.find(
+      session,
+      where: (known) =>
+          known.userId.equals(userId) & known.entryId.inSet(relevantIds),
+    );
+
+    final knownIds = knownRows.map((row) => row.entryId).toSet();
+    final relatedByEntryId = <int, Set<int>>{};
+
+    for (final relation in relations) {
+      relatedByEntryId
+          .putIfAbsent(relation.sourceEntryId, () => <int>{})
+          .add(relation.targetEntryId);
+
+      relatedByEntryId
+          .putIfAbsent(relation.targetEntryId, () => <int>{})
+          .add(relation.sourceEntryId);
+    }
+
+    return [
+      for (final entryId in requestedIds)
+        EntryKnowledgeState(
+          entryId: entryId,
+          state: knownIds.contains(entryId)
+              ? 'exactKnown'
+              : (relatedByEntryId[entryId]?.any(knownIds.contains) ?? false)
+              ? 'relatedKnown'
+              : 'unknown',
+        ),
+    ];
+  }
+
   Future<String> getKnowledgeState(
     Session session, {
     required String languageCode,
@@ -103,8 +161,7 @@ class KnownEntryEndpoint extends Endpoint {
     return results.first.state;
   }
 
-  Future<List<KnowledgeStateResult>>
-      getKnowledgeStates(
+  Future<List<KnowledgeStateResult>> getKnowledgeStates(
     Session session, {
     required List<KnowledgeStateQuery> queries,
   }) async {
@@ -115,17 +172,11 @@ class KnownEntryEndpoint extends Endpoint {
     final userId = _userId(session);
 
     // 1. 一次查出本批次可能需要的词条。
-    final languageCodes = queries
-        .map((q) => q.languageCode)
-        .toSet();
+    final languageCodes = queries.map((q) => q.languageCode).toSet();
 
-    final normalizedTexts = queries
-        .map((q) => q.normalizedText)
-        .toSet();
+    final normalizedTexts = queries.map((q) => q.normalizedText).toSet();
 
-    final entryTypes = queries
-        .map((q) => q.entryType)
-        .toSet();
+    final entryTypes = queries.map((q) => q.entryType).toSet();
 
     final entries = await DictionaryEntry.db.find(
       session,
@@ -137,18 +188,15 @@ class KnownEntryEndpoint extends Endpoint {
           e.entryType.inSet(entryTypes),
     );
 
-    final entryByKey =
-        <String, DictionaryEntry>{};
+    final entryByKey = <String, DictionaryEntry>{};
 
     for (final entry in entries) {
-      entryByKey[
-        _queryKey(
-          languageCode: entry.languageCode,
-          normalizedText:
-              entry.normalizedText,
-          entryType: entry.entryType,
-        )
-      ] = entry;
+      entryByKey[_queryKey(
+            languageCode: entry.languageCode,
+            normalizedText: entry.normalizedText,
+            entryType: entry.entryType,
+          )] =
+          entry;
     }
 
     final requestedEntryIds = entries
@@ -160,10 +208,8 @@ class KnownEntryEndpoint extends Endpoint {
       return queries
           .map(
             (query) => KnowledgeStateResult(
-              languageCode:
-                  query.languageCode,
-              normalizedText:
-                  query.normalizedText,
+              languageCode: query.languageCode,
+              normalizedText: query.normalizedText,
               entryType: query.entryType,
               state: 'unknown',
             ),
@@ -179,8 +225,7 @@ class KnownEntryEndpoint extends Endpoint {
     // 可以让：
     // học 已会     → học sinh relatedKnown
     // học sinh 已会 → học relatedKnown
-    final relations =
-        await DictionaryRelation.db.find(
+    final relations = await DictionaryRelation.db.find(
       session,
       where: (r) =>
           r.sourceEntryId.inSet(
@@ -192,8 +237,7 @@ class KnownEntryEndpoint extends Endpoint {
     );
 
     // 3. 收集当前词条 + 所有关联词条。
-    final allRelevantEntryIds =
-        <int>{...requestedEntryIds};
+    final allRelevantEntryIds = <int>{...requestedEntryIds};
 
     for (final relation in relations) {
       allRelevantEntryIds.add(
@@ -206,8 +250,7 @@ class KnownEntryEndpoint extends Endpoint {
     }
 
     // 4. 一次查出用户真正标记为已会的所有相关词。
-    final knownRows =
-        await UserKnownEntry.db.find(
+    final knownRows = await UserKnownEntry.db.find(
       session,
       where: (k) =>
           k.userId.equals(userId) &
@@ -216,16 +259,12 @@ class KnownEntryEndpoint extends Endpoint {
           ),
     );
 
-    final knownEntryIds = knownRows
-        .map((row) => row.entryId)
-        .toSet();
+    final knownEntryIds = knownRows.map((row) => row.entryId).toSet();
 
     // 5. 把关系放到内存里，之后不再查数据库。
-    final outgoing =
-        <int, Set<int>>{};
+    final outgoing = <int, Set<int>>{};
 
-    final incoming =
-        <int, Set<int>>{};
+    final incoming = <int, Set<int>>{};
 
     for (final relation in relations) {
       outgoing
@@ -248,14 +287,12 @@ class KnownEntryEndpoint extends Endpoint {
     }
 
     // 6. 在 Dart 内存里计算整批状态。
-    final results =
-        <KnowledgeStateResult>[];
+    final results = <KnowledgeStateResult>[];
 
     for (final query in queries) {
       final key = _queryKey(
         languageCode: query.languageCode,
-        normalizedText:
-            query.normalizedText,
+        normalizedText: query.normalizedText,
         entryType: query.entryType,
       );
 
@@ -274,8 +311,7 @@ class KnownEntryEndpoint extends Endpoint {
             ...?incoming[entryId],
           };
 
-          final hasKnownRelated =
-              relatedIds.any(
+          final hasKnownRelated = relatedIds.any(
             knownEntryIds.contains,
           );
 
@@ -287,10 +323,8 @@ class KnownEntryEndpoint extends Endpoint {
 
       results.add(
         KnowledgeStateResult(
-          languageCode:
-              query.languageCode,
-          normalizedText:
-              query.normalizedText,
+          languageCode: query.languageCode,
+          normalizedText: query.normalizedText,
           entryType: query.entryType,
           state: state,
         ),

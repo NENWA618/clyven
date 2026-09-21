@@ -50,7 +50,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
 
   bool _showComments = false;
   bool _subtitlesEnabled = true;
-  String? _selectedSubtitleLanguageCode;
+  String? _selectedSubtitleTrackKey;
 
   static const String _subtitleOffValue = '__subtitle_off__';
 
@@ -164,6 +164,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
             subtitleProvider((
               videoId: numericVideoId,
               languageCode: selectedSubtitleTrack.languageCode,
+              scriptCode: selectedSubtitleTrack.defaultScriptCode,
             )),
           );
 
@@ -191,6 +192,8 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   video,
                   subtitles,
                   historyItem?.positionSeconds ?? 0,
+                  subtitleLanguageCode: selectedSubtitleTrack?.languageCode,
+                  subtitleScriptCode: selectedSubtitleTrack?.defaultScriptCode,
                 ),
                 if (widget.hosted)
                   Positioned(
@@ -214,19 +217,115 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                       ),
                     ),
                   ),
-                if (subtitleTracks.isNotEmpty)
-                  Positioned(
-                    right: 10,
-                    top: 10,
-                    child: _buildSubtitleMenu(
-                      context,
-                      subtitleTracks,
-                      selectedSubtitleTrack,
-                    ),
-                  ),
               ],
             ),
           ),
+          if (subtitleTracks.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                child: PopupMenuButton<String>(
+                  tooltip: 'Subtitles',
+                  position: PopupMenuPosition.under,
+                  initialValue: !_subtitlesEnabled
+                      ? _subtitleOffValue
+                      : selectedSubtitleTrack == null
+                      ? null
+                      : _subtitleTrackKey(selectedSubtitleTrack),
+                  onSelected: (value) {
+                    if (value == _subtitleOffValue) {
+                      setState(() {
+                        _subtitlesEnabled = false;
+                      });
+                      return;
+                    }
+
+                    for (final track in subtitleTracks) {
+                      if (_subtitleTrackKey(track) != value) {
+                        continue;
+                      }
+
+                      setState(() {
+                        _subtitlesEnabled = true;
+                        _selectedSubtitleTrackKey = value;
+                      });
+
+                      return;
+                    }
+                  },
+                  itemBuilder: (context) {
+                    final selectedKey = !_subtitlesEnabled
+                        ? _subtitleOffValue
+                        : selectedSubtitleTrack == null
+                        ? null
+                        : _subtitleTrackKey(selectedSubtitleTrack);
+
+                    return [
+                      PopupMenuItem<String>(
+                        value: _subtitleOffValue,
+                        child: Row(
+                          children: [
+                            Icon(
+                              selectedKey == _subtitleOffValue
+                                  ? Icons.check_rounded
+                                  : Icons.closed_caption_off_rounded,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            const Text('Off'),
+                          ],
+                        ),
+                      ),
+                      for (final track in subtitleTracks)
+                        PopupMenuItem<String>(
+                          value: _subtitleTrackKey(track),
+                          child: Row(
+                            children: [
+                              Icon(
+                                selectedKey == _subtitleTrackKey(track)
+                                    ? Icons.check_rounded
+                                    : Icons.closed_caption_rounded,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(_subtitleTrackLabel(track)),
+                                  Text(
+                                    [
+                                      track.languageCode,
+                                      if (track.variantCode != null)
+                                        track.variantCode!,
+                                      if (track.defaultScriptCode != null)
+                                        track.defaultScriptCode!,
+                                    ].join(' · '),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                    ];
+                  },
+                  child: Container(
+                    width: 44,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).dividerColor),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.closed_caption_rounded, size: 23),
+                  ),
+                ),
+              ),
+            ),
           Expanded(
             child: _showComments
                 ? CommentsPage(
@@ -266,6 +365,16 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     );
   }
 
+  String _subtitleTrackKey(serverpod.SubtitleTrack track) {
+    final id = track.id;
+
+    if (id != null) {
+      return 'id:$id';
+    }
+
+    return 'language:${track.languageCode}|variant:${track.variantCode ?? ''}';
+  }
+
   serverpod.SubtitleTrack? _resolveSubtitleTrack(
     List<serverpod.SubtitleTrack> tracks,
   ) {
@@ -273,11 +382,11 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       return null;
     }
 
-    final selectedCode = _selectedSubtitleLanguageCode;
+    final selectedKey = _selectedSubtitleTrackKey;
 
-    if (selectedCode != null) {
+    if (selectedKey != null) {
       for (final track in tracks) {
-        if (track.languageCode == selectedCode) {
+        if (_subtitleTrackKey(track) == selectedKey) {
           return track;
         }
       }
@@ -287,6 +396,13 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       if (track.isDefault) {
         return track;
       }
+    }
+
+    final tracksWithIds = tracks.where((track) => track.id != null).toList();
+
+    if (tracksWithIds.isNotEmpty) {
+      tracksWithIds.sort((a, b) => a.id!.compareTo(b.id!));
+      return tracksWithIds.first;
     }
 
     return tracks.first;
@@ -302,66 +418,109 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     return track.languageCode.toUpperCase();
   }
 
+  void _showSubtitleMenu(
+    BuildContext context,
+    List<serverpod.SubtitleTrack> tracks,
+  ) {
+    if (tracks.isEmpty) {
+      return;
+    }
+
+    final selectedTrack = _resolveSubtitleTrack(tracks);
+    final selectedKey = _subtitlesEnabled && selectedTrack != null
+        ? _subtitleTrackKey(selectedTrack)
+        : _subtitleOffValue;
+
+    showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 18),
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(12, 2, 12, 10),
+                child: Text(
+                  'Subtitles',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                ),
+              ),
+              ListTile(
+                leading: Icon(
+                  selectedKey == _subtitleOffValue
+                      ? Icons.check_rounded
+                      : Icons.closed_caption_off_rounded,
+                ),
+                title: const Text('Off'),
+                onTap: () {
+                  Navigator.pop(sheetContext, _subtitleOffValue);
+                },
+              ),
+              for (final track in tracks)
+                ListTile(
+                  leading: Icon(
+                    selectedKey == _subtitleTrackKey(track)
+                        ? Icons.check_rounded
+                        : Icons.closed_caption_rounded,
+                  ),
+                  title: Text(_subtitleTrackLabel(track)),
+                  subtitle: Text(
+                    [
+                      track.languageCode,
+                      if (track.variantCode != null) track.variantCode!,
+                      if (track.defaultScriptCode != null)
+                        track.defaultScriptCode!,
+                    ].join(' · '),
+                  ),
+                  onTap: () {
+                    Navigator.pop(sheetContext, _subtitleTrackKey(track));
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    ).then((result) {
+      if (!mounted || result == null) {
+        return;
+      }
+
+      if (result == _subtitleOffValue) {
+        setState(() {
+          _subtitlesEnabled = false;
+        });
+        return;
+      }
+
+      for (final track in tracks) {
+        if (_subtitleTrackKey(track) != result) {
+          continue;
+        }
+
+        setState(() {
+          _subtitlesEnabled = true;
+          _selectedSubtitleTrackKey = result;
+        });
+
+        return;
+      }
+    });
+  }
+
   Widget _buildSubtitleMenu(
     BuildContext context,
     List<serverpod.SubtitleTrack> tracks,
     serverpod.SubtitleTrack? selectedTrack,
   ) {
-    final selectedCode = _subtitlesEnabled ? selectedTrack?.languageCode : null;
-
     return Material(
       color: Colors.black.withValues(alpha: 0.52),
       shape: const CircleBorder(),
-      child: PopupMenuButton<String>(
-        tooltip: 'Subtitles',
-        initialValue: _subtitlesEnabled
-            ? selectedTrack?.languageCode
-            : _subtitleOffValue,
-        onSelected: (value) {
-          setState(() {
-            if (value == _subtitleOffValue) {
-              _subtitlesEnabled = false;
-              return;
-            }
-
-            _subtitlesEnabled = true;
-            _selectedSubtitleLanguageCode = value;
-          });
-        },
-        itemBuilder: (context) {
-          return [
-            PopupMenuItem<String>(
-              value: _subtitleOffValue,
-              child: Row(
-                children: [
-                  Icon(
-                    selectedCode == null
-                        ? Icons.check_rounded
-                        : Icons.closed_caption_off_rounded,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text('Off'),
-                ],
-              ),
-            ),
-            for (final track in tracks)
-              PopupMenuItem<String>(
-                value: track.languageCode,
-                child: Row(
-                  children: [
-                    Icon(
-                      selectedCode == track.languageCode
-                          ? Icons.check_rounded
-                          : Icons.closed_caption_rounded,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(_subtitleTrackLabel(track)),
-                  ],
-                ),
-              ),
-          ];
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () {
+          _showSubtitleMenu(context, tracks);
         },
         child: SizedBox(
           width: 40,
@@ -404,6 +563,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
             subtitleProvider((
               videoId: numericVideoId,
               languageCode: selectedSubtitleTrack.languageCode,
+              scriptCode: selectedSubtitleTrack.defaultScriptCode,
             )),
           );
 
@@ -427,6 +587,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     video,
                     subtitles,
                     historyItem?.positionSeconds ?? 0,
+                    subtitleLanguageCode: selectedSubtitleTrack?.languageCode,
+                    subtitleScriptCode:
+                        selectedSubtitleTrack?.defaultScriptCode,
                     compact: true,
                   ),
                 ),
@@ -493,6 +656,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     VideoDetail video,
     List<serverpod.SubtitleCueDetail> subtitles,
     int initialPositionSeconds, {
+    String? subtitleLanguageCode,
+    String? subtitleScriptCode,
+    VoidCallback? onSubtitlesPressed,
     bool compact = false,
   }) {
     return NetworkVideoPlayer(
@@ -500,6 +666,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       videoUrl: video.videoUrl,
       coverUrl: video.coverUrl,
       subtitles: subtitles,
+      subtitleLanguageCode: subtitleLanguageCode,
+      subtitleScriptCode: subtitleScriptCode,
+      onSubtitlesPressed: onSubtitlesPressed,
       initialPositionSeconds: initialPositionSeconds,
       fallbackDurationSeconds: video.durationSeconds,
       compact: compact,
