@@ -1,253 +1,128 @@
 import 'dart:io';
 
 import 'package:clyven_app/core/localization/localized_labels.dart';
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
 import 'video_search_page.dart';
 
-import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
-
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() {
-    return _HomePageState();
-  }
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  static const Color _inkColor = Color(0xFF161616);
+  static const _lightBackground = Color(0xFFF7F9FC);
+  static const _darkBackground = Color(0xFF0D1117);
+  static const _lightInk = Color(0xFF111827);
+  static const _darkInk = Color(0xFFF2F4F7);
+  static const _lightMuted = Color(0xFF667085);
+  static const _darkMuted = Color(0xFFAAB4C3);
+  static const _lightSoft = Color(0xFFEEF2F7);
+  static const _darkSoft = Color(0xFF1B2430);
+  static const _brandBlue = Color(0xFF3478F6);
 
-  String _selectedContentLanguageCode = 'all';
-
-  static const List<_ContentLanguageOption> _contentLanguages = [
-    _ContentLanguageOption(
-      code: 'all',
-      labelZh: '多语言',
-      labelEn: 'All languages',
-      nativeLabel: 'For you',
-      subtitleZh: '混合你的学习语言',
-      subtitleEn: 'A mix of your learning languages',
-    ),
-    _ContentLanguageOption(
-      code: 'vi',
-      labelZh: '越南语',
-      labelEn: 'Vietnamese',
-      nativeLabel: 'Tiếng Việt',
-      subtitleZh: '越南语内容',
-      subtitleEn: 'Vietnamese content',
-    ),
-    _ContentLanguageOption(
-      code: 'ru',
-      labelZh: '俄语',
-      labelEn: 'Russian',
-      nativeLabel: 'Русский',
-      subtitleZh: '俄语内容',
-      subtitleEn: 'Russian content',
-    ),
-    _ContentLanguageOption(
-      code: 'th',
-      labelZh: '泰语',
-      labelEn: 'Thai',
-      nativeLabel: 'ภาษาไทย',
-      subtitleZh: '泰语内容',
-      subtitleEn: 'Thai content',
-    ),
-    _ContentLanguageOption(
-      code: 'iba',
-      labelZh: '伊班语',
-      labelEn: 'Iban',
-      nativeLabel: 'Iban',
-      subtitleZh: '伊班语内容',
-      subtitleEn: 'Iban content',
-    ),
-  ];
-
-  Widget _buildCoverImage(String path) {
-    if (path.isEmpty) {
-      return Container(
-        color: const Color(0xFFD8D2C8),
-        child: const Icon(Icons.image_not_supported_outlined),
-      );
-    }
-
-    final isNetwork = path.startsWith('http://') || path.startsWith('https://');
-
-    if (isNetwork) {
-      return Image.network(
-        path,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: const Color(0xFFD8D2C8),
-            child: const Icon(Icons.image_not_supported_outlined),
-          );
-        },
-      );
-    }
-
-    return Image.file(
-      File(path),
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          color: const Color(0xFFD8D2C8),
-          child: const Icon(Icons.image_not_supported_outlined),
-        );
-      },
-    );
-  }
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _pageBackground => _isDark ? _darkBackground : _lightBackground;
+  Color get _ink => _isDark ? _darkInk : _lightInk;
+  Color get _muted => _isDark ? _darkMuted : _lightMuted;
+  Color get _soft => _isDark ? _darkSoft : _lightSoft;
 
   @override
   Widget build(BuildContext context) {
-    final homeAsync = ref.watch(homeProvider);
-    final l10n = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-
+    final async = ref.watch(homeProvider);
     return ColoredBox(
-      color: colors.surface,
-      child: homeAsync.when(
-        loading: () {
-          return const Center(child: CircularProgressIndicator());
-        },
-        error: (error, stackTrace) {
-          return SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.cloud_off_rounded,
-                    size: 42,
-                    color: _inkColor,
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    l10n.homeLoadFailed,
-                    style: const TextStyle(
-                      color: _inkColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () {
-                      ref.invalidate(homeProvider);
-                    },
-                    child: Text(l10n.reload),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-        data: (homeState) {
-          return _buildHome(homeState, l10n);
-        },
+      color: _pageBackground,
+      child: async.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => _error(),
+        data: _home,
       ),
     );
   }
 
-  Widget _buildHome(HomeState homeState, AppLocalizations l10n) {
-    final feed = homeState.feed;
-    final videos = feed.videos;
-    final colors = Theme.of(context).colorScheme;
-    final isDark = colors.brightness == Brightness.dark;
-
+  Widget _error() {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
-      bottom: false,
-      child: RefreshIndicator(
-        onRefresh: () {
-          return ref.read(homeProvider.notifier).refresh();
-        },
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: [
-            SliverToBoxAdapter(child: _buildHeader(l10n)),
-            SliverToBoxAdapter(child: _buildLanguageContextBar()),
-            SliverToBoxAdapter(
-              child: _buildFeaturedVideo(feed.featuredVideo, l10n),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.cloud_off_rounded, size: 42),
+            const SizedBox(height: 12),
+            Text(l10n.homeLoadFailed),
+            const SizedBox(height: 14),
+            FilledButton(
+              onPressed: () => ref.invalidate(homeProvider),
+              child: Text(l10n.reload),
             ),
-            SliverToBoxAdapter(child: _buildTopicOrbit(homeState, l10n)),
-            SliverToBoxAdapter(child: _buildSectionHeader(l10n)),
-            if (videos.isEmpty)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 60,
-                  ),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.blur_off_rounded,
-                          size: 38,
-                          color: isDark
-                              ? const Color(0xFF9E9991)
-                              : const Color(0xFF908A81),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          l10n.emptyTrack,
-                          style: TextStyle(
-                            color: isDark
-                                ? const Color(0xFFBEB9B0)
-                                : const Color(0xFF77736C),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 130),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, rawIndex) {
-                    if (rawIndex.isOdd) {
-                      return const SizedBox(height: 18);
-                    }
-
-                    final index = rawIndex ~/ 2;
-
-                    return _buildVideoTrackCard(index, videos[index], l10n);
-                  }, childCount: videos.length * 2 - 1),
-                ),
-              ),
           ],
         ),
       ),
     );
   }
 
-  _ContentLanguageOption get _selectedContentLanguage {
-    return _contentLanguages.firstWhere(
-      (option) => option.code == _selectedContentLanguageCode,
-      orElse: () => _contentLanguages.first,
+  Widget _home(HomeState state) {
+    final l10n = AppLocalizations.of(context)!;
+    final videos = state.feed.videos;
+    final trending = videos.take(2).toList();
+    final explore = videos.skip(2).toList();
+
+    return SafeArea(
+      bottom: false,
+      child: RefreshIndicator(
+        onRefresh: () => ref.read(homeProvider.notifier).refresh(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          slivers: [
+            SliverToBoxAdapter(child: _header()),
+            SliverToBoxAdapter(child: _forYouHeading()),
+            SliverToBoxAdapter(child: _hero(state.feed.featuredVideo, l10n)),
+            SliverToBoxAdapter(child: _topics(state, l10n)),
+            if (trending.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _section(
+                  title: '正在流行',
+                  videos: trending,
+                  l10n: l10n,
+                  compact: false,
+                ),
+              ),
+            if (explore.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _section(
+                  title: '继续探索',
+                  videos: explore,
+                  l10n: l10n,
+                  compact: true,
+                ),
+              ),
+            if (videos.isEmpty)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(48),
+                  child: Center(child: Text('暂无推荐视频')),
+                ),
+              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 110)),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildLanguageContextBar() {
+  Widget _header() {
     final colors = Theme.of(context).colorScheme;
-    final isDark = colors.brightness == Brightness.dark;
-    final isZh = Localizations.localeOf(context).languageCode == 'zh';
-    final selected = _selectedContentLanguage;
-
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
       child: Row(
         children: [
           Expanded(
@@ -255,346 +130,117 @@ class _HomePageState extends ConsumerState<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  selected.code == 'all' ? 'For you' : selected.nativeLabel,
+                  'Clyven',
                   style: TextStyle(
-                    color: colors.onSurface,
-                    fontSize: 19,
+                    color: _ink,
+                    fontSize: 38,
+                    height: .95,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1.7,
+                  ),
+                ),
+                const SizedBox(height: 9),
+                Text(
+                  'Learn. Watch. Grow.',
+                  style: TextStyle(
+                    color: _muted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const VideoSearchPage()),
+            ),
+            icon: const Icon(Icons.search_rounded, size: 30),
+          ),
+          const SizedBox(width: 5),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _brandBlue.withValues(alpha: .12),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.person_rounded,
+              color: _brandBlue,
+              size: 23,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none_rounded, size: 28),
+              ),
+              Positioned(
+                right: 7,
+                top: 5,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: colors.error,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _forYouHeading() {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '为你推荐',
+                  style: TextStyle(
+                    color: _ink,
+                    fontSize: 28,
                     height: 1.05,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 8),
                 Text(
-                  selected.code == 'all'
-                      ? (isZh ? '来自你的学习语言' : 'Across your learning languages')
-                      : (isZh ? selected.subtitleZh : selected.subtitleEn),
+                  '根据你的兴趣与学习语言推荐',
                   style: TextStyle(
-                    color: colors.onSurface.withOpacity(0.58),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
+                    color: _muted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _showContentLanguageSheet,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(12, 8, 9, 8),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Theme.of(context).cardColor
-                    : Colors.white.withOpacity(0.58),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: colors.onSurface.withOpacity(isDark ? 0.18 : 0.12),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: colors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 7),
-                  Text(
-                    isZh ? selected.labelZh : selected.labelEn,
-                    style: TextStyle(
-                      color: colors.onSurface.withOpacity(0.80),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 17,
-                    color: colors.onSurface.withOpacity(0.55),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showContentLanguageSheet() async {
-    final isZh = Localizations.localeOf(context).languageCode == 'zh';
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (sheetContext) {
-        final colors = Theme.of(sheetContext).colorScheme;
-
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 4,
-                      margin: const EdgeInsets.only(left: 6, bottom: 18),
-                      decoration: BoxDecoration(
-                        color: colors.onSurface.withOpacity(0.16),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(
-                        isZh ? '内容语言' : 'Content language',
-                        style: TextStyle(
-                          color: colors.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(
-                        isZh
-                            ? '语言只是内容上下文，不会抢走主页本身。'
-                            : 'Language stays a lightweight content context.',
-                        style: TextStyle(
-                          color: colors.onSurface.withOpacity(0.58),
-                          fontSize: 11,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    ..._contentLanguages.map((option) {
-                      final selected =
-                          option.code == _selectedContentLanguageCode;
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(18),
-                          onTap: () {
-                            setState(() {
-                              _selectedContentLanguageCode = option.code;
-                            });
-                            setSheetState(() {});
-                            Navigator.pop(sheetContext);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 13,
-                            ),
-                            decoration: BoxDecoration(
-                              color: selected
-                                  ? colors.primary.withOpacity(0.12)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: selected
-                                    ? colors.primary.withOpacity(0.72)
-                                    : colors.onSurface.withOpacity(0.10),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    color: selected
-                                        ? colors.primary.withOpacity(0.18)
-                                        : colors.onSurface.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    option.code == 'all'
-                                        ? '∞'
-                                        : option.code.toUpperCase(),
-                                    style: TextStyle(
-                                      color: selected
-                                          ? colors.primary
-                                          : colors.onSurface.withOpacity(0.64),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        option.nativeLabel,
-                                        style: TextStyle(
-                                          color: colors.onSurface,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        isZh ? option.labelZh : option.labelEn,
-                                        style: TextStyle(
-                                          color: colors.onSurface.withOpacity(
-                                            0.52,
-                                          ),
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (selected)
-                                  Icon(
-                                    Icons.check_circle_rounded,
-                                    color: colors.primary,
-                                    size: 21,
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(13),
-                      decoration: BoxDecoration(
-                        color: colors.onSurface.withOpacity(0.045),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.info_outline_rounded,
-                            color: colors.onSurface.withOpacity(0.48),
-                            size: 17,
-                          ),
-                          const SizedBox(width: 9),
-                          Expanded(
-                            child: Text(
-                              isZh
-                                  ? '当前先完成主页语言上下文设计。真正按语言筛选视频，会在 Video/HomeVideo 接入 languageCode 后启用。'
-                                  : 'This first pass establishes the language context UI. Real filtering will be enabled after Video/HomeVideo gets languageCode metadata.',
-                              style: TextStyle(
-                                color: colors.onSurface.withOpacity(0.55),
-                                fontSize: 10,
-                                height: 1.45,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildHeader(AppLocalizations l10n) {
-    final now = DateTime.now();
-    final localeName = Localizations.localeOf(context).toString();
-    final dateText = DateFormat(
-      'EEEE · dd MMM',
-      localeName,
-    ).format(now).toUpperCase();
-    final colors = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: _brandBlue),
+            onPressed: () => ref.read(homeProvider.notifier).refresh(),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  dateText,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.8,
-                    color: colors.brightness == Brightness.dark
-                        ? const Color(0xFFBEB9B0)
-                        : const Color(0xFF77736C),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  l10n.homeQuestion,
-                  style: TextStyle(
-                    fontSize: 24,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                    color: colors.onSurface,
-                  ),
-                ),
+                Text('查看更多'),
+                SizedBox(width: 2),
+                Icon(Icons.chevron_right_rounded, size: 18),
               ],
-            ),
-          ),
-          _buildHeaderButton(
-            icon: Icons.search_rounded,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const VideoSearchPage();
-                  },
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () {
-              // TODO: open profile
-            },
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: colors.secondary,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'C',
-                style: TextStyle(
-                  color: colors.onSecondary,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
             ),
           ),
         ],
@@ -602,222 +248,102 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildHeaderButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    final colors = Theme.of(context).colorScheme;
-    final isDark = colors.brightness == Brightness.dark;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: isDark
-              ? Theme.of(context).cardColor
-              : Colors.white.withOpacity(0.72),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: isDark ? const Color(0xFF383838) : const Color(0xFFE0DBD2),
-          ),
-        ),
-        child: Icon(icon, color: colors.onSurface),
-      ),
-    );
-  }
-
-  Widget _buildFeaturedVideo(HomeVideo video, AppLocalizations l10n) {
-    final colors = Theme.of(context).colorScheme;
-
+  Widget _hero(HomeVideo video, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: GestureDetector(
-        onTap: () {
-          openGlobalVideo(video.id);
-        },
+      child: InkWell(
+        onTap: () => openGlobalVideo(video.id),
+        borderRadius: BorderRadius.circular(23),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: SizedBox(
-            height: 430,
+          borderRadius: BorderRadius.circular(23),
+          child: AspectRatio(
+            aspectRatio: 16 / 8.8,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  video.coverUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFF373149),
-                      child: const Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: Colors.white54,
-                          size: 40,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                _cover(video.coverUrl),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0x12000000),
-                        Color(0x44000000),
-                        Color(0xE8000000),
+                        Color(0x08000000),
+                        Color(0x26000000),
+                        Color(0xE0000000),
                       ],
-                      stops: [0, 0.52, 1],
+                      stops: [0, .48, 1],
                     ),
                   ),
                 ),
-                Positioned.fill(
-                  child: CustomPaint(painter: _OrbitPainter(colors.primary)),
+                Positioned(
+                  left: 16,
+                  top: 16,
+                  child: _pill(
+                    localizedTopicLabel(l10n, video.category),
+                    light: true,
+                  ),
                 ),
                 Positioned(
-                  top: 22,
-                  left: 22,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 13,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.primary,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      l10n.featuredToday,
-                      style: TextStyle(
-                        color: colors.onPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                  right: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x30000000),
+                            blurRadius: 18,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        color: _ink,
+                        size: 34,
                       ),
                     ),
                   ),
                 ),
                 Positioned(
-                  top: 22,
-                  right: 22,
-                  child: Text(
-                    l10n.featuredIndexLabel,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 22,
-                  right: 22,
-                  bottom: 24,
+                  left: 17,
+                  right: 84,
+                  bottom: 15,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        localizedTopicLabel(l10n, video.category).toUpperCase(),
-                        style: TextStyle(
-                          color: colors.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
                         video.title,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 31,
-                          height: 1.08,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        video.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          height: 1.5,
+                          color: Colors.white,
+                          fontSize: 24,
+                          height: 1.12,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              // TODO: play directly
-                            },
-                            child: Container(
-                              width: 58,
-                              height: 58,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.play_arrow_rounded,
-                                size: 34,
-                                color: _inkColor,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
+                          _avatar(video.authorName, 28),
+                          const SizedBox(width: 8),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  video.duration,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${video.authorName} · ${video.viewText}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              // TODO: save
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 13,
-                                vertical: 9,
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white30),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Text(
-                                l10n.save,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            child: Text(
+                              '${video.authorName}\n${video.viewText}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10.5,
+                                height: 1.25,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -826,6 +352,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ],
                   ),
                 ),
+                Positioned(
+                  right: 12,
+                  bottom: 10,
+                  child: _duration(video.duration),
+                ),
               ],
             ),
           ),
@@ -834,61 +365,56 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildTopicOrbit(HomeState homeState, AppLocalizations l10n) {
-    return SizedBox(
-      height: 108,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(18, 24, 18, 16),
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        itemCount: HomeNotifier.topics.length,
-        separatorBuilder: (context, index) {
-          return const SizedBox(width: 9);
-        },
-        itemBuilder: (context, index) {
-          final topic = HomeNotifier.topics[index];
-          final selected = homeState.selectedTopic == topic;
-          final colors = Theme.of(context).colorScheme;
-          final accent = colors.primary;
-          final isDark = colors.brightness == Brightness.dark;
+  Widget _topics(HomeState state, AppLocalizations l10n) {
+    final colors = Theme.of(context).colorScheme;
+    final icons = <IconData>[
+      Icons.grid_view_rounded,
+      Icons.videocam_outlined,
+      Icons.settings_outlined,
+      Icons.translate_rounded,
+      Icons.sports_esports_outlined,
+      Icons.music_note_rounded,
+      Icons.location_city_outlined,
+      Icons.movie_creation_outlined,
+    ];
 
-          return Transform.translate(
-            offset: Offset(0, index.isEven ? 0 : 13),
-            child: GestureDetector(
-              onTap: () {
-                ref.read(homeProvider.notifier).selectTopic(topic);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOut,
-                height: 47,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: selected
-                      ? (isDark ? const Color(0xFF222222) : _inkColor)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: selected
-                        ? (isDark ? accent : _inkColor)
-                        : (isDark
-                              ? const Color(0xFF55514C)
-                              : const Color(0xFFCAC5BB)),
+    return SizedBox(
+      height: 80,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 15),
+        scrollDirection: Axis.horizontal,
+        itemCount: HomeNotifier.topics.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 9),
+        itemBuilder: (_, i) {
+          final topic = HomeNotifier.topics[i];
+          final selected = state.selectedTopic == topic;
+          return InkWell(
+            onTap: () => ref.read(homeProvider.notifier).selectTopic(topic),
+            borderRadius: BorderRadius.circular(16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              decoration: BoxDecoration(
+                color: selected ? _brandBlue : _soft,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    icons[i % icons.length],
+                    size: 17,
+                    color: selected ? Colors.white : _ink,
                   ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  localizedTopicLabel(l10n, topic),
-                  style: TextStyle(
-                    color: selected
-                        ? accent
-                        : (isDark
-                              ? const Color(0xFFBEB9B0)
-                              : const Color(0xFF504D48)),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                  const SizedBox(width: 7),
+                  Text(
+                    localizedTopicLabel(l10n, topic),
+                    style: TextStyle(
+                      color: selected ? Colors.white : _ink,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           );
@@ -897,285 +423,222 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildSectionHeader(AppLocalizations l10n) {
+  Widget _section({
+    required String title,
+    required List<HomeVideo> videos,
+    required AppLocalizations l10n,
+    required bool compact,
+  }) {
     final colors = Theme.of(context).colorScheme;
-    final isDark = colors.brightness == Brightness.dark;
-
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 15, 20, 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      padding: const EdgeInsets.fromLTRB(18, 5, 18, 23),
+      child: Column(
         children: [
-          Expanded(
-            child: Text(
-              l10n.continueByInterest,
-              style: TextStyle(
-                color: colors.onSurface,
-                fontSize: 27,
-                height: 1.05,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              ref.read(homeProvider.notifier).refresh();
-            },
-            child: Row(
-              children: [
-                Text(
-                  l10n.rearrange,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
                   style: TextStyle(
-                    color: isDark
-                        ? const Color(0xFFBEB9B0)
-                        : const Color(0xFF77736C),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    color: _ink,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(width: 5),
-                Icon(
-                  Icons.shuffle_rounded,
-                  size: 17,
-                  color: isDark
-                      ? const Color(0xFFBEB9B0)
-                      : const Color(0xFF77736C),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: _brandBlue),
+                onPressed: () => ref.read(homeProvider.notifier).refresh(),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('查看全部'),
+                    Icon(Icons.chevron_right_rounded, size: 18),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (_, c) {
+              final width = c.maxWidth;
+              final columns = width >= 1050
+                  ? (compact ? 4 : 3)
+                  : width >= 700
+                  ? 3
+                  : 2;
+              const gap = 14.0;
+              final itemWidth = (width - gap * (columns - 1)) / columns;
+              return Wrap(
+                spacing: gap,
+                runSpacing: 22,
+                children: [
+                  for (final video in videos)
+                    SizedBox(
+                      width: itemWidth,
+                      child: _videoCard(video, l10n, compact: compact),
+                    ),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVideoTrackCard(
-    int index,
+  Widget _videoCard(
     HomeVideo video,
-    AppLocalizations l10n,
-  ) {
-    final reverse = index.isOdd;
+    AppLocalizations l10n, {
+    required bool compact,
+  }) {
     final colors = Theme.of(context).colorScheme;
-
-    final cover = Expanded(
-      flex: 5,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildCoverImage(video.coverUrl),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Color(0x7A000000)],
-                ),
-              ),
-            ),
-            Positioned(
-              left: 12,
-              bottom: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: _inkColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  video.duration,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+    return InkWell(
+      onTap: () => openGlobalVideo(video.id),
+      borderRadius: BorderRadius.circular(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _cover(video.coverUrl),
+                  Positioned(
+                    right: 7,
+                    bottom: 7,
+                    child: _duration(video.duration),
                   ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-
-    final information = Expanded(
-      flex: 6,
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: reverse ? 0 : 16,
-          right: reverse ? 16 : 0,
-          top: 6,
-          bottom: 4,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                color: index.isEven ? colors.primary : colors.secondary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                localizedTopicLabel(l10n, video.category),
-                style: TextStyle(
-                  color: index.isEven ? colors.onPrimary : colors.onSecondary,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            const Spacer(),
-            Text(
-              video.title,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colors.onSurface,
-                fontSize: 18,
-                height: 1.2,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const Spacer(),
-            Text(
-              video.authorName,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: colors.brightness == Brightness.dark
-                    ? const Color(0xFFC4BFB7)
-                    : const Color(0xFF5E5A54),
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              video.viewText,
-              style: TextStyle(
-                color: colors.brightness == Brightness.dark
-                    ? const Color(0xFF9E9991)
-                    : const Color(0xFF908A81),
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    return GestureDetector(
-      onTap: () {
-        openGlobalVideo(video.id);
-      },
-      child: Container(
-        height: 220,
-        decoration: BoxDecoration(
-          color: colors.brightness == Brightness.dark
-              ? const Color(0xFF222222)
-              : Colors.white.withOpacity(0.72),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: colors.brightness == Brightness.dark
-                ? const Color(0xFF383838)
-                : const Color(0xFFE3DED5),
           ),
+          const SizedBox(height: 9),
+          Text(
+            video.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: _ink,
+              fontSize: compact ? 12.5 : 13.5,
+              height: 1.25,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Row(
+            children: [
+              _avatar(video.authorName, 25),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  '${video.authorName}\n${video.viewText}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: _muted, fontSize: 9.5, height: 1.25),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cover(String path) {
+    if (path.isEmpty) return _placeholder();
+    final network = path.startsWith('http://') || path.startsWith('https://');
+    if (network) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _placeholder(),
+      );
+    }
+    return Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _placeholder(),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFE7E0D4), Color(0xFFD8CDBD)],
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 35,
-              decoration: const BoxDecoration(
-                color: _inkColor,
-                borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(25),
-                ),
-              ),
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: Center(
-                  child: Text(
-                    'TRACK ${(index + 1).toString().padLeft(2, '0')}',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.4,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: reverse
-                      ? [information, cover]
-                      : [cover, information],
-                ),
-              ),
-            ),
-          ],
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.play_circle_outline_rounded,
+          size: 34,
+          color: Color(0xFF9C8D79),
         ),
       ),
     );
   }
-}
 
-class _ContentLanguageOption {
-  final String code;
-  final String labelZh;
-  final String labelEn;
-  final String nativeLabel;
-  final String subtitleZh;
-  final String subtitleEn;
-
-  const _ContentLanguageOption({
-    required this.code,
-    required this.labelZh,
-    required this.labelEn,
-    required this.nativeLabel,
-    required this.subtitleZh,
-    required this.subtitleEn,
-  });
-}
-
-class _OrbitPainter extends CustomPainter {
-  final Color accent;
-
-  const _OrbitPainter(this.accent);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final linePaint = Paint()
-      ..color = Colors.white.withOpacity(0.18)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final dotPaint = Paint()..color = accent.withOpacity(0.85);
-
-    final center = Offset(size.width * 0.83, size.height * 0.25);
-
-    canvas.drawCircle(center, 74, linePaint);
-
-    canvas.drawCircle(center, 115, linePaint);
-
-    canvas.drawCircle(center, 4, dotPaint);
-
-    canvas.drawLine(
-      Offset(size.width * 0.1, size.height * 0.48),
-      Offset(size.width * 0.88, size.height * 0.48),
-      linePaint,
+  Widget _avatar(String name, double size) {
+    final letter = name.trim().isEmpty ? 'C' : name.trim()[0].toUpperCase();
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Color(0xFFE6ECF7),
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        letter,
+        style: TextStyle(
+          color: const Color(0xFF48678F),
+          fontSize: size * .4,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
     );
   }
 
-  @override
-  bool shouldRepaint(covariant _OrbitPainter oldDelegate) {
-    return oldDelegate.accent != accent;
+  Widget _duration(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xD6111827),
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _pill(String text, {required bool light}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: light ? Colors.white.withValues(alpha: .88) : _ink,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: _ink,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
   }
 }
