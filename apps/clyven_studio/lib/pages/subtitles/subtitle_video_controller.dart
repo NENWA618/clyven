@@ -144,39 +144,66 @@ class SubtitleVideoController {
       return;
     }
 
-    final playheadX =
-        milliseconds / durationMs * trackWidth;
+    final playheadX = milliseconds / durationMs * trackWidth;
 
     final scrollLeft = timeline.scrollLeft.toDouble();
 
-    final leftSafe =
-        scrollLeft + viewportWidth * 0.2;
+    final leftSafe = scrollLeft + viewportWidth * 0.2;
 
-    final rightSafe =
-        scrollLeft + viewportWidth * 0.8;
+    final rightSafe = scrollLeft + viewportWidth * 0.8;
 
     double? targetScroll;
 
     if (playheadX < leftSafe) {
-      targetScroll =
-          playheadX - viewportWidth * 0.2;
+      targetScroll = playheadX - viewportWidth * 0.2;
     } else if (playheadX > rightSafe) {
-      targetScroll =
-          playheadX - viewportWidth * 0.8;
+      targetScroll = playheadX - viewportWidth * 0.8;
     }
 
     if (targetScroll == null) {
       return;
     }
 
-    final maxScroll =
-        (timeline.scrollWidth - timeline.clientWidth)
-            .toDouble();
+    final maxScroll = (timeline.scrollWidth - timeline.clientWidth).toDouble();
 
     timeline.scrollLeft = targetScroll
         .clamp(
           0.0,
           maxScroll,
+        )
+        .round();
+  }
+
+  void centerTimelineAt({
+    required int milliseconds,
+    required int durationMs,
+  }) {
+    final timeline = html.document.querySelector(
+      '.subtitle-timeline',
+    );
+
+    final track = html.document.getElementById(
+      'subtitle-timeline-track',
+    );
+
+    if (timeline == null || track == null || durationMs <= 0) {
+      return;
+    }
+
+    final trackWidth = track.getBoundingClientRect().width;
+    final viewportWidth = timeline.getBoundingClientRect().width;
+
+    if (trackWidth <= 0 || viewportWidth <= 0) {
+      return;
+    }
+
+    final pointX = milliseconds / durationMs * trackWidth;
+    final maxScroll = (timeline.scrollWidth - timeline.clientWidth).toDouble();
+
+    timeline.scrollLeft = (pointX - viewportWidth / 2)
+        .clamp(
+          0.0,
+          maxScroll < 0 ? 0.0 : maxScroll,
         )
         .round();
   }

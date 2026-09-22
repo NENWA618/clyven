@@ -1,5 +1,6 @@
 import 'dart:html' as html;
 
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/dom.dart' as dom;
 import 'package:jaspr/jaspr.dart';
@@ -8,12 +9,16 @@ class SubtitleVideoPanel extends StatefulComponent {
   const SubtitleVideoPanel({
     required this.videoUrl,
     required this.captionText,
+    required this.captionCueStartMs,
+    required this.karaokeSegments,
     required this.onTimeUpdate,
     super.key,
   });
 
   final String videoUrl;
   final String? captionText;
+  final int? captionCueStartMs;
+  final List<serverpod.SubtitleKaraokeSegment> karaokeSegments;
   final void Function() onTimeUpdate;
 
   @override
@@ -31,8 +36,9 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
 
   html.VideoElement? get _video {
     return html.document.getElementById(
-      'subtitle-video-player',
-    ) as html.VideoElement?;
+          'subtitle-video-player',
+        )
+        as html.VideoElement?;
   }
 
   void _syncVideoState() {
@@ -101,9 +107,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
       return;
     }
 
-    final nextTime = (
-      video.currentTime.toDouble() + seconds
-    ).clamp(
+    final nextTime = (video.currentTime.toDouble() + seconds).clamp(
       0.0,
       duration,
     );
@@ -133,9 +137,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
       return;
     }
 
-    video.currentTime = (
-      rawValue / 1000
-    ) * duration;
+    video.currentTime = (rawValue / 1000) * duration;
 
     _syncVideoState();
     component.onTimeUpdate();
@@ -154,9 +156,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
       return;
     }
 
-    final volume = (
-      rawValue / 100
-    ).clamp(
+    final volume = (rawValue / 100).clamp(
       0.0,
       1.0,
     );
@@ -181,9 +181,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
       _playbackRate,
     );
 
-    final nextIndex = currentIndex == -1
-        ? 0
-        : (currentIndex + 1) % speeds.length;
+    final nextIndex = currentIndex == -1 ? 0 : (currentIndex + 1) % speeds.length;
 
     final nextRate = speeds[nextIndex];
 
@@ -228,9 +226,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
     final totalSeconds = seconds.floor();
 
     final hours = totalSeconds ~/ 3600;
-    final minutes = (
-      totalSeconds % 3600
-    ) ~/ 60;
+    final minutes = (totalSeconds % 3600) ~/ 60;
     final secs = totalSeconds % 60;
 
     if (hours > 0) {
@@ -241,6 +237,83 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
 
     return '${minutes.toString().padLeft(2, '0')}:'
         '${secs.toString().padLeft(2, '0')}';
+  }
+
+  String _normalizeCaptionForKaraoke(
+    String value,
+  ) {
+    return value
+        .replaceAll(
+          RegExp(r'\s+'),
+          '',
+        )
+        .trim();
+  }
+
+  bool _karaokeMatchesCaption(
+    String caption,
+  ) {
+    if (component.karaokeSegments.isEmpty) {
+      return false;
+    }
+
+    final karaokeText = component.karaokeSegments.map((segment) => segment.text).join();
+
+    return _normalizeCaptionForKaraoke(karaokeText) == _normalizeCaptionForKaraoke(caption);
+  }
+
+  Component _karaokeCaption(
+    List<serverpod.SubtitleKaraokeSegment> rawSegments,
+    int cueStartMs,
+  ) {
+    final segments = [...rawSegments]
+      ..sort(
+        (a, b) => a.position.compareTo(b.position),
+      );
+
+    final relativeMs = (_currentTime * 1000).round() - cueStartMs;
+
+    String styleFor(serverpod.SubtitleKaraokeSegment segment) {
+      final startMs = segment.startOffsetMs;
+      final endMs = segment.endOffsetMs;
+      final durationMs = endMs - startMs;
+
+      double progress;
+
+      if (relativeMs <= startMs) {
+        progress = 0;
+      } else if (relativeMs >= endMs) {
+        progress = 1;
+      } else if (durationMs <= 0) {
+        progress = 1;
+      } else {
+        progress = (relativeMs - startMs) / durationMs;
+      }
+
+      final percent = (progress.clamp(0.0, 1.0) * 100).toStringAsFixed(2);
+
+      return 'background: linear-gradient('
+          '90deg, #60a5fa 0%, #60a5fa $percent%, '
+          '#ffffff $percent%, #ffffff 100%); '
+          '-webkit-background-clip: text; '
+          'background-clip: text; '
+          'color: transparent;';
+    }
+
+    return span(
+      classes: 'subtitle-video-caption',
+      [
+        for (final segment in segments)
+          span(
+            attributes: {
+              'style': styleFor(segment),
+            },
+            [
+              .text(segment.text),
+            ],
+          ),
+      ],
+    );
   }
 
   String _volumeIcon() {
@@ -259,13 +332,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
   Component build(BuildContext context) {
     final duration = _duration;
 
-    final progress = duration <= 0
-        ? 0
-        : (
-            _currentTime /
-            duration *
-            1000
-          ).round();
+    final progress = duration <= 0 ? 0 : (_currentTime / duration * 1000).round();
 
     final caption = component.captionText?.trim();
 
@@ -333,18 +400,24 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
                 ],
               ),
 
-            if (_captionsVisible &&
-                caption != null &&
-                caption.isNotEmpty)
+            if (_captionsVisible && caption != null && caption.isNotEmpty)
               div(
                 classes: 'subtitle-video-caption-layer',
                 [
-                  span(
-                    classes: 'subtitle-video-caption',
-                    [
-                      .text(caption),
-                    ],
-                  ),
+                  if (component.karaokeSegments.isNotEmpty &&
+                      component.captionCueStartMs != null &&
+                      _karaokeMatchesCaption(caption))
+                    _karaokeCaption(
+                      component.karaokeSegments,
+                      component.captionCueStartMs!,
+                    )
+                  else
+                    span(
+                      classes: 'subtitle-video-caption',
+                      [
+                        .text(caption),
+                      ],
+                    ),
                 ],
               ),
 
@@ -389,9 +462,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
                           },
                           [
                             .text(
-                              _playing
-                                  ? '❚❚'
-                                  : '▶',
+                              _playing ? '❚❚' : '▶',
                             ),
                           ],
                         ),
@@ -449,8 +520,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
                             'min': '0',
                             'max': '100',
                             'step': '1',
-                            'value':
-                                '${(_volume * 100).round()}',
+                            'value': '${(_volume * 100).round()}',
                             'aria-label': 'Volume',
                           },
                           events: events<String>(

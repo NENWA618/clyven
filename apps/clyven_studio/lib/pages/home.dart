@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
   String loginPassword = '';
 
   bool loginLoading = false;
-  bool loggedIn = false;
+  bool loggedIn = studioClient.auth.isAuthenticated;
 
   String? loginError;
 
@@ -396,7 +396,7 @@ class _HomeState extends State<Home> {
     });
 
     try {
-      final result = await client.video.getVideos();
+      final result = await client.video.getMyVideos();
 
       setState(() {
         studioVideos = result;

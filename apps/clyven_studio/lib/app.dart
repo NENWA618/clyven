@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/studio_shell.dart';
+import 'components/studio_auth_gate.dart';
 import 'pages/dictionary/dictionary_import_page.dart';
 import 'pages/subtitles/subtitles_page.dart';
 import 'pages/subtitles/subtitle_editor_page.dart';
@@ -23,8 +24,10 @@ class App extends StatelessComponent {
           routes: [
             ShellRoute(
               builder: (context, state, child) {
-                return StudioShell(
-                  child: child,
+                return StudioAuthGate(
+                  child: StudioShell(
+                    child: child,
+                  ),
                 );
               },
               routes: [
@@ -62,9 +65,7 @@ class App extends StatelessComponent {
                     final languageCode = state.params['languageCode'] ?? '';
                     final scriptCode = state.params['scriptCode'] ?? '';
 
-                    if (videoId == null ||
-                        languageCode.isEmpty ||
-                        scriptCode.isEmpty) {
+                    if (videoId == null || languageCode.isEmpty || scriptCode.isEmpty) {
                       return const PlaceholderPage(
                         title: 'Subtitle Editor',
                         description: '无效的视频、语言或文字参数。',
@@ -101,12 +102,12 @@ class App extends StatelessComponent {
                   },
                 ),
                 Route(
-                    path: '/dictionary',
-                    title: 'Dictionary · Clyven Studio',
-                    builder: (context, state) {
-                      return const DictionaryPage();
-                    },
-                  ),
+                  path: '/dictionary',
+                  title: 'Dictionary · Clyven Studio',
+                  builder: (context, state) {
+                    return const DictionaryPage();
+                  },
+                ),
                 Route(
                   path: '/dictionary/import',
                   title: 'Dictionary Import · Clyven Studio',

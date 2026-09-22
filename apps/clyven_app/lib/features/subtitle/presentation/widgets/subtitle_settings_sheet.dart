@@ -1,5 +1,4 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart'
-    as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:glyphora_language_core/glyphora_language_core.dart';
@@ -13,27 +12,75 @@ Future<void> showClyvenSubtitleSettingsSheet({
   required String videoId,
   required List<SubtitleTrackAvailability> availability,
 }) async {
-  await showModalBottomSheet<void>(
-    context: context,
-    useSafeArea: true,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => SubtitleSettingsSheet(
-      videoId: videoId,
-      availability: availability,
-    ),
+  final overlay = Overlay.maybeOf(context, rootOverlay: true);
+
+  if (overlay == null) {
+    throw StateError(
+      'Cannot open subtitle settings because no Overlay was found.',
+    );
+  }
+
+  late final OverlayEntry entry;
+  var closed = false;
+
+  void close() {
+    if (closed) {
+      return;
+    }
+
+    closed = true;
+    entry.remove();
+  }
+
+  entry = OverlayEntry(
+    builder: (overlayContext) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          ModalBarrier(
+            dismissible: true,
+            color: Colors.black54,
+            onDismiss: close,
+          ),
+          Positioned.fill(
+            child: SafeArea(
+              child: SubtitleSettingsSheet(
+                videoId: videoId,
+                availability: availability,
+                onClose: close,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
   );
+
+  overlay.insert(entry);
 }
 
 class SubtitleSettingsSheet extends ConsumerWidget {
   final String videoId;
   final List<SubtitleTrackAvailability> availability;
+  final VoidCallback? onClose;
 
   const SubtitleSettingsSheet({
     super.key,
     required this.videoId,
     required this.availability,
+    this.onClose,
   });
+
+  void _close(BuildContext context) {
+    final callback = onClose;
+
+    if (callback != null) {
+      callback();
+      return;
+    }
+
+    Navigator.of(context).maybePop();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,9 +88,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
     final state = ref.watch(subtitlePlaybackProvider(videoId));
     final notifier = ref.read(subtitlePlaybackProvider(videoId).notifier);
 
-    final tracks = [
-      for (final item in availability) item.track,
-    ];
+    final tracks = [for (final item in availability) item.track];
 
     final primary = _normalizeSelection(
       resolvePrimarySubtitleSelection(tracks, state),
@@ -63,9 +108,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
       builder: (context, scrollController) {
         return Material(
           color: scheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           clipBehavior: Clip.antiAlias,
           child: ListView(
             controller: scrollController,
@@ -107,7 +150,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => _close(context),
                     icon: const Icon(Icons.close_rounded),
                   ),
                 ],
@@ -134,15 +177,37 @@ class SubtitleSettingsSheet extends ConsumerWidget {
                   ),
                   onTap: () {
                     notifier.setEnabled(false);
-                    Navigator.pop(context);
+                    _close(context);
                   },
                 ),
               ),
               const SizedBox(height: 24),
               const _SectionLabel(
-                title: '主字幕',
-                subtitle: '选择语言与该视频实际存在的文字系统',
+                title: '字幕位置',
+                subtitle: '视频内适合观看；视频下方会展开逐词翻译与完整句意',
               ),
+              const SizedBox(height: 12),
+              SegmentedButton<SubtitleDisplayMode>(
+                segments: const [
+                  ButtonSegment<SubtitleDisplayMode>(
+                    value: SubtitleDisplayMode.overlay,
+                    icon: Icon(Icons.ondemand_video_rounded),
+                    label: Text('视频内'),
+                  ),
+                  ButtonSegment<SubtitleDisplayMode>(
+                    value: SubtitleDisplayMode.learningPanel,
+                    icon: Icon(Icons.view_agenda_outlined),
+                    label: Text('视频下方'),
+                  ),
+                ],
+                selected: <SubtitleDisplayMode>{state.displayMode},
+                onSelectionChanged: (selection) {
+                  if (selection.isEmpty) return;
+                  notifier.setDisplayMode(selection.first);
+                },
+              ),
+              const SizedBox(height: 24),
+              const _SectionLabel(title: '主字幕', subtitle: '选择语言与该视频实际存在的文字系统'),
               const SizedBox(height: 12),
               for (final item in availability) ...[
                 _LanguageGroup(
@@ -150,7 +215,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
                   selection: primary,
                   onSelected: (selection) {
                     notifier.selectPrimary(selection);
-                    Navigator.pop(context);
+                    _close(context);
                   },
                 ),
                 const SizedBox(height: 18),
@@ -161,7 +226,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
                   const Expanded(
                     child: _SectionLabel(
                       title: '第二字幕',
-                      subtitle: '可选另一语言，或同一语言的另一种现有文字',
+                      subtitle: '只能选择这个视频实际已上传的字幕',
                     ),
                   ),
                   if (secondary != null)
@@ -175,10 +240,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
               if (secondary == null)
                 OutlinedButton.icon(
                   onPressed: () {
-                    final candidate = _suggestSecondary(
-                      availability,
-                      primary,
-                    );
+                    final candidate = _suggestSecondary(availability, primary);
 
                     if (candidate != null) {
                       notifier.selectSecondary(candidate);
@@ -199,7 +261,7 @@ class SubtitleSettingsSheet extends ConsumerWidget {
                       }
 
                       notifier.selectSecondary(selection);
-                      Navigator.pop(context);
+                      _close(context);
                     },
                   ),
                   const SizedBox(height: 18),
@@ -216,10 +278,7 @@ class _SectionLabel extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _SectionLabel({
-    required this.title,
-    required this.subtitle,
-  });
+  const _SectionLabel({required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -230,10 +289,7 @@ class _SectionLabel extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w900,
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 3),
         Text(
@@ -280,10 +336,7 @@ class _LanguageGroup extends StatelessWidget {
         Row(
           children: [
             if (language?.flag.isNotEmpty == true) ...[
-              Text(
-                language!.flag,
-                style: const TextStyle(fontSize: 20),
-              ),
+              Text(language!.flag, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 9),
             ],
             Expanded(
@@ -311,19 +364,13 @@ class _LanguageGroup extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
-              for (var index = 0;
-                  index < item.scriptCodes.length;
-                  index++) ...[
+              for (var index = 0; index < item.scriptCodes.length; index++) ...[
                 _ScriptTile(
                   track: track,
                   scriptCode: item.scriptCodes[index],
                   language: language,
                   uiLanguageCode: uiLanguageCode,
-                  selected: _matches(
-                    selection,
-                    track,
-                    item.scriptCodes[index],
-                  ),
+                  selected: _matches(selection, track, item.scriptCodes[index]),
                   disabled: _matches(
                     disabledSelection,
                     track,
@@ -403,10 +450,7 @@ class _ScriptTile extends StatelessWidget {
         ),
       ),
       trailing: selected
-          ? Icon(
-              Icons.check_circle_rounded,
-              color: scheme.primary,
-            )
+          ? Icon(Icons.check_circle_rounded, color: scheme.primary)
           : null,
     );
   }
@@ -456,10 +500,7 @@ SubtitlePlaybackSelection? _normalizeSelection(
   if (defaultScript != null &&
       defaultScript.isNotEmpty &&
       item.scriptCodes.contains(defaultScript)) {
-    return subtitleSelectionFromTrack(
-      item.track,
-      scriptCode: defaultScript,
-    );
+    return subtitleSelectionFromTrack(item.track, scriptCode: defaultScript);
   }
 
   return subtitleSelectionFromTrack(

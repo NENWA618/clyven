@@ -18,6 +18,7 @@ class NetworkVideoPlayer extends StatefulWidget {
   final String? secondarySubtitleLanguageCode;
   final String? secondarySubtitleScriptCode;
   final bool subtitlesEnabled;
+  final ValueChanged<int>? onSubtitlePositionChanged;
   final VoidCallback? onSubtitlesPressed;
   final int initialPositionSeconds;
   final int fallbackDurationSeconds;
@@ -35,6 +36,7 @@ class NetworkVideoPlayer extends StatefulWidget {
     this.secondarySubtitleLanguageCode,
     this.secondarySubtitleScriptCode,
     this.subtitlesEnabled = true,
+    this.onSubtitlePositionChanged,
     this.onSubtitlesPressed,
     required this.initialPositionSeconds,
     required this.fallbackDurationSeconds,
@@ -170,6 +172,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     }
 
     final position = _effectivePosition();
+
+    widget.onSubtitlePositionChanged?.call(position.inMilliseconds);
     final duration = _effectiveDuration();
     final second = position.inSeconds;
 
@@ -193,6 +197,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
+    final isPhoneSubtitleLayout = MediaQuery.sizeOf(context).width < 600;
 
     return AspectRatio(
       aspectRatio: 16 / 9,
@@ -294,16 +299,17 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                     ),
                   if (!widget.compact &&
                       widget.subtitlesEnabled &&
-                      (activeSubtitle != null || activeSecondarySubtitle != null))
+                      (activeSubtitle != null ||
+                          activeSecondarySubtitle != null))
                     Positioned(
-                      left: 24,
-                      right: 24,
-                      bottom: 58,
+                      left: isPhoneSubtitleLayout ? 12 : 24,
+                      right: isPhoneSubtitleLayout ? 12 : 24,
+                      bottom: isPhoneSubtitleLayout ? 52 : 58,
                       child: Center(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isPhoneSubtitleLayout ? 8 : 12,
+                            vertical: isPhoneSubtitleLayout ? 5 : 8,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.68),
@@ -315,18 +321,20 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                               if (activeSubtitle != null)
                                 InteractiveSubtitleOverlay(
                                   detail: activeSubtitle,
+                                  videoPositionMs: position.inMilliseconds,
                                   languageCode:
                                       widget.subtitleLanguageCode ?? 'und',
                                   scriptCode: widget.subtitleScriptCode,
                                 ),
                               if (activeSubtitle != null &&
                                   activeSecondarySubtitle != null)
-                                const SizedBox(height: 4),
+                                SizedBox(height: isPhoneSubtitleLayout ? 2 : 4),
                               if (activeSecondarySubtitle != null)
                                 Opacity(
                                   opacity: 0.82,
                                   child: InteractiveSubtitleOverlay(
                                     detail: activeSecondarySubtitle,
+                                    videoPositionMs: position.inMilliseconds,
                                     languageCode:
                                         widget.secondarySubtitleLanguageCode ??
                                         'und',

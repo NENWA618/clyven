@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:html' as html;
 import 'package:clyven_backend_client/clyven_backend_client.dart';
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
@@ -9,7 +10,6 @@ import '../../services/studio_client.dart';
 import 'components/subtitle_video_panel.dart';
 import 'components/subtitle_create_panel.dart';
 import 'subtitle_keyboard_controller.dart';
-import 'components/subtitle_login_panel.dart';
 import 'components/subtitle_side_panel.dart';
 import 'subtitle_video_controller.dart';
 import 'subtitle_timeline_controller.dart';
@@ -17,7 +17,8 @@ import 'subtitle_cue_drag_controller.dart';
 import 'components/subtitle_cue_list.dart';
 import 'subtitle_cue_service.dart';
 import 'subtitle_cue_controller.dart';
-import 'subtitle_auth_controller.dart';
+import 'subtitle_karaoke_controller.dart';
+import 'components/subtitle_karaoke_editor.dart';
 import 'subtitle_workspace_service.dart';
 import 'subtitle_workspace_controller.dart';
 import 'subtitle_navigation_controller.dart';
@@ -42,6 +43,11 @@ class SubtitleEditorPage extends StatefulComponent {
 }
 
 class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
+  SubtitlePublishStatus? _publishStatus;
+  bool _publishStatusRequested = false;
+  bool _publishingSubtitle = false;
+  String? _publishError;
+
   final client = studioClient;
 
   Video? get video => _workspaceController.video;
@@ -57,12 +63,13 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
   int currentVideoTimeMs = 0;
   int? selectedCueId;
   int? activeCueId;
-  double timelineZoom = 1.0;
-  late final SubtitleAuthController _authController;
+  double timelineZoom = 0.0;
+  bool showCueList = false;
   late final SubtitleCueService _cueService;
   late final SubtitleWorkspaceService _workspaceService;
   late final SubtitleWorkspaceController _workspaceController;
   late final SubtitleCueController _cueController;
+  late final SubtitleKaraokeController _karaokeController;
   late final SubtitleVideoController _videoController;
   late final SubtitleTimelineController _timelineController;
   late final SubtitleCueDragController _cueDragController;
@@ -74,20 +81,13 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
   void initState() {
     super.initState();
 
-    _authController = SubtitleAuthController(
-      client: client,
-      onChanged: () {
-        if (!mounted) {
-          return;
-        }
-
-        setState(() {});
-      },
-    );
-
     _cueService = SubtitleCueService(
       client: client,
       scriptCode: component.scriptCode,
+
+      onDraftChanged: () {
+        _refreshPublishStatus();
+      },
     );
 
     _workspaceService = SubtitleWorkspaceService(
@@ -152,7 +152,19 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     _cueController = SubtitleCueController(
       service: _cueService,
       getCues: () => _workspaceController.cues,
-      isLoggedIn: () => _authController.loggedIn,
+      isLoggedIn: () => client.auth.isAuthenticated,
+      onChanged: () {
+        if (!mounted) {
+          return;
+        }
+
+        setState(() {});
+      },
+    );
+
+    _karaokeController = SubtitleKaraokeController(
+      service: _cueService,
+      isLoggedIn: () => client.auth.isAuthenticated,
       onChanged: () {
         if (!mounted) {
           return;
@@ -320,8 +332,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
 
     _keyboardController.start();
 
-    _authController.restoreLogin();
-
     _workspaceController.load(
       videoId: component.videoId,
       languageCode: component.languageCode,
@@ -392,6 +402,144 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     );
   }
 
+  SubtitleCueDetail? _selectedCueDetail() {
+    final cueId = selectedCueId;
+
+    if (cueId == null) {
+      return null;
+    }
+
+    for (final detail in cues) {
+      if (detail.cue.id == cueId) {
+        return detail;
+      }
+    }
+
+    return null;
+  }
+
+  String _selectedCueText(
+    SubtitleCueDetail detail,
+  ) {
+    final cueId = detail.cue.id;
+
+    if (cueId != null) {
+      final edited = _cueController.editedTexts[cueId];
+
+      if (edited != null && edited.trim().isNotEmpty) {
+        return edited;
+      }
+    }
+
+    return detail.cue.text;
+  }
+
+  SubtitleCueDetail? _activeCueDetail() {
+    for (final detail in cues) {
+      if (detail.cue.id == activeCueId) {
+        return detail;
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> _refreshPublishStatus() async {
+    try {
+      final status = await _cueService.getPublishStatus(
+        videoId: component.videoId,
+        languageCode: component.languageCode,
+      );
+
+      setState(() {
+        _publishStatus = status;
+        _publishError = null;
+      });
+    } catch (e) {
+      setState(() {
+        _publishError = e.toString();
+      });
+    }
+  }
+
+  Future<void> _publishSubtitle() async {
+    if (_publishingSubtitle) {
+      return;
+    }
+
+    setState(() {
+      _publishingSubtitle = true;
+      _publishError = null;
+    });
+
+    try {
+      final status = await _cueService.publish(
+        videoId: component.videoId,
+        languageCode: component.languageCode,
+      );
+
+      setState(() {
+        _publishStatus = status;
+        _publishingSubtitle = false;
+      });
+    } catch (e) {
+      setState(() {
+        _publishingSubtitle = false;
+        _publishError = e.toString();
+      });
+    }
+  }
+
+  Component _buildPublishControls() {
+    final status = _publishStatus;
+
+    final stateText = status == null
+        ? '发布状态…'
+        : !status.hasPublishedVersion
+        ? '未发布'
+        : status.hasUnpublishedChanges
+        ? '有未发布更改'
+        : '已发布';
+
+    final stateClass = status == null
+        ? ' is-loading'
+        : !status.hasPublishedVersion
+        ? ' is-draft'
+        : status.hasUnpublishedChanges
+        ? ' is-dirty'
+        : ' is-published';
+
+    return div(
+      classes: 'subtitle-publish-controls',
+      [
+        span(
+          classes: 'subtitle-publish-state$stateClass',
+          [.text(stateText)],
+        ),
+        button(
+          type: ButtonType.button,
+          classes: 'subtitle-publish-button',
+          attributes: _publishingSubtitle ? {'disabled': 'disabled'} : null,
+          onClick: _publishingSubtitle
+              ? null
+              : () {
+                  _publishSubtitle();
+                },
+          [
+            .text(
+              _publishingSubtitle ? '发布中…' : '发布字幕',
+            ),
+          ],
+        ),
+        if (_publishError != null)
+          span(
+            classes: 'subtitle-publish-error',
+            [.text(_publishError!)],
+          ),
+      ],
+    );
+  }
+
   String? _activeCueText() {
     for (final detail in cues) {
       if (detail.cue.id == activeCueId) {
@@ -401,23 +549,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
           return _cueController.editedTexts[cueId];
         }
 
-        final scriptCode = component.scriptCode;
-        if (scriptCode != null) {
-          final texts = detail.texts;
-
-          if (texts != null) {
-            for (final item in texts) {
-              if (item.scriptCode == scriptCode) {
-                return item.text;
-              }
-            }
-          }
-
-          // The selected script has no text for this cue yet.
-          // Do not show the primary text from another script.
-          return '';
-        }
-
         return detail.cue.text;
       }
     }
@@ -425,8 +556,154 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     return null;
   }
 
+  SubtitleCueDetail? _selectedCueForQuickEdit() {
+    final wantedId = selectedCueId ?? activeCueId;
+
+    if (wantedId == null) {
+      return null;
+    }
+
+    for (final detail in cues) {
+      if (detail.cue.id == wantedId) {
+        return detail;
+      }
+    }
+
+    return null;
+  }
+
+  String _editableCueText(
+    SubtitleCueDetail detail,
+  ) {
+    final cueId = detail.cue.id;
+
+    if (cueId != null && _cueController.editedTexts.containsKey(cueId)) {
+      return _cueController.editedTexts[cueId] ?? '';
+    }
+
+    return detail.cue.text;
+  }
+
+  Component _buildQuickSubtitleEditor() {
+    final detail = _selectedCueForQuickEdit();
+
+    if (detail == null || detail.cue.id == null) {
+      return div(
+        classes: 'subtitle-quick-editor is-empty',
+        [
+          div(
+            classes: 'subtitle-quick-editor-title',
+            [.text('字幕快速编辑')],
+          ),
+          p(
+            [
+              .text(
+                '点击时间轴上的字幕片段后，'
+                '可以直接在这里输入字幕。',
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    final cueId = detail.cue.id!;
+    final isSaving = _cueController.savingCueIds.contains(cueId);
+    final hasUnsavedChanges = _cueController.editedTexts.containsKey(cueId);
+    final text = _editableCueText(detail);
+
+    return div(
+      classes: 'subtitle-quick-editor',
+      [
+        div(
+          classes: 'subtitle-quick-editor-header',
+          [
+            div(
+              [
+                div(
+                  classes: 'subtitle-quick-editor-title',
+                  [.text('字幕快速编辑')],
+                ),
+                span(
+                  classes: 'subtitle-quick-editor-time',
+                  [
+                    .text(
+                      '${detail.cue.startMs}ms → '
+                      '${detail.cue.endMs}ms',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            span(
+              classes:
+                  'subtitle-save-status'
+                  '${isSaving
+                      ? ' is-saving'
+                      : hasUnsavedChanges
+                      ? ' is-unsaved'
+                      : ' is-saved'}',
+              [
+                .text(
+                  isSaving
+                      ? '保存中…'
+                      : hasUnsavedChanges
+                      ? '未保存'
+                      : '草稿已保存',
+                ),
+              ],
+            ),
+            button(
+              type: ButtonType.button,
+              classes: 'subtitle-save-button',
+              attributes: (isSaving || !hasUnsavedChanges) ? {'disabled': 'disabled'} : null,
+              onClick: isSaving
+                  ? null
+                  : () {
+                      _cueController.saveCue(detail);
+                    },
+              [
+                .text(
+                  isSaving ? '保存中…' : '保存草稿',
+                ),
+              ],
+            ),
+          ],
+        ),
+        textarea(
+          classes: 'subtitle-quick-editor-textarea',
+          key: ValueKey('subtitle-quick-editor-$cueId'),
+          [
+            .text(text),
+          ],
+          onInput: (value) {
+            _cueController.editedTexts[cueId] = value;
+            setState(() {});
+          },
+        ),
+        if (_cueController.saveErrors[cueId] != null)
+          span(
+            classes: 'subtitle-save-error',
+            [
+              .text(
+                _cueController.saveErrors[cueId]!,
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+
   @override
   Component build(BuildContext context) {
+    // CLYVEN_INITIAL_PUBLISH_STATUS
+    if (!_publishStatusRequested) {
+      _publishStatusRequested = true;
+      _refreshPublishStatus();
+    }
+
+    final selectedKaraokeCue = _selectedCueDetail();
+
     return div(
       classes: 'subtitle-editor-page',
       [
@@ -443,6 +720,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             div(
               classes: 'subtitle-editor-toolbar-actions',
               [
+                _buildPublishControls(),
                 span(
                   classes: 'subtitle-language-badge',
                   [.text(component.languageCode.toUpperCase())],
@@ -455,21 +733,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               ],
             ),
           ],
-        ),
-
-        SubtitleLoginPanel(
-          loggedIn: _authController.loggedIn,
-          loading: _authController.loading,
-          error: _authController.error,
-          onEmailChanged: (value) {
-            _authController.loginEmail = value;
-          },
-          onPasswordChanged: (value) {
-            _authController.loginPassword = value;
-          },
-          onLogin: () {
-            _authController.login();
-          },
         ),
 
         if (loading)
@@ -516,6 +779,8 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             SubtitleVideoPanel(
               videoUrl: videoUrl!,
               captionText: _activeCueText(),
+              captionCueStartMs: _activeCueDetail()?.cue.startMs,
+              karaokeSegments: _activeCueDetail()?.karaokeSegments ?? const <SubtitleKaraokeSegment>[],
               onTimeUpdate: () {
                 final currentMs = _videoController.currentTimeMs();
 
@@ -551,6 +816,20 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             activeCueId: activeCueId,
             timelineZoom: timelineZoom,
             durationMs: (video?.durationSeconds ?? 0) * 1000,
+            getCueText: _editableCueText,
+            onCueTextChanged: (detail, value) {
+              final cueId = detail.cue.id;
+
+              if (cueId == null) {
+                return;
+              }
+
+              _cueController.editedTexts[cueId] = value;
+              setState(() {});
+            },
+            onCueTextSave: (detail) {
+              _cueController.saveCue(detail);
+            },
             onZoomChanged: (value) {
               setState(() {
                 timelineZoom = value;
@@ -560,6 +839,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               _timelineController.seekFromTimelineClick(event);
             },
             onCueMouseDown: (detail) {
+              _videoController.seekTo(detail.cue.startMs);
               _cueDragController.beginMoveCue(detail);
             },
             onCueClick: (detail) {
@@ -576,6 +856,11 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               _videoController.seekTo(
                 detail.cue.startMs,
               );
+
+              _videoController.centerTimelineAt(
+                milliseconds: detail.cue.startMs,
+                durationMs: (video?.durationSeconds ?? 0) * 1000,
+              );
             },
             onResizeStart: (detail, resizeStart) {
               _cueDragController.beginResizeCue(
@@ -587,6 +872,91 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               _timelineController.beginScrubPlayhead(event);
             },
           ),
+          _buildQuickSubtitleEditor(),
+
+          if (selectedKaraokeCue != null)
+            SubtitleKaraokeEditor(
+              detail: selectedKaraokeCue,
+              drafts: _karaokeController.draftsFor(
+                selectedKaraokeCue,
+              ),
+              currentVideoTimeMs: currentVideoTimeMs,
+              saving:
+                  selectedKaraokeCue.cue.id != null &&
+                  _karaokeController.savingCueIds.contains(
+                    selectedKaraokeCue.cue.id,
+                  ),
+              error: selectedKaraokeCue.cue.id == null ? null : _karaokeController.errors[selectedKaraokeCue.cue.id],
+              onGenerateFromSubtitle: () {
+                _karaokeController.initializeFromSubtitle(
+                  selectedKaraokeCue,
+                  _selectedCueText(selectedKaraokeCue),
+                );
+              },
+              onClear: () {
+                _karaokeController.clear(
+                  selectedKaraokeCue,
+                );
+              },
+              onAdd: () {
+                _karaokeController.addSegment(
+                  selectedKaraokeCue,
+                );
+              },
+              onDelete: (index) {
+                _karaokeController.removeSegment(
+                  selectedKaraokeCue,
+                  index,
+                );
+              },
+              onTextChanged: (index, value) {
+                _karaokeController.updateText(
+                  selectedKaraokeCue,
+                  index,
+                  value,
+                );
+              },
+              onStartChanged: (index, value) {
+                _karaokeController.updateStart(
+                  selectedKaraokeCue,
+                  index,
+                  value,
+                );
+              },
+              onEndChanged: (index, value) {
+                _karaokeController.updateEnd(
+                  selectedKaraokeCue,
+                  index,
+                  value,
+                );
+              },
+              onUseCurrentStart: (index) {
+                final currentMs = _videoController.currentTimeMs() ?? currentVideoTimeMs;
+
+                _karaokeController.useCurrentTimeAsStart(
+                  selectedKaraokeCue,
+                  index,
+                  currentMs,
+                );
+              },
+              onUseCurrentEnd: (index) {
+                final currentMs = _videoController.currentTimeMs() ?? currentVideoTimeMs;
+
+                _karaokeController.useCurrentTimeAsEnd(
+                  selectedKaraokeCue,
+                  index,
+                  currentMs,
+                );
+              },
+              onSeekVideo: (milliseconds) {
+                _videoController.seekTo(milliseconds);
+              },
+              onSave: () {
+                _karaokeController.save(
+                  selectedKaraokeCue,
+                );
+              },
+            ),
 
           SubtitleCreatePanel(
             startTime: _cueController.newCueStart,
@@ -617,63 +987,85 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             },
           ),
 
-          div(
-            classes: 'subtitle-editor-layout',
+          button(
+            type: ButtonType.button,
+            classes: 'subtitle-cue-list-toggle',
+            onClick: () {
+              setState(() {
+                showCueList = !showCueList;
+              });
+            },
             [
-              SubtitleCueList(
-                cues: cues,
-                selectedCueId: selectedCueId,
-                activeCueId: activeCueId,
-                editedTexts: _cueController.editedTexts,
-                editedStartTimes: _cueController.editedStartTimes,
-                editedEndTimes: _cueController.editedEndTimes,
-                savingCueIds: _cueController.savingCueIds,
-                savingTimingCueIds: _cueController.savingTimingCueIds,
-                deletingCueIds: _cueController.deletingCueIds,
-                saveErrors: _cueController.saveErrors,
-                timingErrors: _cueController.timingErrors,
-                deleteErrors: _cueController.deleteErrors,
-                onRowClick: (detail) {
-                  final cueId = detail.cue.id;
-
-                  if (cueId == null) {
-                    return;
-                  }
-
-                  setState(() {
-                    selectedCueId = cueId;
-                  });
-
-                  _videoController.seekTo(
-                    detail.cue.startMs,
-                  );
-                },
-                onStartChanged: (cueId, value) {
-                  _cueController.editedStartTimes[cueId] = value;
-                },
-                onEndChanged: (cueId, value) {
-                  _cueController.editedEndTimes[cueId] = value;
-                },
-                onSaveTiming: (detail) {
-                  _cueController.saveTiming(detail);
-                },
-                onTextChanged: (cueId, value) {
-                  _cueController.editedTexts[cueId] = value;
-                },
-                onSaveText: (detail) {
-                  _cueController.saveCue(detail);
-                },
-                onDelete: (detail) {
-                  _deleteCue(detail);
-                },
-              ),
-              SubtitleSidePanel(
-                languageCode: component.languageCode,
-                scriptCode: component.scriptCode,
-                cueCount: cues.length,
+              .text(
+                showCueList ? '▾ 隐藏字幕列表（${cues.length}）' : '▸ 字幕列表（${cues.length}）',
               ),
             ],
           ),
+
+          if (showCueList)
+            div(
+              classes: 'subtitle-editor-layout',
+              [
+                SubtitleCueList(
+                  cues: cues,
+                  selectedCueId: selectedCueId,
+                  activeCueId: activeCueId,
+                  editedTexts: _cueController.editedTexts,
+                  editedStartTimes: _cueController.editedStartTimes,
+                  editedEndTimes: _cueController.editedEndTimes,
+                  savingCueIds: _cueController.savingCueIds,
+                  savingTimingCueIds: _cueController.savingTimingCueIds,
+                  deletingCueIds: _cueController.deletingCueIds,
+                  saveErrors: _cueController.saveErrors,
+                  timingErrors: _cueController.timingErrors,
+                  deleteErrors: _cueController.deleteErrors,
+                  onRowClick: (detail) {
+                    final cueId = detail.cue.id;
+
+                    if (cueId == null) {
+                      return;
+                    }
+
+                    setState(() {
+                      selectedCueId = cueId;
+                    });
+
+                    _videoController.seekTo(
+                      detail.cue.startMs,
+                    );
+
+                    _videoController.centerTimelineAt(
+                      milliseconds: detail.cue.startMs,
+                      durationMs: (video?.durationSeconds ?? 0) * 1000,
+                    );
+                  },
+                  onStartChanged: (cueId, value) {
+                    _cueController.editedStartTimes[cueId] = value;
+                  },
+                  onEndChanged: (cueId, value) {
+                    _cueController.editedEndTimes[cueId] = value;
+                  },
+                  onSaveTiming: (detail) {
+                    _cueController.saveTiming(detail);
+                  },
+                  onTextChanged: (cueId, value) {
+                    _cueController.editedTexts[cueId] = value;
+                    setState(() {});
+                  },
+                  onSaveText: (detail) {
+                    _cueController.saveCue(detail);
+                  },
+                  onDelete: (detail) {
+                    _deleteCue(detail);
+                  },
+                ),
+                SubtitleSidePanel(
+                  languageCode: component.languageCode,
+                  scriptCode: component.scriptCode,
+                  cueCount: cues.length,
+                ),
+              ],
+            ),
         ],
       ],
     );

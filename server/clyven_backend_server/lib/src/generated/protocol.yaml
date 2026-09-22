@@ -15,6 +15,12 @@ userProfileEdit:
   - changeUserName:
   - changeFullName:
   - get:
+admin:
+  - ping:
+  - getUserEmails:
+  - getAllVideos:
+  - getVideosWithSubtitles:
+  - getSubtitleTracks:
 comment:
   - loadComments:
   - createComment:
@@ -41,6 +47,10 @@ knownEntry:
   - getKnowledgeStates:
 subtitle:
   - getCueDetails:
+  - getPublishedCueDetails:
+  - getPublishedAvailableTracks:
+  - getSubtitlePublishStatus:
+  - publishSubtitleTrack:
   - getAvailableTracks:
   - previewSrtImport:
   - confirmReplaceSrtImport:
@@ -50,9 +60,11 @@ subtitle:
   - updateCueTiming:
   - createCue:
   - deleteCue:
+  - replaceKaraokeSegments:
 video:
   - create:
   - getVideos:
+  - getMyVideos:
   - getVideo:
   - createUploadDescription:
   - verifyUpload:

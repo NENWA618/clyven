@@ -6,6 +6,9 @@ import '../generated/protocol.dart';
 import '../services/dictionary_import_writer.dart';
 
 class DictionaryImportEndpoint extends Endpoint {
+  @override
+  bool get requireLogin => true;
+
   Future<List<DictionaryImportProfile>> getProfiles(
     Session session, {
     String? languageCode,

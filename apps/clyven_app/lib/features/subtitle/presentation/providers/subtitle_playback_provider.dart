@@ -14,6 +14,10 @@ class SubtitlePlaybackNotifier extends Notifier<SubtitlePlaybackState> {
     state = state.copyWith(enabled: value);
   }
 
+  void setDisplayMode(SubtitleDisplayMode value) {
+    state = state.copyWith(displayMode: value);
+  }
+
   void selectPrimary(SubtitlePlaybackSelection selection) {
     state = state.copyWith(enabled: true, primary: selection);
     if (sameSubtitleSelection(state.primary, state.secondary)) {

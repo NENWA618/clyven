@@ -13,7 +13,7 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
     required String languageCode,
     String? scriptCode,
   }) async {
-    return client.subtitle.getCueDetails(
+    return client.subtitle.getPublishedCueDetails(
       videoId: videoId,
       languageCode: languageCode,
       scriptCode: scriptCode,
@@ -24,6 +24,6 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
   Future<List<serverpod.SubtitleTrack>> loadAvailableTracks({
     required int videoId,
   }) async {
-    return client.subtitle.getAvailableTracks(videoId: videoId);
+    return client.subtitle.getPublishedAvailableTracks(videoId: videoId);
   }
 }

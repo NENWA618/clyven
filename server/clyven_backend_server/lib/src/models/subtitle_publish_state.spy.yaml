@@ -1,0 +1,16 @@
+class: SubtitlePublishState
+table: subtitle_publish_state
+
+fields:
+  trackId: int, relation(parent=subtitle_track)
+  publishedPayload: String?
+  publishedAt: DateTime?
+  draftRevision: int, default=0
+  publishedRevision: int, default=0
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  subtitle_publish_state_track_unique_idx:
+    fields: trackId
+    unique: true

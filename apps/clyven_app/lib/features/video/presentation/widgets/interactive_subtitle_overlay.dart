@@ -12,41 +12,21 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   final String languageCode;
   final String? scriptCode;
   final String explanationLanguageCode;
+  final int videoPositionMs;
 
   const InteractiveSubtitleOverlay({
     super.key,
     required this.detail,
     required this.languageCode,
+    required this.videoPositionMs,
     this.scriptCode,
     this.explanationLanguageCode = 'zh',
   });
 
   String _displayText() {
-    final texts = detail.texts ?? const <serverpod.SubtitleCueText>[];
-
-    final requestedScript = scriptCode?.trim();
-
-    if (requestedScript != null && requestedScript.isNotEmpty) {
-      for (final text in texts) {
-        if (text.scriptCode == requestedScript) {
-          return text.text;
-        }
-      }
-
-      // Explicit script selection is strict: no cross-script fallback.
-      return '';
-    }
-
-    for (final text in texts) {
-      if (text.isPrimary) {
-        return text.text;
-      }
-    }
-
-    if (texts.isNotEmpty) {
-      return texts.first.text;
-    }
-
+    // Published backend already projects the selected script representation
+    // into cue.text. Do not re-select from detail.texts here, because legacy
+    // data may contain both "latn" and "Latn" rows and the older row can win.
     return detail.cue.text;
   }
 
@@ -85,16 +65,13 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               children: [
                 Text(
                   definition.gloss,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
                 ),
                 if (definition.definition != null) ...[
                   const SizedBox(height: 8),
                   Text(
                     definition.definition!,
-                    style: const TextStyle(fontSize: 16, height: 1.5),
+                    style: TextStyle(fontSize: 16, height: 1.5),
                   ),
                 ],
               ],
@@ -166,14 +143,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                 children: [
                   Text(
                     target.text,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Text(meaning, style: const TextStyle(fontSize: 16)),
+                    child: Text(meaning, style: TextStyle(fontSize: 16)),
                   ),
                   FutureBuilder<String>(
                     future: knowledgeFuture,
@@ -263,7 +237,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                 children: [
                   Text(
                     entryType == 'phrase' ? 'Phrase' : 'Token',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: Colors.grey,
@@ -272,10 +246,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     text,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 8),
                   Consumer(
@@ -385,7 +356,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                   else if (snapshot.hasError)
                     Text(
                       '查询失败：${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.red),
                     )
                   else if (snapshot.data == null)
                     const Text('暂时没有这个词条的释义', style: TextStyle(fontSize: 16))
@@ -400,15 +371,211 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     );
   }
 
+  List<serverpod.SubtitleKaraokeSegment> _sortedKaraokeSegments() {
+    final segments = [
+      ...(detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[]),
+    ]..sort((a, b) => a.position.compareTo(b.position));
+
+    return segments;
+  }
+
+  double _karaokeProgressForRange(int startPosition, int endPosition) {
+    final segments = _sortedKaraokeSegments();
+
+    if (segments.isEmpty) {
+      return 0;
+    }
+
+    var matches = segments
+        .where(
+          (segment) =>
+              segment.position >= startPosition &&
+              segment.position <= endPosition,
+        )
+        .toList();
+
+    if (matches.isEmpty &&
+        startPosition >= 0 &&
+        startPosition < segments.length) {
+      final safeEnd = endPosition
+          .clamp(startPosition, segments.length - 1)
+          .toInt();
+
+      matches = segments.sublist(startPosition, safeEnd + 1);
+    }
+
+    if (matches.isEmpty) {
+      return 0;
+    }
+
+    final relativeMs = videoPositionMs - detail.cue.startMs;
+    final startMs = matches.first.startOffsetMs;
+    final endMs = matches.last.endOffsetMs;
+
+    if (relativeMs <= startMs) {
+      return 0;
+    }
+
+    if (relativeMs >= endMs) {
+      return 1;
+    }
+
+    final durationMs = endMs - startMs;
+
+    if (durationMs <= 0) {
+      return 1;
+    }
+
+    return ((relativeMs - startMs) / durationMs).clamp(0.0, 1.0).toDouble();
+  }
+
+  LinearGradient? _karaokeGradient(BuildContext context, double progress) {
+    if (progress <= 0) {
+      return null;
+    }
+
+    final accent = Theme.of(
+      context,
+    ).colorScheme.primary.withValues(alpha: 0.34);
+
+    if (progress >= 1) {
+      return LinearGradient(colors: [accent, accent]);
+    }
+
+    return LinearGradient(
+      colors: [accent, accent, Colors.transparent, Colors.transparent],
+      stops: [0.0, progress, progress, 1.0],
+    );
+  }
+
+  Widget _buildPlainKaraoke(
+    BuildContext context,
+    List<serverpod.SubtitleKaraokeSegment> segments,
+  ) {
+    final relativeMs = videoPositionMs - detail.cue.startMs;
+    final accent = Theme.of(context).colorScheme.primary;
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 0,
+      runSpacing: 4,
+      children: [
+        for (final segment in segments)
+          Builder(
+            builder: (context) {
+              final durationMs = segment.endOffsetMs - segment.startOffsetMs;
+
+              double progress;
+
+              if (relativeMs <= segment.startOffsetMs) {
+                progress = 0;
+              } else if (relativeMs >= segment.endOffsetMs) {
+                progress = 1;
+              } else if (durationMs <= 0) {
+                progress = 1;
+              } else {
+                progress = (relativeMs - segment.startOffsetMs) / durationMs;
+              }
+
+              final safeProgress = progress.clamp(0.0, 1.0).toDouble();
+
+              return ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (bounds) {
+                  if (safeProgress <= 0) {
+                    return const LinearGradient(
+                      colors: [Colors.white, Colors.white],
+                    ).createShader(bounds);
+                  }
+
+                  if (safeProgress >= 1) {
+                    return LinearGradient(
+                      colors: [accent, accent],
+                    ).createShader(bounds);
+                  }
+
+                  return LinearGradient(
+                    colors: [accent, accent, Colors.white, Colors.white],
+                    stops: [0.0, safeProgress, safeProgress, 1.0],
+                  ).createShader(bounds);
+                },
+                child: Text(
+                  segment.text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: _subtitleFontSize(context),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  double _subtitleFontSize(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    // A 17sp subtitle is too large inside a phone-sized 16:9 player.
+    // Keep the existing desktop/tablet size while tightening mobile.
+    return width < 600 ? 12.0 : 17.0;
+  }
+
+  String _normalizeSubtitleForComparison(String value) {
+    return value.replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
+
+  bool _karaokeMatchesDisplayText(
+    List<serverpod.SubtitleKaraokeSegment> segments,
+  ) {
+    if (segments.isEmpty) return false;
+
+    final karaokeText = segments.map((segment) => segment.text).join();
+
+    return _normalizeSubtitleForComparison(karaokeText) ==
+        _normalizeSubtitleForComparison(_displayText());
+  }
+
+  bool _tokensMatchDisplayText(List<serverpod.SubtitleToken> tokens) {
+    if (tokens.isEmpty) return false;
+
+    final sorted = [...tokens]
+      ..sort((a, b) => a.position.compareTo(b.position));
+
+    final tokenText = sorted.map((token) => token.text).join();
+
+    String normalize(String value) {
+      return value.replaceAll(RegExp(r'\s+'), '').trim();
+    }
+
+    return normalize(tokenText) == normalize(_displayText());
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (detail.tokens.isEmpty) {
+    final karaokeSegments =
+        detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[];
+
+    if (karaokeSegments.isNotEmpty &&
+        _karaokeMatchesDisplayText(karaokeSegments)) {
+      return _buildPlainKaraoke(context, karaokeSegments);
+    }
+
+    if (detail.tokens.isEmpty || !_tokensMatchDisplayText(detail.tokens)) {
+      final karaokeSegments = _sortedKaraokeSegments();
+
+      if (karaokeSegments.isNotEmpty &&
+          _karaokeMatchesDisplayText(karaokeSegments)) {
+        return _buildPlainKaraoke(context, karaokeSegments);
+      }
+
       return Text(
         _displayText(),
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 17,
+          fontSize: _subtitleFontSize(context),
           fontWeight: FontWeight.w700,
         ),
       );
@@ -518,6 +685,13 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
               decoration: BoxDecoration(
+                gradient: _karaokeGradient(
+                  context,
+                  _karaokeProgressForRange(
+                    phrase.startPosition,
+                    phrase.endPosition,
+                  ),
+                ),
                 border: Border(
                   bottom: BorderSide(
                     color: Theme.of(context).colorScheme.primary,
@@ -529,7 +703,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
                 phrase.text,
                 style: TextStyle(
                   color: _knowledgeColor(knowledgeState),
-                  fontSize: 17,
+                  fontSize: _subtitleFontSize(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -571,13 +745,20 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               entryId: token.entryId,
             );
           },
-          child: Padding(
+          child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+            decoration: BoxDecoration(
+              gradient: _karaokeGradient(
+                context,
+                _karaokeProgressForRange(token.position, token.position),
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
             child: Text(
               token.text,
               style: TextStyle(
                 color: _knowledgeColor(knowledgeState),
-                fontSize: 17,
+                fontSize: _subtitleFontSize(context),
                 fontWeight: FontWeight.w700,
               ),
             ),

@@ -9,3 +9,7 @@ fields:
 
   tokens: List<SubtitleToken>
   phrases: List<SubtitlePhrase>
+
+  # Optional per-script karaoke timing. Each segment stores offsets
+  # relative to cue.startMs so moving the cue keeps its internal timing.
+  karaokeSegments: List<SubtitleKaraokeSegment>?

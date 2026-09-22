@@ -1,6 +1,8 @@
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:glyphora_language_core/glyphora_language_core.dart';
 
+enum SubtitleDisplayMode { overlay, learningPanel }
+
 class SubtitlePlaybackSelection {
   final int? trackId;
   final String languageCode;
@@ -17,17 +19,20 @@ class SubtitlePlaybackSelection {
 
 class SubtitlePlaybackState {
   final bool enabled;
+  final SubtitleDisplayMode displayMode;
   final SubtitlePlaybackSelection? primary;
   final SubtitlePlaybackSelection? secondary;
 
   const SubtitlePlaybackState({
     this.enabled = true,
+    this.displayMode = SubtitleDisplayMode.overlay,
     this.primary,
     this.secondary,
   });
 
   SubtitlePlaybackState copyWith({
     bool? enabled,
+    SubtitleDisplayMode? displayMode,
     SubtitlePlaybackSelection? primary,
     SubtitlePlaybackSelection? secondary,
     bool clearPrimary = false,
@@ -35,6 +40,7 @@ class SubtitlePlaybackState {
   }) {
     return SubtitlePlaybackState(
       enabled: enabled ?? this.enabled,
+      displayMode: displayMode ?? this.displayMode,
       primary: clearPrimary ? null : primary ?? this.primary,
       secondary: clearSecondary ? null : secondary ?? this.secondary,
     );

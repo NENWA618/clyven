@@ -4,6 +4,8 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
+import '../../services/studio_client.dart';
+
 class SubtitlesPage extends StatefulComponent {
   const SubtitlesPage({super.key});
 
@@ -12,10 +14,7 @@ class SubtitlesPage extends StatefulComponent {
 }
 
 class _SubtitlesPageState extends State<SubtitlesPage> {
-  final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-    connectionTimeout: const Duration(minutes: 2),
-  );
+  final client = studioClient;
 
   List<Video> videos = [];
   int? selectedVideoId;
@@ -28,10 +27,9 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
   @override
   void initState() {
     super.initState();
-    selectedLanguage = LanguageConfig.findByCode('vi') ??
-        (LanguageConfig.allLanguages.isEmpty
-            ? null
-            : LanguageConfig.allLanguages.first);
+    selectedLanguage =
+        LanguageConfig.findByCode('vi') ??
+        (LanguageConfig.allLanguages.isEmpty ? null : LanguageConfig.allLanguages.first);
     _chooseDefaultScript();
     _loadVideos();
   }
@@ -43,7 +41,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
     });
 
     try {
-      final result = await client.video.getVideos();
+      final result = await client.video.getMyVideos();
       setState(() {
         videos = result;
         loading = false;
@@ -70,18 +68,19 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
 
   List<LanguageConfig> get filteredLanguages {
     final query = languageSearch.trim().toLowerCase();
-    final source = [...LanguageConfig.allLanguages]
-      ..sort((a, b) => a.sortKeyOf('zh').compareTo(b.sortKeyOf('zh')));
+    final source = [...LanguageConfig.allLanguages]..sort((a, b) => a.sortKeyOf('zh').compareTo(b.sortKeyOf('zh')));
 
     if (query.isEmpty) return source;
 
-    return source.where((language) {
-      return language.code.toLowerCase().contains(query) ||
-          language.nameOf('zh').toLowerCase().contains(query) ||
-          language.nameOf('en').toLowerCase().contains(query) ||
-          language.nameOf('vi').toLowerCase().contains(query) ||
-          language.nameOf('ms').toLowerCase().contains(query);
-    }).toList(growable: false);
+    return source
+        .where((language) {
+          return language.code.toLowerCase().contains(query) ||
+              language.nameOf('zh').toLowerCase().contains(query) ||
+              language.nameOf('en').toLowerCase().contains(query) ||
+              language.nameOf('vi').toLowerCase().contains(query) ||
+              language.nameOf('ms').toLowerCase().contains(query);
+        })
+        .toList(growable: false);
   }
 
   List<ScriptConfig> get selectedScripts {
@@ -95,10 +94,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
       }
     }
 
-    return codes
-        .map(ScriptConfig.findByCode)
-        .whereType<ScriptConfig>()
-        .toList(growable: false);
+    return codes.map(ScriptConfig.findByCode).whereType<ScriptConfig>().toList(growable: false);
   }
 
   void _chooseDefaultScript() {
@@ -122,9 +118,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
     final scriptCode = selectedScriptCode;
 
     Router.of(context).push(
-      scriptCode == null
-          ? base
-          : '$base/${Uri.encodeComponent(scriptCode)}',
+      scriptCode == null ? base : '$base/${Uri.encodeComponent(scriptCode)}',
     );
   }
 
@@ -176,8 +170,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
                     for (final video in videos)
                       button(
                         type: ButtonType.button,
-                        classes:
-                            'subtitle-video-choice ${selectedVideoId == video.id ? 'is-selected' : ''}',
+                        classes: 'subtitle-video-choice ${selectedVideoId == video.id ? 'is-selected' : ''}',
                         onClick: () {
                           setState(() {
                             selectedVideoId = video.id;
@@ -223,8 +216,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
                     for (final item in filteredLanguages)
                       button(
                         type: ButtonType.button,
-                        classes:
-                            'subtitle-language-choice ${language?.code == item.code ? 'is-selected' : ''}',
+                        classes: 'subtitle-language-choice ${language?.code == item.code ? 'is-selected' : ''}',
                         onClick: () => _selectLanguage(item),
                         [
                           span(classes: 'subtitle-language-flag', [.text(item.flag)]),
@@ -255,8 +247,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
                       for (final script in scripts)
                         button(
                           type: ButtonType.button,
-                          classes:
-                              'subtitle-script-choice ${selectedScriptCode == script.code ? 'is-selected' : ''}',
+                          classes: 'subtitle-script-choice ${selectedScriptCode == script.code ? 'is-selected' : ''}',
                           onClick: () {
                             setState(() {
                               selectedScriptCode = script.code;
@@ -285,9 +276,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
                         strong([.text('语言变体已在语言库中登记')]),
                         p([
                           .text(
-                            language.variants
-                                .map((variant) => variant.nameOf('zh'))
-                                .join(' · '),
+                            language.variants.map((variant) => variant.nameOf('zh')).join(' · '),
                           ),
                         ]),
                         small([
@@ -311,9 +300,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
                 span([.text('LANGUAGE')]),
                 strong([
                   .text(
-                    language == null
-                        ? '—'
-                        : '${language.flag} ${language.nameOf('zh')} · ${language.code}',
+                    language == null ? '—' : '${language.flag} ${language.nameOf('zh')} · ${language.code}',
                   ),
                 ]),
               ]),
@@ -331,9 +318,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
             button(
               type: ButtonType.button,
               classes: 'subtitle-launch-button',
-              onClick: selectedVideoId == null || language == null
-                  ? null
-                  : () => _openEditor(context),
+              onClick: selectedVideoId == null || language == null ? null : () => _openEditor(context),
               [
                 span([.text('进入字幕工作台')]),
                 b([.text('→')]),
