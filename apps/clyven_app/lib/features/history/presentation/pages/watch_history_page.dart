@@ -83,7 +83,7 @@ class WatchHistoryPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.arrow_back_rounded),
@@ -159,7 +159,7 @@ class WatchHistoryPage extends ConsumerWidget {
         child: Container(
           height: 130,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.72),
+            color: Colors.white.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: const Color(0xFFE3DED5)),
           ),

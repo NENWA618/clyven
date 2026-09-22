@@ -1,6 +1,8 @@
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
+import 'home_design_tokens.dart';
+
 class HomeNavigationDock extends StatelessWidget {
   final int selectedIndex;
   final int unreadCount;
@@ -15,76 +17,89 @@ class HomeNavigationDock extends StatelessWidget {
     required this.onCreate,
   });
 
-  static const Color _inkColor = Color(0xFF161616);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-    final accent = colors.primary;
-    final onAccent = colors.onPrimary;
+    final brandBlue = HomeDesignTokens.brandFor(context);
+    const dockBackground = Color(0xFF171715);
+    const dockBorder = Color(0xFF302E2A);
 
     return SafeArea(
-      minimum: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+      top: false,
       child: Container(
-        height: 68,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        height: 76,
+        margin: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
         decoration: BoxDecoration(
-          color: _inkColor,
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: const [
+          color: dockBackground,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: dockBorder),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x38000000),
-              blurRadius: 24,
-              offset: Offset(0, 10),
+              color: Colors.black.withValues(alpha: .24),
+              blurRadius: 32,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
         child: Row(
           children: [
-            _buildItem(
-              icon: Icons.blur_on_rounded,
+            _item(
+              context,
+              icon: Icons.home_rounded,
+              outlineIcon: Icons.home_outlined,
               label: l10n.navHome,
               index: 0,
-              accent: accent,
-              onAccent: onAccent,
             ),
-            _buildItem(
-              icon: Icons.explore_outlined,
+            _item(
+              context,
+              icon: Icons.smart_display_rounded,
+              outlineIcon: Icons.smart_display_outlined,
               label: l10n.navDiscover,
               index: 1,
-              accent: accent,
-              onAccent: onAccent,
             ),
             Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: onCreate,
-                child: Container(
-                  height: 48,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: BorderRadius.circular(18),
+              child: Center(
+                child: InkWell(
+                  onTap: onCreate,
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: brandBlue,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandBlue.withValues(alpha: .28),
+                          blurRadius: 14,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 31,
+                    ),
                   ),
-                  child: Icon(Icons.add_rounded, color: onAccent, size: 30),
                 ),
               ),
             ),
-            _buildItem(
-              icon: Icons.notifications_none_rounded,
+            _item(
+              context,
+              icon: Icons.notifications_rounded,
+              outlineIcon: Icons.notifications_none_rounded,
               label: l10n.navEchoes,
               index: 2,
-              badgeCount: unreadCount,
-              accent: accent,
-              onAccent: onAccent,
+              badge: unreadCount,
             ),
-            _buildItem(
-              icon: Icons.person_outline_rounded,
+            _item(
+              context,
+              icon: Icons.person_rounded,
+              outlineIcon: Icons.person_outline_rounded,
               label: l10n.navProfile,
               index: 3,
-              accent: accent,
-              onAccent: onAccent,
             ),
           ],
         ),
@@ -92,48 +107,53 @@ class HomeNavigationDock extends StatelessWidget {
     );
   }
 
-  Widget _buildItem({
+  Widget _item(
+    BuildContext context, {
     required IconData icon,
+    required IconData outlineIcon,
     required String label,
     required int index,
-    required Color accent,
-    required Color onAccent,
-    int badgeCount = 0,
+    int badge = 0,
   }) {
+    final colors = Theme.of(context).colorScheme;
+    final brandBlue = HomeDesignTokens.brandFor(context);
     final selected = selectedIndex == index;
+    const inactive = Color(0xFF9C978F);
 
     return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          onSelected(index);
-        },
+      child: InkWell(
+        onTap: () => onSelected(index),
+        borderRadius: BorderRadius.circular(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(icon, size: 22, color: selected ? accent : Colors.white54),
-                if (badgeCount > 0)
+                Icon(
+                  selected ? icon : outlineIcon,
+                  size: 24,
+                  color: selected ? brandBlue : inactive,
+                ),
+                if (badge > 0)
                   Positioned(
                     right: -9,
-                    top: -7,
+                    top: -5,
                     child: Container(
                       constraints: const BoxConstraints(
-                        minWidth: 17,
-                        minHeight: 17,
+                        minWidth: 16,
+                        minHeight: 16,
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: accent,
-                        shape: BoxShape.circle,
+                        color: colors.error,
+                        borderRadius: BorderRadius.circular(9),
                       ),
                       child: Text(
-                        badgeCount > 99 ? '99+' : badgeCount.toString(),
+                        badge > 99 ? '99+' : '$badge',
                         style: TextStyle(
-                          color: onAccent,
+                          color: colors.onError,
                           fontSize: 8,
                           fontWeight: FontWeight.w900,
                         ),
@@ -148,9 +168,9 @@ class HomeNavigationDock extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: selected ? accent : Colors.white54,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
+                color: selected ? brandBlue : inactive,
+                fontSize: 10,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
               ),
             ),
           ],

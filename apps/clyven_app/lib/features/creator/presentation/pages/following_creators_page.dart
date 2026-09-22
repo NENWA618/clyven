@@ -10,9 +10,9 @@ import 'creator_profile_page.dart';
 class FollowingCreatorsPage extends ConsumerWidget {
   const FollowingCreatorsPage({super.key});
 
-  static const Color _background = Color(0xFFF4F1EA);
-  static const Color _ink = Color(0xFF161616);
-  static const Color _purple = Color(0xFF7657FF);
+  static const Color _background = Color(0xFFF1EFEA);
+  static const Color _ink = Color(0xFF171714);
+  static const Color _purple = Color(0xFFA85F36);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -109,7 +109,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.arrow_back_rounded),
@@ -170,7 +170,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFFE3DED5)),
         ),

@@ -535,49 +535,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     );
   }
 
-  Widget _buildTopBar(BuildContext context, AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-      child: Row(
-        children: [
-          _SquareButton(
-            icon: Icons.arrow_back_rounded,
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.frameEyebrow,
-                  style: const TextStyle(
-                    color: Color(0xFF77736C),
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  l10n.watchingNow,
-                  style: const TextStyle(
-                    color: _inkColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _SquareButton(icon: Icons.more_horiz_rounded, onTap: () {}),
-        ],
-      ),
-    );
-  }
-
   Widget _buildVideoInformation(
     BuildContext context,
     VideoDetail video,
@@ -1100,30 +1057,6 @@ class _ActionButton extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SquareButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _SquareButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE0DBD2)),
-        ),
-        child: Icon(icon, color: const Color(0xFF161616), size: 21),
       ),
     );
   }

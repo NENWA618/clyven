@@ -200,8 +200,6 @@ class ServerpodVideoRepository implements VideoRepository {
 
     final videoUrl = rawVideoUrl ?? '';
 
-    print('VIDEO URL: $videoUrl');
-
     if (videoUrl.isEmpty) {
       throw AppException(
         AppErrorCode.videoUrlUnavailable,

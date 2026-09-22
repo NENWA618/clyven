@@ -24,8 +24,8 @@ class ClyvenThemeSettings {
 
   const ClyvenThemeSettings({
     this.mode = ClyvenThemeMode.accentOnly,
-    this.color = ClyvenThemeColor.acid,
-    this.companionColor = ClyvenThemeColor.purple,
+    this.color = ClyvenThemeColor.orange,
+    this.companionColor = ClyvenThemeColor.orange,
     this.displayMode = ClyvenDisplayMode.day,
   });
 
@@ -47,25 +47,26 @@ class ClyvenThemeSettings {
 class ClyvenTheme {
   ClyvenTheme._();
 
-  /// Original Clyven brand acid yellow. This color must always remain available.
-  static const Color brandAcid = Color(0xFFE5FF58);
-  static const Color originalPurple = Color(0xFF7657FF);
-  static const Color originalBackground = Color(0xFFF4F1EA);
-  static const Color ink = Color(0xFF161616);
+  /// Legacy preset names are retained for stored settings compatibility, while
+  /// their tones are brought into the current editorial palette.
+  static const Color brandAcid = Color(0xFFC7A66A);
+  static const Color originalPurple = Color(0xFF87563A);
+  static const Color originalBackground = Color(0xFFF1EFEA);
+  static const Color ink = Color(0xFF171714);
 
   // Day mode keeps the original Clyven background exactly.
-  static const Color nightBackground = Color(0xFF161616);
-  static const Color nightCard = Color(0xFF222222);
-  static const Color nightText = Color(0xFFF4F1EA);
+  static const Color nightBackground = Color(0xFF0D0D0C);
+  static const Color nightCard = Color(0xFF191918);
+  static const Color nightText = Color(0xFFF0EDE7);
 
   static Color accentFor(ClyvenThemeColor color) {
     return switch (color) {
       ClyvenThemeColor.acid => brandAcid,
       ClyvenThemeColor.yellow => const Color(0xFFFFD84D),
       ClyvenThemeColor.purple => const Color(0xFF8B6CFF),
-      ClyvenThemeColor.blue => const Color(0xFF4F8CFF),
+      ClyvenThemeColor.blue => const Color(0xFF2563EB),
       ClyvenThemeColor.green => const Color(0xFF4FD18B),
-      ClyvenThemeColor.orange => const Color(0xFFFF9B4A),
+      ClyvenThemeColor.orange => const Color(0xFFA85F36),
       ClyvenThemeColor.pink => const Color(0xFFFF6FAE),
       ClyvenThemeColor.cyan => const Color(0xFF47D7E8),
       ClyvenThemeColor.red => const Color(0xFFFF625F),
@@ -124,14 +125,45 @@ class ClyvenTheme {
       scaffoldBackgroundColor: surface,
       canvasColor: surface,
       cardColor: isNight ? nightCardColor : Colors.white,
-      dividerColor: onSurface.withOpacity(0.12),
+      dividerColor: onSurface.withValues(alpha: 0.12),
       iconTheme: IconThemeData(color: onSurface),
-      textTheme: baseTextTheme.apply(
-        bodyColor: onSurface,
-        displayColor: onSurface,
+      textTheme: baseTextTheme
+          .apply(bodyColor: onSurface, displayColor: onSurface)
+          .copyWith(
+            headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+              color: onSurface,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.7,
+            ),
+            headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+              color: onSurface,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
+            ),
+          ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: surface,
+        foregroundColor: onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
-      splashColor: accent.withOpacity(0.12),
-      highlightColor: accent.withOpacity(0.08),
+      cardTheme: CardThemeData(
+        color: isNight ? nightCardColor : Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: accent,
+          foregroundColor: _onAccent(accent),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        ),
+      ),
+      splashColor: accent.withValues(alpha: 0.12),
+      highlightColor: accent.withValues(alpha: 0.08),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: accent),
       sliderTheme: SliderThemeData(
         activeTrackColor: accent,
@@ -228,7 +260,7 @@ class ClyvenTheme {
       ClyvenThemeColor.purple => const Color(0xFF5D4DB3),
       ClyvenThemeColor.blue => const Color(0xFF2F6FD4),
       ClyvenThemeColor.green => const Color(0xFF2E9B67),
-      ClyvenThemeColor.orange => const Color(0xFFE9782F),
+      ClyvenThemeColor.orange => const Color(0xFF87563A),
       ClyvenThemeColor.pink => const Color(0xFFD94F91),
       ClyvenThemeColor.cyan => const Color(0xFF2398A8),
       ClyvenThemeColor.red => const Color(0xFFD94744),
@@ -293,13 +325,13 @@ class ClyvenTheme {
 
       // Orange family
       (ClyvenThemeColor.orange, ClyvenThemeColor.orange) => const Color(
-        0xFFE9782F,
+        0xFF87563A,
       ),
       (ClyvenThemeColor.orange, ClyvenThemeColor.red) => const Color(
-        0xFFE96852,
+        0xFF9C5D4D,
       ),
       (ClyvenThemeColor.orange, ClyvenThemeColor.pink) => const Color(
-        0xFFE87678,
+        0xFFA46668,
       ),
 
       // Pink family
@@ -333,9 +365,9 @@ class ClyvenTheme {
       ClyvenThemeColor.acid => originalBackground,
       ClyvenThemeColor.yellow => const Color(0xFFFFF6D8),
       ClyvenThemeColor.purple => const Color(0xFFF3F0FF),
-      ClyvenThemeColor.blue => const Color(0xFFF0F5FF),
+      ClyvenThemeColor.blue => const Color(0xFFF7F9FC),
       ClyvenThemeColor.green => const Color(0xFFEFF8F3),
-      ClyvenThemeColor.orange => const Color(0xFFFFF3E9),
+      ClyvenThemeColor.orange => const Color(0xFFF1EFEA),
       ClyvenThemeColor.pink => const Color(0xFFFFF0F6),
       ClyvenThemeColor.cyan => const Color(0xFFEDF9FB),
       ClyvenThemeColor.red => const Color(0xFFFFF0EE),

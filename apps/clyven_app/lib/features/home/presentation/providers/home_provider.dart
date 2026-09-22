@@ -29,6 +29,8 @@ class HomeState {
 }
 
 class HomeNotifier extends AsyncNotifier<HomeState> {
+  int _topicRequestId = 0;
+
   static const List<String> topics = [
     '全部',
     '影像',
@@ -74,9 +76,13 @@ class HomeNotifier extends AsyncNotifier<HomeState> {
       return;
     }
 
-    state = const AsyncLoading();
+    final requestId = ++_topicRequestId;
 
-    state = await AsyncValue.guard(() async {
+    // Keep the current feed mounted while the next topic is loading. This
+    // preserves the scroll position and avoids flashing the full-page loader.
+    state = AsyncData(currentState.copyWith(selectedTopic: topic));
+
+    try {
       final publishedVideos = await ref.read(allPublishedVideosProvider.future);
 
       final locale = _resolveLocale(ref.read(appLocaleProvider));
@@ -87,8 +93,17 @@ class HomeNotifier extends AsyncNotifier<HomeState> {
         locale: locale,
       );
 
-      return HomeState(selectedTopic: topic, feed: feed);
-    });
+      // A newer topic selection wins when requests finish out of order.
+      if (requestId != _topicRequestId) {
+        return;
+      }
+
+      state = AsyncData(HomeState(selectedTopic: topic, feed: feed));
+    } catch (_) {
+      if (requestId == _topicRequestId) {
+        state = AsyncData(currentState);
+      }
+    }
   }
 
   Future<void> refresh() async {

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 Future<void> main() async {
@@ -32,8 +34,7 @@ Future<void> main() async {
       '${relationDetail.targetEntry.text}',
     );
 
-    for (final definition
-        in relationDetail.targetDefinitions) {
+    for (final definition in relationDetail.targetDefinitions) {
       print('  → ${definition.gloss}');
     }
   }

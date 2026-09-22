@@ -127,7 +127,7 @@ class NotificationsPage extends ConsumerWidget {
                         nightCardColor,
                       ))
               : (notification.isRead
-                    ? Colors.white.withOpacity(0.65)
+                    ? Colors.white.withValues(alpha: 0.65)
                     : Colors.white),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(

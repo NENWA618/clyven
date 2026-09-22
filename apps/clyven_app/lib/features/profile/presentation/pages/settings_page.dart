@@ -25,7 +25,7 @@ class SettingsPage extends ConsumerWidget {
         child: Column(
           children: [
             _buildTopBar(context, l10n, colors),
-            Divider(height: 1, color: colors.onSurface.withOpacity(0.12)),
+            Divider(height: 1, color: colors.onSurface.withValues(alpha: 0.12)),
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
@@ -437,7 +437,7 @@ class SettingsPage extends ConsumerWidget {
                                 border: Border.all(
                                   color: selected
                                       ? colors.onSurface
-                                      : Colors.white.withOpacity(0.9),
+                                      : Colors.white.withValues(alpha: 0.9),
                                   width: selected ? 3 : 2,
                                 ),
                                 boxShadow: const [
@@ -485,7 +485,7 @@ class SettingsPage extends ConsumerWidget {
                               ? '这里只显示 Clyven 允许的搭配，避免出现不协调的组合。'
                               : 'Only Clyven-approved pairings are shown.',
                           style: TextStyle(
-                            color: colors.onSurface.withOpacity(0.60),
+                            color: colors.onSurface.withValues(alpha: 0.60),
                             fontSize: 10,
                             height: 1.35,
                           ),
@@ -524,8 +524,8 @@ class SettingsPage extends ConsumerWidget {
                                       border: Border.all(
                                         color: selected
                                             ? colors.onSurface
-                                            : colors.onSurface.withOpacity(
-                                                0.18,
+                                            : colors.onSurface.withValues(
+                                                alpha: 0.18,
                                               ),
                                         width: selected ? 3 : 1.5,
                                       ),
@@ -556,7 +556,7 @@ class SettingsPage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: colors.brightness == Brightness.dark
                             ? Theme.of(context).cardColor
-                            : Colors.white.withOpacity(0.62),
+                            : Colors.white.withValues(alpha: 0.62),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: colors.brightness == Brightness.dark
@@ -604,7 +604,7 @@ class SettingsPage extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: colors.brightness == Brightness.dark
                     ? Theme.of(context).cardColor
-                    : Colors.white.withOpacity(0.72),
+                    : Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: colors.brightness == Brightness.dark
@@ -740,13 +740,13 @@ class _ThemeModeCard extends StatelessWidget {
         decoration: BoxDecoration(
           // Unselected mode cards stay transparent.
           color: selected
-              ? colors.primary.withOpacity(0.20)
+              ? colors.primary.withValues(alpha: 0.20)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: selected
                 ? colors.primary
-                : colors.onSurface.withOpacity(0.24),
+                : colors.onSurface.withValues(alpha: 0.24),
             width: selected ? 2 : 1,
           ),
         ),
@@ -757,7 +757,7 @@ class _ThemeModeCard extends StatelessWidget {
               icon,
               color: selected
                   ? colors.secondary
-                  : colors.secondary.withOpacity(0.78),
+                  : colors.secondary.withValues(alpha: 0.78),
               size: 22,
             ),
             const SizedBox(height: 10),
@@ -773,7 +773,7 @@ class _ThemeModeCard extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                color: colors.onSurface.withOpacity(0.62),
+                color: colors.onSurface.withValues(alpha: 0.62),
                 fontSize: 9,
                 height: 1.35,
               ),
@@ -812,7 +812,7 @@ class _SettingsItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.brightness == Brightness.dark
               ? Theme.of(context).cardColor
-              : Colors.white.withOpacity(0.72),
+              : Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: colors.brightness == Brightness.dark
@@ -826,7 +826,7 @@ class _SettingsItem extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: colors.secondary.withOpacity(0.08),
+                color: colors.secondary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: colors.secondary, size: 21),

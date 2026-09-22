@@ -103,7 +103,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.arrow_back_rounded),
@@ -135,7 +135,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
                         icon: const Icon(Icons.close_rounded),
                       ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.75),
+                fillColor: Colors.white.withValues(alpha: 0.75),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide.none,
@@ -179,7 +179,7 @@ class _VideoSearchPageState extends ConsumerState<VideoSearchPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.72),
+          color: Colors.white.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFE3DED5)),
         ),

@@ -161,7 +161,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       hintText: hint,
       prefixIcon: Icon(icon),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.72),
+      fillColor: Colors.white.withValues(alpha: 0.72),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
         borderSide: BorderSide.none,
