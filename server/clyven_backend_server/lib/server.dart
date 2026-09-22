@@ -112,6 +112,67 @@ void run(List<String> args) async {
   }
 
   await pod.start();
+
+  if (!isMaintenance) {
+    await _ensureConfiguredAdminScope();
+  }
+}
+
+Future<void> _ensureConfiguredAdminScope() async {
+  final configuredEmail = Platform.environment['CLYVEN_ADMIN_EMAIL']
+      ?.trim()
+      .toLowerCase();
+
+  if (configuredEmail == null || configuredEmail.isEmpty) {
+    print(
+      '[Clyven Admin] CLYVEN_ADMIN_EMAIL is not configured; '
+      'no admin scope bootstrap was performed.',
+    );
+    return;
+  }
+
+  final session = await Serverpod.instance.createSession();
+
+  try {
+    final emailAccount = await AuthServices.instance.emailIdp.admin.findAccount(
+      session,
+      email: configuredEmail,
+    );
+
+    if (emailAccount == null) {
+      print(
+        '[Clyven Admin] No existing Clyven email account found for '
+        '$configuredEmail. Register/login with this email first.',
+      );
+      return;
+    }
+
+    final authUser = await AuthServices.instance.authUsers.get(
+      session,
+      authUserId: emailAccount.authUserId,
+    );
+
+    if (authUser.scopes.contains(Scope.admin)) {
+      print('[Clyven Admin] Admin scope already present for $configuredEmail.');
+      return;
+    }
+
+    await AuthServices.instance.authUsers.update(
+      session,
+      authUserId: emailAccount.authUserId,
+      scopes: {
+        ...authUser.scopes,
+        Scope.admin,
+      },
+    );
+
+    print('[Clyven Admin] Granted Scope.admin to $configuredEmail.');
+  } catch (e, st) {
+    print('[Clyven Admin] Failed to bootstrap admin scope: $e');
+    print(st);
+  } finally {
+    await session.close();
+  }
 }
 
 Future<void> _sendRegistrationCode(

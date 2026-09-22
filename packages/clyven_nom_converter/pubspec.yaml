@@ -1,0 +1,11 @@
+name: clyven_nom_converter
+description: Shared Vietnamese Latin <-> Chu Nom conversion core for Clyven.
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+resolution: workspace
+
+dev_dependencies:
+  test: ^1.25.0

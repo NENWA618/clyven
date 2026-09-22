@@ -1,0 +1,14 @@
+class: SubtitleReviewDashboard
+fields:
+  currentUserId: String
+  currentDisplayName: String
+
+  unclaimedCount: int
+  myCount: int
+  secondReviewCount: int
+  completedCount: int
+
+  unclaimed: List<SubtitleReviewQueueItem>
+  mine: List<SubtitleReviewQueueItem>
+  secondReview: List<SubtitleReviewQueueItem>
+  completed: List<SubtitleReviewQueueItem>

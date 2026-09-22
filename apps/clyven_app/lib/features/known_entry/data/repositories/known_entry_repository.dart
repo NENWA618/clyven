@@ -29,6 +29,10 @@ abstract class KnownEntryRepository {
 
   Future<bool> setKnown({required int entryId, required bool known});
 
+  Future<Map<int, String>> getKnowledgeStatesByEntryIds({
+    required List<int> entryIds,
+  });
+
   Future<String> getKnowledgeState({
     required String languageCode,
     required String normalizedText,

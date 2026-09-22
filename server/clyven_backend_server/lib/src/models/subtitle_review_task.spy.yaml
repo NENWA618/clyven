@@ -1,0 +1,42 @@
+class: SubtitleReviewTask
+table: subtitle_review_task
+
+fields:
+  videoId: int, relation(parent=video)
+  trackId: int, relation(parent=subtitle_track)
+
+  languageCode: String
+  scriptCode: String?
+
+  status: SubtitleReviewTaskStatus, default=readyForReview
+  priority: int, default=0
+
+  assignedUserId: String?
+  assignedDisplayName: String?
+
+  editedByUserId: String?
+  editedByDisplayName: String?
+
+  reviewedByUserId: String?
+  reviewedByDisplayName: String?
+
+  approvedByUserId: String?
+  approvedByDisplayName: String?
+
+  claimedAt: DateTime?
+  startedAt: DateTime?
+  submittedAt: DateTime?
+  reviewedAt: DateTime?
+  completedAt: DateTime?
+  publishedAt: DateTime?
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  subtitle_review_task_track_script_idx:
+    fields: trackId, scriptCode
+  subtitle_review_task_status_idx:
+    fields: status
+  subtitle_review_task_assigned_idx:
+    fields: assignedUserId

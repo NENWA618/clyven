@@ -1,0 +1,12 @@
+enum: SubtitleReviewTaskStatus
+serialized: byName
+
+values:
+  - readyForReview
+  - assigned
+  - inReview
+  - readyForSecondReview
+  - returned
+  - approved
+  - published
+  - failed

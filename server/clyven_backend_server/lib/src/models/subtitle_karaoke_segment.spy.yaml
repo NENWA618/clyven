@@ -1,0 +1,23 @@
+class: SubtitleKaraokeSegment
+table: subtitle_karaoke_segment
+
+fields:
+  cueId: int, relation(parent=subtitle_cue)
+
+  # Null means the cue's legacy/default text representation.
+  # A concrete script code keeps Karaoke timing strict across script variants.
+  scriptCode: String?
+
+  # Display order inside one cue/script.
+  position: int
+
+  # Milliseconds relative to SubtitleCue.startMs.
+  startOffsetMs: int
+  endOffsetMs: int
+
+  # A segment is intentionally generic: word, syllable, character,
+  # phrase, punctuation, or any editor-defined text span.
+  text: String
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

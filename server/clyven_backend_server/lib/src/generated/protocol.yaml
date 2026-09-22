@@ -15,6 +15,14 @@ userProfileEdit:
   - changeUserName:
   - changeFullName:
   - get:
+admin:
+  - ping:
+  - getUserEmails:
+  - getAsrJobs:
+  - retryVideoAsr:
+  - getAllVideos:
+  - getVideosWithSubtitles:
+  - getSubtitleTracks:
 comment:
   - loadComments:
   - createComment:
@@ -23,6 +31,7 @@ comment:
   - toggleReplyLike:
 dictionary:
   - lookup:
+  - getById:
   - listEntries:
   - updateEntryRow:
 dictionaryImport:
@@ -35,21 +44,38 @@ dictionaryImport:
 knownEntry:
   - getKnownEntryIds:
   - setKnown:
+  - getKnowledgeStatesByEntryIds:
   - getKnowledgeState:
   - getKnowledgeStates:
+review:
+  - getDashboard:
+  - getTaskDetail:
+  - generateVietnameseNomDraft:
+  - claimTask:
+  - startTask:
+  - submitTask:
+  - returnTask:
+  - approveAndPublish:
 subtitle:
   - getCueDetails:
+  - getPublishedCueDetails:
+  - getPublishedAvailableTracks:
+  - getSubtitlePublishStatus:
+  - publishSubtitleTrack:
   - getAvailableTracks:
   - previewSrtImport:
   - confirmReplaceSrtImport:
   - exportSrt:
   - updateCueText:
+  - upsertCueScriptText:
   - updateCueTiming:
   - createCue:
   - deleteCue:
+  - replaceKaraokeSegments:
 video:
   - create:
   - getVideos:
+  - getMyVideos:
   - getVideo:
   - createUploadDescription:
   - verifyUpload:

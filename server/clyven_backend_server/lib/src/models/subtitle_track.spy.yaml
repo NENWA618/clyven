@@ -4,8 +4,19 @@ table: subtitle_track
 fields:
   videoId: int, relation(parent=video)
 
+  # Language identity only. Keep this independent from script.
+  # Values are opaque string codes supplied by the shared language library.
   languageCode: String
+
+  # Optional language/dialect/variant code from the shared language library.
+  # Nullable so current tracks keep working.
+  variantCode: String?
+
   label: String
+
+  # Preferred script when the user has not selected a script explicitly.
+  # This is an opaque string code. Clyven does not hardcode a script list.
+  defaultScriptCode: String?
 
   isDefault: bool, default=false
 

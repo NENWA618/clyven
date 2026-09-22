@@ -36,7 +36,7 @@ class Header extends StatelessComponent {
         css('&').styles(
           display: .flex,
           height: 3.em,
-          radius: .all(.circular(10.px)), 
+          radius: .all(.circular(10.px)),
           overflow: .clip,
           justifyContent: .spaceBetween,
           backgroundColor: primaryColor,
@@ -65,7 +65,7 @@ class Header extends StatelessComponent {
             radius: .circular(1.px),
             backgroundColor: Colors.white,
           ),
-        ])
+        ]),
       ]),
     ]),
   ];

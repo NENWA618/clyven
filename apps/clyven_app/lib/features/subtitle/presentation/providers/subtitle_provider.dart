@@ -26,7 +26,7 @@ final subtitleProvider =
     // 视频 ID + 语言代码。
     FutureProvider.family<
       List<serverpod.SubtitleCueDetail>,
-      ({int videoId, String languageCode})
+      ({int videoId, String languageCode, String? scriptCode})
     >((ref, query) {
       // Provider 最后异步返回的数据类型：字幕详情列表。
       // 从 subtitleRepositoryProvider 取得字幕 Repository。
@@ -38,6 +38,7 @@ final subtitleProvider =
       return repository.loadSubtitles(
         videoId: query.videoId,
         languageCode: query.languageCode,
+        scriptCode: query.scriptCode,
       );
     });
 
@@ -49,3 +50,89 @@ final subtitleTracksProvider =
 
       return repository.loadAvailableTracks(videoId: videoId);
     });
+
+class SubtitleTrackAvailability {
+  final serverpod.SubtitleTrack track;
+  final List<String> scriptCodes;
+
+  const SubtitleTrackAvailability({
+    required this.track,
+    required this.scriptCodes,
+  });
+}
+
+/// This provider does not list every script a language theoretically supports.
+/// It lists only scripts that actually contain subtitle text for this video.
+final subtitleTrackAvailabilityProvider =
+    FutureProvider.family<List<SubtitleTrackAvailability>, int>((
+  ref,
+  videoId,
+) async {
+  final repository = ref.watch(subtitleRepositoryProvider);
+  final tracks = await repository.loadAvailableTracks(videoId: videoId);
+
+  final result = <SubtitleTrackAvailability>[];
+
+  for (final track in tracks) {
+    final details = await repository.loadSubtitles(
+      videoId: videoId,
+      languageCode: track.languageCode,
+      scriptCode: null,
+    );
+
+    final scriptCodes = <String>{};
+
+    for (final detail in details) {
+      final texts = detail.texts ?? const <serverpod.SubtitleCueText>[];
+
+      for (final text in texts) {
+        if (text.text.trim().isEmpty) {
+          continue;
+        }
+
+        final scriptCode = text.scriptCode.trim();
+
+        if (scriptCode.isNotEmpty) {
+          scriptCodes.add(scriptCode);
+        }
+      }
+    }
+
+    // Compatibility for older subtitle data that only has cue.text.
+    if (scriptCodes.isEmpty) {
+      final hasLegacyText = details.any(
+        (detail) => detail.cue.text.trim().isNotEmpty,
+      );
+
+      final defaultScript = track.defaultScriptCode?.trim();
+
+      if (hasLegacyText &&
+          defaultScript != null &&
+          defaultScript.isNotEmpty) {
+        scriptCodes.add(defaultScript);
+      }
+    }
+
+    if (scriptCodes.isEmpty) {
+      continue;
+    }
+
+    final ordered = scriptCodes.toList();
+    final defaultScript = track.defaultScriptCode?.trim();
+
+    if (defaultScript != null &&
+        defaultScript.isNotEmpty &&
+        ordered.remove(defaultScript)) {
+      ordered.insert(0, defaultScript);
+    }
+
+    result.add(
+      SubtitleTrackAvailability(
+        track: track,
+        scriptCodes: ordered,
+      ),
+    );
+  }
+
+  return result;
+});

@@ -22,6 +22,7 @@ abstract class Video implements _i1.SerializableModel {
     required this.title,
     required this.description,
     required this.category,
+    this.languageCode,
     required this.tags,
     required this.videoStorageKey,
     this.coverStorageKey,
@@ -47,6 +48,7 @@ abstract class Video implements _i1.SerializableModel {
     required String title,
     required String description,
     required String category,
+    String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
@@ -69,6 +71,7 @@ abstract class Video implements _i1.SerializableModel {
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
+      languageCode: jsonSerialization['languageCode'] as String?,
       tags: _i3.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
@@ -109,6 +112,8 @@ abstract class Video implements _i1.SerializableModel {
 
   String category;
 
+  String? languageCode;
+
   List<String> tags;
 
   String videoStorageKey;
@@ -143,6 +148,7 @@ abstract class Video implements _i1.SerializableModel {
     String? title,
     String? description,
     String? category,
+    String? languageCode,
     List<String>? tags,
     String? videoStorageKey,
     String? coverStorageKey,
@@ -166,6 +172,7 @@ abstract class Video implements _i1.SerializableModel {
       'title': title,
       'description': description,
       'category': category,
+      if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
@@ -197,6 +204,7 @@ class _VideoImpl extends Video {
     required String title,
     required String description,
     required String category,
+    String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
@@ -216,6 +224,7 @@ class _VideoImpl extends Video {
          title: title,
          description: description,
          category: category,
+         languageCode: languageCode,
          tags: tags,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
@@ -241,6 +250,7 @@ class _VideoImpl extends Video {
     String? title,
     String? description,
     String? category,
+    Object? languageCode = _Undefined,
     List<String>? tags,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
@@ -261,6 +271,7 @@ class _VideoImpl extends Video {
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
+      languageCode: languageCode is String? ? languageCode : this.languageCode,
       tags: tags ?? this.tags.map((e0) => e0).toList(),
       videoStorageKey: videoStorageKey ?? this.videoStorageKey,
       coverStorageKey: coverStorageKey is String?

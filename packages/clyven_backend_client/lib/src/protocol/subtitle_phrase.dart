@@ -16,8 +16,10 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
   SubtitlePhrase._({
     this.id,
     required this.cueId,
+    this.scriptCode,
     required this.text,
     this.normalizedText,
+    this.entryId,
     required this.startPosition,
     required this.endPosition,
     DateTime? createdAt,
@@ -28,8 +30,10 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
   factory SubtitlePhrase({
     int? id,
     required int cueId,
+    String? scriptCode,
     required String text,
     String? normalizedText,
+    int? entryId,
     required int startPosition,
     required int endPosition,
     DateTime? createdAt,
@@ -40,8 +44,10 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
     return SubtitlePhrase(
       id: jsonSerialization['id'] as int?,
       cueId: jsonSerialization['cueId'] as int,
+      scriptCode: jsonSerialization['scriptCode'] as String?,
       text: jsonSerialization['text'] as String,
       normalizedText: jsonSerialization['normalizedText'] as String?,
+      entryId: jsonSerialization['entryId'] as int?,
       startPosition: jsonSerialization['startPosition'] as int,
       endPosition: jsonSerialization['endPosition'] as int,
       createdAt: jsonSerialization['createdAt'] == null
@@ -60,9 +66,13 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
 
   int cueId;
 
+  String? scriptCode;
+
   String text;
 
   String? normalizedText;
+
+  int? entryId;
 
   int startPosition;
 
@@ -78,8 +88,10 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
   SubtitlePhrase copyWith({
     int? id,
     int? cueId,
+    String? scriptCode,
     String? text,
     String? normalizedText,
+    int? entryId,
     int? startPosition,
     int? endPosition,
     DateTime? createdAt,
@@ -91,8 +103,10 @@ abstract class SubtitlePhrase implements _i1.SerializableModel {
       '__className__': 'SubtitlePhrase',
       if (id != null) 'id': id,
       'cueId': cueId,
+      if (scriptCode != null) 'scriptCode': scriptCode,
       'text': text,
       if (normalizedText != null) 'normalizedText': normalizedText,
+      if (entryId != null) 'entryId': entryId,
       'startPosition': startPosition,
       'endPosition': endPosition,
       'createdAt': createdAt.toJson(),
@@ -112,8 +126,10 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
   _SubtitlePhraseImpl({
     int? id,
     required int cueId,
+    String? scriptCode,
     required String text,
     String? normalizedText,
+    int? entryId,
     required int startPosition,
     required int endPosition,
     DateTime? createdAt,
@@ -121,8 +137,10 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
   }) : super._(
          id: id,
          cueId: cueId,
+         scriptCode: scriptCode,
          text: text,
          normalizedText: normalizedText,
+         entryId: entryId,
          startPosition: startPosition,
          endPosition: endPosition,
          createdAt: createdAt,
@@ -136,8 +154,10 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
   SubtitlePhrase copyWith({
     Object? id = _Undefined,
     int? cueId,
+    Object? scriptCode = _Undefined,
     String? text,
     Object? normalizedText = _Undefined,
+    Object? entryId = _Undefined,
     int? startPosition,
     int? endPosition,
     DateTime? createdAt,
@@ -146,10 +166,12 @@ class _SubtitlePhraseImpl extends SubtitlePhrase {
     return SubtitlePhrase(
       id: id is int? ? id : this.id,
       cueId: cueId ?? this.cueId,
+      scriptCode: scriptCode is String? ? scriptCode : this.scriptCode,
       text: text ?? this.text,
       normalizedText: normalizedText is String?
           ? normalizedText
           : this.normalizedText,
+      entryId: entryId is int? ? entryId : this.entryId,
       startPosition: startPosition ?? this.startPosition,
       endPosition: endPosition ?? this.endPosition,
       createdAt: createdAt ?? this.createdAt,

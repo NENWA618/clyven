@@ -1,0 +1,7 @@
+class: SubtitleReviewQueueItem
+fields:
+  task: SubtitleReviewTask
+  videoTitle: String
+  videoAuthorName: String
+  durationSeconds: int
+  isMine: bool

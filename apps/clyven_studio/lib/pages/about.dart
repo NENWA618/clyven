@@ -23,7 +23,8 @@ class About extends StatelessComponent {
         li([
           h3([.text('📦 Ecosystem')]),
           .text(
-              'Get official packages and integrations for your project like jaspr_router, jaspr_tailwind or jaspr_riverpod. Find packages built for Jaspr on pub.dev using the '),
+            'Get official packages and integrations for your project like jaspr_router, jaspr_tailwind or jaspr_riverpod. Find packages built for Jaspr on pub.dev using the ',
+          ),
           a(href: 'https://pub.dev/packages?q=topic%3Ajaspr', [.text('#jaspr')]),
           .text(' topic, or publish your own.'),
         ]),

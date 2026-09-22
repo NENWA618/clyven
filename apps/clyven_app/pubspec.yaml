@@ -18,6 +18,10 @@ dependencies:
   ffmpeg_kit_flutter_new_min: ^3.6.2
   clyven_backend_client:
     path: ../../packages/clyven_backend_client
+  glyphora_language_core:
+    git:
+      url: https://github.com/chengyang1017/flutter-languages-config.git
+      ref: main
   serverpod_client: 3.4.11
   serverpod_auth_idp_flutter: 3.4.11
   serverpod_flutter: 3.4.11

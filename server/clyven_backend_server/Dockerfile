@@ -1,4 +1,4 @@
-﻿# Build from the Clyven monorepo root with:
+# Build from the Clyven monorepo root with:
 # docker build -f server/clyven_backend_server/Dockerfile .
 
 FROM dart:3.12.2 AS build
@@ -10,6 +10,7 @@ COPY pubspec.lock .
 
 # Copy the Serverpod server package.
 COPY server/clyven_backend_server server/clyven_backend_server
+COPY packages/clyven_nom_converter packages/clyven_nom_converter
 
 # Create a minimal Docker build workspace containing only the server.
 RUN printf '%s\n' \
@@ -18,6 +19,7 @@ RUN printf '%s\n' \
   'environment:' \
   '  sdk: ^3.12.2' \
   'workspace:' \
+  '  - packages/clyven_nom_converter' \
   '  - server/clyven_backend_server' \
   > pubspec.yaml
 
@@ -48,6 +50,8 @@ COPY --from=build /app/server/clyven_backend_server/web/ web/
 COPY --from=build /app/server/clyven_backend_server/migrations/ migrations/
 
 COPY --from=build /app/server/clyven_backend_server/lib/src/generated/protocol.yaml lib/src/generated/protocol.yaml
+
+COPY --from=build /app/packages/clyven_nom_converter/data/ data/clyven_nom_converter/
 
 EXPOSE 8080
 EXPOSE 8081

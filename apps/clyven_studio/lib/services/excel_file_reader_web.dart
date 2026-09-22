@@ -5,8 +5,7 @@ import 'dart:typed_data';
 Future<Uint8List?> readSelectedExcelFile(
   String elementId,
 ) async {
-  final element =
-      html.document.querySelector(
+  final element = html.document.querySelector(
     '#$elementId',
   );
 

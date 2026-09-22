@@ -1,0 +1,6413 @@
+{
+  "format": "clyven-nom-dictionary",
+  "version": 1,
+  "generatedAt": "2026-09-22T11:22:34.456918+00:00",
+  "sourceFile": "越南语.xlsx",
+  "sourceSheets": [
+    "词汇",
+    "喃字"
+  ],
+  "rules": {
+    "ignoreBlankMappings": true,
+    "splitLatinSeparators": [
+      ",",
+      "，",
+      ";",
+      "；"
+    ],
+    "splitNomAlternativeStyles": [
+      "A/B",
+      "A（B）"
+    ]
+  },
+  "stats": {
+    "rawEntries": 457,
+    "uniqueEntries": 420,
+    "duplicatesMerged": 37,
+    "blankVocabularyRowsIgnored": 822,
+    "blankCharacterRowsIgnored": 0
+  },
+  "entries": [
+    {
+      "latin": "tôi",
+      "nom": "碎",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 1,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 2,
+            "chinese": "我",
+            "partOfSpeech": "代词",
+            "nomExample": "碎當咹粓",
+            "latinExample": "Tôi đang ăn cơm.",
+            "chineseExample": "我在吃饭"
+          },
+          {
+            "sheet": "喃字",
+            "row": 2,
+            "unicode": "U+788E"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bạn",
+      "nom": "伴",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 2,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 3,
+            "chinese": "你",
+            "partOfSpeech": "代词",
+            "nomExample": "伴當䀡tivi",
+            "latinExample": "Bạn đang xem tivi.",
+            "chineseExample": "你在看电视"
+          },
+          {
+            "sheet": "喃字",
+            "row": 3,
+            "unicode": "U+4F34"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "các bạn",
+      "nom": "各伴",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 3,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 7,
+            "chinese": "你们",
+            "partOfSpeech": "代词",
+            "latinExample": "Các bạn là biến thái",
+            "chineseExample": "你们是变态"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xin chào",
+      "nom": "吀嘲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 4,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 10,
+            "chinese": "你好",
+            "latinExample": "Xin chào"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xin lỗi",
+      "nom": "吀纇",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 5,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 11,
+            "chinese": "对不起；抱歉",
+            "latinExample": "Xin lỗi"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tạm biệt",
+      "nom": "暫别",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 6,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 12,
+            "chinese": "再见"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chào buổi sáng",
+      "nom": "嘲𣇜𤎜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 7,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 13,
+            "chinese": "早上好/早安"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chào buổi chiều",
+      "nom": "嘲𣇜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 8,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 14,
+            "chinese": "中午好/下午好/午安"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chào buổi tối",
+      "nom": "嘲𣇜最",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 9,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 15,
+            "chinese": "晚上好/晚安"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chúc mừng năm mới",
+      "nom": "祝𢜠𢆥𡤔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 10,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 16,
+            "chinese": "新年快乐"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mấy",
+      "nom": "𠇍",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 11,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 18,
+            "chinese": "几",
+            "partOfSpeech": "代词"
+          },
+          {
+            "sheet": "喃字",
+            "row": 6,
+            "unicode": "U+201CD"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bao nhiêu",
+      "nom": "包饒",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 12,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 19,
+            "chinese": "多少",
+            "partOfSpeech": "代词"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tuổi",
+      "nom": "歲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 13,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 20,
+            "chinese": "岁"
+          },
+          {
+            "sheet": "喃字",
+            "row": 24,
+            "unicode": "U+6B72"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tên",
+      "nom": "𠸜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 14,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 21,
+            "chinese": "名字"
+          },
+          {
+            "sheet": "喃字",
+            "row": 25,
+            "unicode": "U+20E1C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "gọi",
+      "nom": "噲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 15,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 22,
+            "chinese": "叫"
+          },
+          {
+            "sheet": "喃字",
+            "row": 26,
+            "unicode": "U+5672"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ai",
+      "nom": "埃",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 16,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 23,
+            "chinese": "谁"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cái gì",
+      "nom": "丐之",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 17,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 24,
+            "chinese": "什么",
+            "latinExample": "Đây là cái gì?",
+            "chineseExample": "这是什么？"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tại sao",
+      "nom": "在牢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 18,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 25,
+            "chinese": "为什么",
+            "latinExample": "Tại sao bạn đi muộn?",
+            "chineseExample": "你为什么迟到？"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ăn",
+      "nom": "咹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 19,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 26,
+            "chinese": "吃",
+            "partOfSpeech": "动词",
+            "latinExample": "Tôi thích gà rán.",
+            "chineseExample": "我爱吃炸鸡"
+          },
+          {
+            "sheet": "喃字",
+            "row": 154,
+            "unicode": "U+54B9"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đang",
+      "nom": "當",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 20,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 27,
+            "chinese": "正在",
+            "latinExample": "Bạn đang làm gì đấy?",
+            "chineseExample": "你正在做什么呢？"
+          },
+          {
+            "sheet": "喃字",
+            "row": 153,
+            "unicode": "U+7576"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khi nào",
+      "nom": "欺芇",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 21,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 28,
+            "chinese": "什么时候",
+            "latinExample": "Khi nào bạn đi Hà Nội?",
+            "chineseExample": "你什么时候去河内？"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đi lên",
+      "nom": "𠫾𬨠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 22,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 31
+          }
+        ]
+      }
+    },
+    {
+      "latin": "và",
+      "nom": "吧",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 23,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 33,
+            "chinese": "和/与"
+          },
+          {
+            "sheet": "喃字",
+            "row": 147,
+            "unicode": "U+5427"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "con",
+      "nom": "𡥵",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 24,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 34,
+            "chinese": "孩子"
+          },
+          {
+            "sheet": "喃字",
+            "row": 75,
+            "unicode": "U+21975"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "con trai",
+      "nom": "𡥵𤳆",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 25,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 39,
+            "chinese": "男孩"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "con gái",
+      "nom": "𡥵𡛔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 26,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 40,
+            "chinese": "女孩"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bạn gái",
+      "nom": "伴𡛔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 27,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 43,
+            "chinese": "女朋友"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thấy giáo",
+      "nom": "偨教",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 28,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 44,
+            "chinese": "男教师"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cô giáo",
+      "nom": "姑教",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 29,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 45,
+            "chinese": "女教师"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "muốn",
+      "nom": "㦖",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 30,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 46,
+            "chinese": "要"
+          },
+          {
+            "sheet": "喃字",
+            "row": 117,
+            "unicode": "U+3996"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "không muốn",
+      "nom": "空㦖",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 31,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 47,
+            "chinese": "不要"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cần",
+      "nom": "勤",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 32,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 48,
+            "chinese": "需要"
+          },
+          {
+            "sheet": "喃字",
+            "row": 151,
+            "unicode": "U+52E4"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cơm",
+      "nom": "粓",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 33,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 49,
+            "chinese": "饭"
+          },
+          {
+            "sheet": "喃字",
+            "row": 155,
+            "unicode": "U+7C93"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "không có",
+      "nom": "空固",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 34,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 58,
+            "chinese": "没有"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "của",
+      "nom": "𧵑",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 35,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 59,
+            "chinese": "的"
+          },
+          {
+            "sheet": "喃字",
+            "row": 62,
+            "unicode": "U+27D51"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cũng",
+      "nom": "拱",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 36,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 60,
+            "chinese": "也"
+          },
+          {
+            "sheet": "喃字",
+            "row": 181,
+            "unicode": "U+62F1"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "là",
+      "nom": "𱺵",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 37,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 61,
+            "chinese": "是"
+          },
+          {
+            "sheet": "喃字",
+            "row": 64,
+            "unicode": "U+31EB5"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "là",
+      "nom": "羅",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 38,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 61,
+            "chinese": "是"
+          },
+          {
+            "sheet": "喃字",
+            "row": 63,
+            "unicode": "U+7F85"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phải",
+      "nom": "沛",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 39,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 62,
+            "chinese": "是"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "không phải",
+      "nom": "空沛",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 40,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 63,
+            "chinese": "不是"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ở đó",
+      "nom": "於妬",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 41,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 76,
+            "chinese": "那里"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sau đó",
+      "nom": "𡢐妬",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 42,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 77,
+            "chinese": "然后，之后，后来",
+            "latinExample": "Sau đó, anh ấy chuyển đến Hà Nội sống.",
+            "chineseExample": "后来，他搬到河内生活。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nghĩ",
+      "nom": "𢣂",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 43,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 78,
+            "chinese": "想，思考；认为",
+            "latinExample": "Tôi đang nghĩ về chuyện đó.",
+            "chineseExample": "我正在想那件事。"
+          },
+          {
+            "sheet": "喃字",
+            "row": 171,
+            "unicode": "U+228C2"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nghĩ",
+      "nom": "𢪀",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 44,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 78,
+            "chinese": "想，思考；认为",
+            "latinExample": "Tôi đang nghĩ về chuyện đó.",
+            "chineseExample": "我正在想那件事。"
+          },
+          {
+            "sheet": "喃字",
+            "row": 172,
+            "unicode": "U+22A80"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hát",
+      "nom": "欱",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 45,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 82,
+            "chinese": "唱歌"
+          },
+          {
+            "sheet": "喃字",
+            "row": 98,
+            "unicode": "U+6B31"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thời gian",
+      "nom": "時間",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 46,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 85,
+            "chinese": "时间"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trung gian",
+      "nom": "中間",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 47,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 86
+          }
+        ]
+      }
+    },
+    {
+      "latin": "vào",
+      "nom": "𠓨",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 48,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 100
+          },
+          {
+            "sheet": "喃字",
+            "row": 101,
+            "unicode": "U+204E8"
+          },
+          {
+            "sheet": "喃字",
+            "row": 182,
+            "unicode": "U+204E8"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xem",
+      "nom": "䀡",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 49,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 127,
+            "chinese": "看，观看",
+            "latinExample": "Tôi đang xem tivi.",
+            "chineseExample": "我正在看电视。"
+          },
+          {
+            "sheet": "喃字",
+            "row": 156,
+            "unicode": "U+4021"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đọc",
+      "nom": "讀",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 50,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 128,
+            "chinese": "读，阅读，念",
+            "latinExample": "Tôi đang đọc sách.",
+            "chineseExample": "我正在读书。"
+          },
+          {
+            "sheet": "喃字",
+            "row": 157,
+            "unicode": "U+8B80"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sách",
+      "nom": "冊",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 51,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 129,
+            "chinese": "书"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tăng lên",
+      "nom": "增𬨠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 52,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 138
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đến",
+      "nom": "𦤾",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 53,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 145,
+            "chinese": "到"
+          },
+          {
+            "sheet": "喃字",
+            "row": 65,
+            "unicode": "U+2693E"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "dám",
+      "nom": "噉",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 54,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 147,
+            "chinese": "敢",
+            "nomExample": "空噉",
+            "latinExample": "không dám"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "từ",
+      "nom": "自",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 55,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 149,
+            "chinese": "从"
+          },
+          {
+            "sheet": "喃字",
+            "row": 66,
+            "unicode": "U+81EA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đến từ",
+      "nom": "𦤾自",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 56,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 150,
+            "chinese": "来自"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bắt đầu",
+      "nom": "扒頭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 57,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 151,
+            "chinese": "开始"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đường",
+      "nom": "糖",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 58,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 153,
+            "chinese": "糖",
+            "partOfSpeech": "名词"
+          },
+          {
+            "sheet": "喃字",
+            "row": 106,
+            "unicode": "U+7CD6"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa mưa",
+      "nom": "务𩅹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 59,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 165,
+            "chinese": "雨季"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa khô",
+      "nom": "务枯",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 60,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 166,
+            "chinese": "旱季"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa xuân",
+      "nom": "务春",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 61,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 167,
+            "chinese": "春天"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa hè",
+      "nom": "务夏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 62,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 168,
+            "chinese": "夏天"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa thu",
+      "nom": "务秋",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 63,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 169,
+            "chinese": "秋天"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa đông",
+      "nom": "务冬",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 64,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 170,
+            "chinese": "冬天"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thậm chí",
+      "nom": "甚至",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 65,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 215
+          }
+        ]
+      }
+    },
+    {
+      "latin": "giữ lại",
+      "nom": "𡨹又",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 66,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 277
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công cộng",
+      "nom": "公共",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 67,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 279,
+            "chinese": "公共"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xúc phạm",
+      "nom": "觸犯",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 68,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 280,
+            "chinese": "触犯"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "âm tiết",
+      "nom": "音節",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 69,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 281,
+            "chinese": "音节"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hỗ trợ",
+      "nom": "互助",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 70,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 322,
+            "chinese": "帮助"
+          },
+          {
+            "sheet": "词汇",
+            "row": 721
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bao gồm",
+      "nom": "包𠁟",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 71,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 329,
+            "chinese": "包括，包含",
+            "latinExample": "Giá phòng bao gồm bữa sáng.",
+            "chineseExample": "房费包含早餐。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thế giới",
+      "nom": "世界",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 72,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 331,
+            "chinese": "世界",
+            "partOfSpeech": "名词",
+            "latinExample": "Thế giới có rất nhiều điều thú vị.",
+            "chineseExample": "世界有很多有趣的事情。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quen",
+      "nom": "慣",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 73,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 339,
+            "chinese": "熟悉，认识，习惯",
+            "partOfSpeech": "动词"
+          },
+          {
+            "sheet": "喃字",
+            "row": 108,
+            "unicode": "U+6163"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tài năng",
+      "nom": "才能",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 74,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 342,
+            "chinese": "天赋"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nói",
+      "nom": "呐",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 75,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 343,
+            "chinese": "说",
+            "partOfSpeech": "动词"
+          },
+          {
+            "sheet": "喃字",
+            "row": 116,
+            "unicode": "U+5450"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hành động",
+      "nom": "行動",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 76,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 349,
+            "chinese": "行动"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trở lại",
+      "nom": "𧿨吏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 77,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 397
+          }
+        ]
+      }
+    },
+    {
+      "latin": "còn lại",
+      "nom": "群吏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 78,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 398
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tác phẩm",
+      "nom": "作品",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 79,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 399
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sản phẩm",
+      "nom": "産品",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 80,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 400,
+            "chinese": "产品"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thành thật",
+      "nom": "誠實",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 81,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 401,
+            "chinese": "诚实"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khác nhau",
+      "nom": "恪僥",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 82,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 406
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kết quả",
+      "nom": "結果",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 83,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 497
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quá trình",
+      "nom": "過程",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 84,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 498,
+            "chinese": "过程"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khả năng",
+      "nom": "可能",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 85,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 504,
+            "chinese": "能力, 可能性, 机会"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hi vọng",
+      "nom": "希望",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 86,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 554
+          }
+        ]
+      }
+    },
+    {
+      "latin": "uy hiếp",
+      "nom": "威脅",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 87,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 555
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ăn hiếp",
+      "nom": "咹脅",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 88,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 556
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cổ vũ",
+      "nom": "鼓舞",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 89,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 564,
+            "chinese": "鼓励，鼓舞；助威",
+            "latinExample": "Mọi người đến sân vận động để cổ vũ cho đội bóng.",
+            "chineseExample": "大家到体育场为球队助威。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cố định",
+      "nom": "固定",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 90,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 565
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chuyên cơ",
+      "nom": "專機",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 91,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 566
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công ty",
+      "nom": "公司",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 92,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 609
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công an",
+      "nom": "公安",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 93,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 610
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công viên",
+      "nom": "公園",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 94,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 611
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công danh",
+      "nom": "功名",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 95,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 612
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chim công",
+      "nom": "𪀄䲲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 96,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 613
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tiếng ý",
+      "nom": "㗂意",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 97,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 629,
+            "chinese": "意大利语"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tiếng Việt",
+      "nom": "㗂越",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 98,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 630,
+            "chinese": "越南语"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tiếng Trung",
+      "nom": "㗂中",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 99,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 631,
+            "chinese": "中文"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trung tâm",
+      "nom": "中心",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 100,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 632,
+            "chinese": "中心"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tâm lý",
+      "nom": "心理",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 101,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 633,
+            "chinese": "心理",
+            "latinExample": "Em ấy có tâm lý không ổn định.",
+            "chineseExample": "他/她心理不太稳定。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trợ lý",
+      "nom": "助理",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 102,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 634,
+            "chinese": "助手，助理",
+            "latinExample": "Cô ấy là trợ lý của giám đốc.",
+            "chineseExample": "她是经理的助理。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "âm nhạc",
+      "nom": "音樂",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 103,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 635,
+            "chinese": "音乐",
+            "latinExample": "Tôi rất thích nghe âm nhạc.",
+            "chineseExample": "我很喜欢听音乐。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "dạy học",
+      "nom": "𠰺學",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 104,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 636,
+            "chinese": "教学",
+            "latinExample": "Cô ấy dạy học ở một trường tiểu học.",
+            "chineseExample": "她在一所小学教书。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mất dạy",
+      "nom": "𠅍𠰺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 105,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 637,
+            "chinese": "没教养，没家教",
+            "latinExample": "Đừng nói chuyện như vậy, mất dạy quá.",
+            "chineseExample": "别那样说话，太没教养了。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thực sự",
+      "nom": "寔事",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 106,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 638,
+            "chinese": "真的，确实，真正地",
+            "latinExample": "Tôi thực sự xin lỗi vì chuyện này.",
+            "chineseExample": "我确实为这件事道歉。"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xảy ra",
+      "nom": "仕𫥨",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 107,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 640
+          }
+        ]
+      }
+    },
+    {
+      "latin": "Nguyễn Thị",
+      "nom": "阮氏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 108,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 649
+          }
+        ]
+      }
+    },
+    {
+      "latin": "vô danh thị",
+      "nom": "無名氏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 109,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 650
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thì là",
+      "nom": "蒔蘿",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 110,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 651
+          }
+        ]
+      }
+    },
+    {
+      "latin": "vậy",
+      "nom": "丕",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 111,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 652
+          },
+          {
+            "sheet": "喃字",
+            "row": 52,
+            "unicode": "U+4E15"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chu vi",
+      "nom": "周圍",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 112,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 653
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chính thức",
+      "nom": "正式",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 113,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 654
+          }
+        ]
+      }
+    },
+    {
+      "latin": "biến chất",
+      "nom": "变質",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 114,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 655
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chỉ dẫn",
+      "nom": "指引",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 115,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 656
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chỉ số",
+      "nom": "指數",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 116,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 657
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đông chí",
+      "nom": "冬至",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 117,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 658
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chưa",
+      "nom": "𣗓",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 118,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 659
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chung kết",
+      "nom": "終結",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 119,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 660
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chứng bệmh",
+      "nom": "症病",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 120,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 661
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chứng minh",
+      "nom": "證明",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 121,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 662
+          },
+          {
+            "sheet": "词汇",
+            "row": 690
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thực dân",
+      "nom": "殖民",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 122,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 663
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hướng dẫn",
+      "nom": "向引",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 123,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 664
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phương hướng",
+      "nom": "方向",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 124,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 665
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hấp dẫn",
+      "nom": "吸引",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 125,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 666
+          }
+        ]
+      }
+    },
+    {
+      "latin": "dịch vụ",
+      "nom": "役務",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 126,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 667
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công việc",
+      "nom": "工役",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 127,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 668
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công nhân",
+      "nom": "工人",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 128,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 669
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công cụ",
+      "nom": "工具",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 129,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 670
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duy vật",
+      "nom": "唯物",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 130,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 671
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duy tâm",
+      "nom": "唯心",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 131,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 672
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duy nhất",
+      "nom": "唯一",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 132,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 673
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duy trì",
+      "nom": "維持",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 133,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 674
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duy tân",
+      "nom": "維新",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 134,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 675
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tư duy",
+      "nom": "思維",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 135,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 676
+          }
+        ]
+      }
+    },
+    {
+      "latin": "duyên hải",
+      "nom": "沿海",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 136,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 677
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lòng",
+      "nom": "𢚸",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 137,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 678
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chữ cái",
+      "nom": "𡨸𡣨",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 138,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 682
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chữ viết",
+      "nom": "𡨸𢪏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 139,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 683
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chữ Nôm",
+      "nom": "𡨸喃",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 140,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 684
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chục",
+      "nom": "𨔿",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 141,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 685,
+            "chinese": "打",
+            "partOfSpeech": "量词",
+            "chineseExample": "一打鸡蛋"
+          },
+          {
+            "sheet": "喃字",
+            "row": 189,
+            "unicode": "U+2853F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chuyên gia",
+      "nom": "專家",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 142,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 686
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nói chung",
+      "nom": "吶終",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 143,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 687
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chứng bệnh",
+      "nom": "症病",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 144,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 688
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chứng cứ",
+      "nom": "證據",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 145,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 689
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thường dùng",
+      "nom": "常用",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 147,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 691
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tín dụng",
+      "nom": "信用",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 148,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 692
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đa số",
+      "nom": "多數",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 149,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 693
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tối đa",
+      "nom": "最多",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 150,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 694
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đa tình",
+      "nom": "多情",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 151,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 695
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đại khái",
+      "nom": "大概",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 152,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 696
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cổ đại",
+      "nom": "古代",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 153,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 697
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đại biểu",
+      "nom": "代表",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 154,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 698
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đám cưới",
+      "nom": "𡌽𡠣",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 155,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 699
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đàm thoại",
+      "nom": "談話",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 156,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 700
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bình đẳng",
+      "nom": "平等",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 157,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 701
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đầu tiên",
+      "nom": "頭先",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 158,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 702
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đầu tóc",
+      "nom": "頭𩯀",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 159,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 703
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trên đầu",
+      "nom": "𨑗頭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 160,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 704
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đê hạ",
+      "nom": "低下",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 161,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 705
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trước đây",
+      "nom": "𠓀低",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 162,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 706
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàng đế",
+      "nom": "皇帝",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 163,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 707
+          }
+        ]
+      }
+    },
+    {
+      "latin": "địa chỉ",
+      "nom": "地址",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 164,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 708
+          }
+        ]
+      }
+    },
+    {
+      "latin": "từ điển",
+      "nom": "詞典",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 165,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 709
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tự điển",
+      "nom": "字典",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 166,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 710
+          }
+        ]
+      }
+    },
+    {
+      "latin": "điển hình",
+      "nom": "典型",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 167,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 711
+          }
+        ]
+      }
+    },
+    {
+      "latin": "điện tử",
+      "nom": "電子",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 168,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 712
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hồ điệp",
+      "nom": "蝴蝶",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 169,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 713
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trao đổi",
+      "nom": "𢭂𢷮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 170,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 714
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thay đổi",
+      "nom": "𠊝𢷮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 171,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 715
+          }
+        ]
+      }
+    },
+    {
+      "latin": "âm đọc",
+      "nom": "音讀",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 172,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 716
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phù hợp",
+      "nom": "符合",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 173,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 717
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hiếu thuận",
+      "nom": "孝順",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 174,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 718
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bất hiếu",
+      "nom": "不孝",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 175,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 719
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hồ li",
+      "nom": "狐狸",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 176,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 720
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phồn hoa",
+      "nom": "繁華",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 178,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 722
+          }
+        ]
+      }
+    },
+    {
+      "latin": "biến hoá",
+      "nom": "變化",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 179,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 723
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cảm hoá",
+      "nom": "感化",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 180,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 724
+          }
+        ]
+      }
+    },
+    {
+      "latin": "văn hoá",
+      "nom": "文化",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 181,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 725
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoà bình",
+      "nom": "和平",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 182,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 726
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàn hảo",
+      "nom": "完好",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 183,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 727,
+            "chinese": "完美"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàn toàn",
+      "nom": "完全",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 184,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 728
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàn thiện",
+      "nom": "完善",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 185,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 729
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàn cảnh",
+      "nom": "環境",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 186,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 730
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phượng hoàng",
+      "nom": "鳳凰",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 187,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 731
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hoàng hôn",
+      "nom": "黃昏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 188,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 732
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ích lợi",
+      "nom": "益利",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 189,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 733
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ích kỉ",
+      "nom": "益己",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 190,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 734,
+            "chinese": "自私"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công ích",
+      "nom": "公益",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 191,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 735
+          }
+        ]
+      }
+    },
+    {
+      "latin": "có ích",
+      "nom": "固益",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 192,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 736
+          }
+        ]
+      }
+    },
+    {
+      "latin": "yêu cầu",
+      "nom": "要求",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 193,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 737
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chủ yếu",
+      "nom": "主要",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 194,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 738
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trọng yếu",
+      "nom": "重要",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 195,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 739
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nhật kí",
+      "nom": "日記",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 196,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 740
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kí tên",
+      "nom": "記𠸜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 197,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 741
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thư kí",
+      "nom": "書記",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 198,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 742
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lá cờ",
+      "nom": "蘿旗",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 199,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 743
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cờ tổ quốc",
+      "nom": "旗祖國",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 200,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 744
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quốc kì",
+      "nom": "國旗",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 201,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 745
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cờ vây",
+      "nom": "棋圍",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 202,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 746,
+            "chinese": "围棋"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kĩ thuật",
+      "nom": "技術",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 203,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 747
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kĩ năng",
+      "nom": "技能",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 204,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 748
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đi kèm",
+      "nom": "𠫾兼",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 205,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 749
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kiểm tra",
+      "nom": "檢查",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 206,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 750
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tìm kiếm",
+      "nom": "尋檢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 207,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 751
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cướp tiền",
+      "nom": "劫錢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 208,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 752
+          }
+        ]
+      }
+    },
+    {
+      "latin": "toán cướp",
+      "nom": "𭍵劫",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 209,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 753
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thiên kiều",
+      "nom": "天橋",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 210,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 754
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kinh thành",
+      "nom": "京城",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 211,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 755
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khắc phục",
+      "nom": "克服",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 212,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 756
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khoa học",
+      "nom": "科學",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 213,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 757
+          }
+        ]
+      }
+    },
+    {
+      "latin": "y khoa",
+      "nom": "醫科",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 214,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 758
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khoa thi",
+      "nom": "科試",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 215,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 759
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khốn nạn",
+      "nom": "困難",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 216,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 760
+          }
+        ]
+      }
+    },
+    {
+      "latin": "Khổng Tử",
+      "nom": "孔子",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 217,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 761
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mộc lan",
+      "nom": "木蘭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 218,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 762
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lan can",
+      "nom": "欄杆",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 219,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 763
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tân lang",
+      "nom": "新郎",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 220,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 764
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công lao",
+      "nom": "功勞",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 221,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 765
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lao động",
+      "nom": "勞動",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 222,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 766
+          }
+        ]
+      }
+    },
+    {
+      "latin": "người Lào",
+      "nom": "𠊛𠈭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 223,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 767
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nguyệt lão",
+      "nom": "月老",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 224,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 768
+          }
+        ]
+      }
+    },
+    {
+      "latin": "Hi Lạp",
+      "nom": "希臘",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 225,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 769
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nói lắp",
+      "nom": "吶擸",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 226,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 770
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lặp đi lặp lại",
+      "nom": "㕸𠫾㕸徠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 227,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 771
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tự lập",
+      "nom": "自立",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 228,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 772
+          }
+        ]
+      }
+    },
+    {
+      "latin": "độc lập",
+      "nom": "獨立",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 229,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 773
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lập pháp",
+      "nom": "立法",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 230,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 774
+          }
+        ]
+      }
+    },
+    {
+      "latin": "rừng lau",
+      "nom": "𡹃𦰤",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 231,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 775
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lâu đài",
+      "nom": "樓臺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 232,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 776
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lầu đài",
+      "nom": "樓臺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 233,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 777
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thanh lâu",
+      "nom": "青樓",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 234,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 778
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đầu lâu",
+      "nom": "頭髏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 235,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 779
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lễ mễ",
+      "nom": "禮米",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 236,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 783
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hôn lễ",
+      "nom": "婚禮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 237,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 784
+          }
+        ]
+      }
+    },
+    {
+      "latin": "buổi lễ",
+      "nom": "𣇜禮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 238,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 785
+          }
+        ]
+      }
+    },
+    {
+      "latin": "miễn lễ",
+      "nom": "免禮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 239,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 786
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đa lễ",
+      "nom": "多禮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 240,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 787
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lễ bái",
+      "nom": "禮拜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 241,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 788
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ngoại lệ",
+      "nom": "外例",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 242,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 789
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lèm nhèm",
+      "nom": "𠿳𣲹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 243,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 790
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mệnh lệnh",
+      "nom": "命令",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 244,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 791
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trêu ghẹo",
+      "nom": "嘹嘺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 245,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 792
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trêu ngươi",
+      "nom": "嘹𥇹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 246,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 793
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trêu tức",
+      "nom": "嘹息",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 247,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 794
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lạnh lẽo",
+      "nom": "冷𠖭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 248,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 795
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hải li",
+      "nom": "海狸",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 249,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 796
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quá khứ",
+      "nom": "過去",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 250,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 797
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bất quá",
+      "nom": "不過",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 251,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 798
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quả báo",
+      "nom": "果報",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 252,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 799
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quả phụ",
+      "nom": "寡婦",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 253,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 800
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hậu quả",
+      "nom": "後果",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 254,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 801
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quả nhân",
+      "nom": "寡人",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 255,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 802
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nhất quán",
+      "nom": "一貫",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 256,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 803
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quan tài",
+      "nom": "棺材",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 257,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 804
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quan niệm",
+      "nom": "觀念",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 258,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 805
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quan sát",
+      "nom": "觀察",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 259,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 806
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tự thú",
+      "nom": "自首",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 260,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 807
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đầu thú",
+      "nom": "投首",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 261,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 808
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hưởng thụ",
+      "nom": "享受",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 262,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 809
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cảm thụ",
+      "nom": "感受",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 263,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 810
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ẩm thực",
+      "nom": "飲食",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 264,
+        "sources": [
+          {
+            "sheet": "词汇",
+            "row": 811
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xin",
+      "nom": "吀",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 267,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 4,
+            "unicode": "U+5400"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chào",
+      "nom": "嘲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 268,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 5,
+            "unicode": "U+5632"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "một",
+      "nom": "𠬠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 270,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 7,
+            "unicode": "U+20B20"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hai",
+      "nom": "𠄩",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 271,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 8,
+            "unicode": "U+20129"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ba",
+      "nom": "𠀧",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 272,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 9,
+            "unicode": "U+20027"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bốn",
+      "nom": "𦊚",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 273,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 10,
+            "unicode": "U+2629A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "năm",
+      "nom": "𠄼",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 274,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 11,
+            "unicode": "U+2013C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sáu",
+      "nom": "𦒹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 275,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 12,
+            "unicode": "U+264B9"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bảy",
+      "nom": "𬙞",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 276,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 13,
+            "unicode": "U+2C65E"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tám",
+      "nom": "𠔭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 277,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 14,
+            "unicode": "U+2052D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chín",
+      "nom": "𠃩",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 278,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 15,
+            "unicode": "U+200E9"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mười",
+      "nom": "𨑮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 279,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 16,
+            "unicode": "U+2846E",
+            "rawLatinCell": "mười, mươi"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mươi",
+      "nom": "𨑮",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 280,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 16,
+            "unicode": "U+2846E",
+            "rawLatinCell": "mười, mươi"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trăm",
+      "nom": "𤾓",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 281,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 17,
+            "unicode": "U+24F93"
+          },
+          {
+            "sheet": "喃字",
+            "row": 136,
+            "unicode": "U+24F93"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nghìn",
+      "nom": "𠦳",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 282,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 18,
+            "unicode": "U+209B3"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "triệu",
+      "nom": "兆",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 283,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 19,
+            "unicode": "U+5146"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "số",
+      "nom": "数",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 284,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 20,
+            "unicode": "U+6570"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "điểm",
+      "nom": "點",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 285,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 21,
+            "unicode": "U+9EDE"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bao",
+      "nom": "包",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 286,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 22,
+            "unicode": "U+5305"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nhiêu",
+      "nom": "饒",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 287,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 23,
+            "unicode": "U+9952"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cái",
+      "nom": "丐",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 291,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 27,
+            "unicode": "U+4E10"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "gì",
+      "nom": "之",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 292,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 28,
+            "unicode": "U+4E4B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "có",
+      "nom": "𣎏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 293,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 29,
+            "unicode": "U+2338F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "có",
+      "nom": "固",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 294,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 30,
+            "unicode": "U+56FA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cơ",
+      "nom": "機",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 295,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 31,
+            "unicode": "U+6A5F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "không",
+      "nom": "空",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 296,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 32,
+            "unicode": "U+7A7A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thể",
+      "nom": "體",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 297,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 33,
+            "unicode": "U+4E16"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thế",
+      "nom": "世",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 298,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 34,
+            "unicode": "U+4E16",
+            "rawLatinCell": "thế, thể"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thể",
+      "nom": "世",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 299,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 34,
+            "unicode": "U+4E16",
+            "rawLatinCell": "thế, thể"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thế",
+      "nom": "勢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 300,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 35,
+            "unicode": "U+52E2"
+          },
+          {
+            "sheet": "喃字",
+            "row": 50,
+            "unicode": "U+52E2"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thế",
+      "nom": "替",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 301,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 36,
+            "unicode": "U+66FF"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hội",
+      "nom": "會",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 302,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 37,
+            "unicode": "U+6703"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xã",
+      "nom": "社",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 303,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 38,
+            "unicode": "U+793E"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "công",
+      "nom": "公",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 304,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 39,
+            "unicode": "U+516C"
+          },
+          {
+            "sheet": "喃字",
+            "row": 56,
+            "unicode": "U+516C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ngày",
+      "nom": "𣈜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 305,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 40,
+            "unicode": "U+2321C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tháng",
+      "nom": "𣎃",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 306,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 41,
+            "unicode": "U+23383"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hôm",
+      "nom": "𣋚",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 307,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 42,
+            "unicode": "U+232DA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nay",
+      "nom": "𫢩",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 308,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 43,
+            "unicode": "U+2B8A9"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lấy",
+      "nom": "𥙩",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 309,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 44,
+            "unicode": "U+25669"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "âm",
+      "nom": "音",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 310,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 45,
+            "unicode": "U+97F3"
+          },
+          {
+            "sheet": "喃字",
+            "row": 174,
+            "unicode": "U+97F3"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tiết",
+      "nom": "節",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 311,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 46,
+            "unicode": "U+7BC0"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tại",
+      "nom": "在",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 312,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 47,
+            "unicode": "U+5728"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sao",
+      "nom": "牢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 313,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 48,
+            "unicode": "U+7262"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "vì",
+      "nom": "爲",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 314,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 49,
+            "unicode": "U+7232"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "như",
+      "nom": "如",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 316,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 51,
+            "unicode": "U+5982"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thì",
+      "nom": "㖘",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 318,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 53,
+            "unicode": "U+3598"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xúc",
+      "nom": "觸",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 319,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 54,
+            "unicode": "U+89F8"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xúc",
+      "nom": "促",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 320,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 55,
+            "unicode": "U+4FC3"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cộng",
+      "nom": "共",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 322,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 57,
+            "unicode": "U+5171"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "giữ",
+      "nom": "𡨹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 323,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 58,
+            "unicode": "U+21A39"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sự",
+      "nom": "亊",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 324,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 59,
+            "unicode": "U+4E8A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lại",
+      "nom": "又",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 325,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 60,
+            "unicode": "U+53C8"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khi",
+      "nom": "欺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 326,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 61,
+            "unicode": "U+6B3A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "buổi",
+      "nom": "𣇜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 332,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 67,
+            "unicode": "U+231DC"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sáng",
+      "nom": "𤎜",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 333,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 68,
+            "unicode": "U+2439C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tối",
+      "nom": "最",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 334,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 69,
+            "unicode": "U+6700"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tạm",
+      "nom": "暫",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 335,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 70,
+            "unicode": "U+66AB"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "biệt",
+      "nom": "别",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 336,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 71,
+            "unicode": "U+522B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trai",
+      "nom": "𤳇",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 337,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 72,
+            "unicode": "U+24CC7"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trai",
+      "nom": "𤳆",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 338,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 73,
+            "unicode": "U+24CC6"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "gái",
+      "nom": "𡛔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 339,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 74,
+            "unicode": "U+216D4"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "em",
+      "nom": "俺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 341,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 76,
+            "unicode": "U+4FFA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "em",
+      "nom": "㛪",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 342,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 77,
+            "unicode": "U+36EA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "gồm",
+      "nom": "𠁟",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 343,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 78,
+            "unicode": "U+2005F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chúc",
+      "nom": "祝",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 344,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 79,
+            "unicode": "U+795D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mừng",
+      "nom": "𢜠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 345,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 80,
+            "unicode": "U+22720"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "năm",
+      "nom": "𢆥",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 346,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 81,
+            "unicode": "U+221A5"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mới",
+      "nom": "𡤔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 347,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 82,
+            "unicode": "U+3D4B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thứ",
+      "nom": "次",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 348,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 83,
+            "unicode": "U+6B21"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cô",
+      "nom": "姑",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 349,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 84,
+            "unicode": "U+59D1"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "giáo",
+      "nom": "教",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 350,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 85,
+            "unicode": "U+6559"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nàng",
+      "nom": "娘",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 351,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 86,
+            "unicode": "U+5A18"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bắt",
+      "nom": "扒",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 352,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 87,
+            "unicode": "U+6252"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đầu",
+      "nom": "頭",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 353,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 88,
+            "unicode": "U+982D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mời",
+      "nom": "𠶆",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 354,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 89,
+            "unicode": "U+20D86"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "các",
+      "nom": "各",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 355,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 90,
+            "unicode": "U+5404"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ngồi",
+      "nom": "𡎥",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 356,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 91,
+            "unicode": "U+213A5"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bài",
+      "nom": "排",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 357,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 92,
+            "unicode": "U+6392"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cảm",
+      "nom": "感",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 358,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 93,
+            "unicode": "U+611F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ơn",
+      "nom": "㤙",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 359,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 94,
+            "unicode": "U+3919"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ơn",
+      "nom": "恩",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 360,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 95,
+            "unicode": "U+6069"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ạ",
+      "nom": "𠶚",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 361,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 96,
+            "unicode": "U+20D9A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lỗi",
+      "nom": "纇",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 362,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 97,
+            "unicode": "U+7E87"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "học",
+      "nom": "學",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 364,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 99,
+            "unicode": "U+5B78"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "về",
+      "nom": "𧗱",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 365,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 100,
+            "unicode": "U+275F1"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nhà",
+      "nom": "茹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 367,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 102,
+            "unicode": "U+8339"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cha",
+      "nom": "吒",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 368,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 103,
+            "unicode": "U+5412"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mẹ",
+      "nom": "媄",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 369,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 104,
+            "unicode": "U+5A84"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "giới",
+      "nom": "界",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 370,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 105,
+            "unicode": "U+754C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đường",
+      "nom": "堂",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 372,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 107,
+            "unicode": "U+5802"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tài",
+      "nom": "才",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 374,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 109,
+            "unicode": "U+624D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "năng",
+      "nom": "能",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 375,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 110,
+            "unicode": "U+80FD"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lượng",
+      "nom": "量",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 376,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 111,
+            "unicode": "U+91CF"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lực",
+      "nom": "力",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 377,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 112,
+            "unicode": "U+529B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "quyền",
+      "nom": "權",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 378,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 113,
+            "unicode": "U+6B0A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "dân",
+      "nom": "民",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 379,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 114,
+            "unicode": "U+6C11"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chủ",
+      "nom": "主",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 380,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 115,
+            "unicode": "U+4E3B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hành",
+      "nom": "行",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 383,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 118,
+            "unicode": "U+884C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "động",
+      "nom": "動",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 384,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 119,
+            "unicode": "U+52D5"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chúng",
+      "nom": "眾",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 385,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 120,
+            "unicode": "U+773E"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ta",
+      "nom": "些",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 386,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 121,
+            "unicode": "U+4E9B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "người",
+      "nom": "𠊛",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 387,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 122,
+            "unicode": "U+2029B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nên",
+      "nom": "𢧚",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 388,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 123,
+            "unicode": "U+229DA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trở",
+      "nom": "𧿨",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 389,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 124,
+            "unicode": "U+27FE8"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lại",
+      "nom": "吏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 390,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 125,
+            "unicode": "U+540F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "còn",
+      "nom": "群",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 391,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 126,
+            "unicode": "U+7FA4"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tác",
+      "nom": "作",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 392,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 127,
+            "unicode": "U+4F5C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phẩm",
+      "nom": "品",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 393,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 128,
+            "unicode": "U+54C1"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sản",
+      "nom": "産",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 394,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 129,
+            "unicode": "U+7523"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xuất",
+      "nom": "出",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 395,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 130,
+            "unicode": "U+51FA"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "bản",
+      "nom": "版",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 396,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 131,
+            "unicode": "U+7248"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hiện",
+      "nom": "現",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 397,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 132,
+            "unicode": "U+73FE"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thật",
+      "nom": "實",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 398,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 133,
+            "unicode": "U+5BE6",
+            "rawLatinCell": "thật; thực"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thực",
+      "nom": "實",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 399,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 133,
+            "unicode": "U+5BE6",
+            "rawLatinCell": "thật; thực"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thành",
+      "nom": "誠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 400,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 134,
+            "unicode": "U+8AA0"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phần",
+      "nom": "分",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 401,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 135,
+            "unicode": "U+5206",
+            "rawLatinCell": "phần; phân"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "phân",
+      "nom": "分",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 402,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 135,
+            "unicode": "U+5206",
+            "rawLatinCell": "phần; phân"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lớn",
+      "nom": "𡘯",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 404,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 137,
+            "unicode": "U+2162F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "to",
+      "nom": "𡚢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 405,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 138,
+            "unicode": "U+216A2"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mùa",
+      "nom": "务",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 406,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 139,
+            "unicode": "U+52A1"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xuân",
+      "nom": "春",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 407,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 140,
+            "unicode": "U+6625"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hè",
+      "nom": "夏",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 408,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 141,
+            "unicode": "U+590F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thu",
+      "nom": "秋",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 409,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 142,
+            "unicode": "U+79CB"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đông",
+      "nom": "冬",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 410,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 143,
+            "unicode": "U+51AC"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mưa",
+      "nom": "𩅹",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 411,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 144,
+            "unicode": "U+29179"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "khô",
+      "nom": "枯",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 412,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 145,
+            "unicode": "U+67AF"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "áo",
+      "nom": "襖",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 413,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 146,
+            "unicode": "U+8956"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "kêu",
+      "nom": "呌",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 415,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 148,
+            "unicode": "U+544C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "cầu",
+      "nom": "求",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 416,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 149,
+            "unicode": "U+6C42"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "yếu",
+      "nom": "要",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 417,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 150,
+            "unicode": "U+8981",
+            "rawLatinCell": "yếu; yêu"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "yêu",
+      "nom": "要",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 418,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 150,
+            "unicode": "U+8981",
+            "rawLatinCell": "yếu; yêu"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ân",
+      "nom": "殷",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 420,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 152,
+            "unicode": "U+6BB7"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thích",
+      "nom": "適",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 426,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 158,
+            "unicode": "U+9069"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ý",
+      "nom": "意",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 427,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 159,
+            "unicode": "U+610F"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tiếng",
+      "nom": "㗂",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 428,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 160,
+            "unicode": "U+35C2"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trung",
+      "nom": "中",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 429,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 161,
+            "unicode": "U+4E2D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "việt",
+      "nom": "越",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 430,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 162,
+            "unicode": "U+8D8A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "tâm",
+      "nom": "心",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 431,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 163,
+            "unicode": "U+5FC3"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "lý",
+      "nom": "理",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 432,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 164,
+            "unicode": "U+7406"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "trợ",
+      "nom": "助",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 433,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 165,
+            "unicode": "U+52A9"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "hỗ",
+      "nom": "互",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 434,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 166,
+            "unicode": "U+4E92"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sau",
+      "nom": "𡢐",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 435,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 167,
+            "unicode": "U+21890"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "này",
+      "nom": "尼",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 436,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 168,
+            "unicode": "U+5C3C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "này",
+      "nom": "呢",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 437,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 169,
+            "unicode": "U+5462"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đó",
+      "nom": "妬",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 438,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 170,
+            "unicode": "U+59AC"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nhạc",
+      "nom": "樂",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 441,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 173,
+            "unicode": "U+6A02"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "đồng",
+      "nom": "同",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 443,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 175,
+            "unicode": "U+540C"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "mất",
+      "nom": "𠅍",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 444,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 176,
+            "unicode": "U+2014D"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "dạy",
+      "nom": "𠰺",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 445,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 177,
+            "unicode": "U+20C3A"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "thực",
+      "nom": "寔",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 446,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 178,
+            "unicode": "U+5BD4"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "sự",
+      "nom": "事",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 447,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 179,
+            "unicode": "U+4E8B"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "nào",
+      "nom": "芇",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 448,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 180,
+            "unicode": "U+8287"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "ra",
+      "nom": "𫥨",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 451,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 183,
+            "unicode": "U+2B968"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "xảy",
+      "nom": "仕",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 452,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 184,
+            "unicode": "U+4ED5"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "vĩnh",
+      "nom": "永",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 453,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 185,
+            "unicode": "U+6C38"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "viễn",
+      "nom": "远",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 454,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 186,
+            "unicode": "U+8FDC"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "viễn",
+      "nom": "遠",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 455,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 187,
+            "unicode": "U+9060"
+          }
+        ]
+      }
+    },
+    {
+      "latin": "chứ",
+      "nom": "渚",
+      "priority": 0,
+      "metadata": {
+        "sourceOrder": 456,
+        "sources": [
+          {
+            "sheet": "喃字",
+            "row": 188
+          }
+        ]
+      }
+    }
+  ]
+}

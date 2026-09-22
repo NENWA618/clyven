@@ -18,7 +18,9 @@ abstract class SubtitleTrack
     this.id,
     required this.videoId,
     required this.languageCode,
+    this.variantCode,
     required this.label,
+    this.defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -30,7 +32,9 @@ abstract class SubtitleTrack
     int? id,
     required int videoId,
     required String languageCode,
+    String? variantCode,
     required String label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -41,7 +45,9 @@ abstract class SubtitleTrack
       id: jsonSerialization['id'] as int?,
       videoId: jsonSerialization['videoId'] as int,
       languageCode: jsonSerialization['languageCode'] as String,
+      variantCode: jsonSerialization['variantCode'] as String?,
       label: jsonSerialization['label'] as String,
+      defaultScriptCode: jsonSerialization['defaultScriptCode'] as String?,
       isDefault: jsonSerialization['isDefault'] == null
           ? null
           : _i1.BoolJsonExtension.fromJson(jsonSerialization['isDefault']),
@@ -65,7 +71,11 @@ abstract class SubtitleTrack
 
   String languageCode;
 
+  String? variantCode;
+
   String label;
+
+  String? defaultScriptCode;
 
   bool isDefault;
 
@@ -83,7 +93,9 @@ abstract class SubtitleTrack
     int? id,
     int? videoId,
     String? languageCode,
+    String? variantCode,
     String? label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -95,7 +107,9 @@ abstract class SubtitleTrack
       if (id != null) 'id': id,
       'videoId': videoId,
       'languageCode': languageCode,
+      if (variantCode != null) 'variantCode': variantCode,
       'label': label,
+      if (defaultScriptCode != null) 'defaultScriptCode': defaultScriptCode,
       'isDefault': isDefault,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -109,7 +123,9 @@ abstract class SubtitleTrack
       if (id != null) 'id': id,
       'videoId': videoId,
       'languageCode': languageCode,
+      if (variantCode != null) 'variantCode': variantCode,
       'label': label,
+      if (defaultScriptCode != null) 'defaultScriptCode': defaultScriptCode,
       'isDefault': isDefault,
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -153,7 +169,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
     int? id,
     required int videoId,
     required String languageCode,
+    String? variantCode,
     required String label,
+    String? defaultScriptCode,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -161,7 +179,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
          id: id,
          videoId: videoId,
          languageCode: languageCode,
+         variantCode: variantCode,
          label: label,
+         defaultScriptCode: defaultScriptCode,
          isDefault: isDefault,
          createdAt: createdAt,
          updatedAt: updatedAt,
@@ -175,7 +195,9 @@ class _SubtitleTrackImpl extends SubtitleTrack {
     Object? id = _Undefined,
     int? videoId,
     String? languageCode,
+    Object? variantCode = _Undefined,
     String? label,
+    Object? defaultScriptCode = _Undefined,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -184,7 +206,11 @@ class _SubtitleTrackImpl extends SubtitleTrack {
       id: id is int? ? id : this.id,
       videoId: videoId ?? this.videoId,
       languageCode: languageCode ?? this.languageCode,
+      variantCode: variantCode is String? ? variantCode : this.variantCode,
       label: label ?? this.label,
+      defaultScriptCode: defaultScriptCode is String?
+          ? defaultScriptCode
+          : this.defaultScriptCode,
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -205,10 +231,21 @@ class SubtitleTrackUpdateTable extends _i1.UpdateTable<SubtitleTrackTable> {
     value,
   );
 
+  _i1.ColumnValue<String, String> variantCode(String? value) => _i1.ColumnValue(
+    table.variantCode,
+    value,
+  );
+
   _i1.ColumnValue<String, String> label(String value) => _i1.ColumnValue(
     table.label,
     value,
   );
+
+  _i1.ColumnValue<String, String> defaultScriptCode(String? value) =>
+      _i1.ColumnValue(
+        table.defaultScriptCode,
+        value,
+      );
 
   _i1.ColumnValue<bool, bool> isDefault(bool value) => _i1.ColumnValue(
     table.isDefault,
@@ -240,8 +277,16 @@ class SubtitleTrackTable extends _i1.Table<int?> {
       'languageCode',
       this,
     );
+    variantCode = _i1.ColumnString(
+      'variantCode',
+      this,
+    );
     label = _i1.ColumnString(
       'label',
+      this,
+    );
+    defaultScriptCode = _i1.ColumnString(
+      'defaultScriptCode',
       this,
     );
     isDefault = _i1.ColumnBool(
@@ -267,7 +312,11 @@ class SubtitleTrackTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString languageCode;
 
+  late final _i1.ColumnString variantCode;
+
   late final _i1.ColumnString label;
+
+  late final _i1.ColumnString defaultScriptCode;
 
   late final _i1.ColumnBool isDefault;
 
@@ -280,7 +329,9 @@ class SubtitleTrackTable extends _i1.Table<int?> {
     id,
     videoId,
     languageCode,
+    variantCode,
     label,
+    defaultScriptCode,
     isDefault,
     createdAt,
     updatedAt,

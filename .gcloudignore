@@ -10,6 +10,9 @@
 
 apps/**
 packages/**
+!packages/
+!packages/clyven_nom_converter/
+!packages/clyven_nom_converter/**
 
 *.log
 

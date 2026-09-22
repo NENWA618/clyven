@@ -19,11 +19,18 @@ class BrowserKeyValueStorage implements KeyValueStorage {
   }
 }
 
+// Shared Clyven browser auth boundary.
+//
+// Studio uses persistent browser storage instead of page-local memory auth.
+// Future Clyven Web should reuse the same Serverpod auth session. If Web and
+// Studio are hosted on the same origin (for example / and /studio), entering
+// Studio can restore the existing session without another login.
+// Future Clyven Web SSO hook: keep auth storage behind this shared client.
 final studioClient =
     Client(
-      'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-      connectionTimeout: const Duration(minutes: 2),
-    )
+        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        connectionTimeout: const Duration(minutes: 2),
+      )
       ..authSessionManager = ClientAuthSessionManager(
         storage: KeyValueClientAuthSuccessStorage(
           keyValueStorage: BrowserKeyValueStorage(),

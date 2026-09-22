@@ -1,0 +1,27 @@
+class: AsrJob
+table: asr_job
+
+fields:
+  videoId: int, relation(parent=video)
+
+  # "auto" means detect the dominant spoken language first.
+  requestedLanguageCode: String
+
+  # Actual language returned/used by ASR.
+  detectedLanguageCode: String?
+
+  provider: String
+
+  status: AsrJobStatus, default=queued
+
+  # Subtitle track created from this ASR draft.
+  trackId: int?
+
+  errorMessage: String?
+
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  asr_job_video_idx:
+    fields: videoId

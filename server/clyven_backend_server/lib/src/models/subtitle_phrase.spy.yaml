@@ -4,8 +4,15 @@ table: subtitle_phrase
 fields:
   cueId: int, relation(parent=subtitle_cue)
 
+  # Identifies which script representation this phrase belongs to.
+  # Nullable for compatibility with existing subtitle rows.
+  scriptCode: String?
+
   text: String
   normalizedText: String?
+
+  # Optional resolved dictionary entry for a phrase.
+  entryId: int?, relation(parent=dictionary_entry)
 
   startPosition: int
   endPosition: int

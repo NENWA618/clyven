@@ -1,0 +1,4 @@
+class: SubtitleReviewTaskDetail
+fields:
+  item: SubtitleReviewQueueItem
+  events: List<SubtitleReviewEvent>

@@ -1,0 +1,14 @@
+class: SubtitleReviewEvent
+table: subtitle_review_event
+
+fields:
+  taskId: int, relation(parent=subtitle_review_task)
+  actorUserId: String?
+  actorDisplayName: String?
+  action: String
+  note: String?
+  createdAt: DateTime, default=now
+
+indexes:
+  subtitle_review_event_task_idx:
+    fields: taskId

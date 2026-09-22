@@ -6,20 +6,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
 import '../../services/excel_file_reader.dart';
-
-class _MemoryAuthStorage implements ClientAuthSuccessStorage {
-  AuthSuccess? _value;
-
-  @override
-  Future<AuthSuccess?> get() async {
-    return _value;
-  }
-
-  @override
-  Future<void> set(AuthSuccess? data) async {
-    _value = data;
-  }
-}
+import '../../services/studio_client.dart';
 
 class DictionaryImportPage extends StatefulComponent {
   const DictionaryImportPage({super.key});
@@ -29,14 +16,7 @@ class DictionaryImportPage extends StatefulComponent {
 }
 
 class _DictionaryImportPageState extends State<DictionaryImportPage> {
-  final client =
-      Client(
-          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-          connectionTimeout: const Duration(minutes: 2),
-        )
-        ..authSessionManager = ClientAuthSessionManager(
-          storage: _MemoryAuthStorage(),
-        );
+  final client = studioClient;
 
   // =========================
   // LOGIN
@@ -46,7 +26,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
   String loginPassword = '';
 
   bool loginLoading = false;
-  bool loggedIn = false;
+  bool loggedIn = studioClient.auth.isAuthenticated;
 
   String? loginError;
 

@@ -8,6 +8,17 @@ class ServerpodDictionaryRepository implements DictionaryRepository {
   ServerpodDictionaryRepository({required this.client});
 
   @override
+  Future<serverpod.DictionaryEntryDetail?> getById({
+    required int entryId,
+    required String explanationLanguageCode,
+  }) {
+    return client.dictionary.getById(
+      entryId: entryId,
+      explanationLanguageCode: explanationLanguageCode,
+    );
+  }
+
+  @override
   Future<serverpod.DictionaryEntryDetail?> lookup({
     required String languageCode,
     required String normalizedText,

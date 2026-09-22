@@ -18,6 +18,21 @@ class ServerpodKnownEntryRepository implements KnownEntryRepository {
   }
 
   @override
+  Future<Map<int, String>> getKnowledgeStatesByEntryIds({
+    required List<int> entryIds,
+  }) async {
+    if (entryIds.isEmpty) {
+      return <int, String>{};
+    }
+
+    final results = await client.knownEntry.getKnowledgeStatesByEntryIds(
+      entryIds: entryIds,
+    );
+
+    return {for (final result in results) result.entryId: result.state};
+  }
+
+  @override
   Future<String> getKnowledgeState({
     required String languageCode,
     required String normalizedText,

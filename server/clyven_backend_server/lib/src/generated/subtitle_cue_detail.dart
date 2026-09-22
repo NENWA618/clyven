@@ -12,59 +12,86 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'subtitle_cue.dart' as _i2;
-import 'subtitle_token.dart' as _i3;
-import 'subtitle_phrase.dart' as _i4;
-import 'package:clyven_backend_server/src/generated/protocol.dart' as _i5;
+import 'subtitle_cue_text.dart' as _i3;
+import 'subtitle_token.dart' as _i4;
+import 'subtitle_phrase.dart' as _i5;
+import 'subtitle_karaoke_segment.dart' as _i6;
+import 'package:clyven_backend_server/src/generated/protocol.dart' as _i7;
 
 abstract class SubtitleCueDetail
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
   SubtitleCueDetail._({
     required this.cue,
+    this.texts,
     required this.tokens,
     required this.phrases,
+    this.karaokeSegments,
   });
 
   factory SubtitleCueDetail({
     required _i2.SubtitleCue cue,
-    required List<_i3.SubtitleToken> tokens,
-    required List<_i4.SubtitlePhrase> phrases,
+    List<_i3.SubtitleCueText>? texts,
+    required List<_i4.SubtitleToken> tokens,
+    required List<_i5.SubtitlePhrase> phrases,
+    List<_i6.SubtitleKaraokeSegment>? karaokeSegments,
   }) = _SubtitleCueDetailImpl;
 
   factory SubtitleCueDetail.fromJson(Map<String, dynamic> jsonSerialization) {
     return SubtitleCueDetail(
-      cue: _i5.Protocol().deserialize<_i2.SubtitleCue>(
+      cue: _i7.Protocol().deserialize<_i2.SubtitleCue>(
         jsonSerialization['cue'],
       ),
-      tokens: _i5.Protocol().deserialize<List<_i3.SubtitleToken>>(
+      texts: jsonSerialization['texts'] == null
+          ? null
+          : _i7.Protocol().deserialize<List<_i3.SubtitleCueText>>(
+              jsonSerialization['texts'],
+            ),
+      tokens: _i7.Protocol().deserialize<List<_i4.SubtitleToken>>(
         jsonSerialization['tokens'],
       ),
-      phrases: _i5.Protocol().deserialize<List<_i4.SubtitlePhrase>>(
+      phrases: _i7.Protocol().deserialize<List<_i5.SubtitlePhrase>>(
         jsonSerialization['phrases'],
       ),
+      karaokeSegments: jsonSerialization['karaokeSegments'] == null
+          ? null
+          : _i7.Protocol().deserialize<List<_i6.SubtitleKaraokeSegment>>(
+              jsonSerialization['karaokeSegments'],
+            ),
     );
   }
 
   _i2.SubtitleCue cue;
 
-  List<_i3.SubtitleToken> tokens;
+  List<_i3.SubtitleCueText>? texts;
 
-  List<_i4.SubtitlePhrase> phrases;
+  List<_i4.SubtitleToken> tokens;
+
+  List<_i5.SubtitlePhrase> phrases;
+
+  List<_i6.SubtitleKaraokeSegment>? karaokeSegments;
 
   /// Returns a shallow copy of this [SubtitleCueDetail]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   SubtitleCueDetail copyWith({
     _i2.SubtitleCue? cue,
-    List<_i3.SubtitleToken>? tokens,
-    List<_i4.SubtitlePhrase>? phrases,
+    List<_i3.SubtitleCueText>? texts,
+    List<_i4.SubtitleToken>? tokens,
+    List<_i5.SubtitlePhrase>? phrases,
+    List<_i6.SubtitleKaraokeSegment>? karaokeSegments,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'SubtitleCueDetail',
       'cue': cue.toJson(),
+      if (texts != null) 'texts': texts?.toJson(valueToJson: (v) => v.toJson()),
       'tokens': tokens.toJson(valueToJson: (v) => v.toJson()),
       'phrases': phrases.toJson(valueToJson: (v) => v.toJson()),
+      if (karaokeSegments != null)
+        'karaokeSegments': karaokeSegments?.toJson(
+          valueToJson: (v) => v.toJson(),
+        ),
     };
   }
 
@@ -73,8 +100,14 @@ abstract class SubtitleCueDetail
     return {
       '__className__': 'SubtitleCueDetail',
       'cue': cue.toJsonForProtocol(),
+      if (texts != null)
+        'texts': texts?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       'tokens': tokens.toJson(valueToJson: (v) => v.toJsonForProtocol()),
       'phrases': phrases.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      if (karaokeSegments != null)
+        'karaokeSegments': karaokeSegments?.toJson(
+          valueToJson: (v) => v.toJsonForProtocol(),
+        ),
     };
   }
 
@@ -84,15 +117,21 @@ abstract class SubtitleCueDetail
   }
 }
 
+class _Undefined {}
+
 class _SubtitleCueDetailImpl extends SubtitleCueDetail {
   _SubtitleCueDetailImpl({
     required _i2.SubtitleCue cue,
-    required List<_i3.SubtitleToken> tokens,
-    required List<_i4.SubtitlePhrase> phrases,
+    List<_i3.SubtitleCueText>? texts,
+    required List<_i4.SubtitleToken> tokens,
+    required List<_i5.SubtitlePhrase> phrases,
+    List<_i6.SubtitleKaraokeSegment>? karaokeSegments,
   }) : super._(
          cue: cue,
+         texts: texts,
          tokens: tokens,
          phrases: phrases,
+         karaokeSegments: karaokeSegments,
        );
 
   /// Returns a shallow copy of this [SubtitleCueDetail]
@@ -101,13 +140,21 @@ class _SubtitleCueDetailImpl extends SubtitleCueDetail {
   @override
   SubtitleCueDetail copyWith({
     _i2.SubtitleCue? cue,
-    List<_i3.SubtitleToken>? tokens,
-    List<_i4.SubtitlePhrase>? phrases,
+    Object? texts = _Undefined,
+    List<_i4.SubtitleToken>? tokens,
+    List<_i5.SubtitlePhrase>? phrases,
+    Object? karaokeSegments = _Undefined,
   }) {
     return SubtitleCueDetail(
       cue: cue ?? this.cue.copyWith(),
+      texts: texts is List<_i3.SubtitleCueText>?
+          ? texts
+          : this.texts?.map((e0) => e0.copyWith()).toList(),
       tokens: tokens ?? this.tokens.map((e0) => e0.copyWith()).toList(),
       phrases: phrases ?? this.phrases.map((e0) => e0.copyWith()).toList(),
+      karaokeSegments: karaokeSegments is List<_i6.SubtitleKaraokeSegment>?
+          ? karaokeSegments
+          : this.karaokeSegments?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
