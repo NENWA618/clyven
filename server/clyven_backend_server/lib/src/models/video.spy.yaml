@@ -9,6 +9,10 @@ fields:
   description: String
   category: String
 
+  # Spoken language detected/confirmed for ASR.
+  # Old videos may remain null.
+  languageCode: String?
+
   tags: List<String>
 
   videoStorageKey: String

@@ -8,7 +8,10 @@ workspace:
   - apps/clyven_app
   - apps/clyven_studio
   - apps/clyven_admin
+  - apps/clyven_review
   - packages/clyven_backend_client
+  - packages/clyven_subtitle_editor
+  - packages/clyven_nom_converter
   - server/clyven_backend_server
   
 dependencies:

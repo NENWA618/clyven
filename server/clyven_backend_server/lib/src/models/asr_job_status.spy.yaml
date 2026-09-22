@@ -1,0 +1,8 @@
+enum: AsrJobStatus
+serialized: byName
+
+values:
+  - queued
+  - processing
+  - readyForReview
+  - failed

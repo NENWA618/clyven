@@ -22,6 +22,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.title,
     required this.description,
     required this.category,
+    this.languageCode,
     required this.tags,
     required this.videoStorageKey,
     this.coverStorageKey,
@@ -47,6 +48,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required String title,
     required String description,
     required String category,
+    String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
@@ -69,6 +71,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
+      languageCode: jsonSerialization['languageCode'] as String?,
       tags: _i3.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
@@ -111,6 +114,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   String category;
 
+  String? languageCode;
+
   List<String> tags;
 
   String videoStorageKey;
@@ -148,6 +153,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? title,
     String? description,
     String? category,
+    String? languageCode,
     List<String>? tags,
     String? videoStorageKey,
     String? coverStorageKey,
@@ -171,6 +177,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'title': title,
       'description': description,
       'category': category,
+      if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
@@ -196,6 +203,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'title': title,
       'description': description,
       'category': category,
+      if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
@@ -251,6 +259,7 @@ class _VideoImpl extends Video {
     required String title,
     required String description,
     required String category,
+    String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
@@ -270,6 +279,7 @@ class _VideoImpl extends Video {
          title: title,
          description: description,
          category: category,
+         languageCode: languageCode,
          tags: tags,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
@@ -295,6 +305,7 @@ class _VideoImpl extends Video {
     String? title,
     String? description,
     String? category,
+    Object? languageCode = _Undefined,
     List<String>? tags,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
@@ -315,6 +326,7 @@ class _VideoImpl extends Video {
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
+      languageCode: languageCode is String? ? languageCode : this.languageCode,
       tags: tags ?? this.tags.map((e0) => e0).toList(),
       videoStorageKey: videoStorageKey ?? this.videoStorageKey,
       coverStorageKey: coverStorageKey is String?
@@ -360,6 +372,12 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
     table.category,
     value,
   );
+
+  _i1.ColumnValue<String, String> languageCode(String? value) =>
+      _i1.ColumnValue(
+        table.languageCode,
+        value,
+      );
 
   _i1.ColumnValue<List<String>, List<String>> tags(List<String> value) =>
       _i1.ColumnValue(
@@ -453,6 +471,10 @@ class VideoTable extends _i1.Table<int?> {
       'category',
       this,
     );
+    languageCode = _i1.ColumnString(
+      'languageCode',
+      this,
+    );
     tags = _i1.ColumnSerializable<List<String>>(
       'tags',
       this,
@@ -521,6 +543,8 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString category;
 
+  late final _i1.ColumnString languageCode;
+
   late final _i1.ColumnSerializable<List<String>> tags;
 
   late final _i1.ColumnString videoStorageKey;
@@ -553,6 +577,7 @@ class VideoTable extends _i1.Table<int?> {
     title,
     description,
     category,
+    languageCode,
     tags,
     videoStorageKey,
     coverStorageKey,

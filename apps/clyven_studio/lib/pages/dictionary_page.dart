@@ -132,8 +132,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
   }) {
     for (final example in detail.examples) {
       for (final text in example.texts) {
-        if (text.languageCode == languageCode &&
-            text.scriptCode == scriptCode) {
+        if (text.languageCode == languageCode && text.scriptCode == scriptCode) {
           return text.text;
         }
       }
@@ -144,9 +143,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
   @override
   Component build(BuildContext context) {
-    final count = visibleCount < entries.length
-        ? visibleCount
-        : entries.length;
+    final count = visibleCount < entries.length ? visibleCount : entries.length;
 
     return div(
       classes: 'dictionary-page',
@@ -221,8 +218,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     classes: 'dictionary-table-scroll',
                     [
                       div(
-                        classes:
-                            'dictionary-table-row dictionary-table-header',
+                        classes: 'dictionary-table-row dictionary-table-header',
                         [
                           div([
                             .text('#'),
@@ -269,9 +265,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                             setState(() {
                               final next = visibleCount + 100;
 
-                              visibleCount = next > entries.length
-                                  ? entries.length
-                                  : next;
+                              visibleCount = next > entries.length ? entries.length : next;
                             });
                           },
                           [
@@ -293,279 +287,265 @@ class _DictionaryPageState extends State<DictionaryPage> {
   }
 
   Future<void> _saveEntry(
-  DictionaryEntryDetail detail,
-) async {
-  final entryId = detail.entry.id;
+    DictionaryEntryDetail detail,
+  ) async {
+    final entryId = detail.entry.id;
 
-  if (entryId == null) {
-    return;
-  }
-
-  setState(() {
-    savingEntryIds.add(entryId);
-    savedEntryIds.remove(entryId);
-    saveErrors.remove(entryId);
-  });
-
-  try {
-    await studioClient.dictionary.updateEntryRow(
-      entryId: entryId,
-      headword:
-          editedHeadwords[entryId] ??
-          detail.entry.text,
-      nomText:
-          editedNomTexts[entryId] ??
-          _form(detail, 'nom'),
-      chineseGloss:
-          editedChineseGlosses[entryId] ??
-          _definition(detail, 'zh'),
-      partOfSpeech:
-          editedPartsOfSpeech[entryId] ??
-          detail.entry.partOfSpeech ??
-          '',
-      vietnameseExample:
-          editedVietnameseExamples[entryId] ??
-          _example(
-            detail,
-            languageCode: 'vi',
-            scriptCode: 'latn',
-          ),
-      nomExample:
-          editedNomExamples[entryId] ??
-          _example(
-            detail,
-            languageCode: 'vi',
-            scriptCode: 'nom',
-          ),
-      chineseExample:
-          editedChineseExamples[entryId] ??
-          _example(
-            detail,
-            languageCode: 'zh',
-            scriptCode: 'hans',
-          ),
-    );
-
-    if (!mounted) {
+    if (entryId == null) {
       return;
     }
 
     setState(() {
-      savingEntryIds.remove(entryId);
-      savedEntryIds.add(entryId);
+      savingEntryIds.add(entryId);
+      savedEntryIds.remove(entryId);
+      saveErrors.remove(entryId);
     });
-  } catch (e) {
-    if (!mounted) {
-      return;
-    }
 
-    setState(() {
-      savingEntryIds.remove(entryId);
-      saveErrors[entryId] = e.toString();
-    });
+    try {
+      await studioClient.dictionary.updateEntryRow(
+        entryId: entryId,
+        headword: editedHeadwords[entryId] ?? detail.entry.text,
+        nomText: editedNomTexts[entryId] ?? _form(detail, 'nom'),
+        chineseGloss: editedChineseGlosses[entryId] ?? _definition(detail, 'zh'),
+        partOfSpeech: editedPartsOfSpeech[entryId] ?? detail.entry.partOfSpeech ?? '',
+        vietnameseExample:
+            editedVietnameseExamples[entryId] ??
+            _example(
+              detail,
+              languageCode: 'vi',
+              scriptCode: 'latn',
+            ),
+        nomExample:
+            editedNomExamples[entryId] ??
+            _example(
+              detail,
+              languageCode: 'vi',
+              scriptCode: 'nom',
+            ),
+        chineseExample:
+            editedChineseExamples[entryId] ??
+            _example(
+              detail,
+              languageCode: 'zh',
+              scriptCode: 'hans',
+            ),
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        savingEntryIds.remove(entryId);
+        savedEntryIds.add(entryId);
+      });
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        savingEntryIds.remove(entryId);
+        saveErrors[entryId] = e.toString();
+      });
+    }
   }
-}
 
   Component _buildRow(
-  int index,
-  DictionaryEntryDetail detail,
-) {
-  final entryId = detail.entry.id;
+    int index,
+    DictionaryEntryDetail detail,
+  ) {
+    final entryId = detail.entry.id;
 
-  if (entryId == null) {
-    return div([]);
-  }
+    if (entryId == null) {
+      return div([]);
+    }
 
-  final headword =
-      editedHeadwords[entryId] ??
-      detail.entry.text;
+    final headword = editedHeadwords[entryId] ?? detail.entry.text;
 
-  final nomText =
-      editedNomTexts[entryId] ??
-      _form(
-        detail,
-        'nom',
-      );
+    final nomText =
+        editedNomTexts[entryId] ??
+        _form(
+          detail,
+          'nom',
+        );
 
-  final chineseGloss =
-      editedChineseGlosses[entryId] ??
-      _definition(
-        detail,
-        'zh',
-      );
+    final chineseGloss =
+        editedChineseGlosses[entryId] ??
+        _definition(
+          detail,
+          'zh',
+        );
 
-  final partOfSpeech =
-      editedPartsOfSpeech[entryId] ??
-      detail.entry.partOfSpeech ??
-      '';
+    final partOfSpeech = editedPartsOfSpeech[entryId] ?? detail.entry.partOfSpeech ?? '';
 
-  final vietnameseExample =
-      editedVietnameseExamples[entryId] ??
-      _example(
-        detail,
-        languageCode: 'vi',
-        scriptCode: 'latn',
-      );
+    final vietnameseExample =
+        editedVietnameseExamples[entryId] ??
+        _example(
+          detail,
+          languageCode: 'vi',
+          scriptCode: 'latn',
+        );
 
-  final nomExample =
-      editedNomExamples[entryId] ??
-      _example(
-        detail,
-        languageCode: 'vi',
-        scriptCode: 'nom',
-      );
+    final nomExample =
+        editedNomExamples[entryId] ??
+        _example(
+          detail,
+          languageCode: 'vi',
+          scriptCode: 'nom',
+        );
 
-  final chineseExample =
-      editedChineseExamples[entryId] ??
-      _example(
-        detail,
-        languageCode: 'zh',
-        scriptCode: 'hans',
-      );
+    final chineseExample =
+        editedChineseExamples[entryId] ??
+        _example(
+          detail,
+          languageCode: 'zh',
+          scriptCode: 'hans',
+        );
 
-  return div(
-    classes: 'dictionary-table-row',
-    [
-      div(
-        [
-          span([
-            .text('${index + 1}'),
-          ]),
-          button(
-            classes: 'dictionary-save-button',
-            attributes: savingEntryIds.contains(entryId)
-                ? {
-                    'disabled': 'disabled',
-                  }
-                : null,
-            onClick: () {
-              _saveEntry(detail);
-            },
-            [
-              .text(
-                savingEntryIds.contains(entryId)
-                    ? '保存中'
-                    : savedEntryIds.contains(entryId)
-                    ? '✓'
-                    : '保存',
-              ),
-            ],
-          ),
-          if (saveErrors[entryId] != null)
-            span(
-              classes: 'dictionary-save-error',
+    return div(
+      classes: 'dictionary-table-row',
+      [
+        div(
+          [
+            span([
+              .text('${index + 1}'),
+            ]),
+            button(
+              classes: 'dictionary-save-button',
+              attributes: savingEntryIds.contains(entryId)
+                  ? {
+                      'disabled': 'disabled',
+                    }
+                  : null,
+              onClick: () {
+                _saveEntry(detail);
+              },
               [
-                .text('!'),
+                .text(
+                  savingEntryIds.contains(entryId)
+                      ? '保存中'
+                      : savedEntryIds.contains(entryId)
+                      ? '✓'
+                      : '保存',
+                ),
               ],
             ),
-        ],
-      ),
-
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': headword,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedHeadwords[entryId] = value;
-              savedEntryIds.remove(entryId);
-            },
-          ),
+            if (saveErrors[entryId] != null)
+              span(
+                classes: 'dictionary-save-error',
+                [
+                  .text('!'),
+                ],
+              ),
+          ],
         ),
-      ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': nomText,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedNomTexts[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': headword,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedHeadwords[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
+        ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': chineseGloss,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedChineseGlosses[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': nomText,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedNomTexts[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
+        ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': partOfSpeech,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedPartsOfSpeech[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': chineseGloss,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedChineseGlosses[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
+        ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': vietnameseExample,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedVietnameseExamples[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': partOfSpeech,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedPartsOfSpeech[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
+        ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': nomExample,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedNomExamples[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': vietnameseExample,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedVietnameseExamples[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
+        ]),
 
-      div([
-        input<String>(
-          type: InputType.text,
-          attributes: {
-            'value': chineseExample,
-          },
-          events: events<String>(
-            onInput: (value) {
-              editedChineseExamples[entryId] = value;
-              savedEntryIds.remove(entryId);
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': nomExample,
             },
+            events: events<String>(
+              onInput: (value) {
+                editedNomExamples[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
           ),
-        ),
-      ]),
-    ],
-  );
-}
+        ]),
+
+        div([
+          input<String>(
+            type: InputType.text,
+            attributes: {
+              'value': chineseExample,
+            },
+            events: events<String>(
+              onInput: (value) {
+                editedChineseExamples[entryId] = value;
+                savedEntryIds.remove(entryId);
+              },
+            ),
+          ),
+        ]),
+      ],
+    );
+  }
 }

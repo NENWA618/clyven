@@ -148,9 +148,7 @@ class StudioShell extends StatelessComponent {
     required String icon,
     required String label,
   }) {
-    final active = path == '/'
-        ? activePath == '/'
-        : activePath == path || activePath.startsWith('$path/');
+    final active = path == '/' ? activePath == '/' : activePath == path || activePath.startsWith('$path/');
 
     return div(
       classes: 'studio-nav-item${active ? ' active' : ''}',

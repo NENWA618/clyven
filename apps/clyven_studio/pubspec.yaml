@@ -18,6 +18,8 @@ dependencies:
       ref: main
   clyven_backend_client:
     path: ../../packages/clyven_backend_client
+  clyven_subtitle_editor:
+    path: ../../packages/clyven_subtitle_editor
   serverpod_client: 3.4.11
   serverpod_auth_core_client: 3.4.11
 

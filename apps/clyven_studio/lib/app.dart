@@ -6,11 +6,12 @@ import 'components/studio_shell.dart';
 import 'components/studio_auth_gate.dart';
 import 'pages/dictionary/dictionary_import_page.dart';
 import 'pages/subtitles/subtitles_page.dart';
-import 'pages/subtitles/subtitle_editor_page.dart';
+import 'package:clyven_subtitle_editor/clyven_subtitle_editor.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/dictionary_page.dart';
 import 'pages/home.dart';
 import 'pages/placeholder_page.dart';
+import 'services/studio_client.dart';
 
 class App extends StatelessComponent {
   const App({super.key});
@@ -73,6 +74,7 @@ class App extends StatelessComponent {
                     }
 
                     return SubtitleEditorPage(
+                      client: studioClient,
                       videoId: videoId,
                       languageCode: languageCode,
                       scriptCode: scriptCode,
@@ -96,6 +98,7 @@ class App extends StatelessComponent {
                     }
 
                     return SubtitleEditorPage(
+                      client: studioClient,
                       videoId: videoId,
                       languageCode: languageCode,
                     );

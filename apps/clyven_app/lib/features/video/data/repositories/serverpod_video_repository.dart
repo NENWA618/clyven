@@ -65,6 +65,7 @@ class ServerpodVideoRepository implements VideoRepository {
       title: draft.title,
       description: draft.description,
       category: draft.category,
+      languageCode: 'auto',
       tags: const [],
       videoStorageKey: videoStorageKey,
       coverStorageKey: coverStorageKey,

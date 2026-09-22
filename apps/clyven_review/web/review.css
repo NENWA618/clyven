@@ -1,0 +1,517 @@
+
+.review-queue-page,
+.review-task-page {
+  display: grid;
+  gap: 20px;
+}
+
+.review-hero,
+.review-workflow-card,
+.review-history {
+  background: #fff;
+  border: 1px solid #e7e9ee;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.review-hero,
+.review-workflow-title,
+.review-task-card-top,
+.review-task-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.review-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.review-hero h1,
+.review-workflow-card h1 {
+  margin: 0;
+}
+
+.review-current-staff,
+.review-workflow-credits {
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.review-current-staff span,
+.review-workflow-credits span,
+.review-credit-lines span {
+  font-size: 12px;
+  opacity: .62;
+}
+
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.review-stat {
+  background: #fff;
+  border: 1px solid #e7e9ee;
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.review-stat strong {
+  font-size: 28px;
+}
+
+.review-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.review-tab,
+.review-refresh,
+.review-primary-button,
+.review-secondary-button {
+  border: 1px solid #dfe2e8;
+  border-radius: 10px;
+  padding: 9px 13px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.review-tab {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.review-tab.is-active,
+.review-primary-button {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.review-task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.review-task-card {
+  background: #fff;
+  border: 1px solid #e7e9ee;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.review-task-card h3 {
+  margin: 14px 0 5px;
+}
+
+.review-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.review-language-badge,
+.review-script-badge,
+.review-status-badge,
+.review-task-id {
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #f1f3f7;
+}
+
+.review-task-meta {
+  margin-top: 0;
+  opacity: .65;
+}
+
+.review-credit-lines {
+  border-top: 1px solid #eef0f4;
+  border-bottom: 1px solid #eef0f4;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.review-credit-lines div,
+.review-workflow-credits div {
+  display: grid;
+  gap: 2px;
+}
+
+.review-task-actions {
+  margin-top: 14px;
+}
+
+.review-empty,
+.review-error {
+  padding: 22px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e7e9ee;
+}
+
+.review-error {
+  border-color: #efb4b4;
+}
+
+.review-page-note {
+  opacity: .55;
+  font-size: 12px;
+}
+
+.review-task-toolbar {
+  align-items: center;
+}
+
+.review-task-toolbar-copy {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.review-back {
+  font-weight: 700;
+}
+
+.review-workflow-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.review-return-note {
+  min-width: 220px;
+  border: 1px solid #dfe2e8;
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+
+.review-history h2 {
+  margin-top: 0;
+}
+
+.review-history-list {
+  display: grid;
+}
+
+.review-history-row {
+  display: grid;
+  grid-template-columns: 150px 180px 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #eef0f4;
+}
+
+.review-history-row em {
+  grid-column: 3;
+}
+
+.review-published-message,
+.review-completed-note {
+  font-size: 13px;
+  opacity: .68;
+}
+
+@media (max-width: 900px) {
+  .review-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-hero,
+  .review-workflow-title {
+    display: grid;
+  }
+
+  .review-history-row {
+    grid-template-columns: 1fr;
+  }
+
+  .review-history-row em {
+    grid-column: auto;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Clyven Review themes                                                       */
+/* -------------------------------------------------------------------------- */
+
+:root,
+html[data-review-theme='light'] {
+  --review-bg: #f4f6f9;
+  --review-surface: #ffffff;
+  --review-surface-2: #f8fafc;
+  --review-surface-3: #eef2f7;
+  --review-text: #111827;
+  --review-text-soft: #64748b;
+  --review-border: #dfe4ea;
+  --review-sidebar: #ffffff;
+  --review-sidebar-text: #111827;
+  --review-sidebar-soft: #64748b;
+  --review-accent: #2563eb;
+  --review-accent-contrast: #ffffff;
+  --review-danger-bg: #fff4f4;
+  --review-danger-border: #f0b6b6;
+  --review-shadow: 0 8px 24px rgba(15, 23, 42, .07);
+}
+
+html[data-review-theme='dark'] {
+  --review-bg: #090d13;
+  --review-surface: #111720;
+  --review-surface-2: #171e29;
+  --review-surface-3: #202938;
+  --review-text: #edf3fb;
+  --review-text-soft: #9eabbc;
+  --review-border: #283241;
+  --review-sidebar: #05080d;
+  --review-sidebar-text: #edf3fb;
+  --review-sidebar-soft: #8795a8;
+  --review-accent: #3b82f6;
+  --review-accent-contrast: #ffffff;
+  --review-danger-bg: #251719;
+  --review-danger-border: #704047;
+  --review-shadow: 0 10px 28px rgba(0, 0, 0, .28);
+}
+
+html,
+body {
+  background: var(--review-bg);
+  color: var(--review-text);
+}
+
+.review-shell,
+.review-main,
+.review-content {
+  background: var(--review-bg) !important;
+  color: var(--review-text) !important;
+}
+
+.review-sidebar,
+.clyven-admin-sidebar {
+  background: var(--review-sidebar) !important;
+  color: var(--review-sidebar-text) !important;
+  border-color: var(--review-border) !important;
+}
+
+.clyven-admin-brand strong,
+.clyven-admin-sidebar strong,
+.clyven-admin-sidebar span {
+  color: inherit;
+}
+
+.clyven-admin-brand span {
+  color: var(--review-sidebar-soft) !important;
+}
+
+.clyven-admin-nav-item {
+  color: var(--review-sidebar-soft) !important;
+  border-color: transparent !important;
+}
+
+.clyven-admin-nav-item:hover {
+  background: var(--review-surface-2) !important;
+  color: var(--review-sidebar-text) !important;
+}
+
+.clyven-admin-nav-item.is-active {
+  background: var(--review-surface-3) !important;
+  color: var(--review-sidebar-text) !important;
+  border-color: var(--review-border) !important;
+}
+
+.review-topbar,
+.clyven-admin-topbar {
+  background: var(--review-bg) !important;
+  color: var(--review-text) !important;
+  border-color: var(--review-border) !important;
+}
+
+.clyven-admin-kicker {
+  color: var(--review-text-soft) !important;
+}
+
+.clyven-admin-topbar h1 {
+  color: var(--review-text) !important;
+}
+
+.review-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--review-border);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: var(--review-surface);
+  color: var(--review-text);
+  cursor: pointer;
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    transform .16s ease;
+}
+
+.review-theme-toggle:hover {
+  background: var(--review-surface-2);
+  transform: translateY(-1px);
+}
+
+.review-theme-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.clyven-admin-scope-badge {
+  background: color-mix(in srgb, var(--review-accent) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--review-accent) 55%, transparent) !important;
+  color: var(--review-accent) !important;
+}
+
+.review-hero,
+.review-workflow-card,
+.review-history,
+.review-stat,
+.review-task-card,
+.review-empty,
+.review-error {
+  background: var(--review-surface) !important;
+  color: var(--review-text) !important;
+  border-color: var(--review-border) !important;
+  box-shadow: var(--review-shadow);
+}
+
+.review-hero p,
+.review-task-meta,
+.review-page-note,
+.review-current-staff span,
+.review-workflow-credits span,
+.review-credit-lines span,
+.review-completed-note,
+.review-published-message {
+  color: var(--review-text-soft) !important;
+  opacity: 1 !important;
+}
+
+.review-hero h1,
+.review-workflow-card h1,
+.review-task-card h3,
+.review-history h2,
+.review-current-staff strong,
+.review-stat strong,
+.review-credit-lines strong,
+.review-workflow-credits strong {
+  color: var(--review-text) !important;
+}
+
+.review-tab,
+.review-refresh,
+.review-secondary-button,
+.review-return-note {
+  background: var(--review-surface) !important;
+  color: var(--review-text) !important;
+  border-color: var(--review-border) !important;
+}
+
+.review-tab:hover,
+.review-refresh:hover,
+.review-secondary-button:hover {
+  background: var(--review-surface-2) !important;
+}
+
+.review-tab.is-active,
+.review-primary-button {
+  background: var(--review-accent) !important;
+  color: var(--review-accent-contrast) !important;
+  border-color: var(--review-accent) !important;
+}
+
+.review-language-badge,
+.review-script-badge,
+.review-status-badge,
+.review-task-id {
+  background: var(--review-surface-3) !important;
+  color: var(--review-text) !important;
+}
+
+.review-credit-lines,
+.review-history-row {
+  border-color: var(--review-border) !important;
+}
+
+.review-return-note::placeholder {
+  color: var(--review-text-soft);
+}
+
+.review-error {
+  background: var(--review-danger-bg) !important;
+  border-color: var(--review-danger-border) !important;
+}
+
+.review-back,
+.review-back:visited {
+  color: var(--review-accent) !important;
+}
+
+.review-task-toolbar,
+.review-task-toolbar-copy,
+.review-history-row,
+.review-workflow-actions {
+  color: var(--review-text);
+}
+
+/* Shared subtitle editor inherits the Review theme while it is mounted here. */
+.review-content .subtitle-editor-page,
+.review-content .subtitle-editor-shell,
+.review-content .subtitle-editor-main,
+.review-content .subtitle-editor-panel,
+.review-content .subtitle-toolbar,
+.review-content .subtitle-cue-list,
+.review-content .subtitle-cue-row,
+.review-content .subtitle-video-panel {
+  background: var(--review-surface) !important;
+  color: var(--review-text) !important;
+  border-color: var(--review-border) !important;
+}
+
+.review-content input,
+.review-content textarea,
+.review-content select {
+  background: var(--review-surface-2);
+  color: var(--review-text);
+  border-color: var(--review-border);
+}
+
+.review-content input::placeholder,
+.review-content textarea::placeholder {
+  color: var(--review-text-soft);
+}
+
+@media (max-width: 720px) {
+  .review-theme-toggle span:last-child {
+    display: none;
+  }
+
+  .review-theme-toggle {
+    padding: 8px 10px;
+  }
+}

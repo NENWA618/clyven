@@ -19,19 +19,22 @@ import '../endpoints/comment_endpoint.dart' as _i6;
 import '../endpoints/dictionary_endpoint.dart' as _i7;
 import '../endpoints/dictionary_import_endpoint.dart' as _i8;
 import '../endpoints/known_entry_endpoint.dart' as _i9;
-import '../endpoints/subtitle_endpoint.dart' as _i10;
-import '../endpoints/video_endpoint.dart' as _i11;
-import '../endpoints/word_list_endpoint.dart' as _i12;
-import '../greetings/greeting_endpoint.dart' as _i13;
-import 'dart:typed_data' as _i14;
-import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
-    as _i15;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+import '../endpoints/review_endpoint.dart' as _i10;
+import '../endpoints/subtitle_endpoint.dart' as _i11;
+import '../endpoints/video_endpoint.dart' as _i12;
+import '../endpoints/word_list_endpoint.dart' as _i13;
+import '../greetings/greeting_endpoint.dart' as _i14;
+import 'dart:typed_data' as _i15;
+import 'package:clyven_backend_server/src/generated/asr_job_status.dart'
     as _i16;
-import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
     as _i17;
-import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
     as _i18;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _i19;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _i20;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -85,25 +88,31 @@ class Endpoints extends _i1.EndpointDispatch {
           'knownEntry',
           null,
         ),
-      'subtitle': _i10.SubtitleEndpoint()
+      'review': _i10.ReviewEndpoint()
+        ..initialize(
+          server,
+          'review',
+          null,
+        ),
+      'subtitle': _i11.SubtitleEndpoint()
         ..initialize(
           server,
           'subtitle',
           null,
         ),
-      'video': _i11.VideoEndpoint()
+      'video': _i12.VideoEndpoint()
         ..initialize(
           server,
           'video',
           null,
         ),
-      'wordList': _i12.WordListEndpoint()
+      'wordList': _i13.WordListEndpoint()
         ..initialize(
           server,
           'wordList',
           null,
         ),
-      'greeting': _i13.GreetingEndpoint()
+      'greeting': _i14.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -334,7 +343,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'image': _i1.ParameterDescription(
               name: 'image',
-              type: _i1.getType<_i14.ByteData>(),
+              type: _i1.getType<_i15.ByteData>(),
               nullable: false,
             ),
           },
@@ -425,6 +434,49 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['admin'] as _i5.AdminEndpoint)
                   .getUserEmails(session),
+        ),
+        'getAsrJobs': _i1.MethodConnector(
+          name: 'getAsrJobs',
+          params: {
+            'status': _i1.ParameterDescription(
+              name: 'status',
+              type: _i1.getType<_i16.AsrJobStatus?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['admin'] as _i5.AdminEndpoint).getAsrJobs(
+                session,
+                status: params['status'],
+              ),
+        ),
+        'retryVideoAsr': _i1.MethodConnector(
+          name: 'retryVideoAsr',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['admin'] as _i5.AdminEndpoint).retryVideoAsr(
+                    session,
+                    videoId: params['videoId'],
+                    languageCode: params['languageCode'],
+                  ),
         ),
         'getAllVideos': _i1.MethodConnector(
           name: 'getAllVideos',
@@ -1033,7 +1085,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'queries': _i1.ParameterDescription(
               name: 'queries',
-              type: _i1.getType<List<_i15.KnowledgeStateQuery>>(),
+              type: _i1.getType<List<_i17.KnowledgeStateQuery>>(),
               nullable: false,
             ),
           },
@@ -1045,6 +1097,159 @@ class Endpoints extends _i1.EndpointDispatch {
                   .getKnowledgeStates(
                     session,
                     queries: params['queries'],
+                  ),
+        ),
+      },
+    );
+    connectors['review'] = _i1.EndpointConnector(
+      name: 'review',
+      endpoint: endpoints['review']!,
+      methodConnectors: {
+        'getDashboard': _i1.MethodConnector(
+          name: 'getDashboard',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['review'] as _i10.ReviewEndpoint)
+                  .getDashboard(session),
+        ),
+        'getTaskDetail': _i1.MethodConnector(
+          name: 'getTaskDetail',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['review'] as _i10.ReviewEndpoint).getTaskDetail(
+                    session,
+                    taskId: params['taskId'],
+                  ),
+        ),
+        'generateVietnameseNomDraft': _i1.MethodConnector(
+          name: 'generateVietnameseNomDraft',
+          params: {
+            'trackId': _i1.ParameterDescription(
+              name: 'trackId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['review'] as _i10.ReviewEndpoint)
+                  .generateVietnameseNomDraft(
+                    session,
+                    trackId: params['trackId'],
+                  ),
+        ),
+        'claimTask': _i1.MethodConnector(
+          name: 'claimTask',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['review'] as _i10.ReviewEndpoint).claimTask(
+                session,
+                taskId: params['taskId'],
+              ),
+        ),
+        'startTask': _i1.MethodConnector(
+          name: 'startTask',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['review'] as _i10.ReviewEndpoint).startTask(
+                session,
+                taskId: params['taskId'],
+              ),
+        ),
+        'submitTask': _i1.MethodConnector(
+          name: 'submitTask',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['review'] as _i10.ReviewEndpoint).submitTask(
+                    session,
+                    taskId: params['taskId'],
+                  ),
+        ),
+        'returnTask': _i1.MethodConnector(
+          name: 'returnTask',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'note': _i1.ParameterDescription(
+              name: 'note',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['review'] as _i10.ReviewEndpoint).returnTask(
+                    session,
+                    taskId: params['taskId'],
+                    note: params['note'],
+                  ),
+        ),
+        'approveAndPublish': _i1.MethodConnector(
+          name: 'approveAndPublish',
+          params: {
+            'taskId': _i1.ParameterDescription(
+              name: 'taskId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['review'] as _i10.ReviewEndpoint)
+                  .approveAndPublish(
+                    session,
+                    taskId: params['taskId'],
                   ),
         ),
       },
@@ -1076,7 +1281,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .getCueDetails(
                     session,
                     videoId: params['videoId'],
@@ -1107,7 +1312,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .getPublishedCueDetails(
                     session,
                     videoId: params['videoId'],
@@ -1128,7 +1333,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .getPublishedAvailableTracks(
                     session,
                     videoId: params['videoId'],
@@ -1152,7 +1357,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .getSubtitlePublishStatus(
                     session,
                     videoId: params['videoId'],
@@ -1177,7 +1382,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .publishSubtitleTrack(
                     session,
                     videoId: params['videoId'],
@@ -1197,7 +1402,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .getAvailableTracks(
                     session,
                     videoId: params['videoId'],
@@ -1226,7 +1431,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .previewSrtImport(
                     session,
                     videoId: params['videoId'],
@@ -1262,7 +1467,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .confirmReplaceSrtImport(
                     session,
                     videoId: params['videoId'],
@@ -1290,7 +1495,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['subtitle'] as _i10.SubtitleEndpoint).exportSrt(
+                  (endpoints['subtitle'] as _i11.SubtitleEndpoint).exportSrt(
                     session,
                     videoId: params['videoId'],
                     languageCode: params['languageCode'],
@@ -1319,7 +1524,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .updateCueText(
                     session,
                     cueId: params['cueId'],
@@ -1355,7 +1560,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .upsertCueScriptText(
                     session,
                     cueId: params['cueId'],
@@ -1387,7 +1592,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .updateCueTiming(
                     session,
                     cueId: params['cueId'],
@@ -1434,7 +1639,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['subtitle'] as _i10.SubtitleEndpoint).createCue(
+                  (endpoints['subtitle'] as _i11.SubtitleEndpoint).createCue(
                     session,
                     videoId: params['videoId'],
                     languageCode: params['languageCode'],
@@ -1458,7 +1663,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['subtitle'] as _i10.SubtitleEndpoint).deleteCue(
+                  (endpoints['subtitle'] as _i11.SubtitleEndpoint).deleteCue(
                     session,
                     cueId: params['cueId'],
                   ),
@@ -1473,7 +1678,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'segments': _i1.ParameterDescription(
               name: 'segments',
-              type: _i1.getType<List<_i16.SubtitleKaraokeSegmentInput>>(),
+              type: _i1.getType<List<_i18.SubtitleKaraokeSegmentInput>>(),
               nullable: false,
             ),
             'scriptCode': _i1.ParameterDescription(
@@ -1486,7 +1691,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i10.SubtitleEndpoint)
+              ) async => (endpoints['subtitle'] as _i11.SubtitleEndpoint)
                   .replaceKaraokeSegments(
                     session,
                     cueId: params['cueId'],
@@ -1528,6 +1733,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'tags': _i1.ParameterDescription(
               name: 'tags',
               type: _i1.getType<List<String>>(),
@@ -1553,13 +1763,14 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['video'] as _i11.VideoEndpoint).create(
+              ) async => (endpoints['video'] as _i12.VideoEndpoint).create(
                 session,
                 authorId: params['authorId'],
                 authorName: params['authorName'],
                 title: params['title'],
                 description: params['description'],
                 category: params['category'],
+                languageCode: params['languageCode'],
                 tags: params['tags'],
                 videoStorageKey: params['videoStorageKey'],
                 coverStorageKey: params['coverStorageKey'],
@@ -1574,7 +1785,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['video'] as _i11.VideoEndpoint).getVideos(session),
+                  (endpoints['video'] as _i12.VideoEndpoint).getVideos(session),
         ),
         'getMyVideos': _i1.MethodConnector(
           name: 'getMyVideos',
@@ -1583,7 +1794,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['video'] as _i11.VideoEndpoint).getMyVideos(
+              ) async => (endpoints['video'] as _i12.VideoEndpoint).getMyVideos(
                 session,
               ),
         ),
@@ -1600,7 +1811,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['video'] as _i11.VideoEndpoint).getVideo(
+              ) async => (endpoints['video'] as _i12.VideoEndpoint).getVideo(
                 session,
                 params['id'],
               ),
@@ -1623,7 +1834,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['video'] as _i11.VideoEndpoint)
+              ) async => (endpoints['video'] as _i12.VideoEndpoint)
                   .createUploadDescription(
                     session,
                     path: params['path'],
@@ -1644,7 +1855,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['video'] as _i11.VideoEndpoint).verifyUpload(
+                  (endpoints['video'] as _i12.VideoEndpoint).verifyUpload(
                     session,
                     path: params['path'],
                   ),
@@ -1662,7 +1873,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['video'] as _i11.VideoEndpoint).getVideoUrl(
+              ) async => (endpoints['video'] as _i12.VideoEndpoint).getVideoUrl(
                 session,
                 path: params['path'],
               ),
@@ -1680,7 +1891,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['wordList'] as _i12.WordListEndpoint)
+              ) async => (endpoints['wordList'] as _i13.WordListEndpoint)
                   .getLists(session),
         ),
         'getListDetail': _i1.MethodConnector(
@@ -1701,7 +1912,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['wordList'] as _i12.WordListEndpoint)
+              ) async => (endpoints['wordList'] as _i13.WordListEndpoint)
                   .getListDetail(
                     session,
                     listId: params['listId'],
@@ -1727,16 +1938,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i13.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i14.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i17.Endpoints()
+    modules['serverpod_auth_idp'] = _i19.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i18.Endpoints()
+    modules['serverpod_auth_core'] = _i20.Endpoints()
       ..initializeEndpoints(server);
   }
 }

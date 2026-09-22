@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import '../services/asr_job_processor.dart';
 
 class VideoEndpoint extends Endpoint {
   String _requireUserId(Session session) {
@@ -38,6 +39,7 @@ class VideoEndpoint extends Endpoint {
     required String title,
     required String description,
     required String category,
+    required String languageCode,
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
@@ -53,6 +55,7 @@ class VideoEndpoint extends Endpoint {
       title: title,
       description: description,
       category: category,
+      languageCode: languageCode,
       tags: tags,
       videoStorageKey: videoStorageKey,
       coverStorageKey: coverStorageKey,
@@ -67,7 +70,38 @@ class VideoEndpoint extends Endpoint {
       updatedAt: now,
     );
 
-    return Video.db.insertRow(session, video);
+    final savedVideo = await Video.db.insertRow(
+      session,
+      video,
+    );
+
+    if (savedVideo.id == null) {
+      throw Exception('视频创建成功，但没有取得 video id');
+    }
+
+    final asrJob = await AsrJob.db.insertRow(
+      session,
+      AsrJob(
+        videoId: savedVideo.id!,
+        requestedLanguageCode: languageCode,
+        detectedLanguageCode: null,
+        provider: 'deepgram',
+        status: AsrJobStatus.queued,
+        trackId: null,
+        errorMessage: null,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+
+    if (asrJob.id != null) {
+      await const AsrJobProcessor().process(
+        session,
+        asrJob.id!,
+      );
+    }
+
+    return savedVideo;
   }
 
   Future<List<Video>> getVideos(Session session) async {

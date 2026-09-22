@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
 import '../generated/protocol.dart';
+import '../services/asr_job_processor.dart';
 
 class AdminEndpoint extends Endpoint {
   @override
@@ -37,6 +38,80 @@ class AdminEndpoint extends Endpoint {
     }
 
     return emails;
+  }
+
+  Future<List<AsrJob>> getAsrJobs(
+    Session session, {
+    AsrJobStatus? status,
+  }) async {
+    if (status == null) {
+      return AsrJob.db.find(
+        session,
+        orderBy: (job) => job.createdAt,
+        orderDescending: true,
+      );
+    }
+
+    return AsrJob.db.find(
+      session,
+      where: (job) => job.status.equals(status),
+      orderBy: (job) => job.createdAt,
+      orderDescending: true,
+    );
+  }
+
+  Future<AsrJob> retryVideoAsr(
+    Session session, {
+    required int videoId,
+    required String languageCode,
+  }) async {
+    final video = await Video.db.findById(
+      session,
+      videoId,
+    );
+
+    if (video == null) {
+      throw Exception('找不到视频');
+    }
+
+    final normalizedLanguage = languageCode.trim();
+
+    if (normalizedLanguage.isEmpty) {
+      throw Exception('languageCode 不能为空');
+    }
+
+    final now = DateTime.now();
+
+    final job = await AsrJob.db.insertRow(
+      session,
+      AsrJob(
+        videoId: videoId,
+        requestedLanguageCode: normalizedLanguage,
+        detectedLanguageCode: null,
+        provider: 'deepgram',
+        status: AsrJobStatus.queued,
+        trackId: null,
+        errorMessage: null,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
+
+    if (job.id == null) {
+      throw Exception('无法创建 ASR 任务');
+    }
+
+    await const AsrJobProcessor().process(
+      session,
+      job.id!,
+    );
+
+    final completedJob = await AsrJob.db.findById(
+      session,
+      job.id!,
+    );
+
+    return completedJob ?? job;
   }
 
   Future<List<Video>> getAllVideos(Session session) async {

@@ -18,6 +18,8 @@ userProfileEdit:
 admin:
   - ping:
   - getUserEmails:
+  - getAsrJobs:
+  - retryVideoAsr:
   - getAllVideos:
   - getVideosWithSubtitles:
   - getSubtitleTracks:
@@ -45,6 +47,15 @@ knownEntry:
   - getKnowledgeStatesByEntryIds:
   - getKnowledgeState:
   - getKnowledgeStates:
+review:
+  - getDashboard:
+  - getTaskDetail:
+  - generateVietnameseNomDraft:
+  - claimTask:
+  - startTask:
+  - submitTask:
+  - returnTask:
+  - approveAndPublish:
 subtitle:
   - getCueDetails:
   - getPublishedCueDetails:
