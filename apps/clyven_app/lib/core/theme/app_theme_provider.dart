@@ -89,7 +89,7 @@ class AppThemeNotifier extends Notifier<ClyvenThemeSettings> {
         return color;
       }
     }
-    return ClyvenThemeColor.acid;
+    return ClyvenThemeColor.orange;
   }
 
   ClyvenDisplayMode _parseDisplayMode(String? value) {

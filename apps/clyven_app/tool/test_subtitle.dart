@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 Future<void> main() async {
@@ -15,12 +17,8 @@ Future<void> main() async {
   for (final detail in details) {
     print('Cue: ${detail.cue.text}');
 
-    print(
-      'Tokens: ${detail.tokens.map((e) => e.text).toList()}',
-    );
+    print('Tokens: ${detail.tokens.map((e) => e.text).toList()}');
 
-    print(
-      'Phrases: ${detail.phrases.map((e) => e.text).toList()}',
-    );
+    print('Phrases: ${detail.phrases.map((e) => e.text).toList()}');
   }
 }

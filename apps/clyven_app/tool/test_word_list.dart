@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 Future<void> main() async {
@@ -10,9 +12,7 @@ Future<void> main() async {
   print('Lists: ${lists.length}');
 
   for (final list in lists) {
-    print(
-      'List: ${list.id} | ${list.name} | ${list.languageCode}',
-    );
+    print('List: ${list.id} | ${list.name} | ${list.languageCode}');
   }
 
   final detail = await client.wordList.getListDetail(

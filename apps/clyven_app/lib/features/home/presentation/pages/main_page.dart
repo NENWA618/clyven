@@ -67,7 +67,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         onCreate: () async {
           final allowed = await requireLogin(context, ref);
 
-          if (!allowed || !mounted) {
+          if (!allowed || !context.mounted) {
             return;
           }
 

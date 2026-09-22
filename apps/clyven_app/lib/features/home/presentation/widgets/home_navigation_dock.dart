@@ -1,6 +1,8 @@
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
+import 'home_design_tokens.dart';
+
 class HomeNavigationDock extends StatelessWidget {
   final int selectedIndex;
   final int unreadCount;
@@ -18,27 +20,25 @@ class HomeNavigationDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    const brandBlue = Color(0xFF3478F6);
-    final dockBackground = dark
-        ? const Color(0xFF161B22)
-        : const Color(0xFFF7F9FC);
-    final dockBorder = dark ? const Color(0xFF273142) : const Color(0xFFE4EAF2);
+    final brandBlue = HomeDesignTokens.brandFor(context);
+    const dockBackground = Color(0xFF171715);
+    const dockBorder = Color(0xFF302E2A);
 
     return SafeArea(
       top: false,
       child: Container(
-        height: 78,
-        padding: const EdgeInsets.fromLTRB(10, 7, 10, 4),
+        height: 76,
+        margin: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
         decoration: BoxDecoration(
           color: dockBackground,
-          border: Border(top: BorderSide(color: dockBorder)),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: dockBorder),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x10000000),
-              blurRadius: 18,
-              offset: Offset(0, -5),
+              color: Colors.black.withValues(alpha: .24),
+              blurRadius: 32,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
@@ -53,8 +53,8 @@ class HomeNavigationDock extends StatelessWidget {
             ),
             _item(
               context,
-              icon: Icons.explore_rounded,
-              outlineIcon: Icons.explore_outlined,
+              icon: Icons.smart_display_rounded,
+              outlineIcon: Icons.smart_display_outlined,
               label: l10n.navDiscover,
               index: 1,
             ),
@@ -64,8 +64,8 @@ class HomeNavigationDock extends StatelessWidget {
                   onTap: onCreate,
                   customBorder: const CircleBorder(),
                   child: Container(
-                    width: 52,
-                    height: 52,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: brandBlue,
                       shape: BoxShape.circle,
@@ -79,7 +79,7 @@ class HomeNavigationDock extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.add_rounded,
-                      color: colors.onPrimary,
+                      color: Colors.white,
                       size: 31,
                     ),
                   ),
@@ -116,10 +116,9 @@ class HomeNavigationDock extends StatelessWidget {
     int badge = 0,
   }) {
     final colors = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    const brandBlue = Color(0xFF3478F6);
+    final brandBlue = HomeDesignTokens.brandFor(context);
     final selected = selectedIndex == index;
-    final inactive = dark ? const Color(0xFFAAB4C3) : const Color(0xFF667085);
+    const inactive = Color(0xFF9C978F);
 
     return Expanded(
       child: InkWell(
@@ -133,7 +132,7 @@ class HomeNavigationDock extends StatelessWidget {
               children: [
                 Icon(
                   selected ? icon : outlineIcon,
-                  size: 25,
+                  size: 24,
                   color: selected ? brandBlue : inactive,
                 ),
                 if (badge > 0)
@@ -170,7 +169,7 @@ class HomeNavigationDock extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: selected ? brandBlue : inactive,
-                fontSize: 9,
+                fontSize: 10,
                 fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
               ),
             ),

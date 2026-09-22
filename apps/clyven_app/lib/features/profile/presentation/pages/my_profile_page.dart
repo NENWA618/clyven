@@ -19,7 +19,7 @@ import 'package:clyven_app/features/video/presentation/controllers/global_video_
 class MyProfilePage extends ConsumerWidget {
   const MyProfilePage({super.key});
 
-  static const Color _ink = Color(0xFF161616);
+  static const Color _ink = Color(0xFF171714);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,20 +94,26 @@ class MyProfilePage extends ConsumerWidget {
           slivers: [
             SliverToBoxAdapter(child: _buildTopBar(context, l10n)),
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                ),
                 child: Row(
                   children: [
                     Container(
                       width: 82,
                       height: 82,
                       decoration: BoxDecoration(
-                        color: scheme.secondary,
-                        borderRadius: BorderRadius.circular(25),
+                        color: _ink,
+                        borderRadius: BorderRadius.circular(22),
                       ),
                       child: Icon(
                         Icons.person_outline_rounded,
-                        color: scheme.onSecondary,
+                        color: const Color(0xFFD49A6A),
                         size: 34,
                       ),
                     ),
@@ -264,7 +270,7 @@ class MyProfilePage extends ConsumerWidget {
     final isDark = scheme.brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 16, 10),
+      padding: const EdgeInsets.fromLTRB(20, 20, 16, 12),
       child: Row(
         children: [
           Expanded(
@@ -274,8 +280,8 @@ class MyProfilePage extends ConsumerWidget {
                 Text(
                   l10n.profileEyebrow,
                   style: TextStyle(
-                    color: scheme.secondary,
-                    fontSize: 9,
+                    color: scheme.primary,
+                    fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                   ),
@@ -285,8 +291,10 @@ class MyProfilePage extends ConsumerWidget {
                   l10n.navProfile,
                   style: TextStyle(
                     color: scheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 30,
+                    height: 1.05,
+                    letterSpacing: -.8,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
@@ -309,12 +317,10 @@ class MyProfilePage extends ConsumerWidget {
               height: 42,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF222222)
-                    : Colors.white.withValues(alpha: 0.72),
+                    ? const Color(0xFF191918)
+                    : const Color(0xFFF9F7F2),
                 borderRadius: BorderRadius.circular(14),
-                border: isDark
-                    ? Border.all(color: const Color(0xFF383838))
-                    : null,
+                border: Border.all(color: scheme.outlineVariant),
               ),
               child: const Icon(Icons.settings_outlined, size: 20),
             ),
@@ -327,8 +333,14 @@ class MyProfilePage extends ConsumerWidget {
   Widget _buildIdentity(BuildContext context, UserProfile profile) {
     final scheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -337,7 +349,7 @@ class MyProfilePage extends ConsumerWidget {
             child: Container(
               width: 82,
               height: 82,
-              color: scheme.secondary,
+              color: _ink,
               child: profile.avatarUrl.isEmpty
                   ? Center(
                       child: Text(
@@ -345,7 +357,7 @@ class MyProfilePage extends ConsumerWidget {
                             ? '?'
                             : profile.displayName.substring(0, 1).toUpperCase(),
                         style: TextStyle(
-                          color: scheme.onSecondary,
+                          color: const Color(0xFFD49A6A),
                           fontSize: 30,
                           fontWeight: FontWeight.w900,
                         ),
@@ -402,17 +414,13 @@ class MyProfilePage extends ConsumerWidget {
     UserProfile profile,
     AppLocalizations l10n,
   ) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Container(
-        height: 82,
+        height: 88,
         decoration: BoxDecoration(
-          color: scheme.brightness == Brightness.dark
-              ? const Color(0xFF222222)
-              : _ink,
-          borderRadius: BorderRadius.circular(25),
+          color: _ink,
+          borderRadius: BorderRadius.circular(22),
         ),
         child: Row(
           children: [
@@ -590,16 +598,12 @@ class MyProfilePage extends ConsumerWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        height: 100,
-        padding: const EdgeInsets.all(14),
+        height: 108,
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF222222)
-              : Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
-          ),
+          color: isDark ? const Color(0xFF191918) : const Color(0xFFF9F7F2),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,8 +612,8 @@ class MyProfilePage extends ConsumerWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: secondary.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(11),
+                color: secondary.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: secondary, size: 20),
             ),
@@ -662,19 +666,15 @@ class MyProfilePage extends ConsumerWidget {
       child: Container(
         height: 125,
         decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF222222)
-              : Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(23),
-          border: Border.all(
-            color: isDark ? const Color(0xFF383838) : const Color(0xFFE3DED5),
-          ),
+          color: isDark ? const Color(0xFF191918) : const Color(0xFFF9F7F2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Row(
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(22),
+                left: Radius.circular(19),
               ),
               child: SizedBox(
                 width: 145,
