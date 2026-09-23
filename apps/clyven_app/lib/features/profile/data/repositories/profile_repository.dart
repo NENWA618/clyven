@@ -1,3 +1,6 @@
+import 'package:clyven_backend_client/clyven_backend_client.dart';
+
+import '../../../video/data/repositories/video_repository.dart';
 import '../models/user_profile.dart';
 
 abstract class ProfileRepository {
@@ -7,10 +10,17 @@ abstract class ProfileRepository {
     required String displayName,
     required String avatarUrl,
   });
+  Future<void> updateBio(String bio);
 }
 
-class MockProfileRepository implements ProfileRepository {
-  const MockProfileRepository();
+class ServerpodProfileRepository implements ProfileRepository {
+  final Client client;
+  final VideoRepository videoRepository;
+
+  const ServerpodProfileRepository({
+    required this.client,
+    required this.videoRepository,
+  });
 
   @override
   Future<UserProfile> loadProfile({
@@ -19,47 +29,41 @@ class MockProfileRepository implements ProfileRepository {
     required String displayName,
     required String avatarUrl,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-
+    final videos = await videoRepository.loadUserVideos(userId: userId);
+    ProfileStats? stats;
+    try {
+      stats = await client.social.getMyProfileStats();
+    } catch (_) {
+      // The Flutter client can be updated before the Serverpod deployment.
+      // Keep the profile usable with authenticated identity and persisted
+      // videos; social counts become available after the server migration.
+    }
     return UserProfile(
       id: userId,
       username: username,
       displayName: displayName,
       avatarUrl: avatarUrl,
-      bio: '在这里记录我看见、学习和想留下来的东西。',
-      followerCount: 128,
-      followingCount: 46,
-      videoCount: 3,
-      favoriteCount: 27,
-      videos: const [
-        ProfileVideo(
-          id: 'my-video-001',
-          title: '第一次记录一座完全陌生的城市',
-          coverUrl:
-              'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df'
-              '?auto=format&fit=crop&w=1200&q=80',
-          viewCount: 3280,
-          durationSeconds: 754,
-        ),
-        ProfileVideo(
-          id: 'my-video-002',
-          title: '我为什么开始记录正在消失的语言',
-          coverUrl:
-              'https://images.unsplash.com/photo-1455390582262-044cdead277a'
-              '?auto=format&fit=crop&w=1200&q=80',
-          viewCount: 8140,
-          durationSeconds: 1128,
-        ),
-        ProfileVideo(
-          id: 'my-video-003',
-          title: '从零开始搭一个大型 Flutter 项目',
-          coverUrl:
-              'https://images.unsplash.com/photo-1516321318423-f06f85e504b3'
-              '?auto=format&fit=crop&w=1200&q=80',
-          viewCount: 5620,
-          durationSeconds: 1840,
-        ),
-      ],
+      bio: stats?.bio ?? '',
+      followerCount: stats?.followerCount ?? 0,
+      followingCount: stats?.followingCount ?? 0,
+      videoCount: stats?.videoCount ?? videos.length,
+      favoriteCount: stats?.favoriteCount ?? 0,
+      videos: videos
+          .map(
+            (video) => ProfileVideo(
+              id: video.id,
+              title: video.title,
+              coverUrl: video.coverUrl,
+              viewCount: video.viewCount,
+              durationSeconds: video.durationSeconds,
+            ),
+          )
+          .toList(growable: false),
     );
+  }
+
+  @override
+  Future<void> updateBio(String bio) async {
+    await client.social.updateBio(bio);
   }
 }

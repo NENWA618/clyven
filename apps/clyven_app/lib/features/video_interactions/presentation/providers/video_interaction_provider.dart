@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../video/presentation/providers/video_detail_provider.dart';
+import '../../../../core/serverpod/serverpod_client_provider.dart';
 import '../../data/models/video_interaction_state.dart';
 import '../../data/repositories/video_interaction_repository.dart';
 
 final videoInteractionRepositoryProvider = Provider<VideoInteractionRepository>(
   (ref) {
-    return MockVideoInteractionRepository();
+    return ServerpodVideoInteractionRepository(
+      client: ref.watch(serverpodClientProvider),
+    );
   },
 );
 

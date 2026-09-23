@@ -1,4 +1,5 @@
 import '../models/video_detail.dart';
+import '../models/video_content_type.dart';
 import '../models/video_upload_draft.dart';
 
 abstract class VideoRepository {
@@ -12,7 +13,9 @@ abstract class VideoRepository {
 
   // 首页 / 发现：
   // 获取所有用户发布的视频。
-  Future<List<VideoDetail>> loadPublishedVideos();
+  Future<List<VideoDetail>> loadPublishedVideos({
+    VideoContentType contentType = VideoContentType.video,
+  });
 
   // 我的投稿：
   // 只获取指定用户的视频。
@@ -45,6 +48,7 @@ class MockVideoRepository implements VideoRepository {
       authorId: userId,
       authorName: authorName,
       category: draft.category,
+      contentType: draft.contentType,
       tags: [draft.category],
       coverUrl: draft.coverPath ?? '',
       videoUrl: draft.videoPath,
@@ -68,10 +72,14 @@ class MockVideoRepository implements VideoRepository {
   // ============================================================
 
   @override
-  Future<List<VideoDetail>> loadPublishedVideos() async {
+  Future<List<VideoDetail>> loadPublishedVideos({
+    VideoContentType contentType = VideoContentType.video,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
-    final videos = _createdVideos.values.toList();
+    final videos = _createdVideos.values
+        .where((video) => video.contentType == contentType)
+        .toList();
 
     videos.sort((a, b) {
       return b.publishedAt.compareTo(a.publishedAt);

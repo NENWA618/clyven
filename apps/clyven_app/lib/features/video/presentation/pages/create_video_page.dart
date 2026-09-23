@@ -6,10 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../data/models/video_content_type.dart';
 import '../providers/video_upload_queue_provider.dart';
 
 class CreateVideoPage extends ConsumerStatefulWidget {
-  const CreateVideoPage({super.key});
+  final VideoContentType contentType;
+
+  const CreateVideoPage({super.key, this.contentType = VideoContentType.video});
 
   @override
   ConsumerState<CreateVideoPage> createState() {
@@ -114,6 +117,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               title: title,
               description: description,
               category: _category,
+              contentType: widget.contentType,
             ),
           );
 
@@ -163,6 +167,10 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
                 children: [
                   _buildVideoSelector(l10n),
+                  if (widget.contentType == VideoContentType.short) ...[
+                    const SizedBox(height: 12),
+                    _buildShortGuidance(l10n),
+                  ],
                   const SizedBox(height: 26),
                   _buildLabel(l10n.titleEyebrow, l10n.titleLabel),
                   const SizedBox(height: 10),
@@ -226,7 +234,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.newFrame,
+                  widget.contentType == VideoContentType.short
+                      ? l10n.shortContentType
+                      : l10n.newFrame,
                   style: TextStyle(
                     color: _purple,
                     fontSize: 9,
@@ -236,7 +246,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  l10n.publishVideo,
+                  widget.contentType == VideoContentType.short
+                      ? l10n.publishShort
+                      : l10n.publishVideo,
                   style: TextStyle(
                     color: scheme.onSurface,
                     fontSize: 20,
@@ -258,7 +270,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     return GestureDetector(
       onTap: _isPublishing ? null : _pickVideo,
       child: Container(
-        height: 210,
+        height: widget.contentType == VideoContentType.short ? 330 : 210,
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF222222) : _ink,
           borderRadius: BorderRadius.circular(28),
@@ -268,7 +280,13 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.video_library_outlined, color: _acid, size: 42),
+                  Icon(
+                    widget.contentType == VideoContentType.short
+                        ? Icons.stay_current_portrait_rounded
+                        : Icons.video_library_outlined,
+                    color: _acid,
+                    size: 42,
+                  ),
                   const SizedBox(height: 14),
                   Text(
                     l10n.selectVideo,
@@ -323,6 +341,35 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _buildShortGuidance(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: scheme.primary.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.primary.withValues(alpha: .24)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.crop_portrait_rounded, color: scheme.primary, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l10n.shortPortraitGuidance,
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 11,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

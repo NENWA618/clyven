@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:clyven_app/core/errors/app_error.dart';
 
 import '../models/app_user.dart';
@@ -170,5 +172,26 @@ class MockAuthRepository implements AuthRepository {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
     _currentUser = null;
+  }
+
+  @override
+  Future<AppUser> updateProfile({
+    required String username,
+    required String displayName,
+    Uint8List? avatarBytes,
+    bool removeAvatar = false,
+  }) async {
+    final current = _currentUser;
+    if (current == null) {
+      throw const AppException(AppErrorCode.notLoggedIn);
+    }
+    final updated = AppUser(
+      id: current.id,
+      username: username.trim(),
+      displayName: displayName.trim(),
+      avatarUrl: removeAvatar ? '' : current.avatarUrl,
+    );
+    _currentUser = updated;
+    return updated;
   }
 }

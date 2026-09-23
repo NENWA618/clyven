@@ -5,6 +5,7 @@ import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:serverpod_client/serverpod_client.dart';
 
 import '../models/video_detail.dart';
+import '../models/video_content_type.dart';
 import '../models/video_upload_draft.dart';
 import 'video_repository.dart';
 
@@ -65,6 +66,10 @@ class ServerpodVideoRepository implements VideoRepository {
       title: draft.title,
       description: draft.description,
       category: draft.category,
+      contentType: switch (draft.contentType) {
+        VideoContentType.video => serverpod.VideoContentType.video,
+        VideoContentType.short => serverpod.VideoContentType.short,
+      },
       languageCode: 'auto',
       tags: const [],
       videoStorageKey: videoStorageKey,
@@ -81,8 +86,15 @@ class ServerpodVideoRepository implements VideoRepository {
   // ============================================================
 
   @override
-  Future<List<VideoDetail>> loadPublishedVideos() async {
-    final videos = await client.video.getVideos();
+  Future<List<VideoDetail>> loadPublishedVideos({
+    VideoContentType contentType = VideoContentType.video,
+  }) async {
+    final videos = await client.video.getVideos(
+      contentType: switch (contentType) {
+        VideoContentType.video => serverpod.VideoContentType.video,
+        VideoContentType.short => serverpod.VideoContentType.short,
+      },
+    );
 
     final results = <VideoDetail>[];
 
@@ -224,6 +236,10 @@ class ServerpodVideoRepository implements VideoRepository {
       authorId: video.authorId,
       authorName: video.authorName,
       category: video.category,
+      contentType: switch (video.contentType) {
+        serverpod.VideoContentType.video => VideoContentType.video,
+        serverpod.VideoContentType.short => VideoContentType.short,
+      },
       tags: video.tags,
       coverUrl: coverUrl,
       videoUrl: videoUrl,

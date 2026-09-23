@@ -56,6 +56,19 @@ review:
   - submitTask:
   - returnTask:
   - approveAndPublish:
+social:
+  - getMyProfileStats:
+  - getProfileStats:
+  - updateBio:
+  - isFollowing:
+  - toggleFollow:
+  - getFollowingCreatorIds:
+  - toggleFavorite:
+  - getFavoriteVideoIds:
+  - getWatchHistory:
+  - saveWatchProgress:
+  - removeWatchHistory:
+  - clearWatchHistory:
 subtitle:
   - getCueDetails:
   - getPublishedCueDetails:

@@ -1,3 +1,6 @@
+import 'package:clyven_backend_client/clyven_backend_client.dart';
+
+import '../../../video/data/repositories/video_repository.dart';
 import '../models/watch_history_item.dart';
 
 abstract class WatchHistoryRepository {
@@ -13,24 +16,40 @@ abstract class WatchHistoryRepository {
   Future<void> clearHistory({required String userId});
 }
 
-class MockWatchHistoryRepository implements WatchHistoryRepository {
-  final Map<String, List<WatchHistoryItem>> _store = {};
+class ServerpodWatchHistoryRepository implements WatchHistoryRepository {
+  final Client client;
+  final VideoRepository videoRepository;
 
-  List<WatchHistoryItem> _historyFor(String userId) {
-    return _store.putIfAbsent(userId, () => []);
-  }
+  const ServerpodWatchHistoryRepository({
+    required this.client,
+    required this.videoRepository,
+  });
 
   @override
   Future<List<WatchHistoryItem>> loadHistory({required String userId}) async {
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
-    final history = [..._historyFor(userId)];
-
-    history.sort((a, b) {
-      return b.watchedAt.compareTo(a.watchedAt);
-    });
-
-    return List.unmodifiable(history);
+    final rows = await client.social.getWatchHistory();
+    final result = <WatchHistoryItem>[];
+    for (final row in rows) {
+      try {
+        final video = await videoRepository.loadVideoDetail(
+          row.videoId.toString(),
+        );
+        result.add(
+          WatchHistoryItem(
+            videoId: video.id,
+            title: video.title,
+            coverUrl: video.coverUrl,
+            authorName: video.authorName,
+            positionSeconds: row.positionSeconds,
+            durationSeconds: video.durationSeconds,
+            watchedAt: row.watchedAt,
+          ),
+        );
+      } catch (_) {
+        // A deleted or inaccessible video is omitted from history.
+      }
+    }
+    return List.unmodifiable(result);
   }
 
   @override
@@ -38,18 +57,10 @@ class MockWatchHistoryRepository implements WatchHistoryRepository {
     required String userId,
     required WatchHistoryItem item,
   }) async {
-    final history = _historyFor(userId);
-
-    final index = history.indexWhere((historyItem) {
-      return historyItem.videoId == item.videoId;
-    });
-
-    if (index == -1) {
-      history.insert(0, item);
-    } else {
-      history[index] = item;
-    }
-
+    await client.social.saveWatchProgress(
+      int.parse(item.videoId),
+      item.positionSeconds,
+    );
     return item;
   }
 
@@ -58,13 +69,11 @@ class MockWatchHistoryRepository implements WatchHistoryRepository {
     required String userId,
     required String videoId,
   }) async {
-    _historyFor(userId).removeWhere((item) {
-      return item.videoId == videoId;
-    });
+    await client.social.removeWatchHistory(int.parse(videoId));
   }
 
   @override
   Future<void> clearHistory({required String userId}) async {
-    _historyFor(userId).clear();
+    await client.social.clearWatchHistory();
   }
 }

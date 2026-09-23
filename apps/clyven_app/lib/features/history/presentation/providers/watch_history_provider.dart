@@ -1,11 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/serverpod/serverpod_client_provider.dart';
+import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../data/models/watch_history_item.dart';
 import '../../data/repositories/watch_history_repository.dart';
 
 final watchHistoryRepositoryProvider = Provider<WatchHistoryRepository>((ref) {
-  return MockWatchHistoryRepository();
+  return ServerpodWatchHistoryRepository(
+    client: ref.watch(serverpodClientProvider),
+    videoRepository: ref.watch(videoRepositoryProvider),
+  );
 });
 
 class WatchHistoryNotifier extends AsyncNotifier<List<WatchHistoryItem>> {

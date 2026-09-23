@@ -7,6 +7,7 @@ import '../../../notifications/presentation/pages/notifications_page.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
 import '../../../profile/presentation/pages/my_profile_page.dart';
 import '../../../video/presentation/pages/create_video_page.dart';
+import '../../../video/presentation/widgets/publish_type_sheet.dart';
 import '../widgets/home_navigation_dock.dart';
 import 'discover_page.dart';
 import 'home_page.dart';
@@ -65,6 +66,12 @@ class _MainPageState extends ConsumerState<MainPage> {
         // “发布”属于真正的账号操作，
         // 所以这里仍然要求登录。
         onCreate: () async {
+          final contentType = await showPublishTypeSheet(context);
+
+          if (contentType == null || !context.mounted) {
+            return;
+          }
+
           final allowed = await requireLogin(context, ref);
 
           if (!allowed || !context.mounted) {
@@ -75,7 +82,7 @@ class _MainPageState extends ConsumerState<MainPage> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return const CreateVideoPage();
+                return CreateVideoPage(contentType: contentType);
               },
             ),
           );

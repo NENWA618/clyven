@@ -1,3 +1,5 @@
+import 'video_content_type.dart';
+
 class VideoDetail {
   final String id;
   final String title;
@@ -7,6 +9,7 @@ class VideoDetail {
   final String authorName;
 
   final String category;
+  final VideoContentType contentType;
   final List<String> tags;
 
   final String coverUrl;
@@ -27,6 +30,7 @@ class VideoDetail {
     required this.authorId,
     required this.authorName,
     required this.category,
+    this.contentType = VideoContentType.video,
     required this.tags,
     required this.coverUrl,
     required this.videoUrl,

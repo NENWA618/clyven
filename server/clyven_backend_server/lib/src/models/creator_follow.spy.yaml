@@ -1,0 +1,12 @@
+class: CreatorFollow
+table: creator_follow
+
+fields:
+  followerId: String
+  creatorId: String
+  createdAt: DateTime, default=now
+
+indexes:
+  creator_follow_unique_idx:
+    fields: followerId, creatorId
+    unique: true

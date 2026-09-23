@@ -1,0 +1,1 @@
+enum VideoContentType { video, short }

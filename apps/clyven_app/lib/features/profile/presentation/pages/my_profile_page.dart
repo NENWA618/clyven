@@ -13,6 +13,7 @@ import '../../data/models/user_profile.dart';
 import '../providers/my_profile_provider.dart';
 import 'my_submissions_page.dart';
 import 'settings_page.dart';
+import 'edit_profile_page.dart';
 
 import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
@@ -212,7 +213,7 @@ class MyProfilePage extends ConsumerWidget {
           ),
           slivers: [
             SliverToBoxAdapter(child: _buildTopBar(context, l10n)),
-            SliverToBoxAdapter(child: _buildIdentity(context, profile)),
+            SliverToBoxAdapter(child: _buildIdentity(context, ref, profile)),
             SliverToBoxAdapter(child: _buildStats(context, profile, l10n)),
             SliverToBoxAdapter(child: _buildLibrary(context, l10n)),
             SliverToBoxAdapter(
@@ -330,7 +331,11 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentity(BuildContext context, UserProfile profile) {
+  Widget _buildIdentity(
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile profile,
+  ) {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -399,6 +404,26 @@ class MyProfilePage extends ConsumerWidget {
                         : const Color(0xFF4F4B45),
                     fontSize: 13,
                     height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final changed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditProfilePage(profile: profile),
+                      ),
+                    );
+                    if (changed == true) {
+                      ref.invalidate(myProfileProvider);
+                    }
+                  },
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: Text(
+                    Localizations.localeOf(context).languageCode == 'zh'
+                        ? '编辑资料'
+                        : 'Edit profile',
                   ),
                 ),
               ],

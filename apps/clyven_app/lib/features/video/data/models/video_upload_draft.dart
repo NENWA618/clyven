@@ -1,3 +1,5 @@
+import 'video_content_type.dart';
+
 class VideoUploadDraft {
   final String videoPath;
   final String? coverPath;
@@ -5,6 +7,7 @@ class VideoUploadDraft {
   final String description;
   final String category;
   final int durationSeconds;
+  final VideoContentType contentType;
 
   const VideoUploadDraft({
     required this.videoPath,
@@ -13,5 +16,6 @@ class VideoUploadDraft {
     required this.description,
     required this.category,
     required this.durationSeconds,
+    this.contentType = VideoContentType.video,
   });
 }

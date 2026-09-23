@@ -9,6 +9,10 @@ fields:
   description: String
   category: String
 
+  # Distinguishes long-form videos from short-form content. Existing rows are
+  # backfilled as regular videos by the database migration default.
+  contentType: VideoContentType, default=video
+
   # Spoken language detected/confirmed for ASR.
   # Old videos may remain null.
   languageCode: String?

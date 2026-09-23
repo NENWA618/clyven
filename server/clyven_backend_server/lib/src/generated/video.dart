@@ -10,9 +10,11 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:serverpod/serverpod.dart' as _i1;
-import 'video_status.dart' as _i2;
-import 'package:clyven_backend_server/src/generated/protocol.dart' as _i3;
+import 'video_content_type.dart' as _i2;
+import 'video_status.dart' as _i3;
+import 'package:clyven_backend_server/src/generated/protocol.dart' as _i4;
 
 abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Video._({
@@ -22,6 +24,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.title,
     required this.description,
     required this.category,
+    _i2.VideoContentType? contentType,
     this.languageCode,
     required this.tags,
     required this.videoStorageKey,
@@ -31,15 +34,16 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
-    _i2.VideoStatus? status,
+    _i3.VideoStatus? status,
     this.publishedAt,
     required this.createdAt,
     required this.updatedAt,
-  }) : viewCount = viewCount ?? 0,
+  }) : contentType = contentType ?? _i2.VideoContentType.video,
+       viewCount = viewCount ?? 0,
        likeCount = likeCount ?? 0,
        favoriteCount = favoriteCount ?? 0,
        commentCount = commentCount ?? 0,
-       status = status ?? _i2.VideoStatus.uploading;
+       status = status ?? _i3.VideoStatus.uploading;
 
   factory Video({
     int? id,
@@ -48,6 +52,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required String title,
     required String description,
     required String category,
+    _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -57,7 +62,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
-    _i2.VideoStatus? status,
+    _i3.VideoStatus? status,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -71,8 +76,13 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
+      contentType: jsonSerialization['contentType'] == null
+          ? null
+          : _i2.VideoContentType.fromJson(
+              (jsonSerialization['contentType'] as String),
+            ),
       languageCode: jsonSerialization['languageCode'] as String?,
-      tags: _i3.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
+      tags: _i4.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
       durationSeconds: jsonSerialization['durationSeconds'] as int,
@@ -82,7 +92,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       commentCount: jsonSerialization['commentCount'] as int?,
       status: jsonSerialization['status'] == null
           ? null
-          : _i2.VideoStatus.fromJson((jsonSerialization['status'] as String)),
+          : _i3.VideoStatus.fromJson((jsonSerialization['status'] as String)),
       publishedAt: jsonSerialization['publishedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
@@ -114,6 +124,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   String category;
 
+  _i2.VideoContentType contentType;
+
   String? languageCode;
 
   List<String> tags;
@@ -132,7 +144,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   int commentCount;
 
-  _i2.VideoStatus status;
+  _i3.VideoStatus status;
 
   DateTime? publishedAt;
 
@@ -153,6 +165,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? title,
     String? description,
     String? category,
+    _i2.VideoContentType? contentType,
     String? languageCode,
     List<String>? tags,
     String? videoStorageKey,
@@ -162,7 +175,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
-    _i2.VideoStatus? status,
+    _i3.VideoStatus? status,
     DateTime? publishedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -177,6 +190,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'title': title,
       'description': description,
       'category': category,
+      'contentType': contentType.toJson(),
       if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
@@ -203,6 +217,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'title': title,
       'description': description,
       'category': category,
+      'contentType': contentType.toJson(),
       if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
@@ -259,6 +274,7 @@ class _VideoImpl extends Video {
     required String title,
     required String description,
     required String category,
+    _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -268,7 +284,7 @@ class _VideoImpl extends Video {
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
-    _i2.VideoStatus? status,
+    _i3.VideoStatus? status,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -279,6 +295,7 @@ class _VideoImpl extends Video {
          title: title,
          description: description,
          category: category,
+         contentType: contentType,
          languageCode: languageCode,
          tags: tags,
          videoStorageKey: videoStorageKey,
@@ -305,6 +322,7 @@ class _VideoImpl extends Video {
     String? title,
     String? description,
     String? category,
+    _i2.VideoContentType? contentType,
     Object? languageCode = _Undefined,
     List<String>? tags,
     String? videoStorageKey,
@@ -314,7 +332,7 @@ class _VideoImpl extends Video {
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
-    _i2.VideoStatus? status,
+    _i3.VideoStatus? status,
     Object? publishedAt = _Undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -326,6 +344,7 @@ class _VideoImpl extends Video {
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
+      contentType: contentType ?? this.contentType,
       languageCode: languageCode is String? ? languageCode : this.languageCode,
       tags: tags ?? this.tags.map((e0) => e0).toList(),
       videoStorageKey: videoStorageKey ?? this.videoStorageKey,
@@ -370,6 +389,13 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
 
   _i1.ColumnValue<String, String> category(String value) => _i1.ColumnValue(
     table.category,
+    value,
+  );
+
+  _i1.ColumnValue<_i2.VideoContentType, _i2.VideoContentType> contentType(
+    _i2.VideoContentType value,
+  ) => _i1.ColumnValue(
+    table.contentType,
     value,
   );
 
@@ -422,8 +448,8 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
     value,
   );
 
-  _i1.ColumnValue<_i2.VideoStatus, _i2.VideoStatus> status(
-    _i2.VideoStatus value,
+  _i1.ColumnValue<_i3.VideoStatus, _i3.VideoStatus> status(
+    _i3.VideoStatus value,
   ) => _i1.ColumnValue(
     table.status,
     value,
@@ -470,6 +496,12 @@ class VideoTable extends _i1.Table<int?> {
     category = _i1.ColumnString(
       'category',
       this,
+    );
+    contentType = _i1.ColumnEnum(
+      'contentType',
+      this,
+      _i1.EnumSerialization.byName,
+      hasDefault: true,
     );
     languageCode = _i1.ColumnString(
       'languageCode',
@@ -543,6 +575,8 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString category;
 
+  late final _i1.ColumnEnum<_i2.VideoContentType> contentType;
+
   late final _i1.ColumnString languageCode;
 
   late final _i1.ColumnSerializable<List<String>> tags;
@@ -561,7 +595,7 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnInt commentCount;
 
-  late final _i1.ColumnEnum<_i2.VideoStatus> status;
+  late final _i1.ColumnEnum<_i3.VideoStatus> status;
 
   late final _i1.ColumnDateTime publishedAt;
 
@@ -577,6 +611,7 @@ class VideoTable extends _i1.Table<int?> {
     title,
     description,
     category,
+    contentType,
     languageCode,
     tags,
     videoStorageKey,

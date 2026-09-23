@@ -1,0 +1,6 @@
+enum: VideoContentType
+serialized: byName
+
+values:
+  - video
+  - short

@@ -39,6 +39,7 @@ class VideoEndpoint extends Endpoint {
     required String title,
     required String description,
     required String category,
+    required VideoContentType contentType,
     required String languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -55,6 +56,7 @@ class VideoEndpoint extends Endpoint {
       title: title,
       description: description,
       category: category,
+      contentType: contentType,
       languageCode: languageCode,
       tags: tags,
       videoStorageKey: videoStorageKey,
@@ -104,9 +106,15 @@ class VideoEndpoint extends Endpoint {
     return savedVideo;
   }
 
-  Future<List<Video>> getVideos(Session session) async {
+  Future<List<Video>> getVideos(
+    Session session, {
+    VideoContentType? contentType,
+  }) async {
     return Video.db.find(
       session,
+      where: contentType == null
+          ? null
+          : (table) => table.contentType.equals(contentType),
       orderBy: (table) => table.createdAt,
       orderDescending: true,
     );

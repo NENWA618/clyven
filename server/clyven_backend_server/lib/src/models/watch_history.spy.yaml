@@ -1,0 +1,13 @@
+class: WatchHistory
+table: watch_history
+
+fields:
+  userId: String
+  videoId: int, relation(parent=video)
+  positionSeconds: int, default=0
+  watchedAt: DateTime, default=now
+
+indexes:
+  watch_history_unique_idx:
+    fields: userId, videoId
+    unique: true

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../models/app_user.dart';
 
 abstract class AuthRepository {
@@ -24,4 +26,11 @@ abstract class AuthRepository {
   });
 
   Future<void> logout();
+
+  Future<AppUser> updateProfile({
+    required String username,
+    required String displayName,
+    Uint8List? avatarBytes,
+    bool removeAvatar = false,
+  });
 }

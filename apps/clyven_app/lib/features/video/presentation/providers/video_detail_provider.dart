@@ -4,6 +4,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/serverpod/serverpod_client_provider.dart';
 
 import '../../data/models/video_detail.dart';
+import '../../data/models/video_content_type.dart';
 import '../../data/repositories/video_repository.dart';
 import '../../data/repositories/serverpod_video_repository.dart';
 
@@ -39,6 +40,13 @@ final allPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
   final repository = ref.watch(videoRepositoryProvider);
 
   return repository.loadPublishedVideos();
+});
+
+// Only persisted short-form content. Regular videos never enter this feed.
+final publishedShortsProvider = FutureProvider<List<VideoDetail>>((ref) async {
+  final repository = ref.watch(videoRepositoryProvider);
+
+  return repository.loadPublishedVideos(contentType: VideoContentType.short);
 });
 
 // ============================================================
