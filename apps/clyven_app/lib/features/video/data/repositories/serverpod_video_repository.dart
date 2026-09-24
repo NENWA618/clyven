@@ -65,6 +65,7 @@ class ServerpodVideoRepository implements VideoRepository {
       authorName: authorName,
       title: draft.title,
       description: draft.description,
+      seriesTitle: draft.seriesTitle,
       category: draft.category,
       contentType: switch (draft.contentType) {
         VideoContentType.video => serverpod.VideoContentType.video,
@@ -136,6 +137,19 @@ class ServerpodVideoRepository implements VideoRepository {
     }
 
     return results;
+  }
+
+  @override
+  Future<VideoDetail> updateVideoSeries({
+    required String videoId,
+    String? seriesTitle,
+  }) async {
+    final video = await client.video.setSeries(
+      videoId: int.parse(videoId),
+      seriesTitle: seriesTitle,
+    );
+
+    return _toVideoDetailWithUrls(video);
   }
 
   Future<void> _uploadFile({
@@ -220,6 +234,7 @@ class ServerpodVideoRepository implements VideoRepository {
       description: video.description,
       authorId: video.authorId,
       authorName: video.authorName,
+      seriesTitle: video.seriesTitle ?? '',
       category: video.category,
       contentType: switch (video.contentType) {
         serverpod.VideoContentType.video => VideoContentType.video,

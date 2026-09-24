@@ -61,6 +61,7 @@ class VideoEndpoint extends Endpoint {
     required String authorName,
     required String title,
     required String description,
+    String? seriesTitle,
     required String category,
     required VideoContentType contentType,
     required String languageCode,
@@ -91,6 +92,9 @@ class VideoEndpoint extends Endpoint {
     final normalizedAuthorName = authorName.trim().isEmpty
         ? currentUserId
         : authorName.trim();
+    final normalizedSeriesTitle = seriesTitle?.trim();
+    final storedSeriesTitle =
+        normalizedSeriesTitle == null || normalizedSeriesTitle.isEmpty ? null : normalizedSeriesTitle;
 
     final now = DateTime.now();
 
@@ -99,6 +103,7 @@ class VideoEndpoint extends Endpoint {
       authorName: normalizedAuthorName,
       title: normalizedTitle,
       description: description.trim(),
+      seriesTitle: storedSeriesTitle,
       category: category.trim().isEmpty ? 'general' : category.trim(),
       contentType: contentType,
       languageCode: languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
@@ -210,6 +215,23 @@ class VideoEndpoint extends Endpoint {
     }
 
     return null;
+  }
+
+  Future<Video> setSeries(
+    Session session, {
+    required int videoId,
+    String? seriesTitle,
+  }) async {
+    final video = await _requireOwnedVideo(session, videoId);
+    final normalizedSeriesTitle = seriesTitle?.trim();
+
+    video.seriesTitle =
+        normalizedSeriesTitle == null || normalizedSeriesTitle.isEmpty
+        ? null
+        : normalizedSeriesTitle;
+    video.updatedAt = DateTime.now();
+
+    return Video.db.updateRow(session, video);
   }
 
   Future<Video> setVisibility(

@@ -104,6 +104,7 @@ video:
   - getVideos:
   - getMyVideos:
   - getVideo:
+  - setSeries:
   - setVisibility:
   - deleteVideo:
   - createUploadDescription:

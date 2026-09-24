@@ -20,6 +20,11 @@ abstract class VideoRepository {
   // 我的投稿：
   // 只获取指定用户的视频。
   Future<List<VideoDetail>> loadUserVideos({required String userId});
+
+  Future<VideoDetail> updateVideoSeries({
+    required String videoId,
+    String? seriesTitle,
+  });
 }
 
 class MockVideoRepository implements VideoRepository {
@@ -47,6 +52,7 @@ class MockVideoRepository implements VideoRepository {
       description: draft.description,
       authorId: userId,
       authorName: authorName,
+      seriesTitle: draft.seriesTitle,
       category: draft.category,
       contentType: draft.contentType,
       tags: [draft.category],
@@ -105,6 +111,44 @@ class MockVideoRepository implements VideoRepository {
     });
 
     return List.unmodifiable(videos);
+  }
+
+
+  @override
+  Future<VideoDetail> updateVideoSeries({
+    required String videoId,
+    String? seriesTitle,
+  }) async {
+    final current = _createdVideos[videoId];
+
+    if (current == null) {
+      throw StateError('Video not found: $videoId');
+    }
+
+    final normalizedSeriesTitle = seriesTitle?.trim() ?? '';
+
+    final updated = VideoDetail(
+      id: current.id,
+      title: current.title,
+      description: current.description,
+      authorId: current.authorId,
+      authorName: current.authorName,
+      seriesTitle: normalizedSeriesTitle,
+      category: current.category,
+      contentType: current.contentType,
+      tags: current.tags,
+      coverUrl: current.coverUrl,
+      videoUrl: current.videoUrl,
+      durationSeconds: current.durationSeconds,
+      viewCount: current.viewCount,
+      likeCount: current.likeCount,
+      favoriteCount: current.favoriteCount,
+      commentCount: current.commentCount,
+      publishedAt: current.publishedAt,
+    );
+
+    _createdVideos[videoId] = updated;
+    return updated;
   }
 
   // ============================================================

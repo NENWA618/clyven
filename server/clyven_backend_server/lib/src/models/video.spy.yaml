@@ -5,6 +5,9 @@ fields:
   authorId: String
   authorName: String
 
+  # Creator-defined series. Null only for legacy videos created before series existed.
+  seriesTitle: String?
+
   title: String
   description: String
   category: String

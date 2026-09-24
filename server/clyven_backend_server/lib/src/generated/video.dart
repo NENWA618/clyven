@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'video_content_type.dart' as _i2;
 import 'video_status.dart' as _i3;
@@ -21,6 +20,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     this.id,
     required this.authorId,
     required this.authorName,
+    this.seriesTitle,
     required this.title,
     required this.description,
     required this.category,
@@ -54,6 +54,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
     required String title,
     required String description,
     required String category,
@@ -82,6 +83,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       id: jsonSerialization['id'] as int?,
       authorId: jsonSerialization['authorId'] as String,
       authorName: jsonSerialization['authorName'] as String,
+      seriesTitle: jsonSerialization['seriesTitle'] as String?,
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
@@ -133,6 +135,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   String authorId;
 
   String authorName;
+
+  String? seriesTitle;
 
   String title;
 
@@ -186,6 +190,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? id,
     String? authorId,
     String? authorName,
+    String? seriesTitle,
     String? title,
     String? description,
     String? category,
@@ -215,6 +220,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (id != null) 'id': id,
       'authorId': authorId,
       'authorName': authorName,
+      if (seriesTitle != null) 'seriesTitle': seriesTitle,
       'title': title,
       'description': description,
       'category': category,
@@ -247,6 +253,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (id != null) 'id': id,
       'authorId': authorId,
       'authorName': authorName,
+      if (seriesTitle != null) 'seriesTitle': seriesTitle,
       'title': title,
       'description': description,
       'category': category,
@@ -309,6 +316,7 @@ class _VideoImpl extends Video {
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
     required String title,
     required String description,
     required String category,
@@ -334,6 +342,7 @@ class _VideoImpl extends Video {
          id: id,
          authorId: authorId,
          authorName: authorName,
+         seriesTitle: seriesTitle,
          title: title,
          description: description,
          category: category,
@@ -365,6 +374,7 @@ class _VideoImpl extends Video {
     Object? id = _Undefined,
     String? authorId,
     String? authorName,
+    Object? seriesTitle = _Undefined,
     String? title,
     String? description,
     String? category,
@@ -391,6 +401,7 @@ class _VideoImpl extends Video {
       id: id is int? ? id : this.id,
       authorId: authorId ?? this.authorId,
       authorName: authorName ?? this.authorName,
+      seriesTitle: seriesTitle is String? ? seriesTitle : this.seriesTitle,
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
@@ -434,6 +445,11 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
 
   _i1.ColumnValue<String, String> authorName(String value) => _i1.ColumnValue(
     table.authorName,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> seriesTitle(String? value) => _i1.ColumnValue(
+    table.seriesTitle,
     value,
   );
 
@@ -568,6 +584,10 @@ class VideoTable extends _i1.Table<int?> {
       'authorName',
       this,
     );
+    seriesTitle = _i1.ColumnString(
+      'seriesTitle',
+      this,
+    );
     title = _i1.ColumnString(
       'title',
       this,
@@ -669,6 +689,8 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString authorName;
 
+  late final _i1.ColumnString seriesTitle;
+
   late final _i1.ColumnString title;
 
   late final _i1.ColumnString description;
@@ -716,6 +738,7 @@ class VideoTable extends _i1.Table<int?> {
     id,
     authorId,
     authorName,
+    seriesTitle,
     title,
     description,
     category,

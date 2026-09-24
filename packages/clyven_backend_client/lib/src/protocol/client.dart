@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
@@ -1276,6 +1275,7 @@ class EndpointVideo extends _i2.EndpointRef {
     required String authorName,
     required String title,
     required String description,
+    String? seriesTitle,
     required String category,
     required _i37.VideoContentType contentType,
     required String languageCode,
@@ -1292,6 +1292,7 @@ class EndpointVideo extends _i2.EndpointRef {
       'authorName': authorName,
       'title': title,
       'description': description,
+      'seriesTitle': seriesTitle,
       'category': category,
       'contentType': contentType,
       'languageCode': languageCode,
@@ -1323,6 +1324,18 @@ class EndpointVideo extends _i2.EndpointRef {
         'getVideo',
         {'id': id},
       );
+
+  _i3.Future<_i8.Video> setSeries({
+    required int videoId,
+    String? seriesTitle,
+  }) => caller.callServerEndpoint<_i8.Video>(
+    'video',
+    'setSeries',
+    {
+      'videoId': videoId,
+      'seriesTitle': seriesTitle,
+    },
+  );
 
   _i3.Future<_i8.Video> setVisibility({
     required int videoId,

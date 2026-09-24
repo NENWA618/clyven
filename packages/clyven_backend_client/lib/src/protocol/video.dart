@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'video_content_type.dart' as _i2;
 import 'video_status.dart' as _i3;
@@ -21,6 +20,7 @@ abstract class Video implements _i1.SerializableModel {
     this.id,
     required this.authorId,
     required this.authorName,
+    this.seriesTitle,
     required this.title,
     required this.description,
     required this.category,
@@ -54,6 +54,7 @@ abstract class Video implements _i1.SerializableModel {
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
     required String title,
     required String description,
     required String category,
@@ -82,6 +83,7 @@ abstract class Video implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       authorId: jsonSerialization['authorId'] as String,
       authorName: jsonSerialization['authorName'] as String,
+      seriesTitle: jsonSerialization['seriesTitle'] as String?,
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
@@ -132,6 +134,8 @@ abstract class Video implements _i1.SerializableModel {
 
   String authorName;
 
+  String? seriesTitle;
+
   String title;
 
   String description;
@@ -181,6 +185,7 @@ abstract class Video implements _i1.SerializableModel {
     int? id,
     String? authorId,
     String? authorName,
+    String? seriesTitle,
     String? title,
     String? description,
     String? category,
@@ -210,6 +215,7 @@ abstract class Video implements _i1.SerializableModel {
       if (id != null) 'id': id,
       'authorId': authorId,
       'authorName': authorName,
+      if (seriesTitle != null) 'seriesTitle': seriesTitle,
       'title': title,
       'description': description,
       'category': category,
@@ -248,6 +254,7 @@ class _VideoImpl extends Video {
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
     required String title,
     required String description,
     required String category,
@@ -273,6 +280,7 @@ class _VideoImpl extends Video {
          id: id,
          authorId: authorId,
          authorName: authorName,
+         seriesTitle: seriesTitle,
          title: title,
          description: description,
          category: category,
@@ -304,6 +312,7 @@ class _VideoImpl extends Video {
     Object? id = _Undefined,
     String? authorId,
     String? authorName,
+    Object? seriesTitle = _Undefined,
     String? title,
     String? description,
     String? category,
@@ -330,6 +339,7 @@ class _VideoImpl extends Video {
       id: id is int? ? id : this.id,
       authorId: authorId ?? this.authorId,
       authorName: authorName ?? this.authorName,
+      seriesTitle: seriesTitle is String? ? seriesTitle : this.seriesTitle,
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,

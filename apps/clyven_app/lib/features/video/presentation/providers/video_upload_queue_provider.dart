@@ -21,6 +21,7 @@ class VideoUploadRequest {
   final String title;
   final String description;
   final String category;
+  final String seriesTitle;
   final VideoContentType contentType;
 
   const VideoUploadRequest({
@@ -30,6 +31,7 @@ class VideoUploadRequest {
     required this.title,
     required this.description,
     required this.category,
+    this.seriesTitle = '',
     this.contentType = VideoContentType.video,
   });
 }
@@ -111,6 +113,7 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
         title: request.title,
         description: request.description,
         category: request.category,
+        seriesTitle: request.seriesTitle,
         durationSeconds: durationSeconds,
         contentType: request.contentType,
       );

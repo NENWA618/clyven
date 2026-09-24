@@ -7,6 +7,7 @@ class VideoDetail {
 
   final String authorId;
   final String authorName;
+  final String seriesTitle;
 
   final String category;
   final VideoContentType contentType;
@@ -29,6 +30,7 @@ class VideoDetail {
     required this.description,
     required this.authorId,
     required this.authorName,
+    this.seriesTitle = '',
     required this.category,
     this.contentType = VideoContentType.video,
     required this.tags,

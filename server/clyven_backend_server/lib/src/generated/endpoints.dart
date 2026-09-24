@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
@@ -2410,6 +2409,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'seriesTitle': _i1.ParameterDescription(
+              name: 'seriesTitle',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
             'category': _i1.ParameterDescription(
               name: 'category',
               type: _i1.getType<String>(),
@@ -2461,6 +2465,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 authorName: params['authorName'],
                 title: params['title'],
                 description: params['description'],
+                seriesTitle: params['seriesTitle'],
                 category: params['category'],
                 contentType: params['contentType'],
                 languageCode: params['languageCode'],
@@ -2516,6 +2521,30 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['video'] as _i14.VideoEndpoint).getVideo(
                 session,
                 params['id'],
+              ),
+        ),
+        'setSeries': _i1.MethodConnector(
+          name: 'setSeries',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'seriesTitle': _i1.ParameterDescription(
+              name: 'seriesTitle',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['video'] as _i14.VideoEndpoint).setSeries(
+                session,
+                videoId: params['videoId'],
+                seriesTitle: params['seriesTitle'],
               ),
         ),
         'setVisibility': _i1.MethodConnector(

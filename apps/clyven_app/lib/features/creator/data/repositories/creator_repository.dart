@@ -45,6 +45,7 @@ class ServerpodCreatorRepository implements CreatorRepository {
               title: video.title,
               coverUrl: video.coverUrl,
               viewCount: video.viewCount,
+              seriesTitle: video.seriesTitle,
               durationSeconds: video.durationSeconds,
             ),
           )

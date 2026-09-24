@@ -53,6 +53,8 @@ class CreatorProfilePage extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final creator = state.creator;
+    final seriesGroups =
+        _groupVideosBySeries(creator.videos, l10n.uncategorizedSeries);
 
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
@@ -62,16 +64,17 @@ class CreatorProfilePage extends ConsumerWidget {
         SliverToBoxAdapter(child: _buildStatistics(context, creator, l10n)),
         SliverToBoxAdapter(child: _buildSectionHeader(l10n)),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 60),
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 42),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
-              final video = creator.videos[index];
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 14),
-                child: _buildVideoCard(context, video, index, l10n),
+              final entry = seriesGroups.entries.elementAt(index);
+              return _buildSeriesSection(
+                context,
+                entry.key,
+                entry.value,
+                l10n,
               );
-            }, childCount: creator.videos.length),
+            }, childCount: seriesGroups.length),
           ),
         ),
       ],
@@ -383,6 +386,72 @@ class CreatorProfilePage extends ConsumerWidget {
               letterSpacing: 1.2,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, List<CreatorVideoPreview>> _groupVideosBySeries(
+    List<CreatorVideoPreview> videos,
+    String uncategorizedSeries,
+  ) {
+    final groups = <String, List<CreatorVideoPreview>>{};
+
+    for (final video in videos) {
+      final normalized = video.seriesTitle.trim();
+      final title = normalized.isEmpty ? uncategorizedSeries : normalized;
+      groups.putIfAbsent(title, () => <CreatorVideoPreview>[]).add(video);
+    }
+
+    return groups;
+  }
+
+  Widget _buildSeriesSection(
+    BuildContext context,
+    String seriesTitle,
+    List<CreatorVideoPreview> videos,
+    AppLocalizations l10n,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 2, bottom: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    seriesTitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _ink,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  l10n.seriesVideoCount(videos.length),
+                  style: const TextStyle(
+                    color: Color(0xFF99938A),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          for (var index = 0; index < videos.length; index++)
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: index == videos.length - 1 ? 0 : 14,
+              ),
+              child: _buildVideoCard(context, videos[index], index, l10n),
+            ),
         ],
       ),
     );

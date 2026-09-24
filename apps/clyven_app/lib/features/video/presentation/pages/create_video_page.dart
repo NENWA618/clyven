@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/video_content_type.dart';
+import '../providers/video_detail_provider.dart';
 import '../providers/video_upload_queue_provider.dart';
 
 class CreateVideoPage extends ConsumerStatefulWidget {
@@ -26,9 +27,15 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _seriesController = TextEditingController();
+
+  final List<String> _existingSeries = [];
 
   XFile? _video;
   String _category = '影像';
+  String? _selectedSeries;
+  bool _createNewSeries = false;
+  bool _isLoadingSeries = true;
   bool _isPublishing = false;
 
   final List<String> _categories = const [
@@ -46,10 +53,66 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   Color get _acid => Theme.of(context).colorScheme.primary;
 
   @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(_loadExistingSeries);
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _seriesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadExistingSeries() async {
+    try {
+      final user = await ref.read(authProvider.future);
+
+      if (user == null) {
+        if (mounted) {
+          setState(() {
+            _createNewSeries = true;
+          });
+        }
+        return;
+      }
+
+      final repository = ref.read(videoRepositoryProvider);
+      final videos = await repository.loadUserVideos(userId: user.id);
+
+      final values = videos
+          .map((video) => video.seriesTitle.trim())
+          .where((title) => title.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _existingSeries
+          ..clear()
+          ..addAll(values);
+        _selectedSeries = values.isEmpty ? null : values.first;
+        _createNewSeries = values.isEmpty;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _createNewSeries = true;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingSeries = false;
+        });
+      }
+    }
   }
 
   Future<void> _pickVideo() async {
@@ -76,6 +139,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     final l10n = AppLocalizations.of(context)!;
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
+    final seriesTitle = _createNewSeries
+        ? _seriesController.text.trim()
+        : (_selectedSeries ?? '').trim();
 
     if (_video == null) {
       _showMessage(l10n.chooseVideoRequired);
@@ -84,6 +150,11 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
 
     if (title.isEmpty) {
       _showMessage(l10n.titleRequired);
+      return;
+    }
+
+    if (seriesTitle.isEmpty) {
+      _showMessage(l10n.seriesRequired);
       return;
     }
 
@@ -117,6 +188,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               title: title,
               description: description,
               category: _category,
+              seriesTitle: seriesTitle,
               contentType: widget.contentType,
             ),
           );
@@ -179,6 +251,10 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                     hintText: l10n.videoTitleHint,
                     maxLines: 2,
                   ),
+                  const SizedBox(height: 24),
+                  _buildLabel(l10n.seriesEyebrow, l10n.seriesLabel),
+                  const SizedBox(height: 12),
+                  _buildSeriesPicker(l10n),
                   const SizedBox(height: 24),
                   _buildLabel(l10n.aboutEyebrow, l10n.descriptionLabel),
                   const SizedBox(height: 10),
@@ -438,6 +514,99 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
           borderSide: BorderSide(color: _purple, width: 1.5),
         ),
       ),
+    );
+  }
+
+  Widget _buildSeriesPicker(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
+    if (_isLoadingSeries) {
+      return const Align(
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_existingSeries.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            runSpacing: 9,
+            children: [
+              for (final series in _existingSeries)
+                ChoiceChip(
+                  label: Text(series),
+                  selected: !_createNewSeries && _selectedSeries == series,
+                  onSelected: _isPublishing
+                      ? null
+                      : (selected) {
+                          if (!selected) {
+                            return;
+                          }
+
+                          setState(() {
+                            _selectedSeries = series;
+                            _createNewSeries = false;
+                          });
+                        },
+                ),
+              ChoiceChip(
+                label: Text(l10n.createNewSeries),
+                selected: _createNewSeries,
+                onSelected: _isPublishing
+                    ? null
+                    : (selected) {
+                        if (!selected) {
+                          return;
+                        }
+
+                        setState(() {
+                          _createNewSeries = true;
+                          _selectedSeries = null;
+                        });
+                      },
+              ),
+            ],
+          )
+        else
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF222222)
+                  : Colors.white.withValues(alpha: 0.72),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF383838)
+                    : const Color(0xFFE3DED5),
+              ),
+            ),
+            child: Text(
+              l10n.noExistingSeries,
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.70),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        if (_createNewSeries) ...[
+          const SizedBox(height: 12),
+          _buildTextField(
+            controller: _seriesController,
+            hintText: l10n.seriesHint,
+            maxLines: 1,
+          ),
+        ],
+      ],
     );
   }
 
