@@ -1,4 +1,4 @@
-import 'package:jaspr/dom.dart';
+﻿import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -56,6 +56,12 @@ class StudioShell extends StatelessComponent {
                   path: '/videos',
                   icon: '▶',
                   label: 'Videos',
+                ),
+                _navItem(
+                  activePath: activePath,
+                  path: '/comments',
+                  icon: '☰',
+                  label: 'Comments',
                 ),
                 _navItem(
                   activePath: activePath,
@@ -188,6 +194,9 @@ class StudioShell extends StatelessComponent {
 
     if (path.startsWith('/videos')) {
       return 'Videos';
+    }
+    if (path.startsWith('/comments')) {
+      return 'Comments';
     }
 
     if (path.startsWith('/nom')) {

@@ -1,0 +1,8 @@
+class: ScriptConversionImportPreview
+fields:
+  profile: ScriptConversionProfile
+  totalRows: int
+  validRows: int
+  warningRows: int
+  errorRows: int
+  rows: List<ScriptConversionImportPreviewRow>

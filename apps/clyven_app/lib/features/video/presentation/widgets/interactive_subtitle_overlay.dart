@@ -372,9 +372,23 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   }
 
   List<serverpod.SubtitleKaraokeSegment> _sortedKaraokeSegments() {
-    final segments = [
-      ...(detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[]),
-    ]..sort((a, b) => a.position.compareTo(b.position));
+    final requestedScript = scriptCode?.trim().toLowerCase();
+
+    final segments =
+        (detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[])
+            .where((segment) {
+              if (requestedScript == null || requestedScript.isEmpty) {
+                return true;
+              }
+
+              final segmentScript = segment.scriptCode?.trim().toLowerCase();
+
+              return segmentScript == null ||
+                  segmentScript.isEmpty ||
+                  segmentScript == requestedScript;
+            })
+            .toList()
+          ..sort((a, b) => a.position.compareTo(b.position));
 
     return segments;
   }
@@ -523,7 +537,10 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
   }
 
   String _normalizeSubtitleForComparison(String value) {
-    return value.replaceAll(RegExp(r'\s+'), ' ').trim();
+    // Karaoke segments are edited independently and do not have to keep
+    // the exact spaces from the sentence. Compare visible text, not storage
+    // whitespace, so "Xin " + "chao" still matches "Xin chao".
+    return value.replaceAll(RegExp(r'\s+'), '');
   }
 
   bool _karaokeMatchesDisplayText(

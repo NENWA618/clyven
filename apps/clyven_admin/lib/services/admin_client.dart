@@ -19,14 +19,11 @@ class BrowserKeyValueStorage implements KeyValueStorage {
   }
 }
 
-// Same Clyven browser auth boundary as Studio.
-// When /studio and /admin are served from the same origin, both can restore the
-// same Serverpod browser session without asking the user to log in twice.
+const _serverUrl =
+    'https://glyphora-server-11129163384.asia-southeast1.run.app/';
+
 final adminClient =
-    Client(
-        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-        connectionTimeout: const Duration(minutes: 2),
-      )
+    Client(_serverUrl, connectionTimeout: const Duration(minutes: 2))
       ..authSessionManager = ClientAuthSessionManager(
         storage: KeyValueClientAuthSuccessStorage(
           keyValueStorage: BrowserKeyValueStorage(),

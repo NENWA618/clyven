@@ -1,4 +1,4 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
+﻿import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -264,14 +264,14 @@ class _SubtitleLearningPanelState extends ConsumerState<SubtitleLearningPanel> {
     final segments =
         detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[];
 
-    final requestedScript = widget.primaryScriptCode?.trim();
+    final requestedScript = widget.primaryScriptCode?.trim().toLowerCase();
 
     serverpod.SubtitleKaraokeSegment? segment;
 
     for (final item in segments) {
       if (item.position != word.position) continue;
 
-      final segmentScript = item.scriptCode?.trim();
+      final segmentScript = item.scriptCode?.trim().toLowerCase();
 
       if (requestedScript != null &&
           requestedScript.isNotEmpty &&

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   font-family:
     Inter,
     "Segoe UI",
@@ -2753,7 +2753,7 @@ body {
   min-height: 43px;
 }
 
-/* 行号固定在左边 */
+/* è¡Œå·å›ºå®šåœ¨å·¦è¾¹ */
 .dictionary-table-row > div:first-child {
   position: sticky;
 
@@ -2784,7 +2784,7 @@ body {
   color: #66758f;
 }
 
-/* 国语字 */
+/* å›½è¯­å­— */
 .dictionary-table-row > div:nth-child(2) {
   color: #172033;
 
@@ -2792,7 +2792,7 @@ body {
   font-weight: 750;
 }
 
-/* 喃字 */
+/* å–ƒå­— */
 .dictionary-table-row > div:nth-child(3) {
   color: #172033;
 
@@ -2800,12 +2800,12 @@ body {
   font-weight: 600;
 }
 
-/* 中文释义 */
+/* ä¸­æ–‡é‡Šä¹‰ */
 .dictionary-table-row > div:nth-child(4) {
   color: #39465b;
 }
 
-/* 词性 */
+/* è¯æ€§ */
 .dictionary-table-row > div:nth-child(5) {
   color: #245eea;
 
@@ -2813,7 +2813,7 @@ body {
   font-weight: 750;
 }
 
-/* 三个例句 */
+/* ä¸‰ä¸ªä¾‹å¥ */
 .dictionary-table-row > div:nth-child(6),
 .dictionary-table-row > div:nth-child(7),
 .dictionary-table-row > div:nth-child(8) {
@@ -2879,7 +2879,7 @@ body {
 }
 
 .dictionary-page .page-heading::before {
-  content: "文";
+  content: "æ–‡";
   position: absolute;
   left: 0;
   top: 0;
@@ -4562,3 +4562,82 @@ body {
   font-size: 11px;
   font-weight: 700;
 }
+
+
+/* Studio video + comment management v1 */
+.studio-page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.studio-page-heading h1 { margin: 0 0 6px; }
+.studio-page-heading p { margin: 0; color: var(--text-muted, #6b7280); }
+.sv-layout { display: grid; grid-template-columns: minmax(300px, 390px) minmax(0, 1fr); gap: 20px; }
+.sv-panel, .sc-video-list, .sc-comments-panel {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 16px;
+  padding: 20px;
+}
+.sv-panel h2, .sc-video-list h2, .sc-comments-panel h2 { margin-top: 0; }
+.sv-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; min-width: 0; }
+.sv-label { font-size: 12px; font-weight: 700; color: var(--text-muted, #6b7280); text-transform: uppercase; letter-spacing: .04em; }
+.sv-field input {
+  width: 100%; box-sizing: border-box; border: 1px solid var(--border, #d1d5db);
+  border-radius: 10px; padding: 10px 12px; background: transparent; color: inherit;
+}
+.sv-two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sv-segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sv-segment, .sv-secondary-button, .sv-primary-button, .sv-danger-button, .sv-link-button, .sv-link-danger {
+  border: 0; border-radius: 10px; padding: 9px 12px; cursor: pointer; font: inherit;
+}
+.sv-segment { background: #f3f4f6; color: #4b5563; }
+.sv-segment.active { background: #111827; color: #fff; }
+.sv-primary-button { width: 100%; background: #111827; color: #fff; font-weight: 700; margin-top: 14px; }
+.sv-secondary-button { background: #f3f4f6; color: #111827; }
+.sv-danger-button { background: #fee2e2; color: #991b1b; }
+.sv-danger-button.confirm { background: #b91c1c; color: white; }
+.sv-danger-button.compact { padding: 6px 9px; font-size: 12px; }
+.sv-link-button { background: transparent; color: #6b7280; }
+.sv-link-danger { background: transparent; color: #b91c1c; padding: 4px; font-size: 12px; }
+button:disabled { opacity: .55; cursor: default; }
+.sv-upload-box { border: 1px dashed #9ca3af; border-radius: 12px; padding: 14px; margin-top: 8px; }
+.sv-file-meta, .sv-upload-message { color: var(--text-muted, #6b7280); font-size: 13px; overflow-wrap: anywhere; }
+.sv-video-card { border-top: 1px solid var(--border, #e5e7eb); padding: 16px 0; display: flex; gap: 18px; justify-content: space-between; }
+.sv-video-card:first-of-type { border-top: 0; }
+.sv-video-card-main { min-width: 0; flex: 1; }
+.sv-video-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sv-video-title-row h3 { margin: 0; }
+.sv-video-meta, .sv-video-description { color: var(--text-muted, #6b7280); margin: 6px 0 0; overflow-wrap: anywhere; }
+.sv-visibility { border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 700; }
+.sv-visibility.public { background: #dcfce7; color: #166534; }
+.sv-visibility.private { background: #f3f4f6; color: #4b5563; }
+.sv-video-actions { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.sv-alert { border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+.sv-alert-error { background: #fee2e2; color: #991b1b; }
+.sv-empty { padding: 28px 12px; text-align: center; color: var(--text-muted, #6b7280); }
+.sc-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 20px; }
+.sc-video-list { display: flex; flex-direction: column; gap: 8px; align-self: start; }
+.sc-video-item { border: 1px solid transparent; border-radius: 10px; padding: 10px 12px; text-align: left; background: transparent; cursor: pointer; color: inherit; }
+.sc-video-item strong, .sc-video-item span { display: block; }
+.sc-video-item span { margin-top: 4px; font-size: 12px; color: var(--text-muted, #6b7280); }
+.sc-video-item.active { background: #f3f4f6; border-color: #d1d5db; }
+.sc-comment-card { border-top: 1px solid var(--border, #e5e7eb); padding: 18px 0; }
+.sc-comment-card:first-of-type { border-top: 0; }
+.sc-comment-head { display: flex; justify-content: space-between; gap: 12px; }
+.sc-time { color: var(--text-muted, #6b7280); font-size: 12px; margin-left: 8px; }
+.sc-comment-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-comment-meta { color: var(--text-muted, #6b7280); font-size: 12px; }
+.sc-replies { border-left: 2px solid #e5e7eb; margin: 14px 0 0 14px; padding-left: 14px; }
+.sc-reply { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; }
+.sc-reply p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-reply-main { min-width: 0; flex: 1; }
+.sc-pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 18px; }
+@media (max-width: 980px) {
+  .sv-layout, .sc-layout { grid-template-columns: 1fr; }
+  .sv-video-card { flex-direction: column; }
+  .sv-two-columns { grid-template-columns: 1fr; }
+}
+

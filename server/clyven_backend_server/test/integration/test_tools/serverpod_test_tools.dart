@@ -49,24 +49,32 @@ import 'package:clyven_backend_server/src/generated/subtitle_review_task_detail.
     as _i22;
 import 'package:clyven_backend_server/src/generated/subtitle_review_task.dart'
     as _i23;
-import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
     as _i24;
-import 'package:clyven_backend_server/src/generated/subtitle_publish_status.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
     as _i25;
-import 'package:clyven_backend_server/src/generated/subtitle_srt_preview.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_import_preview.dart'
     as _i26;
-import 'package:clyven_backend_server/src/generated/subtitle_cue.dart' as _i27;
-import 'package:clyven_backend_server/src/generated/subtitle_cue_text.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_commit_result.dart'
+    as _i27;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
     as _i28;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_publish_status.dart'
     as _i29;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_srt_preview.dart'
     as _i30;
-import 'package:clyven_backend_server/src/generated/word_list.dart' as _i31;
-import 'package:clyven_backend_server/src/generated/word_list_detail.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_cue.dart' as _i31;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_text.dart'
     as _i32;
-import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
     as _i33;
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+    as _i34;
+import 'package:clyven_backend_server/src/generated/word_list.dart' as _i35;
+import 'package:clyven_backend_server/src/generated/word_list_detail.dart'
+    as _i36;
+import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+    as _i37;
 import 'package:clyven_backend_server/src/generated/protocol.dart';
 import 'package:clyven_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -199,6 +207,8 @@ class TestEndpoints {
 
   late final _ReviewEndpoint review;
 
+  late final _ScriptConversionEndpoint scriptConversion;
+
   late final _SubtitleEndpoint subtitle;
 
   late final _VideoEndpoint video;
@@ -248,6 +258,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     review = _ReviewEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    scriptConversion = _ScriptConversionEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1172,6 +1186,78 @@ class _CommentEndpoint {
       }
     });
   }
+
+  _i3.Future<void> deleteManagedComment(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+    required int commentId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'comment',
+            method: 'deleteManagedComment',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'comment',
+          methodName: 'deleteManagedComment',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'commentId': commentId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> deleteManagedReply(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+    required int commentId,
+    required int replyId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'comment',
+            method: 'deleteManagedReply',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'comment',
+          methodName: 'deleteManagedReply',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'commentId': commentId,
+            'replyId': replyId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _DictionaryEndpoint {
@@ -1990,6 +2076,406 @@ class _ReviewEndpoint {
   }
 }
 
+class _ScriptConversionEndpoint {
+  _ScriptConversionEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i24.ScriptConversionProfile>> listProfiles(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'listProfiles',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'listProfiles',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i24.ScriptConversionProfile>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i24.ScriptConversionProfile> createProfile(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String name,
+    required String languageCode,
+    required String sourceScriptCode,
+    required String targetScriptCode,
+    required String sourceColumn,
+    required String targetColumn,
+    String? sheetName,
+    String? priorityColumn,
+    String? noteColumn,
+    required String conversionMode,
+    String? typeColumn,
+    String? description,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'createProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'createProfile',
+          parameters: _i1.testObjectToJson({
+            'name': name,
+            'languageCode': languageCode,
+            'sourceScriptCode': sourceScriptCode,
+            'targetScriptCode': targetScriptCode,
+            'sourceColumn': sourceColumn,
+            'targetColumn': targetColumn,
+            'sheetName': sheetName,
+            'priorityColumn': priorityColumn,
+            'noteColumn': noteColumn,
+            'conversionMode': conversionMode,
+            'typeColumn': typeColumn,
+            'description': description,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i24.ScriptConversionProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i24.ScriptConversionProfile> updateProfile(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String name,
+    required String languageCode,
+    required String sourceScriptCode,
+    required String targetScriptCode,
+    required String sourceColumn,
+    required String targetColumn,
+    String? sheetName,
+    String? priorityColumn,
+    String? noteColumn,
+    required String conversionMode,
+    String? typeColumn,
+    String? description,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'updateProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'updateProfile',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'name': name,
+            'languageCode': languageCode,
+            'sourceScriptCode': sourceScriptCode,
+            'targetScriptCode': targetScriptCode,
+            'sourceColumn': sourceColumn,
+            'targetColumn': targetColumn,
+            'sheetName': sheetName,
+            'priorityColumn': priorityColumn,
+            'noteColumn': noteColumn,
+            'conversionMode': conversionMode,
+            'typeColumn': typeColumn,
+            'description': description,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i24.ScriptConversionProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> deleteProfile(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'deleteProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'deleteProfile',
+          parameters: _i1.testObjectToJson({'profileId': profileId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i25.ScriptConversionEntry>> listEntries(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required int limit,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'listEntries',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'listEntries',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i25.ScriptConversionEntry>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i25.ScriptConversionEntry> updateEntry(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int entryId,
+    required String sourceText,
+    required String targetText,
+    required int priority,
+    String? note,
+    String? entryType,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'updateEntry',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'updateEntry',
+          parameters: _i1.testObjectToJson({
+            'entryId': entryId,
+            'sourceText': sourceText,
+            'targetText': targetText,
+            'priority': priority,
+            'note': note,
+            'entryType': entryType,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i25.ScriptConversionEntry>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> deleteEntry(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int entryId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'deleteEntry',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'deleteEntry',
+          parameters: _i1.testObjectToJson({'entryId': entryId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i26.ScriptConversionImportPreview> previewExcelBase64(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String excelBase64,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'previewExcelBase64',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'previewExcelBase64',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'excelBase64': excelBase64,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i26.ScriptConversionImportPreview>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i27.ScriptConversionCommitResult> commitExcelBase64(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String excelBase64,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'commitExcelBase64',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'commitExcelBase64',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'excelBase64': excelBase64,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i27.ScriptConversionCommitResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String> testConvert(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int profileId,
+    required String text,
+    required bool reverse,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'scriptConversion',
+            method: 'testConvert',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'scriptConversion',
+          methodName: 'testConvert',
+          parameters: _i1.testObjectToJson({
+            'profileId': profileId,
+            'text': text,
+            'reverse': reverse,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _SubtitleEndpoint {
   _SubtitleEndpoint(
     this._endpointDispatch,
@@ -2000,7 +2486,7 @@ class _SubtitleEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i24.SubtitleCueDetail>> getCueDetails(
+  _i3.Future<List<_i28.SubtitleCueDetail>> getCueDetails(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2029,7 +2515,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i24.SubtitleCueDetail>>);
+                as _i3.Future<List<_i28.SubtitleCueDetail>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2037,7 +2523,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<List<_i24.SubtitleCueDetail>> getPublishedCueDetails(
+  _i3.Future<List<_i28.SubtitleCueDetail>> getPublishedCueDetails(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2066,7 +2552,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i24.SubtitleCueDetail>>);
+                as _i3.Future<List<_i28.SubtitleCueDetail>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2105,7 +2591,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i25.SubtitlePublishStatus> getSubtitlePublishStatus(
+  _i3.Future<_i29.SubtitlePublishStatus> getSubtitlePublishStatus(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2132,7 +2618,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i25.SubtitlePublishStatus>);
+                as _i3.Future<_i29.SubtitlePublishStatus>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2140,7 +2626,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i25.SubtitlePublishStatus> publishSubtitleTrack(
+  _i3.Future<_i29.SubtitlePublishStatus> publishSubtitleTrack(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2167,7 +2653,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i25.SubtitlePublishStatus>);
+                as _i3.Future<_i29.SubtitlePublishStatus>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2206,7 +2692,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i26.SubtitleSrtPreview> previewSrtImport(
+  _i3.Future<_i30.SubtitleSrtPreview> previewSrtImport(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2235,7 +2721,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i26.SubtitleSrtPreview>);
+                as _i3.Future<_i30.SubtitleSrtPreview>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2317,7 +2803,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i27.SubtitleCue> updateCueText(
+  _i3.Future<_i31.SubtitleCue> updateCueText(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required String text,
@@ -2346,7 +2832,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i27.SubtitleCue>);
+                as _i3.Future<_i31.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2354,7 +2840,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i28.SubtitleCueText> upsertCueScriptText(
+  _i3.Future<_i32.SubtitleCueText> upsertCueScriptText(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required String scriptCode,
@@ -2385,7 +2871,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i28.SubtitleCueText>);
+                as _i3.Future<_i32.SubtitleCueText>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2393,7 +2879,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i27.SubtitleCue> updateCueTiming(
+  _i3.Future<_i31.SubtitleCue> updateCueTiming(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required int startMs,
@@ -2422,7 +2908,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i27.SubtitleCue>);
+                as _i3.Future<_i31.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2430,7 +2916,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i27.SubtitleCue> createCue(
+  _i3.Future<_i31.SubtitleCue> createCue(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2465,7 +2951,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i27.SubtitleCue>);
+                as _i3.Future<_i31.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2504,10 +2990,10 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<List<_i29.SubtitleKaraokeSegment>> replaceKaraokeSegments(
+  _i3.Future<List<_i33.SubtitleKaraokeSegment>> replaceKaraokeSegments(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
-    required List<_i30.SubtitleKaraokeSegmentInput> segments,
+    required List<_i34.SubtitleKaraokeSegmentInput> segments,
     String? scriptCode,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -2533,7 +3019,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i29.SubtitleKaraokeSegment>>);
+                as _i3.Future<List<_i33.SubtitleKaraokeSegment>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2552,6 +3038,36 @@ class _VideoEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
+  _i3.Future<String> getCurrentUserId(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'video',
+            method: 'getCurrentUserId',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'video',
+          methodName: 'getCurrentUserId',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _i3.Future<_i8.Video> create(
     _i1.TestSessionBuilder sessionBuilder, {
     required String authorId,
@@ -2564,6 +3080,7 @@ class _VideoEndpoint {
     required String videoStorageKey,
     String? coverStorageKey,
     required int durationSeconds,
+    required bool isPublic,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -2587,6 +3104,7 @@ class _VideoEndpoint {
             'videoStorageKey': videoStorageKey,
             'coverStorageKey': coverStorageKey,
             'durationSeconds': durationSeconds,
+            'isPublic': isPublic,
           }),
           serializationManager: _serializationManager,
         );
@@ -2694,6 +3212,72 @@ class _VideoEndpoint {
     });
   }
 
+  _i3.Future<_i8.Video> setVisibility(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+    required bool isPublic,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'video',
+            method: 'setVisibility',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'video',
+          methodName: 'setVisibility',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'isPublic': isPublic,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.Video>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> deleteVideo(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'video',
+            method: 'deleteVideo',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'video',
+          methodName: 'deleteVideo',
+          parameters: _i1.testObjectToJson({'videoId': videoId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _i3.Future<String?> createUploadDescription(
     _i1.TestSessionBuilder sessionBuilder, {
     required String path,
@@ -2790,6 +3374,37 @@ class _VideoEndpoint {
       }
     });
   }
+
+  _i3.Future<String?> getPlaybackManifestUrl(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'video',
+            method: 'getPlaybackManifestUrl',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'video',
+          methodName: 'getPlaybackManifestUrl',
+          parameters: _i1.testObjectToJson({'videoId': videoId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _WordListEndpoint {
@@ -2802,7 +3417,7 @@ class _WordListEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i31.WordList>> getLists(
+  _i3.Future<List<_i35.WordList>> getLists(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -2824,7 +3439,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i31.WordList>>);
+                as _i3.Future<List<_i35.WordList>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2832,7 +3447,7 @@ class _WordListEndpoint {
     });
   }
 
-  _i3.Future<_i32.WordListDetail?> getListDetail(
+  _i3.Future<_i36.WordListDetail?> getListDetail(
     _i1.TestSessionBuilder sessionBuilder, {
     required int listId,
     required String explanationLanguageCode,
@@ -2859,7 +3474,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i32.WordListDetail?>);
+                as _i3.Future<_i36.WordListDetail?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2878,7 +3493,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i33.Greeting> hello(
+  _i3.Future<_i37.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -2901,7 +3516,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i33.Greeting>);
+                as _i3.Future<_i37.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

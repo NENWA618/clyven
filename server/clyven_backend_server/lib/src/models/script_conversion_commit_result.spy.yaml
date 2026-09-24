@@ -1,0 +1,7 @@
+class: ScriptConversionCommitResult
+fields:
+  profileId: int
+  totalRows: int
+  insertedRows: int
+  updatedRows: int
+  skippedRows: int
