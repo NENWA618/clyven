@@ -1,4 +1,4 @@
-﻿import 'package:clyven_backend_client/clyven_backend_client.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
@@ -147,6 +147,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
         title: title.trim(),
         description: descriptionText,
         category: category.trim().isEmpty ? 'general' : category.trim(),
+        contentType: VideoContentType.video,
         languageCode: languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
         tags: tagsText
             .split(',')
