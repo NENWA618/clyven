@@ -26,12 +26,16 @@ abstract class Video implements _i1.SerializableModel {
     required this.tags,
     required this.videoStorageKey,
     this.coverStorageKey,
+    this.hlsManifestStorageKey,
+    this.transcoderJobName,
+    this.transcodeState,
     required this.durationSeconds,
     int? viewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i2.VideoStatus? status,
+    bool? isPublic,
     this.publishedAt,
     required this.createdAt,
     required this.updatedAt,
@@ -39,7 +43,8 @@ abstract class Video implements _i1.SerializableModel {
        likeCount = likeCount ?? 0,
        favoriteCount = favoriteCount ?? 0,
        commentCount = commentCount ?? 0,
-       status = status ?? _i2.VideoStatus.uploading;
+       status = status ?? _i2.VideoStatus.uploading,
+       isPublic = isPublic ?? true;
 
   factory Video({
     int? id,
@@ -52,12 +57,16 @@ abstract class Video implements _i1.SerializableModel {
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     required int durationSeconds,
     int? viewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i2.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -75,6 +84,10 @@ abstract class Video implements _i1.SerializableModel {
       tags: _i3.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
+      hlsManifestStorageKey:
+          jsonSerialization['hlsManifestStorageKey'] as String?,
+      transcoderJobName: jsonSerialization['transcoderJobName'] as String?,
+      transcodeState: jsonSerialization['transcodeState'] as String?,
       durationSeconds: jsonSerialization['durationSeconds'] as int,
       viewCount: jsonSerialization['viewCount'] as int?,
       likeCount: jsonSerialization['likeCount'] as int?,
@@ -83,6 +96,9 @@ abstract class Video implements _i1.SerializableModel {
       status: jsonSerialization['status'] == null
           ? null
           : _i2.VideoStatus.fromJson((jsonSerialization['status'] as String)),
+      isPublic: jsonSerialization['isPublic'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isPublic']),
       publishedAt: jsonSerialization['publishedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
@@ -120,6 +136,12 @@ abstract class Video implements _i1.SerializableModel {
 
   String? coverStorageKey;
 
+  String? hlsManifestStorageKey;
+
+  String? transcoderJobName;
+
+  String? transcodeState;
+
   int durationSeconds;
 
   int viewCount;
@@ -131,6 +153,8 @@ abstract class Video implements _i1.SerializableModel {
   int commentCount;
 
   _i2.VideoStatus status;
+
+  bool isPublic;
 
   DateTime? publishedAt;
 
@@ -152,12 +176,16 @@ abstract class Video implements _i1.SerializableModel {
     List<String>? tags,
     String? videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     int? durationSeconds,
     int? viewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i2.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -176,12 +204,17 @@ abstract class Video implements _i1.SerializableModel {
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
+      if (hlsManifestStorageKey != null)
+        'hlsManifestStorageKey': hlsManifestStorageKey,
+      if (transcoderJobName != null) 'transcoderJobName': transcoderJobName,
+      if (transcodeState != null) 'transcodeState': transcodeState,
       'durationSeconds': durationSeconds,
       'viewCount': viewCount,
       'likeCount': likeCount,
       'favoriteCount': favoriteCount,
       'commentCount': commentCount,
       'status': status.toJson(),
+      'isPublic': isPublic,
       if (publishedAt != null) 'publishedAt': publishedAt?.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -208,12 +241,16 @@ class _VideoImpl extends Video {
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     required int durationSeconds,
     int? viewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i2.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -228,12 +265,16 @@ class _VideoImpl extends Video {
          tags: tags,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
+         hlsManifestStorageKey: hlsManifestStorageKey,
+         transcoderJobName: transcoderJobName,
+         transcodeState: transcodeState,
          durationSeconds: durationSeconds,
          viewCount: viewCount,
          likeCount: likeCount,
          favoriteCount: favoriteCount,
          commentCount: commentCount,
          status: status,
+         isPublic: isPublic,
          publishedAt: publishedAt,
          createdAt: createdAt,
          updatedAt: updatedAt,
@@ -254,12 +295,16 @@ class _VideoImpl extends Video {
     List<String>? tags,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
+    Object? hlsManifestStorageKey = _Undefined,
+    Object? transcoderJobName = _Undefined,
+    Object? transcodeState = _Undefined,
     int? durationSeconds,
     int? viewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i2.VideoStatus? status,
+    bool? isPublic,
     Object? publishedAt = _Undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -277,12 +322,22 @@ class _VideoImpl extends Video {
       coverStorageKey: coverStorageKey is String?
           ? coverStorageKey
           : this.coverStorageKey,
+      hlsManifestStorageKey: hlsManifestStorageKey is String?
+          ? hlsManifestStorageKey
+          : this.hlsManifestStorageKey,
+      transcoderJobName: transcoderJobName is String?
+          ? transcoderJobName
+          : this.transcoderJobName,
+      transcodeState: transcodeState is String?
+          ? transcodeState
+          : this.transcodeState,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       viewCount: viewCount ?? this.viewCount,
       likeCount: likeCount ?? this.likeCount,
       favoriteCount: favoriteCount ?? this.favoriteCount,
       commentCount: commentCount ?? this.commentCount,
       status: status ?? this.status,
+      isPublic: isPublic ?? this.isPublic,
       publishedAt: publishedAt is DateTime? ? publishedAt : this.publishedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

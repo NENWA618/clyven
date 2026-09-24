@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
@@ -70,6 +70,7 @@ class ServerpodVideoRepository implements VideoRepository {
       videoStorageKey: videoStorageKey,
       coverStorageKey: coverStorageKey,
       durationSeconds: draft.durationSeconds,
+      isPublic: true,
     );
 
     return _toVideoDetailWithUrls(video);
@@ -107,13 +108,7 @@ class ServerpodVideoRepository implements VideoRepository {
 
   @override
   Future<List<VideoDetail>> loadUserVideos({required String userId}) async {
-    final videos = await client.video.getVideos();
-
-    final userVideos = videos
-        .where((video) {
-          return video.authorId == userId;
-        })
-        .toList(growable: false);
+    final userVideos = await client.video.getMyVideos();
 
     final results = <VideoDetail>[];
 

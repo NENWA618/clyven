@@ -1,4 +1,4 @@
-import 'package:serverpod/serverpod.dart';
+﻿import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
 
@@ -412,5 +412,86 @@ class CommentEndpoint extends Endpoint {
       likeCount: reply.likeCount,
       isLiked: liked,
     );
+  }
+
+  Future<Video> _requireManagedVideo(
+    Session session,
+    int videoId,
+  ) async {
+    final userId = _requireUserId(session);
+    final video = await _requireVideo(session, videoId);
+
+    if (video.authorId != userId) {
+      throw Exception('只能管理自己视频下的评论');
+    }
+
+    return video;
+  }
+
+  Future<void> deleteManagedComment(
+    Session session, {
+    required int videoId,
+    required int commentId,
+  }) async {
+    final video = await _requireManagedVideo(session, videoId);
+    final comment = await _requireComment(
+      session,
+      videoId: videoId,
+      commentId: commentId,
+    );
+
+    final replies = await CommentReplyRow.db.find(
+      session,
+      where: (row) => row.commentId.equals(commentId),
+    );
+    final replyIds = replies.map((row) => row.id).whereType<int>().toSet();
+
+    if (replyIds.isNotEmpty) {
+      await CommentReplyLike.db.deleteWhere(
+        session,
+        where: (row) => row.replyId.inSet(replyIds),
+      );
+    }
+
+    await CommentReplyRow.db.deleteWhere(
+      session,
+      where: (row) => row.commentId.equals(commentId),
+    );
+    await CommentLike.db.deleteWhere(
+      session,
+      where: (row) => row.commentId.equals(commentId),
+    );
+    await VideoCommentRow.db.deleteRow(session, comment);
+
+    if (video.commentCount > 0) {
+      video.commentCount -= 1;
+    }
+    video.updatedAt = DateTime.now();
+    await Video.db.updateRow(session, video);
+  }
+
+  Future<void> deleteManagedReply(
+    Session session, {
+    required int videoId,
+    required int commentId,
+    required int replyId,
+  }) async {
+    await _requireManagedVideo(session, videoId);
+    await _requireComment(
+      session,
+      videoId: videoId,
+      commentId: commentId,
+    );
+    final reply = await _requireReply(
+      session,
+      commentId: commentId,
+      replyId: replyId,
+    );
+
+    await CommentReplyLike.db.deleteWhere(
+      session,
+      where: (row) => row.replyId.equals(replyId),
+    );
+    await CommentReplyRow.db.deleteRow(session, reply);
   }
 }

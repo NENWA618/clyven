@@ -42,53 +42,62 @@ import 'entry_knowledge_state.dart' as _i27;
 import 'greetings/greeting.dart' as _i28;
 import 'knowledge_state_query.dart' as _i29;
 import 'knowledge_state_result.dart' as _i30;
-import 'subtitle_cue.dart' as _i31;
-import 'subtitle_cue_detail.dart' as _i32;
-import 'subtitle_cue_text.dart' as _i33;
-import 'subtitle_karaoke_segment.dart' as _i34;
-import 'subtitle_karaoke_segment_input.dart' as _i35;
-import 'subtitle_phrase.dart' as _i36;
-import 'subtitle_publish_state.dart' as _i37;
-import 'subtitle_publish_status.dart' as _i38;
-import 'subtitle_review_dashboard.dart' as _i39;
-import 'subtitle_review_event.dart' as _i40;
-import 'subtitle_review_queue_item.dart' as _i41;
-import 'subtitle_review_task.dart' as _i42;
-import 'subtitle_review_task_detail.dart' as _i43;
-import 'subtitle_review_task_status.dart' as _i44;
-import 'subtitle_srt_preview.dart' as _i45;
-import 'subtitle_token.dart' as _i46;
-import 'subtitle_track.dart' as _i47;
-import 'user_known_entry.dart' as _i48;
-import 'video.dart' as _i49;
-import 'video_comment_dto.dart' as _i50;
-import 'video_comment_row.dart' as _i51;
-import 'video_status.dart' as _i52;
-import 'word_list.dart' as _i53;
-import 'word_list_detail.dart' as _i54;
-import 'word_list_item.dart' as _i55;
-import 'word_list_item_detail.dart' as _i56;
-import 'package:clyven_backend_server/src/generated/asr_job.dart' as _i57;
-import 'package:clyven_backend_server/src/generated/video.dart' as _i58;
+import 'script_conversion_commit_result.dart' as _i31;
+import 'script_conversion_entry.dart' as _i32;
+import 'script_conversion_import_preview.dart' as _i33;
+import 'script_conversion_import_preview_row.dart' as _i34;
+import 'script_conversion_profile.dart' as _i35;
+import 'subtitle_cue.dart' as _i36;
+import 'subtitle_cue_detail.dart' as _i37;
+import 'subtitle_cue_text.dart' as _i38;
+import 'subtitle_karaoke_segment.dart' as _i39;
+import 'subtitle_karaoke_segment_input.dart' as _i40;
+import 'subtitle_phrase.dart' as _i41;
+import 'subtitle_publish_state.dart' as _i42;
+import 'subtitle_publish_status.dart' as _i43;
+import 'subtitle_review_dashboard.dart' as _i44;
+import 'subtitle_review_event.dart' as _i45;
+import 'subtitle_review_queue_item.dart' as _i46;
+import 'subtitle_review_task.dart' as _i47;
+import 'subtitle_review_task_detail.dart' as _i48;
+import 'subtitle_review_task_status.dart' as _i49;
+import 'subtitle_srt_preview.dart' as _i50;
+import 'subtitle_token.dart' as _i51;
+import 'subtitle_track.dart' as _i52;
+import 'user_known_entry.dart' as _i53;
+import 'video.dart' as _i54;
+import 'video_comment_dto.dart' as _i55;
+import 'video_comment_row.dart' as _i56;
+import 'video_status.dart' as _i57;
+import 'word_list.dart' as _i58;
+import 'word_list_detail.dart' as _i59;
+import 'word_list_item.dart' as _i60;
+import 'word_list_item_detail.dart' as _i61;
+import 'package:clyven_backend_server/src/generated/asr_job.dart' as _i62;
+import 'package:clyven_backend_server/src/generated/video.dart' as _i63;
 import 'package:clyven_backend_server/src/generated/subtitle_track.dart'
-    as _i59;
-import 'package:clyven_backend_server/src/generated/dictionary_entry_detail.dart'
-    as _i60;
-import 'package:clyven_backend_server/src/generated/dictionary_import_profile.dart'
-    as _i61;
-import 'package:clyven_backend_server/src/generated/entry_knowledge_state.dart'
-    as _i62;
-import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
-    as _i63;
-import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
     as _i64;
-import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+import 'package:clyven_backend_server/src/generated/dictionary_entry_detail.dart'
     as _i65;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
+import 'package:clyven_backend_server/src/generated/dictionary_import_profile.dart'
     as _i66;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+import 'package:clyven_backend_server/src/generated/entry_knowledge_state.dart'
     as _i67;
-import 'package:clyven_backend_server/src/generated/word_list.dart' as _i68;
+import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
+    as _i68;
+import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
+    as _i69;
+import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
+    as _i70;
+import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
+    as _i71;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+    as _i72;
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
+    as _i73;
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+    as _i74;
+import 'package:clyven_backend_server/src/generated/word_list.dart' as _i75;
 export 'asr_job.dart';
 export 'asr_job_status.dart';
 export 'comment_like.dart';
@@ -115,6 +124,11 @@ export 'entry_knowledge_state.dart';
 export 'greetings/greeting.dart';
 export 'knowledge_state_query.dart';
 export 'knowledge_state_result.dart';
+export 'script_conversion_commit_result.dart';
+export 'script_conversion_entry.dart';
+export 'script_conversion_import_preview.dart';
+export 'script_conversion_import_preview_row.dart';
+export 'script_conversion_profile.dart';
 export 'subtitle_cue.dart';
 export 'subtitle_cue_detail.dart';
 export 'subtitle_cue_text.dart';
@@ -1224,6 +1238,222 @@ class Protocol extends _i1.SerializationManagerServer {
       indexes: [
         _i2.IndexDefinition(
           indexName: 'dictionary_relation_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'script_conversion_entry',
+      dartName: 'ScriptConversionEntry',
+      schema: 'public',
+      module: 'clyven_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'script_conversion_entry_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'profileId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sourceText',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'targetText',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'priority',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _i2.ColumnDefinition(
+          name: 'note',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'metadataJson',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'entryType',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'script_conversion_entry_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'script_conversion_profile',
+      dartName: 'ScriptConversionProfile',
+      schema: 'public',
+      module: 'clyven_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'script_conversion_profile_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'name',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'languageCode',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sourceScriptCode',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'targetScriptCode',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sheetName',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'sourceColumn',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'targetColumn',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'priorityColumn',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'noteColumn',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'conversionMode',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'typeColumn',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'description',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isActive',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'true',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'CURRENT_TIMESTAMP',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'script_conversion_profile_pkey',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(
@@ -2417,6 +2647,24 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String?',
         ),
         _i2.ColumnDefinition(
+          name: 'hlsManifestStorageKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'transcoderJobName',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'transcodeState',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
           name: 'durationSeconds',
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
@@ -2456,6 +2704,13 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'protocol:VideoStatus',
           columnDefault: '\'uploading\'::text',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isPublic',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'true',
         ),
         _i2.ColumnDefinition(
           name: 'publishedAt',
@@ -2853,83 +3108,98 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i30.KnowledgeStateResult) {
       return _i30.KnowledgeStateResult.fromJson(data) as T;
     }
-    if (t == _i31.SubtitleCue) {
-      return _i31.SubtitleCue.fromJson(data) as T;
+    if (t == _i31.ScriptConversionCommitResult) {
+      return _i31.ScriptConversionCommitResult.fromJson(data) as T;
     }
-    if (t == _i32.SubtitleCueDetail) {
-      return _i32.SubtitleCueDetail.fromJson(data) as T;
+    if (t == _i32.ScriptConversionEntry) {
+      return _i32.ScriptConversionEntry.fromJson(data) as T;
     }
-    if (t == _i33.SubtitleCueText) {
-      return _i33.SubtitleCueText.fromJson(data) as T;
+    if (t == _i33.ScriptConversionImportPreview) {
+      return _i33.ScriptConversionImportPreview.fromJson(data) as T;
     }
-    if (t == _i34.SubtitleKaraokeSegment) {
-      return _i34.SubtitleKaraokeSegment.fromJson(data) as T;
+    if (t == _i34.ScriptConversionImportPreviewRow) {
+      return _i34.ScriptConversionImportPreviewRow.fromJson(data) as T;
     }
-    if (t == _i35.SubtitleKaraokeSegmentInput) {
-      return _i35.SubtitleKaraokeSegmentInput.fromJson(data) as T;
+    if (t == _i35.ScriptConversionProfile) {
+      return _i35.ScriptConversionProfile.fromJson(data) as T;
     }
-    if (t == _i36.SubtitlePhrase) {
-      return _i36.SubtitlePhrase.fromJson(data) as T;
+    if (t == _i36.SubtitleCue) {
+      return _i36.SubtitleCue.fromJson(data) as T;
     }
-    if (t == _i37.SubtitlePublishState) {
-      return _i37.SubtitlePublishState.fromJson(data) as T;
+    if (t == _i37.SubtitleCueDetail) {
+      return _i37.SubtitleCueDetail.fromJson(data) as T;
     }
-    if (t == _i38.SubtitlePublishStatus) {
-      return _i38.SubtitlePublishStatus.fromJson(data) as T;
+    if (t == _i38.SubtitleCueText) {
+      return _i38.SubtitleCueText.fromJson(data) as T;
     }
-    if (t == _i39.SubtitleReviewDashboard) {
-      return _i39.SubtitleReviewDashboard.fromJson(data) as T;
+    if (t == _i39.SubtitleKaraokeSegment) {
+      return _i39.SubtitleKaraokeSegment.fromJson(data) as T;
     }
-    if (t == _i40.SubtitleReviewEvent) {
-      return _i40.SubtitleReviewEvent.fromJson(data) as T;
+    if (t == _i40.SubtitleKaraokeSegmentInput) {
+      return _i40.SubtitleKaraokeSegmentInput.fromJson(data) as T;
     }
-    if (t == _i41.SubtitleReviewQueueItem) {
-      return _i41.SubtitleReviewQueueItem.fromJson(data) as T;
+    if (t == _i41.SubtitlePhrase) {
+      return _i41.SubtitlePhrase.fromJson(data) as T;
     }
-    if (t == _i42.SubtitleReviewTask) {
-      return _i42.SubtitleReviewTask.fromJson(data) as T;
+    if (t == _i42.SubtitlePublishState) {
+      return _i42.SubtitlePublishState.fromJson(data) as T;
     }
-    if (t == _i43.SubtitleReviewTaskDetail) {
-      return _i43.SubtitleReviewTaskDetail.fromJson(data) as T;
+    if (t == _i43.SubtitlePublishStatus) {
+      return _i43.SubtitlePublishStatus.fromJson(data) as T;
     }
-    if (t == _i44.SubtitleReviewTaskStatus) {
-      return _i44.SubtitleReviewTaskStatus.fromJson(data) as T;
+    if (t == _i44.SubtitleReviewDashboard) {
+      return _i44.SubtitleReviewDashboard.fromJson(data) as T;
     }
-    if (t == _i45.SubtitleSrtPreview) {
-      return _i45.SubtitleSrtPreview.fromJson(data) as T;
+    if (t == _i45.SubtitleReviewEvent) {
+      return _i45.SubtitleReviewEvent.fromJson(data) as T;
     }
-    if (t == _i46.SubtitleToken) {
-      return _i46.SubtitleToken.fromJson(data) as T;
+    if (t == _i46.SubtitleReviewQueueItem) {
+      return _i46.SubtitleReviewQueueItem.fromJson(data) as T;
     }
-    if (t == _i47.SubtitleTrack) {
-      return _i47.SubtitleTrack.fromJson(data) as T;
+    if (t == _i47.SubtitleReviewTask) {
+      return _i47.SubtitleReviewTask.fromJson(data) as T;
     }
-    if (t == _i48.UserKnownEntry) {
-      return _i48.UserKnownEntry.fromJson(data) as T;
+    if (t == _i48.SubtitleReviewTaskDetail) {
+      return _i48.SubtitleReviewTaskDetail.fromJson(data) as T;
     }
-    if (t == _i49.Video) {
-      return _i49.Video.fromJson(data) as T;
+    if (t == _i49.SubtitleReviewTaskStatus) {
+      return _i49.SubtitleReviewTaskStatus.fromJson(data) as T;
     }
-    if (t == _i50.VideoCommentDto) {
-      return _i50.VideoCommentDto.fromJson(data) as T;
+    if (t == _i50.SubtitleSrtPreview) {
+      return _i50.SubtitleSrtPreview.fromJson(data) as T;
     }
-    if (t == _i51.VideoCommentRow) {
-      return _i51.VideoCommentRow.fromJson(data) as T;
+    if (t == _i51.SubtitleToken) {
+      return _i51.SubtitleToken.fromJson(data) as T;
     }
-    if (t == _i52.VideoStatus) {
-      return _i52.VideoStatus.fromJson(data) as T;
+    if (t == _i52.SubtitleTrack) {
+      return _i52.SubtitleTrack.fromJson(data) as T;
     }
-    if (t == _i53.WordList) {
-      return _i53.WordList.fromJson(data) as T;
+    if (t == _i53.UserKnownEntry) {
+      return _i53.UserKnownEntry.fromJson(data) as T;
     }
-    if (t == _i54.WordListDetail) {
-      return _i54.WordListDetail.fromJson(data) as T;
+    if (t == _i54.Video) {
+      return _i54.Video.fromJson(data) as T;
     }
-    if (t == _i55.WordListItem) {
-      return _i55.WordListItem.fromJson(data) as T;
+    if (t == _i55.VideoCommentDto) {
+      return _i55.VideoCommentDto.fromJson(data) as T;
     }
-    if (t == _i56.WordListItemDetail) {
-      return _i56.WordListItemDetail.fromJson(data) as T;
+    if (t == _i56.VideoCommentRow) {
+      return _i56.VideoCommentRow.fromJson(data) as T;
+    }
+    if (t == _i57.VideoStatus) {
+      return _i57.VideoStatus.fromJson(data) as T;
+    }
+    if (t == _i58.WordList) {
+      return _i58.WordList.fromJson(data) as T;
+    }
+    if (t == _i59.WordListDetail) {
+      return _i59.WordListDetail.fromJson(data) as T;
+    }
+    if (t == _i60.WordListItem) {
+      return _i60.WordListItem.fromJson(data) as T;
+    }
+    if (t == _i61.WordListItemDetail) {
+      return _i61.WordListItemDetail.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.AsrJob?>()) {
       return (data != null ? _i5.AsrJob.fromJson(data) : null) as T;
@@ -3032,105 +3302,131 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null ? _i30.KnowledgeStateResult.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i31.SubtitleCue?>()) {
-      return (data != null ? _i31.SubtitleCue.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i32.SubtitleCueDetail?>()) {
-      return (data != null ? _i32.SubtitleCueDetail.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i33.SubtitleCueText?>()) {
-      return (data != null ? _i33.SubtitleCueText.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i34.SubtitleKaraokeSegment?>()) {
-      return (data != null ? _i34.SubtitleKaraokeSegment.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i35.SubtitleKaraokeSegmentInput?>()) {
+    if (t == _i1.getType<_i31.ScriptConversionCommitResult?>()) {
       return (data != null
-              ? _i35.SubtitleKaraokeSegmentInput.fromJson(data)
+              ? _i31.ScriptConversionCommitResult.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i36.SubtitlePhrase?>()) {
-      return (data != null ? _i36.SubtitlePhrase.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i37.SubtitlePublishState?>()) {
-      return (data != null ? _i37.SubtitlePublishState.fromJson(data) : null)
+    if (t == _i1.getType<_i32.ScriptConversionEntry?>()) {
+      return (data != null ? _i32.ScriptConversionEntry.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i38.SubtitlePublishStatus?>()) {
-      return (data != null ? _i38.SubtitlePublishStatus.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i39.SubtitleReviewDashboard?>()) {
-      return (data != null ? _i39.SubtitleReviewDashboard.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i40.SubtitleReviewEvent?>()) {
-      return (data != null ? _i40.SubtitleReviewEvent.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i41.SubtitleReviewQueueItem?>()) {
-      return (data != null ? _i41.SubtitleReviewQueueItem.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i42.SubtitleReviewTask?>()) {
-      return (data != null ? _i42.SubtitleReviewTask.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i43.SubtitleReviewTaskDetail?>()) {
+    if (t == _i1.getType<_i33.ScriptConversionImportPreview?>()) {
       return (data != null
-              ? _i43.SubtitleReviewTaskDetail.fromJson(data)
+              ? _i33.ScriptConversionImportPreview.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i44.SubtitleReviewTaskStatus?>()) {
+    if (t == _i1.getType<_i34.ScriptConversionImportPreviewRow?>()) {
       return (data != null
-              ? _i44.SubtitleReviewTaskStatus.fromJson(data)
+              ? _i34.ScriptConversionImportPreviewRow.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i45.SubtitleSrtPreview?>()) {
-      return (data != null ? _i45.SubtitleSrtPreview.fromJson(data) : null)
+    if (t == _i1.getType<_i35.ScriptConversionProfile?>()) {
+      return (data != null ? _i35.ScriptConversionProfile.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i46.SubtitleToken?>()) {
-      return (data != null ? _i46.SubtitleToken.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i36.SubtitleCue?>()) {
+      return (data != null ? _i36.SubtitleCue.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i47.SubtitleTrack?>()) {
-      return (data != null ? _i47.SubtitleTrack.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i37.SubtitleCueDetail?>()) {
+      return (data != null ? _i37.SubtitleCueDetail.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i48.UserKnownEntry?>()) {
-      return (data != null ? _i48.UserKnownEntry.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i38.SubtitleCueText?>()) {
+      return (data != null ? _i38.SubtitleCueText.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i49.Video?>()) {
-      return (data != null ? _i49.Video.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i50.VideoCommentDto?>()) {
-      return (data != null ? _i50.VideoCommentDto.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i51.VideoCommentRow?>()) {
-      return (data != null ? _i51.VideoCommentRow.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i52.VideoStatus?>()) {
-      return (data != null ? _i52.VideoStatus.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i53.WordList?>()) {
-      return (data != null ? _i53.WordList.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i54.WordListDetail?>()) {
-      return (data != null ? _i54.WordListDetail.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i55.WordListItem?>()) {
-      return (data != null ? _i55.WordListItem.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i56.WordListItemDetail?>()) {
-      return (data != null ? _i56.WordListItemDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i39.SubtitleKaraokeSegment?>()) {
+      return (data != null ? _i39.SubtitleKaraokeSegment.fromJson(data) : null)
           as T;
     }
-    if (t == List<_i50.VideoCommentDto>) {
+    if (t == _i1.getType<_i40.SubtitleKaraokeSegmentInput?>()) {
+      return (data != null
+              ? _i40.SubtitleKaraokeSegmentInput.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i41.SubtitlePhrase?>()) {
+      return (data != null ? _i41.SubtitlePhrase.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i42.SubtitlePublishState?>()) {
+      return (data != null ? _i42.SubtitlePublishState.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i43.SubtitlePublishStatus?>()) {
+      return (data != null ? _i43.SubtitlePublishStatus.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i44.SubtitleReviewDashboard?>()) {
+      return (data != null ? _i44.SubtitleReviewDashboard.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i45.SubtitleReviewEvent?>()) {
+      return (data != null ? _i45.SubtitleReviewEvent.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i46.SubtitleReviewQueueItem?>()) {
+      return (data != null ? _i46.SubtitleReviewQueueItem.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i47.SubtitleReviewTask?>()) {
+      return (data != null ? _i47.SubtitleReviewTask.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i48.SubtitleReviewTaskDetail?>()) {
+      return (data != null
+              ? _i48.SubtitleReviewTaskDetail.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i49.SubtitleReviewTaskStatus?>()) {
+      return (data != null
+              ? _i49.SubtitleReviewTaskStatus.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _i1.getType<_i50.SubtitleSrtPreview?>()) {
+      return (data != null ? _i50.SubtitleSrtPreview.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i51.SubtitleToken?>()) {
+      return (data != null ? _i51.SubtitleToken.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i52.SubtitleTrack?>()) {
+      return (data != null ? _i52.SubtitleTrack.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i53.UserKnownEntry?>()) {
+      return (data != null ? _i53.UserKnownEntry.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i54.Video?>()) {
+      return (data != null ? _i54.Video.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i55.VideoCommentDto?>()) {
+      return (data != null ? _i55.VideoCommentDto.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i56.VideoCommentRow?>()) {
+      return (data != null ? _i56.VideoCommentRow.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i57.VideoStatus?>()) {
+      return (data != null ? _i57.VideoStatus.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i58.WordList?>()) {
+      return (data != null ? _i58.WordList.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i59.WordListDetail?>()) {
+      return (data != null ? _i59.WordListDetail.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i60.WordListItem?>()) {
+      return (data != null ? _i60.WordListItem.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i61.WordListItemDetail?>()) {
+      return (data != null ? _i61.WordListItemDetail.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_i55.VideoCommentDto>) {
       return (data as List)
-              .map((e) => deserialize<_i50.VideoCommentDto>(e))
+              .map((e) => deserialize<_i55.VideoCommentDto>(e))
               .toList()
           as T;
     }
@@ -3179,55 +3475,61 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == List<_i33.SubtitleCueText>) {
+    if (t == List<_i34.ScriptConversionImportPreviewRow>) {
       return (data as List)
-              .map((e) => deserialize<_i33.SubtitleCueText>(e))
+              .map((e) => deserialize<_i34.ScriptConversionImportPreviewRow>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i33.SubtitleCueText>?>()) {
+    if (t == List<_i38.SubtitleCueText>) {
+      return (data as List)
+              .map((e) => deserialize<_i38.SubtitleCueText>(e))
+              .toList()
+          as T;
+    }
+    if (t == _i1.getType<List<_i38.SubtitleCueText>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i33.SubtitleCueText>(e))
+                    .map((e) => deserialize<_i38.SubtitleCueText>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i46.SubtitleToken>) {
+    if (t == List<_i51.SubtitleToken>) {
       return (data as List)
-              .map((e) => deserialize<_i46.SubtitleToken>(e))
+              .map((e) => deserialize<_i51.SubtitleToken>(e))
               .toList()
           as T;
     }
-    if (t == List<_i36.SubtitlePhrase>) {
+    if (t == List<_i41.SubtitlePhrase>) {
       return (data as List)
-              .map((e) => deserialize<_i36.SubtitlePhrase>(e))
+              .map((e) => deserialize<_i41.SubtitlePhrase>(e))
               .toList()
           as T;
     }
-    if (t == List<_i34.SubtitleKaraokeSegment>) {
+    if (t == List<_i39.SubtitleKaraokeSegment>) {
       return (data as List)
-              .map((e) => deserialize<_i34.SubtitleKaraokeSegment>(e))
+              .map((e) => deserialize<_i39.SubtitleKaraokeSegment>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i34.SubtitleKaraokeSegment>?>()) {
+    if (t == _i1.getType<List<_i39.SubtitleKaraokeSegment>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i34.SubtitleKaraokeSegment>(e))
+                    .map((e) => deserialize<_i39.SubtitleKaraokeSegment>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i41.SubtitleReviewQueueItem>) {
+    if (t == List<_i46.SubtitleReviewQueueItem>) {
       return (data as List)
-              .map((e) => deserialize<_i41.SubtitleReviewQueueItem>(e))
+              .map((e) => deserialize<_i46.SubtitleReviewQueueItem>(e))
               .toList()
           as T;
     }
-    if (t == List<_i40.SubtitleReviewEvent>) {
+    if (t == List<_i45.SubtitleReviewEvent>) {
       return (data as List)
-              .map((e) => deserialize<_i40.SubtitleReviewEvent>(e))
+              .map((e) => deserialize<_i45.SubtitleReviewEvent>(e))
               .toList()
           as T;
     }
@@ -3237,9 +3539,9 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == List<_i56.WordListItemDetail>) {
+    if (t == List<_i61.WordListItemDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i56.WordListItemDetail>(e))
+              .map((e) => deserialize<_i61.WordListItemDetail>(e))
               .toList()
           as T;
     }
@@ -3249,29 +3551,29 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i57.AsrJob>) {
-      return (data as List).map((e) => deserialize<_i57.AsrJob>(e)).toList()
+    if (t == List<_i62.AsrJob>) {
+      return (data as List).map((e) => deserialize<_i62.AsrJob>(e)).toList()
           as T;
     }
-    if (t == List<_i58.Video>) {
-      return (data as List).map((e) => deserialize<_i58.Video>(e)).toList()
+    if (t == List<_i63.Video>) {
+      return (data as List).map((e) => deserialize<_i63.Video>(e)).toList()
           as T;
     }
-    if (t == List<_i59.SubtitleTrack>) {
+    if (t == List<_i64.SubtitleTrack>) {
       return (data as List)
-              .map((e) => deserialize<_i59.SubtitleTrack>(e))
+              .map((e) => deserialize<_i64.SubtitleTrack>(e))
               .toList()
           as T;
     }
-    if (t == List<_i60.DictionaryEntryDetail>) {
+    if (t == List<_i65.DictionaryEntryDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i60.DictionaryEntryDetail>(e))
+              .map((e) => deserialize<_i65.DictionaryEntryDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i61.DictionaryImportProfile>) {
+    if (t == List<_i66.DictionaryImportProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i61.DictionaryImportProfile>(e))
+              .map((e) => deserialize<_i66.DictionaryImportProfile>(e))
               .toList()
           as T;
     }
@@ -3281,44 +3583,56 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
     }
-    if (t == List<_i62.EntryKnowledgeState>) {
+    if (t == List<_i67.EntryKnowledgeState>) {
       return (data as List)
-              .map((e) => deserialize<_i62.EntryKnowledgeState>(e))
+              .map((e) => deserialize<_i67.EntryKnowledgeState>(e))
               .toList()
           as T;
     }
-    if (t == List<_i63.KnowledgeStateResult>) {
+    if (t == List<_i68.KnowledgeStateResult>) {
       return (data as List)
-              .map((e) => deserialize<_i63.KnowledgeStateResult>(e))
+              .map((e) => deserialize<_i68.KnowledgeStateResult>(e))
               .toList()
           as T;
     }
-    if (t == List<_i64.KnowledgeStateQuery>) {
+    if (t == List<_i69.KnowledgeStateQuery>) {
       return (data as List)
-              .map((e) => deserialize<_i64.KnowledgeStateQuery>(e))
+              .map((e) => deserialize<_i69.KnowledgeStateQuery>(e))
               .toList()
           as T;
     }
-    if (t == List<_i65.SubtitleCueDetail>) {
+    if (t == List<_i70.ScriptConversionProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i65.SubtitleCueDetail>(e))
+              .map((e) => deserialize<_i70.ScriptConversionProfile>(e))
               .toList()
           as T;
     }
-    if (t == List<_i66.SubtitleKaraokeSegment>) {
+    if (t == List<_i71.ScriptConversionEntry>) {
       return (data as List)
-              .map((e) => deserialize<_i66.SubtitleKaraokeSegment>(e))
+              .map((e) => deserialize<_i71.ScriptConversionEntry>(e))
               .toList()
           as T;
     }
-    if (t == List<_i67.SubtitleKaraokeSegmentInput>) {
+    if (t == List<_i72.SubtitleCueDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i67.SubtitleKaraokeSegmentInput>(e))
+              .map((e) => deserialize<_i72.SubtitleCueDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i68.WordList>) {
-      return (data as List).map((e) => deserialize<_i68.WordList>(e)).toList()
+    if (t == List<_i73.SubtitleKaraokeSegment>) {
+      return (data as List)
+              .map((e) => deserialize<_i73.SubtitleKaraokeSegment>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i74.SubtitleKaraokeSegmentInput>) {
+      return (data as List)
+              .map((e) => deserialize<_i74.SubtitleKaraokeSegmentInput>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i75.WordList>) {
+      return (data as List).map((e) => deserialize<_i75.WordList>(e)).toList()
           as T;
     }
     try {
@@ -3361,32 +3675,38 @@ class Protocol extends _i1.SerializationManagerServer {
       _i28.Greeting => 'Greeting',
       _i29.KnowledgeStateQuery => 'KnowledgeStateQuery',
       _i30.KnowledgeStateResult => 'KnowledgeStateResult',
-      _i31.SubtitleCue => 'SubtitleCue',
-      _i32.SubtitleCueDetail => 'SubtitleCueDetail',
-      _i33.SubtitleCueText => 'SubtitleCueText',
-      _i34.SubtitleKaraokeSegment => 'SubtitleKaraokeSegment',
-      _i35.SubtitleKaraokeSegmentInput => 'SubtitleKaraokeSegmentInput',
-      _i36.SubtitlePhrase => 'SubtitlePhrase',
-      _i37.SubtitlePublishState => 'SubtitlePublishState',
-      _i38.SubtitlePublishStatus => 'SubtitlePublishStatus',
-      _i39.SubtitleReviewDashboard => 'SubtitleReviewDashboard',
-      _i40.SubtitleReviewEvent => 'SubtitleReviewEvent',
-      _i41.SubtitleReviewQueueItem => 'SubtitleReviewQueueItem',
-      _i42.SubtitleReviewTask => 'SubtitleReviewTask',
-      _i43.SubtitleReviewTaskDetail => 'SubtitleReviewTaskDetail',
-      _i44.SubtitleReviewTaskStatus => 'SubtitleReviewTaskStatus',
-      _i45.SubtitleSrtPreview => 'SubtitleSrtPreview',
-      _i46.SubtitleToken => 'SubtitleToken',
-      _i47.SubtitleTrack => 'SubtitleTrack',
-      _i48.UserKnownEntry => 'UserKnownEntry',
-      _i49.Video => 'Video',
-      _i50.VideoCommentDto => 'VideoCommentDto',
-      _i51.VideoCommentRow => 'VideoCommentRow',
-      _i52.VideoStatus => 'VideoStatus',
-      _i53.WordList => 'WordList',
-      _i54.WordListDetail => 'WordListDetail',
-      _i55.WordListItem => 'WordListItem',
-      _i56.WordListItemDetail => 'WordListItemDetail',
+      _i31.ScriptConversionCommitResult => 'ScriptConversionCommitResult',
+      _i32.ScriptConversionEntry => 'ScriptConversionEntry',
+      _i33.ScriptConversionImportPreview => 'ScriptConversionImportPreview',
+      _i34.ScriptConversionImportPreviewRow =>
+        'ScriptConversionImportPreviewRow',
+      _i35.ScriptConversionProfile => 'ScriptConversionProfile',
+      _i36.SubtitleCue => 'SubtitleCue',
+      _i37.SubtitleCueDetail => 'SubtitleCueDetail',
+      _i38.SubtitleCueText => 'SubtitleCueText',
+      _i39.SubtitleKaraokeSegment => 'SubtitleKaraokeSegment',
+      _i40.SubtitleKaraokeSegmentInput => 'SubtitleKaraokeSegmentInput',
+      _i41.SubtitlePhrase => 'SubtitlePhrase',
+      _i42.SubtitlePublishState => 'SubtitlePublishState',
+      _i43.SubtitlePublishStatus => 'SubtitlePublishStatus',
+      _i44.SubtitleReviewDashboard => 'SubtitleReviewDashboard',
+      _i45.SubtitleReviewEvent => 'SubtitleReviewEvent',
+      _i46.SubtitleReviewQueueItem => 'SubtitleReviewQueueItem',
+      _i47.SubtitleReviewTask => 'SubtitleReviewTask',
+      _i48.SubtitleReviewTaskDetail => 'SubtitleReviewTaskDetail',
+      _i49.SubtitleReviewTaskStatus => 'SubtitleReviewTaskStatus',
+      _i50.SubtitleSrtPreview => 'SubtitleSrtPreview',
+      _i51.SubtitleToken => 'SubtitleToken',
+      _i52.SubtitleTrack => 'SubtitleTrack',
+      _i53.UserKnownEntry => 'UserKnownEntry',
+      _i54.Video => 'Video',
+      _i55.VideoCommentDto => 'VideoCommentDto',
+      _i56.VideoCommentRow => 'VideoCommentRow',
+      _i57.VideoStatus => 'VideoStatus',
+      _i58.WordList => 'WordList',
+      _i59.WordListDetail => 'WordListDetail',
+      _i60.WordListItem => 'WordListItem',
+      _i61.WordListItemDetail => 'WordListItemDetail',
       _ => null,
     };
   }
@@ -3456,57 +3776,67 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'KnowledgeStateQuery';
       case _i30.KnowledgeStateResult():
         return 'KnowledgeStateResult';
-      case _i31.SubtitleCue():
+      case _i31.ScriptConversionCommitResult():
+        return 'ScriptConversionCommitResult';
+      case _i32.ScriptConversionEntry():
+        return 'ScriptConversionEntry';
+      case _i33.ScriptConversionImportPreview():
+        return 'ScriptConversionImportPreview';
+      case _i34.ScriptConversionImportPreviewRow():
+        return 'ScriptConversionImportPreviewRow';
+      case _i35.ScriptConversionProfile():
+        return 'ScriptConversionProfile';
+      case _i36.SubtitleCue():
         return 'SubtitleCue';
-      case _i32.SubtitleCueDetail():
+      case _i37.SubtitleCueDetail():
         return 'SubtitleCueDetail';
-      case _i33.SubtitleCueText():
+      case _i38.SubtitleCueText():
         return 'SubtitleCueText';
-      case _i34.SubtitleKaraokeSegment():
+      case _i39.SubtitleKaraokeSegment():
         return 'SubtitleKaraokeSegment';
-      case _i35.SubtitleKaraokeSegmentInput():
+      case _i40.SubtitleKaraokeSegmentInput():
         return 'SubtitleKaraokeSegmentInput';
-      case _i36.SubtitlePhrase():
+      case _i41.SubtitlePhrase():
         return 'SubtitlePhrase';
-      case _i37.SubtitlePublishState():
+      case _i42.SubtitlePublishState():
         return 'SubtitlePublishState';
-      case _i38.SubtitlePublishStatus():
+      case _i43.SubtitlePublishStatus():
         return 'SubtitlePublishStatus';
-      case _i39.SubtitleReviewDashboard():
+      case _i44.SubtitleReviewDashboard():
         return 'SubtitleReviewDashboard';
-      case _i40.SubtitleReviewEvent():
+      case _i45.SubtitleReviewEvent():
         return 'SubtitleReviewEvent';
-      case _i41.SubtitleReviewQueueItem():
+      case _i46.SubtitleReviewQueueItem():
         return 'SubtitleReviewQueueItem';
-      case _i42.SubtitleReviewTask():
+      case _i47.SubtitleReviewTask():
         return 'SubtitleReviewTask';
-      case _i43.SubtitleReviewTaskDetail():
+      case _i48.SubtitleReviewTaskDetail():
         return 'SubtitleReviewTaskDetail';
-      case _i44.SubtitleReviewTaskStatus():
+      case _i49.SubtitleReviewTaskStatus():
         return 'SubtitleReviewTaskStatus';
-      case _i45.SubtitleSrtPreview():
+      case _i50.SubtitleSrtPreview():
         return 'SubtitleSrtPreview';
-      case _i46.SubtitleToken():
+      case _i51.SubtitleToken():
         return 'SubtitleToken';
-      case _i47.SubtitleTrack():
+      case _i52.SubtitleTrack():
         return 'SubtitleTrack';
-      case _i48.UserKnownEntry():
+      case _i53.UserKnownEntry():
         return 'UserKnownEntry';
-      case _i49.Video():
+      case _i54.Video():
         return 'Video';
-      case _i50.VideoCommentDto():
+      case _i55.VideoCommentDto():
         return 'VideoCommentDto';
-      case _i51.VideoCommentRow():
+      case _i56.VideoCommentRow():
         return 'VideoCommentRow';
-      case _i52.VideoStatus():
+      case _i57.VideoStatus():
         return 'VideoStatus';
-      case _i53.WordList():
+      case _i58.WordList():
         return 'WordList';
-      case _i54.WordListDetail():
+      case _i59.WordListDetail():
         return 'WordListDetail';
-      case _i55.WordListItem():
+      case _i60.WordListItem():
         return 'WordListItem';
-      case _i56.WordListItemDetail():
+      case _i61.WordListItemDetail():
         return 'WordListItemDetail';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -3608,83 +3938,98 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'KnowledgeStateResult') {
       return deserialize<_i30.KnowledgeStateResult>(data['data']);
     }
+    if (dataClassName == 'ScriptConversionCommitResult') {
+      return deserialize<_i31.ScriptConversionCommitResult>(data['data']);
+    }
+    if (dataClassName == 'ScriptConversionEntry') {
+      return deserialize<_i32.ScriptConversionEntry>(data['data']);
+    }
+    if (dataClassName == 'ScriptConversionImportPreview') {
+      return deserialize<_i33.ScriptConversionImportPreview>(data['data']);
+    }
+    if (dataClassName == 'ScriptConversionImportPreviewRow') {
+      return deserialize<_i34.ScriptConversionImportPreviewRow>(data['data']);
+    }
+    if (dataClassName == 'ScriptConversionProfile') {
+      return deserialize<_i35.ScriptConversionProfile>(data['data']);
+    }
     if (dataClassName == 'SubtitleCue') {
-      return deserialize<_i31.SubtitleCue>(data['data']);
+      return deserialize<_i36.SubtitleCue>(data['data']);
     }
     if (dataClassName == 'SubtitleCueDetail') {
-      return deserialize<_i32.SubtitleCueDetail>(data['data']);
+      return deserialize<_i37.SubtitleCueDetail>(data['data']);
     }
     if (dataClassName == 'SubtitleCueText') {
-      return deserialize<_i33.SubtitleCueText>(data['data']);
+      return deserialize<_i38.SubtitleCueText>(data['data']);
     }
     if (dataClassName == 'SubtitleKaraokeSegment') {
-      return deserialize<_i34.SubtitleKaraokeSegment>(data['data']);
+      return deserialize<_i39.SubtitleKaraokeSegment>(data['data']);
     }
     if (dataClassName == 'SubtitleKaraokeSegmentInput') {
-      return deserialize<_i35.SubtitleKaraokeSegmentInput>(data['data']);
+      return deserialize<_i40.SubtitleKaraokeSegmentInput>(data['data']);
     }
     if (dataClassName == 'SubtitlePhrase') {
-      return deserialize<_i36.SubtitlePhrase>(data['data']);
+      return deserialize<_i41.SubtitlePhrase>(data['data']);
     }
     if (dataClassName == 'SubtitlePublishState') {
-      return deserialize<_i37.SubtitlePublishState>(data['data']);
+      return deserialize<_i42.SubtitlePublishState>(data['data']);
     }
     if (dataClassName == 'SubtitlePublishStatus') {
-      return deserialize<_i38.SubtitlePublishStatus>(data['data']);
+      return deserialize<_i43.SubtitlePublishStatus>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewDashboard') {
-      return deserialize<_i39.SubtitleReviewDashboard>(data['data']);
+      return deserialize<_i44.SubtitleReviewDashboard>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewEvent') {
-      return deserialize<_i40.SubtitleReviewEvent>(data['data']);
+      return deserialize<_i45.SubtitleReviewEvent>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewQueueItem') {
-      return deserialize<_i41.SubtitleReviewQueueItem>(data['data']);
+      return deserialize<_i46.SubtitleReviewQueueItem>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTask') {
-      return deserialize<_i42.SubtitleReviewTask>(data['data']);
+      return deserialize<_i47.SubtitleReviewTask>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTaskDetail') {
-      return deserialize<_i43.SubtitleReviewTaskDetail>(data['data']);
+      return deserialize<_i48.SubtitleReviewTaskDetail>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTaskStatus') {
-      return deserialize<_i44.SubtitleReviewTaskStatus>(data['data']);
+      return deserialize<_i49.SubtitleReviewTaskStatus>(data['data']);
     }
     if (dataClassName == 'SubtitleSrtPreview') {
-      return deserialize<_i45.SubtitleSrtPreview>(data['data']);
+      return deserialize<_i50.SubtitleSrtPreview>(data['data']);
     }
     if (dataClassName == 'SubtitleToken') {
-      return deserialize<_i46.SubtitleToken>(data['data']);
+      return deserialize<_i51.SubtitleToken>(data['data']);
     }
     if (dataClassName == 'SubtitleTrack') {
-      return deserialize<_i47.SubtitleTrack>(data['data']);
+      return deserialize<_i52.SubtitleTrack>(data['data']);
     }
     if (dataClassName == 'UserKnownEntry') {
-      return deserialize<_i48.UserKnownEntry>(data['data']);
+      return deserialize<_i53.UserKnownEntry>(data['data']);
     }
     if (dataClassName == 'Video') {
-      return deserialize<_i49.Video>(data['data']);
+      return deserialize<_i54.Video>(data['data']);
     }
     if (dataClassName == 'VideoCommentDto') {
-      return deserialize<_i50.VideoCommentDto>(data['data']);
+      return deserialize<_i55.VideoCommentDto>(data['data']);
     }
     if (dataClassName == 'VideoCommentRow') {
-      return deserialize<_i51.VideoCommentRow>(data['data']);
+      return deserialize<_i56.VideoCommentRow>(data['data']);
     }
     if (dataClassName == 'VideoStatus') {
-      return deserialize<_i52.VideoStatus>(data['data']);
+      return deserialize<_i57.VideoStatus>(data['data']);
     }
     if (dataClassName == 'WordList') {
-      return deserialize<_i53.WordList>(data['data']);
+      return deserialize<_i58.WordList>(data['data']);
     }
     if (dataClassName == 'WordListDetail') {
-      return deserialize<_i54.WordListDetail>(data['data']);
+      return deserialize<_i59.WordListDetail>(data['data']);
     }
     if (dataClassName == 'WordListItem') {
-      return deserialize<_i55.WordListItem>(data['data']);
+      return deserialize<_i60.WordListItem>(data['data']);
     }
     if (dataClassName == 'WordListItemDetail') {
-      return deserialize<_i56.WordListItemDetail>(data['data']);
+      return deserialize<_i61.WordListItemDetail>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -3746,34 +4091,38 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i23.DictionaryImportProfile.t;
       case _i25.DictionaryRelation:
         return _i25.DictionaryRelation.t;
-      case _i31.SubtitleCue:
-        return _i31.SubtitleCue.t;
-      case _i33.SubtitleCueText:
-        return _i33.SubtitleCueText.t;
-      case _i34.SubtitleKaraokeSegment:
-        return _i34.SubtitleKaraokeSegment.t;
-      case _i36.SubtitlePhrase:
-        return _i36.SubtitlePhrase.t;
-      case _i37.SubtitlePublishState:
-        return _i37.SubtitlePublishState.t;
-      case _i40.SubtitleReviewEvent:
-        return _i40.SubtitleReviewEvent.t;
-      case _i42.SubtitleReviewTask:
-        return _i42.SubtitleReviewTask.t;
-      case _i46.SubtitleToken:
-        return _i46.SubtitleToken.t;
-      case _i47.SubtitleTrack:
-        return _i47.SubtitleTrack.t;
-      case _i48.UserKnownEntry:
-        return _i48.UserKnownEntry.t;
-      case _i49.Video:
-        return _i49.Video.t;
-      case _i51.VideoCommentRow:
-        return _i51.VideoCommentRow.t;
-      case _i53.WordList:
-        return _i53.WordList.t;
-      case _i55.WordListItem:
-        return _i55.WordListItem.t;
+      case _i32.ScriptConversionEntry:
+        return _i32.ScriptConversionEntry.t;
+      case _i35.ScriptConversionProfile:
+        return _i35.ScriptConversionProfile.t;
+      case _i36.SubtitleCue:
+        return _i36.SubtitleCue.t;
+      case _i38.SubtitleCueText:
+        return _i38.SubtitleCueText.t;
+      case _i39.SubtitleKaraokeSegment:
+        return _i39.SubtitleKaraokeSegment.t;
+      case _i41.SubtitlePhrase:
+        return _i41.SubtitlePhrase.t;
+      case _i42.SubtitlePublishState:
+        return _i42.SubtitlePublishState.t;
+      case _i45.SubtitleReviewEvent:
+        return _i45.SubtitleReviewEvent.t;
+      case _i47.SubtitleReviewTask:
+        return _i47.SubtitleReviewTask.t;
+      case _i51.SubtitleToken:
+        return _i51.SubtitleToken.t;
+      case _i52.SubtitleTrack:
+        return _i52.SubtitleTrack.t;
+      case _i53.UserKnownEntry:
+        return _i53.UserKnownEntry.t;
+      case _i54.Video:
+        return _i54.Video.t;
+      case _i56.VideoCommentRow:
+        return _i56.VideoCommentRow.t;
+      case _i58.WordList:
+        return _i58.WordList.t;
+      case _i60.WordListItem:
+        return _i60.WordListItem.t;
     }
     return null;
   }

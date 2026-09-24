@@ -119,6 +119,23 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     }
   }
 
+  void applyAvatarUrl(String avatarUrl) {
+    final current = state.value;
+
+    if (current == null) {
+      return;
+    }
+
+    state = AsyncData(
+      AppUser(
+        id: current.id,
+        username: current.username,
+        displayName: current.displayName,
+        avatarUrl: avatarUrl,
+      ),
+    );
+  }
+
   Future<void> logout() async {
     final previous = state.value;
 
