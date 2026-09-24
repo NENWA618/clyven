@@ -2,11 +2,16 @@ import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/serverpod/serverpod_client_provider.dart';
+import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../data/models/user_profile.dart';
 import '../../data/repositories/profile_repository.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
-  return const MockProfileRepository();
+  return ServerpodProfileRepository(
+    client: ref.watch(serverpodClientProvider),
+    videoRepository: ref.watch(videoRepositoryProvider),
+  );
 });
 
 class MyProfileNotifier extends AsyncNotifier<UserProfile> {
@@ -47,6 +52,11 @@ class MyProfileNotifier extends AsyncNotifier<UserProfile> {
         avatarUrl: user.avatarUrl,
       );
     });
+  }
+
+  Future<void> updateBio(String bio) async {
+    await _repository.updateBio(bio);
+    await refresh();
   }
 }
 

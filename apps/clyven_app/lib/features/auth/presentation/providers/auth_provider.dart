@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/serverpod/serverpod_client_provider.dart';
@@ -151,6 +153,29 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
       if (previous != null) {
         state = AsyncData(previous);
       }
+    }
+  }
+
+  Future<bool> updateProfile({
+    required String username,
+    required String displayName,
+    Uint8List? avatarBytes,
+    bool removeAvatar = false,
+  }) async {
+    final previous = state.value;
+    try {
+      final user = await _repository.updateProfile(
+        username: username,
+        displayName: displayName,
+        avatarBytes: avatarBytes,
+        removeAvatar: removeAvatar,
+      );
+      state = AsyncData(user);
+      return true;
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      if (previous != null) state = AsyncData(previous);
+      return false;
     }
   }
 }

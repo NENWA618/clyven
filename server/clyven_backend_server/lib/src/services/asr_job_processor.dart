@@ -5,6 +5,7 @@ import '../generated/protocol.dart';
 import 'deepgram_asr_service.dart';
 
 import 'subtitle_review_task_service.dart';
+
 class AsrJobProcessor {
   const AsrJobProcessor();
 

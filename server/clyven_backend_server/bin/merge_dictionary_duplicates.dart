@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 
 void main() {
-  const inputPath =
-      r'C:\Users\USER\Downloads\越南语.xlsx';
+  const inputPath = r'C:\Users\USER\Downloads\越南语.xlsx';
 
-  const outputPath =
-      r'C:\Users\USER\Downloads\越南语_去重.xlsx';
+  const outputPath = r'C:\Users\USER\Downloads\越南语_去重.xlsx';
 
   final bytes = File(inputPath).readAsBytesSync();
   final excel = Excel.decodeBytes(bytes);
@@ -38,8 +36,7 @@ void main() {
     }
   }
 
-  final mergedRows =
-      <String, Map<String, String>>{};
+  final mergedRows = <String, Map<String, String>>{};
 
   final order = <String>[];
 
@@ -76,8 +73,7 @@ void main() {
       final key = '__row_$i';
 
       mergedRows[key] = {
-        for (final header in headers.keys)
-          header: valueAt(header),
+        for (final header in headers.keys) header: valueAt(header),
       };
 
       order.add(key);
@@ -88,8 +84,7 @@ void main() {
 
     if (!mergedRows.containsKey(key)) {
       mergedRows[key] = {
-        for (final header in headers.keys)
-          header: valueAt(header),
+        for (final header in headers.keys) header: valueAt(header),
       };
 
       order.add(key);
@@ -115,8 +110,7 @@ void main() {
         continue;
       }
 
-      if (header == '国语字' &&
-          oldValue.toLowerCase() == newValue.toLowerCase()) {
+      if (header == '国语字' && oldValue.toLowerCase() == newValue.toLowerCase()) {
         continue;
       }
 

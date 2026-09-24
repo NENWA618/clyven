@@ -10,92 +10,101 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'asr_job.dart' as _i2;
-import 'asr_job_status.dart' as _i3;
-import 'comment_like.dart' as _i4;
-import 'comment_page_dto.dart' as _i5;
-import 'comment_reply_dto.dart' as _i6;
-import 'comment_reply_like.dart' as _i7;
-import 'comment_reply_row.dart' as _i8;
-import 'dictionary_definition.dart' as _i9;
-import 'dictionary_entry.dart' as _i10;
-import 'dictionary_entry_detail.dart' as _i11;
-import 'dictionary_example.dart' as _i12;
-import 'dictionary_example_detail.dart' as _i13;
-import 'dictionary_example_text.dart' as _i14;
-import 'dictionary_form.dart' as _i15;
-import 'dictionary_import_commit_result.dart' as _i16;
-import 'dictionary_import_mapping.dart' as _i17;
-import 'dictionary_import_preview.dart' as _i18;
-import 'dictionary_import_preview_row.dart' as _i19;
-import 'dictionary_import_profile.dart' as _i20;
-import 'dictionary_import_profile_detail.dart' as _i21;
-import 'dictionary_relation.dart' as _i22;
-import 'dictionary_relation_detail.dart' as _i23;
-import 'entry_knowledge_state.dart' as _i24;
-import 'greetings/greeting.dart' as _i25;
-import 'knowledge_state_query.dart' as _i26;
-import 'knowledge_state_result.dart' as _i27;
-import 'script_conversion_commit_result.dart' as _i28;
-import 'script_conversion_entry.dart' as _i29;
-import 'script_conversion_import_preview.dart' as _i30;
-import 'script_conversion_import_preview_row.dart' as _i31;
-import 'script_conversion_profile.dart' as _i32;
-import 'subtitle_cue.dart' as _i33;
-import 'subtitle_cue_detail.dart' as _i34;
-import 'subtitle_cue_text.dart' as _i35;
-import 'subtitle_karaoke_segment.dart' as _i36;
-import 'subtitle_karaoke_segment_input.dart' as _i37;
-import 'subtitle_phrase.dart' as _i38;
-import 'subtitle_publish_state.dart' as _i39;
-import 'subtitle_publish_status.dart' as _i40;
-import 'subtitle_review_dashboard.dart' as _i41;
-import 'subtitle_review_event.dart' as _i42;
-import 'subtitle_review_queue_item.dart' as _i43;
-import 'subtitle_review_task.dart' as _i44;
-import 'subtitle_review_task_detail.dart' as _i45;
-import 'subtitle_review_task_status.dart' as _i46;
-import 'subtitle_srt_preview.dart' as _i47;
-import 'subtitle_token.dart' as _i48;
-import 'subtitle_track.dart' as _i49;
-import 'user_known_entry.dart' as _i50;
-import 'video.dart' as _i51;
-import 'video_comment_dto.dart' as _i52;
-import 'video_comment_row.dart' as _i53;
-import 'video_status.dart' as _i54;
-import 'word_list.dart' as _i55;
-import 'word_list_detail.dart' as _i56;
-import 'word_list_item.dart' as _i57;
-import 'word_list_item_detail.dart' as _i58;
-import 'package:clyven_backend_client/src/protocol/asr_job.dart' as _i59;
-import 'package:clyven_backend_client/src/protocol/video.dart' as _i60;
-import 'package:clyven_backend_client/src/protocol/subtitle_track.dart' as _i61;
+import 'app_profile.dart' as _i2;
+import 'asr_job.dart' as _i3;
+import 'asr_job_status.dart' as _i4;
+import 'comment_like.dart' as _i5;
+import 'comment_page_dto.dart' as _i6;
+import 'comment_reply_dto.dart' as _i7;
+import 'comment_reply_like.dart' as _i8;
+import 'comment_reply_row.dart' as _i9;
+import 'creator_follow.dart' as _i10;
+import 'dictionary_definition.dart' as _i11;
+import 'dictionary_entry.dart' as _i12;
+import 'dictionary_entry_detail.dart' as _i13;
+import 'dictionary_example.dart' as _i14;
+import 'dictionary_example_detail.dart' as _i15;
+import 'dictionary_example_text.dart' as _i16;
+import 'dictionary_form.dart' as _i17;
+import 'dictionary_import_commit_result.dart' as _i18;
+import 'dictionary_import_mapping.dart' as _i19;
+import 'dictionary_import_preview.dart' as _i20;
+import 'dictionary_import_preview_row.dart' as _i21;
+import 'dictionary_import_profile.dart' as _i22;
+import 'dictionary_import_profile_detail.dart' as _i23;
+import 'dictionary_relation.dart' as _i24;
+import 'dictionary_relation_detail.dart' as _i25;
+import 'entry_knowledge_state.dart' as _i26;
+import 'greetings/greeting.dart' as _i27;
+import 'knowledge_state_query.dart' as _i28;
+import 'knowledge_state_result.dart' as _i29;
+import 'profile_stats.dart' as _i30;
+import 'script_conversion_commit_result.dart' as _i31;
+import 'script_conversion_entry.dart' as _i32;
+import 'script_conversion_import_preview.dart' as _i33;
+import 'script_conversion_import_preview_row.dart' as _i34;
+import 'script_conversion_profile.dart' as _i35;
+import 'subtitle_cue.dart' as _i36;
+import 'subtitle_cue_detail.dart' as _i37;
+import 'subtitle_cue_text.dart' as _i38;
+import 'subtitle_karaoke_segment.dart' as _i39;
+import 'subtitle_karaoke_segment_input.dart' as _i40;
+import 'subtitle_phrase.dart' as _i41;
+import 'subtitle_publish_state.dart' as _i42;
+import 'subtitle_publish_status.dart' as _i43;
+import 'subtitle_review_dashboard.dart' as _i44;
+import 'subtitle_review_event.dart' as _i45;
+import 'subtitle_review_queue_item.dart' as _i46;
+import 'subtitle_review_task.dart' as _i47;
+import 'subtitle_review_task_detail.dart' as _i48;
+import 'subtitle_review_task_status.dart' as _i49;
+import 'subtitle_srt_preview.dart' as _i50;
+import 'subtitle_token.dart' as _i51;
+import 'subtitle_track.dart' as _i52;
+import 'user_known_entry.dart' as _i53;
+import 'video.dart' as _i54;
+import 'video_comment_dto.dart' as _i55;
+import 'video_comment_row.dart' as _i56;
+import 'video_content_type.dart' as _i57;
+import 'video_favorite.dart' as _i58;
+import 'video_status.dart' as _i59;
+import 'watch_history.dart' as _i60;
+import 'word_list.dart' as _i61;
+import 'word_list_detail.dart' as _i62;
+import 'word_list_item.dart' as _i63;
+import 'word_list_item_detail.dart' as _i64;
+import 'package:clyven_backend_client/src/protocol/asr_job.dart' as _i65;
+import 'package:clyven_backend_client/src/protocol/video.dart' as _i66;
+import 'package:clyven_backend_client/src/protocol/subtitle_track.dart' as _i67;
 import 'package:clyven_backend_client/src/protocol/dictionary_entry_detail.dart'
-    as _i62;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
-    as _i63;
-import 'package:clyven_backend_client/src/protocol/entry_knowledge_state.dart'
-    as _i64;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
-    as _i65;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
-    as _i66;
-import 'package:clyven_backend_client/src/protocol/script_conversion_profile.dart'
-    as _i67;
-import 'package:clyven_backend_client/src/protocol/script_conversion_entry.dart'
     as _i68;
-import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
     as _i69;
-import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment.dart'
+import 'package:clyven_backend_client/src/protocol/entry_knowledge_state.dart'
     as _i70;
-import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment_input.dart'
+import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
     as _i71;
-import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i72;
-import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
+    as _i72;
+import 'package:clyven_backend_client/src/protocol/script_conversion_profile.dart'
     as _i73;
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+import 'package:clyven_backend_client/src/protocol/script_conversion_entry.dart'
     as _i74;
+import 'package:clyven_backend_client/src/protocol/watch_history.dart' as _i75;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+    as _i76;
+import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment.dart'
+    as _i77;
+import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment_input.dart'
+    as _i78;
+import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i79;
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _i80;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _i81;
+export 'app_profile.dart';
 export 'asr_job.dart';
 export 'asr_job_status.dart';
 export 'comment_like.dart';
@@ -103,6 +112,7 @@ export 'comment_page_dto.dart';
 export 'comment_reply_dto.dart';
 export 'comment_reply_like.dart';
 export 'comment_reply_row.dart';
+export 'creator_follow.dart';
 export 'dictionary_definition.dart';
 export 'dictionary_entry.dart';
 export 'dictionary_entry_detail.dart';
@@ -122,6 +132,7 @@ export 'entry_knowledge_state.dart';
 export 'greetings/greeting.dart';
 export 'knowledge_state_query.dart';
 export 'knowledge_state_result.dart';
+export 'profile_stats.dart';
 export 'script_conversion_commit_result.dart';
 export 'script_conversion_entry.dart';
 export 'script_conversion_import_preview.dart';
@@ -148,7 +159,10 @@ export 'user_known_entry.dart';
 export 'video.dart';
 export 'video_comment_dto.dart';
 export 'video_comment_row.dart';
+export 'video_content_type.dart';
+export 'video_favorite.dart';
 export 'video_status.dart';
+export 'watch_history.dart';
 export 'word_list.dart';
 export 'word_list_detail.dart';
 export 'word_list_item.dart';
@@ -189,518 +203,554 @@ class Protocol extends _i1.SerializationManager {
       }
     }
 
-    if (t == _i2.AsrJob) {
-      return _i2.AsrJob.fromJson(data) as T;
+    if (t == _i2.AppProfile) {
+      return _i2.AppProfile.fromJson(data) as T;
     }
-    if (t == _i3.AsrJobStatus) {
-      return _i3.AsrJobStatus.fromJson(data) as T;
+    if (t == _i3.AsrJob) {
+      return _i3.AsrJob.fromJson(data) as T;
     }
-    if (t == _i4.CommentLike) {
-      return _i4.CommentLike.fromJson(data) as T;
+    if (t == _i4.AsrJobStatus) {
+      return _i4.AsrJobStatus.fromJson(data) as T;
     }
-    if (t == _i5.CommentPageDto) {
-      return _i5.CommentPageDto.fromJson(data) as T;
+    if (t == _i5.CommentLike) {
+      return _i5.CommentLike.fromJson(data) as T;
     }
-    if (t == _i6.CommentReplyDto) {
-      return _i6.CommentReplyDto.fromJson(data) as T;
+    if (t == _i6.CommentPageDto) {
+      return _i6.CommentPageDto.fromJson(data) as T;
     }
-    if (t == _i7.CommentReplyLike) {
-      return _i7.CommentReplyLike.fromJson(data) as T;
+    if (t == _i7.CommentReplyDto) {
+      return _i7.CommentReplyDto.fromJson(data) as T;
     }
-    if (t == _i8.CommentReplyRow) {
-      return _i8.CommentReplyRow.fromJson(data) as T;
+    if (t == _i8.CommentReplyLike) {
+      return _i8.CommentReplyLike.fromJson(data) as T;
     }
-    if (t == _i9.DictionaryDefinition) {
-      return _i9.DictionaryDefinition.fromJson(data) as T;
+    if (t == _i9.CommentReplyRow) {
+      return _i9.CommentReplyRow.fromJson(data) as T;
     }
-    if (t == _i10.DictionaryEntry) {
-      return _i10.DictionaryEntry.fromJson(data) as T;
+    if (t == _i10.CreatorFollow) {
+      return _i10.CreatorFollow.fromJson(data) as T;
     }
-    if (t == _i11.DictionaryEntryDetail) {
-      return _i11.DictionaryEntryDetail.fromJson(data) as T;
+    if (t == _i11.DictionaryDefinition) {
+      return _i11.DictionaryDefinition.fromJson(data) as T;
     }
-    if (t == _i12.DictionaryExample) {
-      return _i12.DictionaryExample.fromJson(data) as T;
+    if (t == _i12.DictionaryEntry) {
+      return _i12.DictionaryEntry.fromJson(data) as T;
     }
-    if (t == _i13.DictionaryExampleDetail) {
-      return _i13.DictionaryExampleDetail.fromJson(data) as T;
+    if (t == _i13.DictionaryEntryDetail) {
+      return _i13.DictionaryEntryDetail.fromJson(data) as T;
     }
-    if (t == _i14.DictionaryExampleText) {
-      return _i14.DictionaryExampleText.fromJson(data) as T;
+    if (t == _i14.DictionaryExample) {
+      return _i14.DictionaryExample.fromJson(data) as T;
     }
-    if (t == _i15.DictionaryForm) {
-      return _i15.DictionaryForm.fromJson(data) as T;
+    if (t == _i15.DictionaryExampleDetail) {
+      return _i15.DictionaryExampleDetail.fromJson(data) as T;
     }
-    if (t == _i16.DictionaryImportCommitResult) {
-      return _i16.DictionaryImportCommitResult.fromJson(data) as T;
+    if (t == _i16.DictionaryExampleText) {
+      return _i16.DictionaryExampleText.fromJson(data) as T;
     }
-    if (t == _i17.DictionaryImportMapping) {
-      return _i17.DictionaryImportMapping.fromJson(data) as T;
+    if (t == _i17.DictionaryForm) {
+      return _i17.DictionaryForm.fromJson(data) as T;
     }
-    if (t == _i18.DictionaryImportPreview) {
-      return _i18.DictionaryImportPreview.fromJson(data) as T;
+    if (t == _i18.DictionaryImportCommitResult) {
+      return _i18.DictionaryImportCommitResult.fromJson(data) as T;
     }
-    if (t == _i19.DictionaryImportPreviewRow) {
-      return _i19.DictionaryImportPreviewRow.fromJson(data) as T;
+    if (t == _i19.DictionaryImportMapping) {
+      return _i19.DictionaryImportMapping.fromJson(data) as T;
     }
-    if (t == _i20.DictionaryImportProfile) {
-      return _i20.DictionaryImportProfile.fromJson(data) as T;
+    if (t == _i20.DictionaryImportPreview) {
+      return _i20.DictionaryImportPreview.fromJson(data) as T;
     }
-    if (t == _i21.DictionaryImportProfileDetail) {
-      return _i21.DictionaryImportProfileDetail.fromJson(data) as T;
+    if (t == _i21.DictionaryImportPreviewRow) {
+      return _i21.DictionaryImportPreviewRow.fromJson(data) as T;
     }
-    if (t == _i22.DictionaryRelation) {
-      return _i22.DictionaryRelation.fromJson(data) as T;
+    if (t == _i22.DictionaryImportProfile) {
+      return _i22.DictionaryImportProfile.fromJson(data) as T;
     }
-    if (t == _i23.DictionaryRelationDetail) {
-      return _i23.DictionaryRelationDetail.fromJson(data) as T;
+    if (t == _i23.DictionaryImportProfileDetail) {
+      return _i23.DictionaryImportProfileDetail.fromJson(data) as T;
     }
-    if (t == _i24.EntryKnowledgeState) {
-      return _i24.EntryKnowledgeState.fromJson(data) as T;
+    if (t == _i24.DictionaryRelation) {
+      return _i24.DictionaryRelation.fromJson(data) as T;
     }
-    if (t == _i25.Greeting) {
-      return _i25.Greeting.fromJson(data) as T;
+    if (t == _i25.DictionaryRelationDetail) {
+      return _i25.DictionaryRelationDetail.fromJson(data) as T;
     }
-    if (t == _i26.KnowledgeStateQuery) {
-      return _i26.KnowledgeStateQuery.fromJson(data) as T;
+    if (t == _i26.EntryKnowledgeState) {
+      return _i26.EntryKnowledgeState.fromJson(data) as T;
     }
-    if (t == _i27.KnowledgeStateResult) {
-      return _i27.KnowledgeStateResult.fromJson(data) as T;
+    if (t == _i27.Greeting) {
+      return _i27.Greeting.fromJson(data) as T;
     }
-    if (t == _i28.ScriptConversionCommitResult) {
-      return _i28.ScriptConversionCommitResult.fromJson(data) as T;
+    if (t == _i28.KnowledgeStateQuery) {
+      return _i28.KnowledgeStateQuery.fromJson(data) as T;
     }
-    if (t == _i29.ScriptConversionEntry) {
-      return _i29.ScriptConversionEntry.fromJson(data) as T;
+    if (t == _i29.KnowledgeStateResult) {
+      return _i29.KnowledgeStateResult.fromJson(data) as T;
     }
-    if (t == _i30.ScriptConversionImportPreview) {
-      return _i30.ScriptConversionImportPreview.fromJson(data) as T;
+    if (t == _i30.ProfileStats) {
+      return _i30.ProfileStats.fromJson(data) as T;
     }
-    if (t == _i31.ScriptConversionImportPreviewRow) {
-      return _i31.ScriptConversionImportPreviewRow.fromJson(data) as T;
+    if (t == _i31.ScriptConversionCommitResult) {
+      return _i31.ScriptConversionCommitResult.fromJson(data) as T;
     }
-    if (t == _i32.ScriptConversionProfile) {
-      return _i32.ScriptConversionProfile.fromJson(data) as T;
+    if (t == _i32.ScriptConversionEntry) {
+      return _i32.ScriptConversionEntry.fromJson(data) as T;
     }
-    if (t == _i33.SubtitleCue) {
-      return _i33.SubtitleCue.fromJson(data) as T;
+    if (t == _i33.ScriptConversionImportPreview) {
+      return _i33.ScriptConversionImportPreview.fromJson(data) as T;
     }
-    if (t == _i34.SubtitleCueDetail) {
-      return _i34.SubtitleCueDetail.fromJson(data) as T;
+    if (t == _i34.ScriptConversionImportPreviewRow) {
+      return _i34.ScriptConversionImportPreviewRow.fromJson(data) as T;
     }
-    if (t == _i35.SubtitleCueText) {
-      return _i35.SubtitleCueText.fromJson(data) as T;
+    if (t == _i35.ScriptConversionProfile) {
+      return _i35.ScriptConversionProfile.fromJson(data) as T;
     }
-    if (t == _i36.SubtitleKaraokeSegment) {
-      return _i36.SubtitleKaraokeSegment.fromJson(data) as T;
+    if (t == _i36.SubtitleCue) {
+      return _i36.SubtitleCue.fromJson(data) as T;
     }
-    if (t == _i37.SubtitleKaraokeSegmentInput) {
-      return _i37.SubtitleKaraokeSegmentInput.fromJson(data) as T;
+    if (t == _i37.SubtitleCueDetail) {
+      return _i37.SubtitleCueDetail.fromJson(data) as T;
     }
-    if (t == _i38.SubtitlePhrase) {
-      return _i38.SubtitlePhrase.fromJson(data) as T;
+    if (t == _i38.SubtitleCueText) {
+      return _i38.SubtitleCueText.fromJson(data) as T;
     }
-    if (t == _i39.SubtitlePublishState) {
-      return _i39.SubtitlePublishState.fromJson(data) as T;
+    if (t == _i39.SubtitleKaraokeSegment) {
+      return _i39.SubtitleKaraokeSegment.fromJson(data) as T;
     }
-    if (t == _i40.SubtitlePublishStatus) {
-      return _i40.SubtitlePublishStatus.fromJson(data) as T;
+    if (t == _i40.SubtitleKaraokeSegmentInput) {
+      return _i40.SubtitleKaraokeSegmentInput.fromJson(data) as T;
     }
-    if (t == _i41.SubtitleReviewDashboard) {
-      return _i41.SubtitleReviewDashboard.fromJson(data) as T;
+    if (t == _i41.SubtitlePhrase) {
+      return _i41.SubtitlePhrase.fromJson(data) as T;
     }
-    if (t == _i42.SubtitleReviewEvent) {
-      return _i42.SubtitleReviewEvent.fromJson(data) as T;
+    if (t == _i42.SubtitlePublishState) {
+      return _i42.SubtitlePublishState.fromJson(data) as T;
     }
-    if (t == _i43.SubtitleReviewQueueItem) {
-      return _i43.SubtitleReviewQueueItem.fromJson(data) as T;
+    if (t == _i43.SubtitlePublishStatus) {
+      return _i43.SubtitlePublishStatus.fromJson(data) as T;
     }
-    if (t == _i44.SubtitleReviewTask) {
-      return _i44.SubtitleReviewTask.fromJson(data) as T;
+    if (t == _i44.SubtitleReviewDashboard) {
+      return _i44.SubtitleReviewDashboard.fromJson(data) as T;
     }
-    if (t == _i45.SubtitleReviewTaskDetail) {
-      return _i45.SubtitleReviewTaskDetail.fromJson(data) as T;
+    if (t == _i45.SubtitleReviewEvent) {
+      return _i45.SubtitleReviewEvent.fromJson(data) as T;
     }
-    if (t == _i46.SubtitleReviewTaskStatus) {
-      return _i46.SubtitleReviewTaskStatus.fromJson(data) as T;
+    if (t == _i46.SubtitleReviewQueueItem) {
+      return _i46.SubtitleReviewQueueItem.fromJson(data) as T;
     }
-    if (t == _i47.SubtitleSrtPreview) {
-      return _i47.SubtitleSrtPreview.fromJson(data) as T;
+    if (t == _i47.SubtitleReviewTask) {
+      return _i47.SubtitleReviewTask.fromJson(data) as T;
     }
-    if (t == _i48.SubtitleToken) {
-      return _i48.SubtitleToken.fromJson(data) as T;
+    if (t == _i48.SubtitleReviewTaskDetail) {
+      return _i48.SubtitleReviewTaskDetail.fromJson(data) as T;
     }
-    if (t == _i49.SubtitleTrack) {
-      return _i49.SubtitleTrack.fromJson(data) as T;
+    if (t == _i49.SubtitleReviewTaskStatus) {
+      return _i49.SubtitleReviewTaskStatus.fromJson(data) as T;
     }
-    if (t == _i50.UserKnownEntry) {
-      return _i50.UserKnownEntry.fromJson(data) as T;
+    if (t == _i50.SubtitleSrtPreview) {
+      return _i50.SubtitleSrtPreview.fromJson(data) as T;
     }
-    if (t == _i51.Video) {
-      return _i51.Video.fromJson(data) as T;
+    if (t == _i51.SubtitleToken) {
+      return _i51.SubtitleToken.fromJson(data) as T;
     }
-    if (t == _i52.VideoCommentDto) {
-      return _i52.VideoCommentDto.fromJson(data) as T;
+    if (t == _i52.SubtitleTrack) {
+      return _i52.SubtitleTrack.fromJson(data) as T;
     }
-    if (t == _i53.VideoCommentRow) {
-      return _i53.VideoCommentRow.fromJson(data) as T;
+    if (t == _i53.UserKnownEntry) {
+      return _i53.UserKnownEntry.fromJson(data) as T;
     }
-    if (t == _i54.VideoStatus) {
-      return _i54.VideoStatus.fromJson(data) as T;
+    if (t == _i54.Video) {
+      return _i54.Video.fromJson(data) as T;
     }
-    if (t == _i55.WordList) {
-      return _i55.WordList.fromJson(data) as T;
+    if (t == _i55.VideoCommentDto) {
+      return _i55.VideoCommentDto.fromJson(data) as T;
     }
-    if (t == _i56.WordListDetail) {
-      return _i56.WordListDetail.fromJson(data) as T;
+    if (t == _i56.VideoCommentRow) {
+      return _i56.VideoCommentRow.fromJson(data) as T;
     }
-    if (t == _i57.WordListItem) {
-      return _i57.WordListItem.fromJson(data) as T;
+    if (t == _i57.VideoContentType) {
+      return _i57.VideoContentType.fromJson(data) as T;
     }
-    if (t == _i58.WordListItemDetail) {
-      return _i58.WordListItemDetail.fromJson(data) as T;
+    if (t == _i58.VideoFavorite) {
+      return _i58.VideoFavorite.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i2.AsrJob?>()) {
-      return (data != null ? _i2.AsrJob.fromJson(data) : null) as T;
+    if (t == _i59.VideoStatus) {
+      return _i59.VideoStatus.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i3.AsrJobStatus?>()) {
-      return (data != null ? _i3.AsrJobStatus.fromJson(data) : null) as T;
+    if (t == _i60.WatchHistory) {
+      return _i60.WatchHistory.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i4.CommentLike?>()) {
-      return (data != null ? _i4.CommentLike.fromJson(data) : null) as T;
+    if (t == _i61.WordList) {
+      return _i61.WordList.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.CommentPageDto?>()) {
-      return (data != null ? _i5.CommentPageDto.fromJson(data) : null) as T;
+    if (t == _i62.WordListDetail) {
+      return _i62.WordListDetail.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i6.CommentReplyDto?>()) {
-      return (data != null ? _i6.CommentReplyDto.fromJson(data) : null) as T;
+    if (t == _i63.WordListItem) {
+      return _i63.WordListItem.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i7.CommentReplyLike?>()) {
-      return (data != null ? _i7.CommentReplyLike.fromJson(data) : null) as T;
+    if (t == _i64.WordListItemDetail) {
+      return _i64.WordListItemDetail.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i8.CommentReplyRow?>()) {
-      return (data != null ? _i8.CommentReplyRow.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i2.AppProfile?>()) {
+      return (data != null ? _i2.AppProfile.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.DictionaryDefinition?>()) {
-      return (data != null ? _i9.DictionaryDefinition.fromJson(data) : null)
+    if (t == _i1.getType<_i3.AsrJob?>()) {
+      return (data != null ? _i3.AsrJob.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i4.AsrJobStatus?>()) {
+      return (data != null ? _i4.AsrJobStatus.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i5.CommentLike?>()) {
+      return (data != null ? _i5.CommentLike.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i6.CommentPageDto?>()) {
+      return (data != null ? _i6.CommentPageDto.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.CommentReplyDto?>()) {
+      return (data != null ? _i7.CommentReplyDto.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i8.CommentReplyLike?>()) {
+      return (data != null ? _i8.CommentReplyLike.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i9.CommentReplyRow?>()) {
+      return (data != null ? _i9.CommentReplyRow.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i10.CreatorFollow?>()) {
+      return (data != null ? _i10.CreatorFollow.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.DictionaryDefinition?>()) {
+      return (data != null ? _i11.DictionaryDefinition.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i10.DictionaryEntry?>()) {
-      return (data != null ? _i10.DictionaryEntry.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.DictionaryEntry?>()) {
+      return (data != null ? _i12.DictionaryEntry.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.DictionaryEntryDetail?>()) {
-      return (data != null ? _i11.DictionaryEntryDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i13.DictionaryEntryDetail?>()) {
+      return (data != null ? _i13.DictionaryEntryDetail.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i12.DictionaryExample?>()) {
-      return (data != null ? _i12.DictionaryExample.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i14.DictionaryExample?>()) {
+      return (data != null ? _i14.DictionaryExample.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i13.DictionaryExampleDetail?>()) {
-      return (data != null ? _i13.DictionaryExampleDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i15.DictionaryExampleDetail?>()) {
+      return (data != null ? _i15.DictionaryExampleDetail.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i14.DictionaryExampleText?>()) {
-      return (data != null ? _i14.DictionaryExampleText.fromJson(data) : null)
+    if (t == _i1.getType<_i16.DictionaryExampleText?>()) {
+      return (data != null ? _i16.DictionaryExampleText.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i15.DictionaryForm?>()) {
-      return (data != null ? _i15.DictionaryForm.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i17.DictionaryForm?>()) {
+      return (data != null ? _i17.DictionaryForm.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i16.DictionaryImportCommitResult?>()) {
+    if (t == _i1.getType<_i18.DictionaryImportCommitResult?>()) {
       return (data != null
-              ? _i16.DictionaryImportCommitResult.fromJson(data)
+              ? _i18.DictionaryImportCommitResult.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i17.DictionaryImportMapping?>()) {
-      return (data != null ? _i17.DictionaryImportMapping.fromJson(data) : null)
+    if (t == _i1.getType<_i19.DictionaryImportMapping?>()) {
+      return (data != null ? _i19.DictionaryImportMapping.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i18.DictionaryImportPreview?>()) {
-      return (data != null ? _i18.DictionaryImportPreview.fromJson(data) : null)
+    if (t == _i1.getType<_i20.DictionaryImportPreview?>()) {
+      return (data != null ? _i20.DictionaryImportPreview.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i19.DictionaryImportPreviewRow?>()) {
+    if (t == _i1.getType<_i21.DictionaryImportPreviewRow?>()) {
       return (data != null
-              ? _i19.DictionaryImportPreviewRow.fromJson(data)
+              ? _i21.DictionaryImportPreviewRow.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i20.DictionaryImportProfile?>()) {
-      return (data != null ? _i20.DictionaryImportProfile.fromJson(data) : null)
+    if (t == _i1.getType<_i22.DictionaryImportProfile?>()) {
+      return (data != null ? _i22.DictionaryImportProfile.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i21.DictionaryImportProfileDetail?>()) {
+    if (t == _i1.getType<_i23.DictionaryImportProfileDetail?>()) {
       return (data != null
-              ? _i21.DictionaryImportProfileDetail.fromJson(data)
+              ? _i23.DictionaryImportProfileDetail.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i22.DictionaryRelation?>()) {
-      return (data != null ? _i22.DictionaryRelation.fromJson(data) : null)
+    if (t == _i1.getType<_i24.DictionaryRelation?>()) {
+      return (data != null ? _i24.DictionaryRelation.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i23.DictionaryRelationDetail?>()) {
+    if (t == _i1.getType<_i25.DictionaryRelationDetail?>()) {
       return (data != null
-              ? _i23.DictionaryRelationDetail.fromJson(data)
+              ? _i25.DictionaryRelationDetail.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i24.EntryKnowledgeState?>()) {
-      return (data != null ? _i24.EntryKnowledgeState.fromJson(data) : null)
+    if (t == _i1.getType<_i26.EntryKnowledgeState?>()) {
+      return (data != null ? _i26.EntryKnowledgeState.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i25.Greeting?>()) {
-      return (data != null ? _i25.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i27.Greeting?>()) {
+      return (data != null ? _i27.Greeting.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i26.KnowledgeStateQuery?>()) {
-      return (data != null ? _i26.KnowledgeStateQuery.fromJson(data) : null)
+    if (t == _i1.getType<_i28.KnowledgeStateQuery?>()) {
+      return (data != null ? _i28.KnowledgeStateQuery.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i27.KnowledgeStateResult?>()) {
-      return (data != null ? _i27.KnowledgeStateResult.fromJson(data) : null)
+    if (t == _i1.getType<_i29.KnowledgeStateResult?>()) {
+      return (data != null ? _i29.KnowledgeStateResult.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i28.ScriptConversionCommitResult?>()) {
+    if (t == _i1.getType<_i30.ProfileStats?>()) {
+      return (data != null ? _i30.ProfileStats.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i31.ScriptConversionCommitResult?>()) {
       return (data != null
-              ? _i28.ScriptConversionCommitResult.fromJson(data)
+              ? _i31.ScriptConversionCommitResult.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i29.ScriptConversionEntry?>()) {
-      return (data != null ? _i29.ScriptConversionEntry.fromJson(data) : null)
+    if (t == _i1.getType<_i32.ScriptConversionEntry?>()) {
+      return (data != null ? _i32.ScriptConversionEntry.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i30.ScriptConversionImportPreview?>()) {
+    if (t == _i1.getType<_i33.ScriptConversionImportPreview?>()) {
       return (data != null
-              ? _i30.ScriptConversionImportPreview.fromJson(data)
+              ? _i33.ScriptConversionImportPreview.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i31.ScriptConversionImportPreviewRow?>()) {
+    if (t == _i1.getType<_i34.ScriptConversionImportPreviewRow?>()) {
       return (data != null
-              ? _i31.ScriptConversionImportPreviewRow.fromJson(data)
+              ? _i34.ScriptConversionImportPreviewRow.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i32.ScriptConversionProfile?>()) {
-      return (data != null ? _i32.ScriptConversionProfile.fromJson(data) : null)
+    if (t == _i1.getType<_i35.ScriptConversionProfile?>()) {
+      return (data != null ? _i35.ScriptConversionProfile.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i33.SubtitleCue?>()) {
-      return (data != null ? _i33.SubtitleCue.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i36.SubtitleCue?>()) {
+      return (data != null ? _i36.SubtitleCue.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i34.SubtitleCueDetail?>()) {
-      return (data != null ? _i34.SubtitleCueDetail.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i37.SubtitleCueDetail?>()) {
+      return (data != null ? _i37.SubtitleCueDetail.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i35.SubtitleCueText?>()) {
-      return (data != null ? _i35.SubtitleCueText.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i38.SubtitleCueText?>()) {
+      return (data != null ? _i38.SubtitleCueText.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i36.SubtitleKaraokeSegment?>()) {
-      return (data != null ? _i36.SubtitleKaraokeSegment.fromJson(data) : null)
+    if (t == _i1.getType<_i39.SubtitleKaraokeSegment?>()) {
+      return (data != null ? _i39.SubtitleKaraokeSegment.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i37.SubtitleKaraokeSegmentInput?>()) {
+    if (t == _i1.getType<_i40.SubtitleKaraokeSegmentInput?>()) {
       return (data != null
-              ? _i37.SubtitleKaraokeSegmentInput.fromJson(data)
+              ? _i40.SubtitleKaraokeSegmentInput.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i38.SubtitlePhrase?>()) {
-      return (data != null ? _i38.SubtitlePhrase.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i41.SubtitlePhrase?>()) {
+      return (data != null ? _i41.SubtitlePhrase.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i39.SubtitlePublishState?>()) {
-      return (data != null ? _i39.SubtitlePublishState.fromJson(data) : null)
+    if (t == _i1.getType<_i42.SubtitlePublishState?>()) {
+      return (data != null ? _i42.SubtitlePublishState.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i40.SubtitlePublishStatus?>()) {
-      return (data != null ? _i40.SubtitlePublishStatus.fromJson(data) : null)
+    if (t == _i1.getType<_i43.SubtitlePublishStatus?>()) {
+      return (data != null ? _i43.SubtitlePublishStatus.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i41.SubtitleReviewDashboard?>()) {
-      return (data != null ? _i41.SubtitleReviewDashboard.fromJson(data) : null)
+    if (t == _i1.getType<_i44.SubtitleReviewDashboard?>()) {
+      return (data != null ? _i44.SubtitleReviewDashboard.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i42.SubtitleReviewEvent?>()) {
-      return (data != null ? _i42.SubtitleReviewEvent.fromJson(data) : null)
+    if (t == _i1.getType<_i45.SubtitleReviewEvent?>()) {
+      return (data != null ? _i45.SubtitleReviewEvent.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i43.SubtitleReviewQueueItem?>()) {
-      return (data != null ? _i43.SubtitleReviewQueueItem.fromJson(data) : null)
+    if (t == _i1.getType<_i46.SubtitleReviewQueueItem?>()) {
+      return (data != null ? _i46.SubtitleReviewQueueItem.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i44.SubtitleReviewTask?>()) {
-      return (data != null ? _i44.SubtitleReviewTask.fromJson(data) : null)
+    if (t == _i1.getType<_i47.SubtitleReviewTask?>()) {
+      return (data != null ? _i47.SubtitleReviewTask.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i45.SubtitleReviewTaskDetail?>()) {
+    if (t == _i1.getType<_i48.SubtitleReviewTaskDetail?>()) {
       return (data != null
-              ? _i45.SubtitleReviewTaskDetail.fromJson(data)
+              ? _i48.SubtitleReviewTaskDetail.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i46.SubtitleReviewTaskStatus?>()) {
+    if (t == _i1.getType<_i49.SubtitleReviewTaskStatus?>()) {
       return (data != null
-              ? _i46.SubtitleReviewTaskStatus.fromJson(data)
+              ? _i49.SubtitleReviewTaskStatus.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i47.SubtitleSrtPreview?>()) {
-      return (data != null ? _i47.SubtitleSrtPreview.fromJson(data) : null)
+    if (t == _i1.getType<_i50.SubtitleSrtPreview?>()) {
+      return (data != null ? _i50.SubtitleSrtPreview.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i48.SubtitleToken?>()) {
-      return (data != null ? _i48.SubtitleToken.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i51.SubtitleToken?>()) {
+      return (data != null ? _i51.SubtitleToken.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i49.SubtitleTrack?>()) {
-      return (data != null ? _i49.SubtitleTrack.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i52.SubtitleTrack?>()) {
+      return (data != null ? _i52.SubtitleTrack.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i50.UserKnownEntry?>()) {
-      return (data != null ? _i50.UserKnownEntry.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i53.UserKnownEntry?>()) {
+      return (data != null ? _i53.UserKnownEntry.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i51.Video?>()) {
-      return (data != null ? _i51.Video.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i54.Video?>()) {
+      return (data != null ? _i54.Video.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i52.VideoCommentDto?>()) {
-      return (data != null ? _i52.VideoCommentDto.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i55.VideoCommentDto?>()) {
+      return (data != null ? _i55.VideoCommentDto.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i53.VideoCommentRow?>()) {
-      return (data != null ? _i53.VideoCommentRow.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i56.VideoCommentRow?>()) {
+      return (data != null ? _i56.VideoCommentRow.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i54.VideoStatus?>()) {
-      return (data != null ? _i54.VideoStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i57.VideoContentType?>()) {
+      return (data != null ? _i57.VideoContentType.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i55.WordList?>()) {
-      return (data != null ? _i55.WordList.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i58.VideoFavorite?>()) {
+      return (data != null ? _i58.VideoFavorite.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i56.WordListDetail?>()) {
-      return (data != null ? _i56.WordListDetail.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i59.VideoStatus?>()) {
+      return (data != null ? _i59.VideoStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i57.WordListItem?>()) {
-      return (data != null ? _i57.WordListItem.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i60.WatchHistory?>()) {
+      return (data != null ? _i60.WatchHistory.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i58.WordListItemDetail?>()) {
-      return (data != null ? _i58.WordListItemDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i61.WordList?>()) {
+      return (data != null ? _i61.WordList.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i62.WordListDetail?>()) {
+      return (data != null ? _i62.WordListDetail.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i63.WordListItem?>()) {
+      return (data != null ? _i63.WordListItem.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i64.WordListItemDetail?>()) {
+      return (data != null ? _i64.WordListItemDetail.fromJson(data) : null)
           as T;
     }
-    if (t == List<_i52.VideoCommentDto>) {
+    if (t == List<_i55.VideoCommentDto>) {
       return (data as List)
-              .map((e) => deserialize<_i52.VideoCommentDto>(e))
+              .map((e) => deserialize<_i55.VideoCommentDto>(e))
               .toList()
           as T;
     }
-    if (t == List<_i9.DictionaryDefinition>) {
+    if (t == List<_i11.DictionaryDefinition>) {
       return (data as List)
-              .map((e) => deserialize<_i9.DictionaryDefinition>(e))
+              .map((e) => deserialize<_i11.DictionaryDefinition>(e))
               .toList()
           as T;
     }
-    if (t == List<_i15.DictionaryForm>) {
+    if (t == List<_i17.DictionaryForm>) {
       return (data as List)
-              .map((e) => deserialize<_i15.DictionaryForm>(e))
+              .map((e) => deserialize<_i17.DictionaryForm>(e))
               .toList()
           as T;
     }
-    if (t == List<_i13.DictionaryExampleDetail>) {
+    if (t == List<_i15.DictionaryExampleDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i13.DictionaryExampleDetail>(e))
+              .map((e) => deserialize<_i15.DictionaryExampleDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i23.DictionaryRelationDetail>) {
+    if (t == List<_i25.DictionaryRelationDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i23.DictionaryRelationDetail>(e))
+              .map((e) => deserialize<_i25.DictionaryRelationDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i14.DictionaryExampleText>) {
+    if (t == List<_i16.DictionaryExampleText>) {
       return (data as List)
-              .map((e) => deserialize<_i14.DictionaryExampleText>(e))
+              .map((e) => deserialize<_i16.DictionaryExampleText>(e))
               .toList()
           as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i19.DictionaryImportPreviewRow>) {
+    if (t == List<_i21.DictionaryImportPreviewRow>) {
       return (data as List)
-              .map((e) => deserialize<_i19.DictionaryImportPreviewRow>(e))
+              .map((e) => deserialize<_i21.DictionaryImportPreviewRow>(e))
               .toList()
           as T;
     }
-    if (t == List<_i17.DictionaryImportMapping>) {
+    if (t == List<_i19.DictionaryImportMapping>) {
       return (data as List)
-              .map((e) => deserialize<_i17.DictionaryImportMapping>(e))
+              .map((e) => deserialize<_i19.DictionaryImportMapping>(e))
               .toList()
           as T;
     }
-    if (t == List<_i31.ScriptConversionImportPreviewRow>) {
+    if (t == List<_i34.ScriptConversionImportPreviewRow>) {
       return (data as List)
-              .map((e) => deserialize<_i31.ScriptConversionImportPreviewRow>(e))
+              .map((e) => deserialize<_i34.ScriptConversionImportPreviewRow>(e))
               .toList()
           as T;
     }
-    if (t == List<_i35.SubtitleCueText>) {
+    if (t == List<_i38.SubtitleCueText>) {
       return (data as List)
-              .map((e) => deserialize<_i35.SubtitleCueText>(e))
+              .map((e) => deserialize<_i38.SubtitleCueText>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i35.SubtitleCueText>?>()) {
+    if (t == _i1.getType<List<_i38.SubtitleCueText>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i35.SubtitleCueText>(e))
+                    .map((e) => deserialize<_i38.SubtitleCueText>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i48.SubtitleToken>) {
+    if (t == List<_i51.SubtitleToken>) {
       return (data as List)
-              .map((e) => deserialize<_i48.SubtitleToken>(e))
+              .map((e) => deserialize<_i51.SubtitleToken>(e))
               .toList()
           as T;
     }
-    if (t == List<_i38.SubtitlePhrase>) {
+    if (t == List<_i41.SubtitlePhrase>) {
       return (data as List)
-              .map((e) => deserialize<_i38.SubtitlePhrase>(e))
+              .map((e) => deserialize<_i41.SubtitlePhrase>(e))
               .toList()
           as T;
     }
-    if (t == List<_i36.SubtitleKaraokeSegment>) {
+    if (t == List<_i39.SubtitleKaraokeSegment>) {
       return (data as List)
-              .map((e) => deserialize<_i36.SubtitleKaraokeSegment>(e))
+              .map((e) => deserialize<_i39.SubtitleKaraokeSegment>(e))
               .toList()
           as T;
     }
-    if (t == _i1.getType<List<_i36.SubtitleKaraokeSegment>?>()) {
+    if (t == _i1.getType<List<_i39.SubtitleKaraokeSegment>?>()) {
       return (data != null
               ? (data as List)
-                    .map((e) => deserialize<_i36.SubtitleKaraokeSegment>(e))
+                    .map((e) => deserialize<_i39.SubtitleKaraokeSegment>(e))
                     .toList()
               : null)
           as T;
     }
-    if (t == List<_i43.SubtitleReviewQueueItem>) {
+    if (t == List<_i46.SubtitleReviewQueueItem>) {
       return (data as List)
-              .map((e) => deserialize<_i43.SubtitleReviewQueueItem>(e))
+              .map((e) => deserialize<_i46.SubtitleReviewQueueItem>(e))
               .toList()
           as T;
     }
-    if (t == List<_i42.SubtitleReviewEvent>) {
+    if (t == List<_i45.SubtitleReviewEvent>) {
       return (data as List)
-              .map((e) => deserialize<_i42.SubtitleReviewEvent>(e))
+              .map((e) => deserialize<_i45.SubtitleReviewEvent>(e))
               .toList()
           as T;
     }
-    if (t == List<_i6.CommentReplyDto>) {
+    if (t == List<_i7.CommentReplyDto>) {
       return (data as List)
-              .map((e) => deserialize<_i6.CommentReplyDto>(e))
+              .map((e) => deserialize<_i7.CommentReplyDto>(e))
               .toList()
           as T;
     }
-    if (t == List<_i58.WordListItemDetail>) {
+    if (t == List<_i64.WordListItemDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i58.WordListItemDetail>(e))
+              .map((e) => deserialize<_i64.WordListItemDetail>(e))
               .toList()
           as T;
     }
@@ -710,29 +760,29 @@ class Protocol extends _i1.SerializationManager {
           )
           as T;
     }
-    if (t == List<_i59.AsrJob>) {
-      return (data as List).map((e) => deserialize<_i59.AsrJob>(e)).toList()
+    if (t == List<_i65.AsrJob>) {
+      return (data as List).map((e) => deserialize<_i65.AsrJob>(e)).toList()
           as T;
     }
-    if (t == List<_i60.Video>) {
-      return (data as List).map((e) => deserialize<_i60.Video>(e)).toList()
+    if (t == List<_i66.Video>) {
+      return (data as List).map((e) => deserialize<_i66.Video>(e)).toList()
           as T;
     }
-    if (t == List<_i61.SubtitleTrack>) {
+    if (t == List<_i67.SubtitleTrack>) {
       return (data as List)
-              .map((e) => deserialize<_i61.SubtitleTrack>(e))
+              .map((e) => deserialize<_i67.SubtitleTrack>(e))
               .toList()
           as T;
     }
-    if (t == List<_i62.DictionaryEntryDetail>) {
+    if (t == List<_i68.DictionaryEntryDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i62.DictionaryEntryDetail>(e))
+              .map((e) => deserialize<_i68.DictionaryEntryDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i63.DictionaryImportProfile>) {
+    if (t == List<_i69.DictionaryImportProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i63.DictionaryImportProfile>(e))
+              .map((e) => deserialize<_i69.DictionaryImportProfile>(e))
               .toList()
           as T;
     }
@@ -742,127 +792,139 @@ class Protocol extends _i1.SerializationManager {
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
     }
-    if (t == List<_i64.EntryKnowledgeState>) {
+    if (t == List<_i70.EntryKnowledgeState>) {
       return (data as List)
-              .map((e) => deserialize<_i64.EntryKnowledgeState>(e))
+              .map((e) => deserialize<_i70.EntryKnowledgeState>(e))
               .toList()
           as T;
     }
-    if (t == List<_i65.KnowledgeStateResult>) {
+    if (t == List<_i71.KnowledgeStateResult>) {
       return (data as List)
-              .map((e) => deserialize<_i65.KnowledgeStateResult>(e))
+              .map((e) => deserialize<_i71.KnowledgeStateResult>(e))
               .toList()
           as T;
     }
-    if (t == List<_i66.KnowledgeStateQuery>) {
+    if (t == List<_i72.KnowledgeStateQuery>) {
       return (data as List)
-              .map((e) => deserialize<_i66.KnowledgeStateQuery>(e))
+              .map((e) => deserialize<_i72.KnowledgeStateQuery>(e))
               .toList()
           as T;
     }
-    if (t == List<_i67.ScriptConversionProfile>) {
+    if (t == List<_i73.ScriptConversionProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i67.ScriptConversionProfile>(e))
+              .map((e) => deserialize<_i73.ScriptConversionProfile>(e))
               .toList()
           as T;
     }
-    if (t == List<_i68.ScriptConversionEntry>) {
+    if (t == List<_i74.ScriptConversionEntry>) {
       return (data as List)
-              .map((e) => deserialize<_i68.ScriptConversionEntry>(e))
+              .map((e) => deserialize<_i74.ScriptConversionEntry>(e))
               .toList()
           as T;
     }
-    if (t == List<_i69.SubtitleCueDetail>) {
+    if (t == List<_i75.WatchHistory>) {
       return (data as List)
-              .map((e) => deserialize<_i69.SubtitleCueDetail>(e))
+              .map((e) => deserialize<_i75.WatchHistory>(e))
               .toList()
           as T;
     }
-    if (t == List<_i70.SubtitleKaraokeSegment>) {
+    if (t == List<_i76.SubtitleCueDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i70.SubtitleKaraokeSegment>(e))
+              .map((e) => deserialize<_i76.SubtitleCueDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i71.SubtitleKaraokeSegmentInput>) {
+    if (t == List<_i77.SubtitleKaraokeSegment>) {
       return (data as List)
-              .map((e) => deserialize<_i71.SubtitleKaraokeSegmentInput>(e))
+              .map((e) => deserialize<_i77.SubtitleKaraokeSegment>(e))
               .toList()
           as T;
     }
-    if (t == List<_i72.WordList>) {
-      return (data as List).map((e) => deserialize<_i72.WordList>(e)).toList()
+    if (t == List<_i78.SubtitleKaraokeSegmentInput>) {
+      return (data as List)
+              .map((e) => deserialize<_i78.SubtitleKaraokeSegmentInput>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i79.WordList>) {
+      return (data as List).map((e) => deserialize<_i79.WordList>(e)).toList()
           as T;
     }
     try {
-      return _i73.Protocol().deserialize<T>(data, t);
+      return _i80.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _i74.Protocol().deserialize<T>(data, t);
+      return _i81.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i2.AsrJob => 'AsrJob',
-      _i3.AsrJobStatus => 'AsrJobStatus',
-      _i4.CommentLike => 'CommentLike',
-      _i5.CommentPageDto => 'CommentPageDto',
-      _i6.CommentReplyDto => 'CommentReplyDto',
-      _i7.CommentReplyLike => 'CommentReplyLike',
-      _i8.CommentReplyRow => 'CommentReplyRow',
-      _i9.DictionaryDefinition => 'DictionaryDefinition',
-      _i10.DictionaryEntry => 'DictionaryEntry',
-      _i11.DictionaryEntryDetail => 'DictionaryEntryDetail',
-      _i12.DictionaryExample => 'DictionaryExample',
-      _i13.DictionaryExampleDetail => 'DictionaryExampleDetail',
-      _i14.DictionaryExampleText => 'DictionaryExampleText',
-      _i15.DictionaryForm => 'DictionaryForm',
-      _i16.DictionaryImportCommitResult => 'DictionaryImportCommitResult',
-      _i17.DictionaryImportMapping => 'DictionaryImportMapping',
-      _i18.DictionaryImportPreview => 'DictionaryImportPreview',
-      _i19.DictionaryImportPreviewRow => 'DictionaryImportPreviewRow',
-      _i20.DictionaryImportProfile => 'DictionaryImportProfile',
-      _i21.DictionaryImportProfileDetail => 'DictionaryImportProfileDetail',
-      _i22.DictionaryRelation => 'DictionaryRelation',
-      _i23.DictionaryRelationDetail => 'DictionaryRelationDetail',
-      _i24.EntryKnowledgeState => 'EntryKnowledgeState',
-      _i25.Greeting => 'Greeting',
-      _i26.KnowledgeStateQuery => 'KnowledgeStateQuery',
-      _i27.KnowledgeStateResult => 'KnowledgeStateResult',
-      _i28.ScriptConversionCommitResult => 'ScriptConversionCommitResult',
-      _i29.ScriptConversionEntry => 'ScriptConversionEntry',
-      _i30.ScriptConversionImportPreview => 'ScriptConversionImportPreview',
-      _i31.ScriptConversionImportPreviewRow =>
+      _i2.AppProfile => 'AppProfile',
+      _i3.AsrJob => 'AsrJob',
+      _i4.AsrJobStatus => 'AsrJobStatus',
+      _i5.CommentLike => 'CommentLike',
+      _i6.CommentPageDto => 'CommentPageDto',
+      _i7.CommentReplyDto => 'CommentReplyDto',
+      _i8.CommentReplyLike => 'CommentReplyLike',
+      _i9.CommentReplyRow => 'CommentReplyRow',
+      _i10.CreatorFollow => 'CreatorFollow',
+      _i11.DictionaryDefinition => 'DictionaryDefinition',
+      _i12.DictionaryEntry => 'DictionaryEntry',
+      _i13.DictionaryEntryDetail => 'DictionaryEntryDetail',
+      _i14.DictionaryExample => 'DictionaryExample',
+      _i15.DictionaryExampleDetail => 'DictionaryExampleDetail',
+      _i16.DictionaryExampleText => 'DictionaryExampleText',
+      _i17.DictionaryForm => 'DictionaryForm',
+      _i18.DictionaryImportCommitResult => 'DictionaryImportCommitResult',
+      _i19.DictionaryImportMapping => 'DictionaryImportMapping',
+      _i20.DictionaryImportPreview => 'DictionaryImportPreview',
+      _i21.DictionaryImportPreviewRow => 'DictionaryImportPreviewRow',
+      _i22.DictionaryImportProfile => 'DictionaryImportProfile',
+      _i23.DictionaryImportProfileDetail => 'DictionaryImportProfileDetail',
+      _i24.DictionaryRelation => 'DictionaryRelation',
+      _i25.DictionaryRelationDetail => 'DictionaryRelationDetail',
+      _i26.EntryKnowledgeState => 'EntryKnowledgeState',
+      _i27.Greeting => 'Greeting',
+      _i28.KnowledgeStateQuery => 'KnowledgeStateQuery',
+      _i29.KnowledgeStateResult => 'KnowledgeStateResult',
+      _i30.ProfileStats => 'ProfileStats',
+      _i31.ScriptConversionCommitResult => 'ScriptConversionCommitResult',
+      _i32.ScriptConversionEntry => 'ScriptConversionEntry',
+      _i33.ScriptConversionImportPreview => 'ScriptConversionImportPreview',
+      _i34.ScriptConversionImportPreviewRow =>
         'ScriptConversionImportPreviewRow',
-      _i32.ScriptConversionProfile => 'ScriptConversionProfile',
-      _i33.SubtitleCue => 'SubtitleCue',
-      _i34.SubtitleCueDetail => 'SubtitleCueDetail',
-      _i35.SubtitleCueText => 'SubtitleCueText',
-      _i36.SubtitleKaraokeSegment => 'SubtitleKaraokeSegment',
-      _i37.SubtitleKaraokeSegmentInput => 'SubtitleKaraokeSegmentInput',
-      _i38.SubtitlePhrase => 'SubtitlePhrase',
-      _i39.SubtitlePublishState => 'SubtitlePublishState',
-      _i40.SubtitlePublishStatus => 'SubtitlePublishStatus',
-      _i41.SubtitleReviewDashboard => 'SubtitleReviewDashboard',
-      _i42.SubtitleReviewEvent => 'SubtitleReviewEvent',
-      _i43.SubtitleReviewQueueItem => 'SubtitleReviewQueueItem',
-      _i44.SubtitleReviewTask => 'SubtitleReviewTask',
-      _i45.SubtitleReviewTaskDetail => 'SubtitleReviewTaskDetail',
-      _i46.SubtitleReviewTaskStatus => 'SubtitleReviewTaskStatus',
-      _i47.SubtitleSrtPreview => 'SubtitleSrtPreview',
-      _i48.SubtitleToken => 'SubtitleToken',
-      _i49.SubtitleTrack => 'SubtitleTrack',
-      _i50.UserKnownEntry => 'UserKnownEntry',
-      _i51.Video => 'Video',
-      _i52.VideoCommentDto => 'VideoCommentDto',
-      _i53.VideoCommentRow => 'VideoCommentRow',
-      _i54.VideoStatus => 'VideoStatus',
-      _i55.WordList => 'WordList',
-      _i56.WordListDetail => 'WordListDetail',
-      _i57.WordListItem => 'WordListItem',
-      _i58.WordListItemDetail => 'WordListItemDetail',
+      _i35.ScriptConversionProfile => 'ScriptConversionProfile',
+      _i36.SubtitleCue => 'SubtitleCue',
+      _i37.SubtitleCueDetail => 'SubtitleCueDetail',
+      _i38.SubtitleCueText => 'SubtitleCueText',
+      _i39.SubtitleKaraokeSegment => 'SubtitleKaraokeSegment',
+      _i40.SubtitleKaraokeSegmentInput => 'SubtitleKaraokeSegmentInput',
+      _i41.SubtitlePhrase => 'SubtitlePhrase',
+      _i42.SubtitlePublishState => 'SubtitlePublishState',
+      _i43.SubtitlePublishStatus => 'SubtitlePublishStatus',
+      _i44.SubtitleReviewDashboard => 'SubtitleReviewDashboard',
+      _i45.SubtitleReviewEvent => 'SubtitleReviewEvent',
+      _i46.SubtitleReviewQueueItem => 'SubtitleReviewQueueItem',
+      _i47.SubtitleReviewTask => 'SubtitleReviewTask',
+      _i48.SubtitleReviewTaskDetail => 'SubtitleReviewTaskDetail',
+      _i49.SubtitleReviewTaskStatus => 'SubtitleReviewTaskStatus',
+      _i50.SubtitleSrtPreview => 'SubtitleSrtPreview',
+      _i51.SubtitleToken => 'SubtitleToken',
+      _i52.SubtitleTrack => 'SubtitleTrack',
+      _i53.UserKnownEntry => 'UserKnownEntry',
+      _i54.Video => 'Video',
+      _i55.VideoCommentDto => 'VideoCommentDto',
+      _i56.VideoCommentRow => 'VideoCommentRow',
+      _i57.VideoContentType => 'VideoContentType',
+      _i58.VideoFavorite => 'VideoFavorite',
+      _i59.VideoStatus => 'VideoStatus',
+      _i60.WatchHistory => 'WatchHistory',
+      _i61.WordList => 'WordList',
+      _i62.WordListDetail => 'WordListDetail',
+      _i63.WordListItem => 'WordListItem',
+      _i64.WordListItemDetail => 'WordListItemDetail',
       _ => null,
     };
   }
@@ -880,126 +942,138 @@ class Protocol extends _i1.SerializationManager {
     }
 
     switch (data) {
-      case _i2.AsrJob():
+      case _i2.AppProfile():
+        return 'AppProfile';
+      case _i3.AsrJob():
         return 'AsrJob';
-      case _i3.AsrJobStatus():
+      case _i4.AsrJobStatus():
         return 'AsrJobStatus';
-      case _i4.CommentLike():
+      case _i5.CommentLike():
         return 'CommentLike';
-      case _i5.CommentPageDto():
+      case _i6.CommentPageDto():
         return 'CommentPageDto';
-      case _i6.CommentReplyDto():
+      case _i7.CommentReplyDto():
         return 'CommentReplyDto';
-      case _i7.CommentReplyLike():
+      case _i8.CommentReplyLike():
         return 'CommentReplyLike';
-      case _i8.CommentReplyRow():
+      case _i9.CommentReplyRow():
         return 'CommentReplyRow';
-      case _i9.DictionaryDefinition():
+      case _i10.CreatorFollow():
+        return 'CreatorFollow';
+      case _i11.DictionaryDefinition():
         return 'DictionaryDefinition';
-      case _i10.DictionaryEntry():
+      case _i12.DictionaryEntry():
         return 'DictionaryEntry';
-      case _i11.DictionaryEntryDetail():
+      case _i13.DictionaryEntryDetail():
         return 'DictionaryEntryDetail';
-      case _i12.DictionaryExample():
+      case _i14.DictionaryExample():
         return 'DictionaryExample';
-      case _i13.DictionaryExampleDetail():
+      case _i15.DictionaryExampleDetail():
         return 'DictionaryExampleDetail';
-      case _i14.DictionaryExampleText():
+      case _i16.DictionaryExampleText():
         return 'DictionaryExampleText';
-      case _i15.DictionaryForm():
+      case _i17.DictionaryForm():
         return 'DictionaryForm';
-      case _i16.DictionaryImportCommitResult():
+      case _i18.DictionaryImportCommitResult():
         return 'DictionaryImportCommitResult';
-      case _i17.DictionaryImportMapping():
+      case _i19.DictionaryImportMapping():
         return 'DictionaryImportMapping';
-      case _i18.DictionaryImportPreview():
+      case _i20.DictionaryImportPreview():
         return 'DictionaryImportPreview';
-      case _i19.DictionaryImportPreviewRow():
+      case _i21.DictionaryImportPreviewRow():
         return 'DictionaryImportPreviewRow';
-      case _i20.DictionaryImportProfile():
+      case _i22.DictionaryImportProfile():
         return 'DictionaryImportProfile';
-      case _i21.DictionaryImportProfileDetail():
+      case _i23.DictionaryImportProfileDetail():
         return 'DictionaryImportProfileDetail';
-      case _i22.DictionaryRelation():
+      case _i24.DictionaryRelation():
         return 'DictionaryRelation';
-      case _i23.DictionaryRelationDetail():
+      case _i25.DictionaryRelationDetail():
         return 'DictionaryRelationDetail';
-      case _i24.EntryKnowledgeState():
+      case _i26.EntryKnowledgeState():
         return 'EntryKnowledgeState';
-      case _i25.Greeting():
+      case _i27.Greeting():
         return 'Greeting';
-      case _i26.KnowledgeStateQuery():
+      case _i28.KnowledgeStateQuery():
         return 'KnowledgeStateQuery';
-      case _i27.KnowledgeStateResult():
+      case _i29.KnowledgeStateResult():
         return 'KnowledgeStateResult';
-      case _i28.ScriptConversionCommitResult():
+      case _i30.ProfileStats():
+        return 'ProfileStats';
+      case _i31.ScriptConversionCommitResult():
         return 'ScriptConversionCommitResult';
-      case _i29.ScriptConversionEntry():
+      case _i32.ScriptConversionEntry():
         return 'ScriptConversionEntry';
-      case _i30.ScriptConversionImportPreview():
+      case _i33.ScriptConversionImportPreview():
         return 'ScriptConversionImportPreview';
-      case _i31.ScriptConversionImportPreviewRow():
+      case _i34.ScriptConversionImportPreviewRow():
         return 'ScriptConversionImportPreviewRow';
-      case _i32.ScriptConversionProfile():
+      case _i35.ScriptConversionProfile():
         return 'ScriptConversionProfile';
-      case _i33.SubtitleCue():
+      case _i36.SubtitleCue():
         return 'SubtitleCue';
-      case _i34.SubtitleCueDetail():
+      case _i37.SubtitleCueDetail():
         return 'SubtitleCueDetail';
-      case _i35.SubtitleCueText():
+      case _i38.SubtitleCueText():
         return 'SubtitleCueText';
-      case _i36.SubtitleKaraokeSegment():
+      case _i39.SubtitleKaraokeSegment():
         return 'SubtitleKaraokeSegment';
-      case _i37.SubtitleKaraokeSegmentInput():
+      case _i40.SubtitleKaraokeSegmentInput():
         return 'SubtitleKaraokeSegmentInput';
-      case _i38.SubtitlePhrase():
+      case _i41.SubtitlePhrase():
         return 'SubtitlePhrase';
-      case _i39.SubtitlePublishState():
+      case _i42.SubtitlePublishState():
         return 'SubtitlePublishState';
-      case _i40.SubtitlePublishStatus():
+      case _i43.SubtitlePublishStatus():
         return 'SubtitlePublishStatus';
-      case _i41.SubtitleReviewDashboard():
+      case _i44.SubtitleReviewDashboard():
         return 'SubtitleReviewDashboard';
-      case _i42.SubtitleReviewEvent():
+      case _i45.SubtitleReviewEvent():
         return 'SubtitleReviewEvent';
-      case _i43.SubtitleReviewQueueItem():
+      case _i46.SubtitleReviewQueueItem():
         return 'SubtitleReviewQueueItem';
-      case _i44.SubtitleReviewTask():
+      case _i47.SubtitleReviewTask():
         return 'SubtitleReviewTask';
-      case _i45.SubtitleReviewTaskDetail():
+      case _i48.SubtitleReviewTaskDetail():
         return 'SubtitleReviewTaskDetail';
-      case _i46.SubtitleReviewTaskStatus():
+      case _i49.SubtitleReviewTaskStatus():
         return 'SubtitleReviewTaskStatus';
-      case _i47.SubtitleSrtPreview():
+      case _i50.SubtitleSrtPreview():
         return 'SubtitleSrtPreview';
-      case _i48.SubtitleToken():
+      case _i51.SubtitleToken():
         return 'SubtitleToken';
-      case _i49.SubtitleTrack():
+      case _i52.SubtitleTrack():
         return 'SubtitleTrack';
-      case _i50.UserKnownEntry():
+      case _i53.UserKnownEntry():
         return 'UserKnownEntry';
-      case _i51.Video():
+      case _i54.Video():
         return 'Video';
-      case _i52.VideoCommentDto():
+      case _i55.VideoCommentDto():
         return 'VideoCommentDto';
-      case _i53.VideoCommentRow():
+      case _i56.VideoCommentRow():
         return 'VideoCommentRow';
-      case _i54.VideoStatus():
+      case _i57.VideoContentType():
+        return 'VideoContentType';
+      case _i58.VideoFavorite():
+        return 'VideoFavorite';
+      case _i59.VideoStatus():
         return 'VideoStatus';
-      case _i55.WordList():
+      case _i60.WatchHistory():
+        return 'WatchHistory';
+      case _i61.WordList():
         return 'WordList';
-      case _i56.WordListDetail():
+      case _i62.WordListDetail():
         return 'WordListDetail';
-      case _i57.WordListItem():
+      case _i63.WordListItem():
         return 'WordListItem';
-      case _i58.WordListItemDetail():
+      case _i64.WordListItemDetail():
         return 'WordListItemDetail';
     }
-    className = _i73.Protocol().getClassNameForObject(data);
+    className = _i80.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_idp.$className';
     }
-    className = _i74.Protocol().getClassNameForObject(data);
+    className = _i81.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -1012,184 +1086,202 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'AppProfile') {
+      return deserialize<_i2.AppProfile>(data['data']);
+    }
     if (dataClassName == 'AsrJob') {
-      return deserialize<_i2.AsrJob>(data['data']);
+      return deserialize<_i3.AsrJob>(data['data']);
     }
     if (dataClassName == 'AsrJobStatus') {
-      return deserialize<_i3.AsrJobStatus>(data['data']);
+      return deserialize<_i4.AsrJobStatus>(data['data']);
     }
     if (dataClassName == 'CommentLike') {
-      return deserialize<_i4.CommentLike>(data['data']);
+      return deserialize<_i5.CommentLike>(data['data']);
     }
     if (dataClassName == 'CommentPageDto') {
-      return deserialize<_i5.CommentPageDto>(data['data']);
+      return deserialize<_i6.CommentPageDto>(data['data']);
     }
     if (dataClassName == 'CommentReplyDto') {
-      return deserialize<_i6.CommentReplyDto>(data['data']);
+      return deserialize<_i7.CommentReplyDto>(data['data']);
     }
     if (dataClassName == 'CommentReplyLike') {
-      return deserialize<_i7.CommentReplyLike>(data['data']);
+      return deserialize<_i8.CommentReplyLike>(data['data']);
     }
     if (dataClassName == 'CommentReplyRow') {
-      return deserialize<_i8.CommentReplyRow>(data['data']);
+      return deserialize<_i9.CommentReplyRow>(data['data']);
+    }
+    if (dataClassName == 'CreatorFollow') {
+      return deserialize<_i10.CreatorFollow>(data['data']);
     }
     if (dataClassName == 'DictionaryDefinition') {
-      return deserialize<_i9.DictionaryDefinition>(data['data']);
+      return deserialize<_i11.DictionaryDefinition>(data['data']);
     }
     if (dataClassName == 'DictionaryEntry') {
-      return deserialize<_i10.DictionaryEntry>(data['data']);
+      return deserialize<_i12.DictionaryEntry>(data['data']);
     }
     if (dataClassName == 'DictionaryEntryDetail') {
-      return deserialize<_i11.DictionaryEntryDetail>(data['data']);
+      return deserialize<_i13.DictionaryEntryDetail>(data['data']);
     }
     if (dataClassName == 'DictionaryExample') {
-      return deserialize<_i12.DictionaryExample>(data['data']);
+      return deserialize<_i14.DictionaryExample>(data['data']);
     }
     if (dataClassName == 'DictionaryExampleDetail') {
-      return deserialize<_i13.DictionaryExampleDetail>(data['data']);
+      return deserialize<_i15.DictionaryExampleDetail>(data['data']);
     }
     if (dataClassName == 'DictionaryExampleText') {
-      return deserialize<_i14.DictionaryExampleText>(data['data']);
+      return deserialize<_i16.DictionaryExampleText>(data['data']);
     }
     if (dataClassName == 'DictionaryForm') {
-      return deserialize<_i15.DictionaryForm>(data['data']);
+      return deserialize<_i17.DictionaryForm>(data['data']);
     }
     if (dataClassName == 'DictionaryImportCommitResult') {
-      return deserialize<_i16.DictionaryImportCommitResult>(data['data']);
+      return deserialize<_i18.DictionaryImportCommitResult>(data['data']);
     }
     if (dataClassName == 'DictionaryImportMapping') {
-      return deserialize<_i17.DictionaryImportMapping>(data['data']);
+      return deserialize<_i19.DictionaryImportMapping>(data['data']);
     }
     if (dataClassName == 'DictionaryImportPreview') {
-      return deserialize<_i18.DictionaryImportPreview>(data['data']);
+      return deserialize<_i20.DictionaryImportPreview>(data['data']);
     }
     if (dataClassName == 'DictionaryImportPreviewRow') {
-      return deserialize<_i19.DictionaryImportPreviewRow>(data['data']);
+      return deserialize<_i21.DictionaryImportPreviewRow>(data['data']);
     }
     if (dataClassName == 'DictionaryImportProfile') {
-      return deserialize<_i20.DictionaryImportProfile>(data['data']);
+      return deserialize<_i22.DictionaryImportProfile>(data['data']);
     }
     if (dataClassName == 'DictionaryImportProfileDetail') {
-      return deserialize<_i21.DictionaryImportProfileDetail>(data['data']);
+      return deserialize<_i23.DictionaryImportProfileDetail>(data['data']);
     }
     if (dataClassName == 'DictionaryRelation') {
-      return deserialize<_i22.DictionaryRelation>(data['data']);
+      return deserialize<_i24.DictionaryRelation>(data['data']);
     }
     if (dataClassName == 'DictionaryRelationDetail') {
-      return deserialize<_i23.DictionaryRelationDetail>(data['data']);
+      return deserialize<_i25.DictionaryRelationDetail>(data['data']);
     }
     if (dataClassName == 'EntryKnowledgeState') {
-      return deserialize<_i24.EntryKnowledgeState>(data['data']);
+      return deserialize<_i26.EntryKnowledgeState>(data['data']);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i25.Greeting>(data['data']);
+      return deserialize<_i27.Greeting>(data['data']);
     }
     if (dataClassName == 'KnowledgeStateQuery') {
-      return deserialize<_i26.KnowledgeStateQuery>(data['data']);
+      return deserialize<_i28.KnowledgeStateQuery>(data['data']);
     }
     if (dataClassName == 'KnowledgeStateResult') {
-      return deserialize<_i27.KnowledgeStateResult>(data['data']);
+      return deserialize<_i29.KnowledgeStateResult>(data['data']);
+    }
+    if (dataClassName == 'ProfileStats') {
+      return deserialize<_i30.ProfileStats>(data['data']);
     }
     if (dataClassName == 'ScriptConversionCommitResult') {
-      return deserialize<_i28.ScriptConversionCommitResult>(data['data']);
+      return deserialize<_i31.ScriptConversionCommitResult>(data['data']);
     }
     if (dataClassName == 'ScriptConversionEntry') {
-      return deserialize<_i29.ScriptConversionEntry>(data['data']);
+      return deserialize<_i32.ScriptConversionEntry>(data['data']);
     }
     if (dataClassName == 'ScriptConversionImportPreview') {
-      return deserialize<_i30.ScriptConversionImportPreview>(data['data']);
+      return deserialize<_i33.ScriptConversionImportPreview>(data['data']);
     }
     if (dataClassName == 'ScriptConversionImportPreviewRow') {
-      return deserialize<_i31.ScriptConversionImportPreviewRow>(data['data']);
+      return deserialize<_i34.ScriptConversionImportPreviewRow>(data['data']);
     }
     if (dataClassName == 'ScriptConversionProfile') {
-      return deserialize<_i32.ScriptConversionProfile>(data['data']);
+      return deserialize<_i35.ScriptConversionProfile>(data['data']);
     }
     if (dataClassName == 'SubtitleCue') {
-      return deserialize<_i33.SubtitleCue>(data['data']);
+      return deserialize<_i36.SubtitleCue>(data['data']);
     }
     if (dataClassName == 'SubtitleCueDetail') {
-      return deserialize<_i34.SubtitleCueDetail>(data['data']);
+      return deserialize<_i37.SubtitleCueDetail>(data['data']);
     }
     if (dataClassName == 'SubtitleCueText') {
-      return deserialize<_i35.SubtitleCueText>(data['data']);
+      return deserialize<_i38.SubtitleCueText>(data['data']);
     }
     if (dataClassName == 'SubtitleKaraokeSegment') {
-      return deserialize<_i36.SubtitleKaraokeSegment>(data['data']);
+      return deserialize<_i39.SubtitleKaraokeSegment>(data['data']);
     }
     if (dataClassName == 'SubtitleKaraokeSegmentInput') {
-      return deserialize<_i37.SubtitleKaraokeSegmentInput>(data['data']);
+      return deserialize<_i40.SubtitleKaraokeSegmentInput>(data['data']);
     }
     if (dataClassName == 'SubtitlePhrase') {
-      return deserialize<_i38.SubtitlePhrase>(data['data']);
+      return deserialize<_i41.SubtitlePhrase>(data['data']);
     }
     if (dataClassName == 'SubtitlePublishState') {
-      return deserialize<_i39.SubtitlePublishState>(data['data']);
+      return deserialize<_i42.SubtitlePublishState>(data['data']);
     }
     if (dataClassName == 'SubtitlePublishStatus') {
-      return deserialize<_i40.SubtitlePublishStatus>(data['data']);
+      return deserialize<_i43.SubtitlePublishStatus>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewDashboard') {
-      return deserialize<_i41.SubtitleReviewDashboard>(data['data']);
+      return deserialize<_i44.SubtitleReviewDashboard>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewEvent') {
-      return deserialize<_i42.SubtitleReviewEvent>(data['data']);
+      return deserialize<_i45.SubtitleReviewEvent>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewQueueItem') {
-      return deserialize<_i43.SubtitleReviewQueueItem>(data['data']);
+      return deserialize<_i46.SubtitleReviewQueueItem>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTask') {
-      return deserialize<_i44.SubtitleReviewTask>(data['data']);
+      return deserialize<_i47.SubtitleReviewTask>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTaskDetail') {
-      return deserialize<_i45.SubtitleReviewTaskDetail>(data['data']);
+      return deserialize<_i48.SubtitleReviewTaskDetail>(data['data']);
     }
     if (dataClassName == 'SubtitleReviewTaskStatus') {
-      return deserialize<_i46.SubtitleReviewTaskStatus>(data['data']);
+      return deserialize<_i49.SubtitleReviewTaskStatus>(data['data']);
     }
     if (dataClassName == 'SubtitleSrtPreview') {
-      return deserialize<_i47.SubtitleSrtPreview>(data['data']);
+      return deserialize<_i50.SubtitleSrtPreview>(data['data']);
     }
     if (dataClassName == 'SubtitleToken') {
-      return deserialize<_i48.SubtitleToken>(data['data']);
+      return deserialize<_i51.SubtitleToken>(data['data']);
     }
     if (dataClassName == 'SubtitleTrack') {
-      return deserialize<_i49.SubtitleTrack>(data['data']);
+      return deserialize<_i52.SubtitleTrack>(data['data']);
     }
     if (dataClassName == 'UserKnownEntry') {
-      return deserialize<_i50.UserKnownEntry>(data['data']);
+      return deserialize<_i53.UserKnownEntry>(data['data']);
     }
     if (dataClassName == 'Video') {
-      return deserialize<_i51.Video>(data['data']);
+      return deserialize<_i54.Video>(data['data']);
     }
     if (dataClassName == 'VideoCommentDto') {
-      return deserialize<_i52.VideoCommentDto>(data['data']);
+      return deserialize<_i55.VideoCommentDto>(data['data']);
     }
     if (dataClassName == 'VideoCommentRow') {
-      return deserialize<_i53.VideoCommentRow>(data['data']);
+      return deserialize<_i56.VideoCommentRow>(data['data']);
+    }
+    if (dataClassName == 'VideoContentType') {
+      return deserialize<_i57.VideoContentType>(data['data']);
+    }
+    if (dataClassName == 'VideoFavorite') {
+      return deserialize<_i58.VideoFavorite>(data['data']);
     }
     if (dataClassName == 'VideoStatus') {
-      return deserialize<_i54.VideoStatus>(data['data']);
+      return deserialize<_i59.VideoStatus>(data['data']);
+    }
+    if (dataClassName == 'WatchHistory') {
+      return deserialize<_i60.WatchHistory>(data['data']);
     }
     if (dataClassName == 'WordList') {
-      return deserialize<_i55.WordList>(data['data']);
+      return deserialize<_i61.WordList>(data['data']);
     }
     if (dataClassName == 'WordListDetail') {
-      return deserialize<_i56.WordListDetail>(data['data']);
+      return deserialize<_i62.WordListDetail>(data['data']);
     }
     if (dataClassName == 'WordListItem') {
-      return deserialize<_i57.WordListItem>(data['data']);
+      return deserialize<_i63.WordListItem>(data['data']);
     }
     if (dataClassName == 'WordListItemDetail') {
-      return deserialize<_i58.WordListItemDetail>(data['data']);
+      return deserialize<_i64.WordListItemDetail>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
-      return _i73.Protocol().deserializeByClassName(data);
+      return _i80.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i74.Protocol().deserializeByClassName(data);
+      return _i81.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -1204,10 +1296,10 @@ class Protocol extends _i1.SerializationManager {
       return null;
     }
     try {
-      return _i73.Protocol().mapRecordToJson(record);
+      return _i80.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i74.Protocol().mapRecordToJson(record);
+      return _i81.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

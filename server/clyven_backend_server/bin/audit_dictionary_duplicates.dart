@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 
 void main() {
-  const filePath =
-      r'C:\Users\USER\Downloads\越南语.xlsx';
+  const filePath = r'C:\Users\USER\Downloads\越南语.xlsx';
 
   final bytes = File(filePath).readAsBytesSync();
   final excel = Excel.decodeBytes(bytes);
@@ -48,8 +47,7 @@ void main() {
     return cellText(row[index]);
   }
 
-  final groups =
-      <String, List<Map<String, String>>>{};
+  final groups = <String, List<Map<String, String>>>{};
 
   for (var i = 1; i < sheet.rows.length; i++) {
     final row = sheet.rows[i];
@@ -72,12 +70,10 @@ void main() {
     });
   }
 
-  final duplicates = groups.entries
-      .where((entry) => entry.value.length > 1)
-      .toList()
-    ..sort(
-      (a, b) => a.key.compareTo(b.key),
-    );
+  final duplicates =
+      groups.entries.where((entry) => entry.value.length > 1).toList()..sort(
+        (a, b) => a.key.compareTo(b.key),
+      );
 
   print('重复国语字组数: ${duplicates.length}');
   print('');

@@ -1,0 +1,12 @@
+class: AppProfile
+table: app_profile
+
+fields:
+  userId: String
+  bio: String, default=''
+  updatedAt: DateTime, default=now
+
+indexes:
+  app_profile_user_unique_idx:
+    fields: userId
+    unique: true

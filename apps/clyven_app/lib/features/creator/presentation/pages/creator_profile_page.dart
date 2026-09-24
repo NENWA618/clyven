@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/models/creator_profile.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/creator_profile_provider.dart';
 
 import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
@@ -239,36 +240,37 @@ class CreatorProfilePage extends ConsumerWidget {
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: state.isChangingFollow
-                    ? null
-                    : () {
-                        ref
-                            .read(creatorProfileProvider(creator.id).notifier)
-                            .toggleFollow();
-                      },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 19,
-                    vertical: 11,
-                  ),
-                  decoration: BoxDecoration(
-                    color: state.isFollowing ? _ink : scheme.primary,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Text(
-                    state.isFollowing ? l10n.followingButton : l10n.follow,
-                    style: TextStyle(
-                      color: state.isFollowing
-                          ? Colors.white
-                          : scheme.onPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
+              if (ref.watch(authProvider).value?.id != creator.id)
+                GestureDetector(
+                  onTap: state.isChangingFollow
+                      ? null
+                      : () {
+                          ref
+                              .read(creatorProfileProvider(creator.id).notifier)
+                              .toggleFollow();
+                        },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 19,
+                      vertical: 11,
+                    ),
+                    decoration: BoxDecoration(
+                      color: state.isFollowing ? _ink : scheme.primary,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: Text(
+                      state.isFollowing ? l10n.followingButton : l10n.follow,
+                      style: TextStyle(
+                        color: state.isFollowing
+                            ? Colors.white
+                            : scheme.onPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 18),

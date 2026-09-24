@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'home_design_tokens.dart';
 
-class HomeTopicSelector extends StatelessWidget {
+class HomeTopicSelector extends StatefulWidget {
   final List<String> topics;
   final String selectedTopic;
   final String Function(String topic) labelFor;
@@ -16,6 +16,15 @@ class HomeTopicSelector extends StatelessWidget {
     required this.onSelected,
   });
 
+  @override
+  State<HomeTopicSelector> createState() => _HomeTopicSelectorState();
+}
+
+class _HomeTopicSelectorState extends State<HomeTopicSelector> {
+  final ScrollController _controller = ScrollController();
+  bool _canScrollBack = false;
+  bool _canScrollForward = false;
+
   static const _icons = <IconData>[
     Icons.grid_view_rounded,
     Icons.movie_filter_outlined,
@@ -28,22 +37,146 @@ class HomeTopicSelector extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_updateScrollActions);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollActions());
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeTopicSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollActions());
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_updateScrollActions)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _updateScrollActions() {
+    if (!mounted || !_controller.hasClients) return;
+    final position = _controller.position;
+    final canBack = position.pixels > position.minScrollExtent + 1;
+    final canForward = position.pixels < position.maxScrollExtent - 1;
+    if (canBack == _canScrollBack && canForward == _canScrollForward) return;
+    setState(() {
+      _canScrollBack = canBack;
+      _canScrollForward = canForward;
+    });
+  }
+
+  void _scrollBy(double delta) {
+    if (!_controller.hasClients) return;
+    final position = _controller.position;
+    final target = (position.pixels + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    _controller.animateTo(
+      target,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) => SizedBox(
     height: 48,
-    child: ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      scrollDirection: Axis.horizontal,
-      itemCount: topics.length,
-      separatorBuilder: (_, _) => const SizedBox(width: 8),
-      itemBuilder: (_, index) {
-        final topic = topics[index];
-        return _TopicChip(
-          icon: _icons[index % _icons.length],
-          label: labelFor(topic),
-          selected: topic == selectedTopic,
-          onTap: () => onSelected(topic),
-        );
-      },
+    child: Stack(
+      children: [
+        ListView.separated(
+          controller: _controller,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          itemCount: widget.topics.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (_, index) {
+            final topic = widget.topics[index];
+            return _TopicChip(
+              icon: _icons[index % _icons.length],
+              label: widget.labelFor(topic),
+              selected: topic == widget.selectedTopic,
+              onTap: () => widget.onSelected(topic),
+            );
+          },
+        ),
+        _ScrollAction(
+          alignment: Alignment.centerLeft,
+          icon: Icons.chevron_left_rounded,
+          visible: _canScrollBack,
+          onTap: () => _scrollBy(-220),
+        ),
+        _ScrollAction(
+          alignment: Alignment.centerRight,
+          icon: Icons.chevron_right_rounded,
+          visible: _canScrollForward,
+          onTap: () => _scrollBy(220),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ScrollAction extends StatelessWidget {
+  final Alignment alignment;
+  final IconData icon;
+  final bool visible;
+  final VoidCallback onTap;
+
+  const _ScrollAction({
+    required this.alignment,
+    required this.icon,
+    required this.visible,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: alignment,
+    child: IgnorePointer(
+      ignoring: !visible,
+      child: AnimatedOpacity(
+        opacity: visible ? 1 : 0,
+        duration: const Duration(milliseconds: 160),
+        child: Container(
+          width: 42,
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: alignment == Alignment.centerLeft
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              end: alignment == Alignment.centerLeft
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              colors: [
+                HomeDesignTokens.background(context),
+                HomeDesignTokens.background(context).withValues(alpha: 0),
+              ],
+            ),
+          ),
+          child: Material(
+            color: HomeDesignTokens.surface(context),
+            shape: const CircleBorder(),
+            elevation: 2,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const CircleBorder(),
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(icon, size: 20),
+              ),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }

@@ -65,74 +65,71 @@ class SubtitleTrackAvailability {
 /// It lists only scripts that actually contain subtitle text for this video.
 final subtitleTrackAvailabilityProvider =
     FutureProvider.family<List<SubtitleTrackAvailability>, int>((
-  ref,
-  videoId,
-) async {
-  final repository = ref.watch(subtitleRepositoryProvider);
-  final tracks = await repository.loadAvailableTracks(videoId: videoId);
+      ref,
+      videoId,
+    ) async {
+      final repository = ref.watch(subtitleRepositoryProvider);
+      final tracks = await repository.loadAvailableTracks(videoId: videoId);
 
-  final result = <SubtitleTrackAvailability>[];
+      final result = <SubtitleTrackAvailability>[];
 
-  for (final track in tracks) {
-    final details = await repository.loadSubtitles(
-      videoId: videoId,
-      languageCode: track.languageCode,
-      scriptCode: null,
-    );
+      for (final track in tracks) {
+        final details = await repository.loadSubtitles(
+          videoId: videoId,
+          languageCode: track.languageCode,
+          scriptCode: null,
+        );
 
-    final scriptCodes = <String>{};
+        final scriptCodes = <String>{};
 
-    for (final detail in details) {
-      final texts = detail.texts ?? const <serverpod.SubtitleCueText>[];
+        for (final detail in details) {
+          final texts = detail.texts ?? const <serverpod.SubtitleCueText>[];
 
-      for (final text in texts) {
-        if (text.text.trim().isEmpty) {
+          for (final text in texts) {
+            if (text.text.trim().isEmpty) {
+              continue;
+            }
+
+            final scriptCode = text.scriptCode.trim();
+
+            if (scriptCode.isNotEmpty) {
+              scriptCodes.add(scriptCode);
+            }
+          }
+        }
+
+        // Compatibility for older subtitle data that only has cue.text.
+        if (scriptCodes.isEmpty) {
+          final hasLegacyText = details.any(
+            (detail) => detail.cue.text.trim().isNotEmpty,
+          );
+
+          final defaultScript = track.defaultScriptCode?.trim();
+
+          if (hasLegacyText &&
+              defaultScript != null &&
+              defaultScript.isNotEmpty) {
+            scriptCodes.add(defaultScript);
+          }
+        }
+
+        if (scriptCodes.isEmpty) {
           continue;
         }
 
-        final scriptCode = text.scriptCode.trim();
+        final ordered = scriptCodes.toList();
+        final defaultScript = track.defaultScriptCode?.trim();
 
-        if (scriptCode.isNotEmpty) {
-          scriptCodes.add(scriptCode);
+        if (defaultScript != null &&
+            defaultScript.isNotEmpty &&
+            ordered.remove(defaultScript)) {
+          ordered.insert(0, defaultScript);
         }
+
+        result.add(
+          SubtitleTrackAvailability(track: track, scriptCodes: ordered),
+        );
       }
-    }
 
-    // Compatibility for older subtitle data that only has cue.text.
-    if (scriptCodes.isEmpty) {
-      final hasLegacyText = details.any(
-        (detail) => detail.cue.text.trim().isNotEmpty,
-      );
-
-      final defaultScript = track.defaultScriptCode?.trim();
-
-      if (hasLegacyText &&
-          defaultScript != null &&
-          defaultScript.isNotEmpty) {
-        scriptCodes.add(defaultScript);
-      }
-    }
-
-    if (scriptCodes.isEmpty) {
-      continue;
-    }
-
-    final ordered = scriptCodes.toList();
-    final defaultScript = track.defaultScriptCode?.trim();
-
-    if (defaultScript != null &&
-        defaultScript.isNotEmpty &&
-        ordered.remove(defaultScript)) {
-      ordered.insert(0, defaultScript);
-    }
-
-    result.add(
-      SubtitleTrackAvailability(
-        track: track,
-        scriptCodes: ordered,
-      ),
-    );
-  }
-
-  return result;
-});
+      return result;
+    });

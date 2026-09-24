@@ -1,10 +1,11 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:serverpod_client/serverpod_client.dart';
 
 import '../models/video_detail.dart';
+import '../models/video_content_type.dart';
 import '../models/video_upload_draft.dart';
 import 'video_repository.dart';
 
@@ -65,6 +66,10 @@ class ServerpodVideoRepository implements VideoRepository {
       title: draft.title,
       description: draft.description,
       category: draft.category,
+      contentType: switch (draft.contentType) {
+        VideoContentType.video => serverpod.VideoContentType.video,
+        VideoContentType.short => serverpod.VideoContentType.short,
+      },
       languageCode: 'auto',
       tags: const [],
       videoStorageKey: videoStorageKey,
@@ -82,8 +87,15 @@ class ServerpodVideoRepository implements VideoRepository {
   // ============================================================
 
   @override
-  Future<List<VideoDetail>> loadPublishedVideos() async {
-    final videos = await client.video.getVideos();
+  Future<List<VideoDetail>> loadPublishedVideos({
+    VideoContentType contentType = VideoContentType.video,
+  }) async {
+    final videos = await client.video.getVideos(
+      contentType: switch (contentType) {
+        VideoContentType.video => serverpod.VideoContentType.video,
+        VideoContentType.short => serverpod.VideoContentType.short,
+      },
+    );
 
     final results = <VideoDetail>[];
 
@@ -93,8 +105,7 @@ class ServerpodVideoRepository implements VideoRepository {
 
         results.add(detail);
       } catch (_) {
-        // 跳过以前保存本地路径、
-        // 文件已经失效等旧数据。
+        // 跳过以前保存本地路径、文件已经失效等旧数据。
       }
     }
 
@@ -103,19 +114,21 @@ class ServerpodVideoRepository implements VideoRepository {
 
   // ============================================================
   // 指定用户的视频
-  // 我的投稿使用
   // ============================================================
 
   @override
   Future<List<VideoDetail>> loadUserVideos({required String userId}) async {
-    final userVideos = await client.video.getMyVideos();
+    final videos = await client.video.getVideos();
+
+    final userVideos = videos
+        .where((video) => video.authorId == userId)
+        .toList(growable: false);
 
     final results = <VideoDetail>[];
 
     for (final video in userVideos) {
       try {
         final detail = await _toVideoDetailWithUrls(video);
-
         results.add(detail);
       } catch (_) {
         // 跳过以前保存本地文件路径的旧数据。
@@ -124,10 +137,6 @@ class ServerpodVideoRepository implements VideoRepository {
 
     return results;
   }
-
-  // ============================================================
-  // 上传文件
-  // ============================================================
 
   Future<void> _uploadFile({
     required String localPath,
@@ -164,7 +173,6 @@ class ServerpodVideoRepository implements VideoRepository {
     }
 
     final uploader = FileUploader(uploadDescription);
-
     final uploaded = await uploader.upload(file.openRead(), fileSize);
 
     if (!uploaded) {
@@ -184,10 +192,6 @@ class ServerpodVideoRepository implements VideoRepository {
     }
   }
 
-  // ============================================================
-  // Serverpod Video -> Flutter VideoDetail
-  // ============================================================
-
   Future<VideoDetail> _toVideoDetailWithUrls(serverpod.Video video) async {
     final rawVideoUrl = await client.video.getVideoUrl(
       path: video.videoStorageKey,
@@ -203,12 +207,10 @@ class ServerpodVideoRepository implements VideoRepository {
     }
 
     var coverUrl = '';
-
     final coverStorageKey = video.coverStorageKey;
 
     if (coverStorageKey != null && coverStorageKey.isNotEmpty) {
       final rawCoverUrl = await client.video.getVideoUrl(path: coverStorageKey);
-
       coverUrl = rawCoverUrl ?? '';
     }
 
@@ -219,6 +221,10 @@ class ServerpodVideoRepository implements VideoRepository {
       authorId: video.authorId,
       authorName: video.authorName,
       category: video.category,
+      contentType: switch (video.contentType) {
+        serverpod.VideoContentType.video => VideoContentType.video,
+        serverpod.VideoContentType.short => VideoContentType.short,
+      },
       tags: video.tags,
       coverUrl: coverUrl,
       videoUrl: videoUrl,

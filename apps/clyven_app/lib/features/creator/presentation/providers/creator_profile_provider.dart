@@ -2,11 +2,16 @@ import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/serverpod/serverpod_client_provider.dart';
+import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../data/models/creator_profile.dart';
 import '../../data/repositories/creator_repository.dart';
 
 final creatorRepositoryProvider = Provider<CreatorRepository>((ref) {
-  return MockCreatorRepository();
+  return ServerpodCreatorRepository(
+    client: ref.watch(serverpodClientProvider),
+    videoRepository: ref.watch(videoRepositoryProvider),
+  );
 });
 
 final followingCreatorIdsProvider = FutureProvider<List<String>>((ref) async {
@@ -92,6 +97,10 @@ class CreatorProfileNotifier extends AsyncNotifier<CreatorProfileState> {
     final user = await ref.read(authProvider.future);
 
     if (user == null) {
+      return;
+    }
+
+    if (user.id == creatorId) {
       return;
     }
 

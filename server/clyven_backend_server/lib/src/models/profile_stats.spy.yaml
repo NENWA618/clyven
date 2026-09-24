@@ -1,0 +1,9 @@
+class: ProfileStats
+
+fields:
+  followerCount: int
+  followingCount: int
+  videoCount: int
+  favoriteCount: int
+  totalViewCount: int
+  bio: String

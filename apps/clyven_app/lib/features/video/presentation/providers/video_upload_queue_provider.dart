@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/video_upload_draft.dart';
+import '../../data/models/video_content_type.dart';
 import 'video_detail_provider.dart';
 
 enum VideoUploadStatus { waiting, preparing, uploading, success, failed }
@@ -20,6 +21,7 @@ class VideoUploadRequest {
   final String title;
   final String description;
   final String category;
+  final VideoContentType contentType;
 
   const VideoUploadRequest({
     required this.userId,
@@ -28,6 +30,7 @@ class VideoUploadRequest {
     required this.title,
     required this.description,
     required this.category,
+    this.contentType = VideoContentType.video,
   });
 }
 
@@ -109,6 +112,7 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
         description: request.description,
         category: request.category,
         durationSeconds: durationSeconds,
+        contentType: request.contentType,
       );
 
       _updateTask(taskId, status: VideoUploadStatus.uploading);
@@ -127,6 +131,8 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
 
       // 上传完成后重新读取投稿列表。
       ref.invalidate(myPublishedVideosProvider);
+      ref.invalidate(allPublishedVideosProvider);
+      ref.invalidate(publishedShortsProvider);
     } catch (error, stackTrace) {
       debugPrint('Video upload failed: $error');
 

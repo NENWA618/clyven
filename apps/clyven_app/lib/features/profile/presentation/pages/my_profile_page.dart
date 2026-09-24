@@ -1,12 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/serverpod/serverpod_client_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/utils/require_login.dart';
 import '../../../creator/presentation/pages/following_creators_page.dart';
@@ -17,6 +13,7 @@ import '../../data/models/user_profile.dart';
 import '../providers/my_profile_provider.dart';
 import 'my_submissions_page.dart';
 import 'settings_page.dart';
+import 'edit_profile_page.dart';
 
 import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 
@@ -24,76 +21,6 @@ class MyProfilePage extends ConsumerWidget {
   const MyProfilePage({super.key});
 
   static const Color _ink = Color(0xFF171714);
-
-  Future<void> _uploadAvatar(BuildContext context, WidgetRef ref) async {
-    try {
-      final picked = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1600,
-        maxHeight: 1600,
-        imageQuality: 90,
-      );
-
-      if (picked == null) {
-        return;
-      }
-
-      final bytes = await picked.readAsBytes();
-
-      if (bytes.isEmpty) {
-        throw StateError('Selected image is empty.');
-      }
-
-      if (bytes.lengthInBytes > 10 * 1024 * 1024) {
-        if (!context.mounted) return;
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('头像图片不能超过 10 MB')));
-        return;
-      }
-
-      final client = ref.read(serverpodClientProvider);
-
-      final updated = await client.userProfileEdit.setUserImage(
-        ByteData.sublistView(bytes),
-      );
-
-      final avatarUrl = updated.imageUrl?.toString() ?? '';
-
-      ref.read(authProvider.notifier).applyAvatarUrl(avatarUrl);
-
-      await ref.read(myProfileProvider.notifier).refresh();
-
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('头像已更新')));
-    } catch (error) {
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('头像上传失败：$error')));
-    }
-  }
-
-  Widget _buildAvatarUploadAction(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: OutlinedButton.icon(
-          onPressed: () {
-            _uploadAvatar(context, ref);
-          },
-          icon: const Icon(Icons.photo_camera_outlined, size: 18),
-          label: const Text('更换头像'),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -286,8 +213,7 @@ class MyProfilePage extends ConsumerWidget {
           ),
           slivers: [
             SliverToBoxAdapter(child: _buildTopBar(context, l10n)),
-            SliverToBoxAdapter(child: _buildIdentity(context, profile)),
-            SliverToBoxAdapter(child: _buildAvatarUploadAction(context, ref)),
+            SliverToBoxAdapter(child: _buildIdentity(context, ref, profile)),
             SliverToBoxAdapter(child: _buildStats(context, profile, l10n)),
             SliverToBoxAdapter(child: _buildLibrary(context, l10n)),
             SliverToBoxAdapter(
@@ -405,7 +331,11 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildIdentity(BuildContext context, UserProfile profile) {
+  Widget _buildIdentity(
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile profile,
+  ) {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -474,6 +404,26 @@ class MyProfilePage extends ConsumerWidget {
                         : const Color(0xFF4F4B45),
                     fontSize: 13,
                     height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final changed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EditProfilePage(profile: profile),
+                      ),
+                    );
+                    if (changed == true) {
+                      ref.invalidate(myProfileProvider);
+                    }
+                  },
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: Text(
+                    Localizations.localeOf(context).languageCode == 'zh'
+                        ? '编辑资料'
+                        : 'Edit profile',
                   ),
                 ),
               ],

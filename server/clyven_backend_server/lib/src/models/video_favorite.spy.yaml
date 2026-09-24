@@ -1,0 +1,12 @@
+class: VideoFavorite
+table: video_favorite
+
+fields:
+  userId: String
+  videoId: int, relation(parent=video)
+  createdAt: DateTime, default=now
+
+indexes:
+  video_favorite_unique_idx:
+    fields: userId, videoId
+    unique: true

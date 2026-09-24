@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
@@ -157,6 +159,33 @@ class ServerpodAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async {
     await client.auth.signOutDevice();
+  }
+
+  @override
+  Future<AppUser> updateProfile({
+    required String username,
+    required String displayName,
+    Uint8List? avatarBytes,
+    bool removeAvatar = false,
+  }) async {
+    final normalizedUsername = username.trim();
+    final normalizedDisplayName = displayName.trim();
+    if (normalizedUsername.isEmpty) {
+      throw const AppException(AppErrorCode.usernameRequired);
+    }
+    if (normalizedDisplayName.isEmpty) {
+      throw const AppException(AppErrorCode.displayNameRequired);
+    }
+    await client.userProfileEdit.changeUserName(normalizedUsername);
+    await client.userProfileEdit.changeFullName(normalizedDisplayName);
+    if (removeAvatar) {
+      await client.userProfileEdit.removeUserImage();
+    } else if (avatarBytes != null) {
+      await client.userProfileEdit.setUserImage(
+        ByteData.sublistView(avatarBytes),
+      );
+    }
+    return _loadCurrentUser();
   }
 
   Future<AppUser> _loadCurrentUser() async {
