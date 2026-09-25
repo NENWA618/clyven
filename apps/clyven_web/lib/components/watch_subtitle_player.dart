@@ -280,12 +280,12 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
     _syncVideoState();
   }
 
-  void _seekToProgress(String value) {
+  void _seekToProgress(num value) {
     final video = _video;
     if (video == null) return;
 
-    final rawValue = double.tryParse(value);
-    if (rawValue == null) return;
+    final rawValue = value.toDouble();
+    if (rawValue.isNaN) return;
 
     final duration = video.duration.toDouble();
     if (!duration.isFinite || duration <= 0) return;
@@ -294,12 +294,12 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
     _syncVideoState();
   }
 
-  void _changeVolume(String value) {
+  void _changeVolume(num value) {
     final video = _video;
     if (video == null) return;
 
-    final rawValue = double.tryParse(value);
-    if (rawValue == null) return;
+    final rawValue = value.toDouble();
+    if (rawValue.isNaN) return;
 
     final volume = (rawValue / 100).clamp(0.0, 1.0).toDouble();
     video.volume = volume;
@@ -553,7 +553,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
 
         div(classes: 'watch-player-controls', [
           div(classes: 'watch-player-progress-wrap', [
-            input<String>(
+            input<num>(
               type: InputType.range,
               classes: 'watch-player-progress',
               attributes: {
@@ -563,7 +563,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                 'value': '$progress',
                 'aria-label': 'Video progress',
               },
-              events: events<String>(onInput: _seekToProgress),
+              events: events<num>(onInput: _seekToProgress),
             ),
           ]),
           div(classes: 'watch-player-control-row', [
@@ -602,7 +602,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                   onClick: _toggleMute,
                   [.text(_volumeIcon())],
                 ),
-                input<String>(
+                input<num>(
                   type: InputType.range,
                   classes: 'watch-player-volume',
                   attributes: {
@@ -612,7 +612,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                     'value': '${(_volume * 100).round()}',
                     'aria-label': 'Volume',
                   },
-                  events: events<String>(onInput: _changeVolume),
+                  events: events<num>(onInput: _changeVolume),
                 ),
                 _qualityControl(),
                 button(
