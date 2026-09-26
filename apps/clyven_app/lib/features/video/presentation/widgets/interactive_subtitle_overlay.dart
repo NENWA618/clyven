@@ -393,29 +393,62 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     return segments;
   }
 
-  double _karaokeProgressForRange(int startPosition, int endPosition) {
+  String _normalizeKaraokeUnit(String value) {
+    return value.replaceAll(RegExp(r'\s+'), '');
+  }
+
+  double _karaokeProgressForTokenRange(
+    List<serverpod.SubtitleToken> tokens,
+    int startPosition,
+    int endPosition,
+  ) {
     final segments = _sortedKaraokeSegments();
 
-    if (segments.isEmpty) {
+    if (segments.isEmpty || tokens.isEmpty) {
       return 0;
     }
 
-    var matches = segments
-        .where(
-          (segment) =>
-              segment.position >= startPosition &&
-              segment.position <= endPosition,
-        )
-        .toList();
+    final sortedTokens = [...tokens]
+      ..sort((a, b) => a.position.compareTo(b.position));
 
-    if (matches.isEmpty &&
-        startPosition >= 0 &&
-        startPosition < segments.length) {
-      final safeEnd = endPosition
-          .clamp(startPosition, segments.length - 1)
-          .toInt();
+    var tokenCursor = 0;
+    int? requestedStart;
+    int? requestedEnd;
 
-      matches = segments.sublist(startPosition, safeEnd + 1);
+    for (final token in sortedTokens) {
+      final length = _normalizeKaraokeUnit(token.text).runes.length;
+      final tokenStart = tokenCursor;
+      final tokenEnd = tokenCursor + length;
+
+      if (token.position >= startPosition &&
+          token.position <= endPosition) {
+        requestedStart ??= tokenStart;
+        requestedEnd = tokenEnd;
+      }
+
+      tokenCursor = tokenEnd;
+    }
+
+    if (requestedStart == null || requestedEnd == null) {
+      return 0;
+    }
+
+    var segmentCursor = 0;
+    final matches = <serverpod.SubtitleKaraokeSegment>[];
+
+    for (final segment in segments) {
+      final length = _normalizeKaraokeUnit(segment.text).runes.length;
+      final segmentStart = segmentCursor;
+      final segmentEnd = segmentCursor + length;
+
+      final overlaps =
+          segmentEnd > requestedStart && segmentStart < requestedEnd;
+
+      if (overlaps) {
+        matches.add(segment);
+      }
+
+      segmentCursor = segmentEnd;
     }
 
     if (matches.isEmpty) {
@@ -426,19 +459,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     final startMs = matches.first.startOffsetMs;
     final endMs = matches.last.endOffsetMs;
 
-    if (relativeMs <= startMs) {
-      return 0;
-    }
-
-    if (relativeMs >= endMs) {
-      return 1;
-    }
+    if (relativeMs <= startMs) return 0;
+    if (relativeMs >= endMs) return 1;
 
     final durationMs = endMs - startMs;
-
-    if (durationMs <= 0) {
-      return 1;
-    }
+    if (durationMs <= 0) return 1;
 
     return ((relativeMs - startMs) / durationMs).clamp(0.0, 1.0).toDouble();
   }
@@ -571,30 +596,42 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final karaokeSegments =
-        detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[];
+    final karaokeSegments = _sortedKaraokeSegments();
+    final tokensMatch =
+        detail.tokens.isNotEmpty && _tokensMatchDisplayText(detail.tokens);
 
-    if (karaokeSegments.isNotEmpty &&
-        _karaokeMatchesDisplayText(karaokeSegments)) {
-      return _buildPlainKaraoke(context, karaokeSegments);
-    }
+    final debugLabel =
+        'tokens=${detail.tokens.length} | karaoke=${karaokeSegments.length} | script=${scriptCode ?? '-'}';
 
-    if (detail.tokens.isEmpty || !_tokensMatchDisplayText(detail.tokens)) {
-      final karaokeSegments = _sortedKaraokeSegments();
-
+    if (!tokensMatch) {
       if (karaokeSegments.isNotEmpty &&
           _karaokeMatchesDisplayText(karaokeSegments)) {
         return _buildPlainKaraoke(context, karaokeSegments);
       }
 
-      return Text(
-        _displayText(),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: _subtitleFontSize(context),
-          fontWeight: FontWeight.w700,
-        ),
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            debugLabel,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.redAccent,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            _displayText(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: _subtitleFontSize(context),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       );
     }
 
@@ -704,7 +741,8 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
               decoration: BoxDecoration(
                 gradient: _karaokeGradient(
                   context,
-                  _karaokeProgressForRange(
+                  _karaokeProgressForTokenRange(
+                    tokens,
                     phrase.startPosition,
                     phrase.endPosition,
                   ),
@@ -767,7 +805,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
             decoration: BoxDecoration(
               gradient: _karaokeGradient(
                 context,
-                _karaokeProgressForRange(token.position, token.position),
+                _karaokeProgressForTokenRange(
+                  tokens,
+                  token.position,
+                  token.position,
+                ),
               ),
               borderRadius: BorderRadius.circular(4),
             ),
@@ -786,11 +828,26 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       index++;
     }
 
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 6,
-      runSpacing: 4,
-      children: children,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          debugLabel,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.redAccent,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 6,
+          runSpacing: 4,
+          children: children,
+        ),
+      ],
     );
   }
 }

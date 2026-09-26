@@ -1,4 +1,4 @@
-import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
+﻿import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import 'subtitle_repository.dart';
 
@@ -13,7 +13,7 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
     required String languageCode,
     String? scriptCode,
   }) async {
-    return client.subtitle.getPublishedCueDetails(
+    return client.subtitle.getCueDetails(
       videoId: videoId,
       languageCode: languageCode,
       scriptCode: scriptCode,
@@ -27,3 +27,4 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
     return client.subtitle.getPublishedAvailableTracks(videoId: videoId);
   }
 }
+
