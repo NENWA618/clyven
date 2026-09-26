@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import 'interactive_subtitle_overlay.dart';
 
-class NetworkVideoPlayer extends StatefulWidget {
+class NetworkVideoPlayer extends ConsumerStatefulWidget {
+  final int? videoId;
   final String videoUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
@@ -27,6 +30,7 @@ class NetworkVideoPlayer extends StatefulWidget {
 
   const NetworkVideoPlayer({
     super.key,
+    required this.videoId,
     required this.videoUrl,
     required this.coverUrl,
     required this.subtitles,
@@ -45,14 +49,15 @@ class NetworkVideoPlayer extends StatefulWidget {
   });
 
   @override
-  State<NetworkVideoPlayer> createState() {
+  ConsumerState<NetworkVideoPlayer> createState() {
     return _NetworkVideoPlayerState();
   }
 }
 
-class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
-  late final VideoPlayerController _controller;
+class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
+  late VideoPlayerController _controller;
   late final Future<void> _initializeFuture;
+  bool _controllerCreated = false;
 
   final Stopwatch _fallbackClock = Stopwatch();
   Timer? _positionTicker;
@@ -62,21 +67,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   @override
   void initState() {
     super.initState();
-
-    final isNetworkVideo =
-        widget.videoUrl.startsWith('http://') ||
-        widget.videoUrl.startsWith('https://');
-
-    if (isNetworkVideo) {
-      _controller = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl),
-      );
-    } else {
-      _controller = VideoPlayerController.file(File(widget.videoUrl));
-    }
-
     _initializeFuture = _initializePlayer();
-    _controller.addListener(_handleProgress);
   }
 
   serverpod.SubtitleCueDetail? _findActiveSubtitle(
@@ -96,9 +87,113 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     return null;
   }
 
+  VideoPlayerController _createController(String source) {
+    final isNetworkVideo =
+        source.startsWith('http://') || source.startsWith('https://');
+
+    if (isNetworkVideo) {
+      return VideoPlayerController.networkUrl(Uri.parse(source));
+    }
+
+    return VideoPlayerController.file(File(source));
+  }
+
+  Future<String?> _fetchPlaybackManifestUrl() async {
+    final videoId = widget.videoId;
+
+    if (videoId == null) {
+      return null;
+    }
+
+    try {
+      final client = ref.read(serverpodClientProvider);
+      final manifestUrl = await client.video.getPlaybackManifestUrl(
+        videoId: videoId,
+      );
+      final normalized = manifestUrl?.trim();
+
+      if (normalized == null || normalized.isEmpty) {
+        return null;
+      }
+
+      return normalized;
+    } catch (error, stackTrace) {
+      debugPrint('Failed to resolve HLS manifest for video $videoId: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  Future<bool> _tryInitializeSource(String source) async {
+    final controller = _createController(source);
+
+    try {
+      await controller.initialize();
+      await controller.setLooping(false);
+
+      if (!mounted) {
+        await controller.dispose();
+        return false;
+      }
+
+      _controller = controller;
+      _controllerCreated = true;
+      _controller.addListener(_handleProgress);
+      return true;
+    } catch (error, stackTrace) {
+      debugPrint('Video source failed to initialize: $source');
+      debugPrint('Player error: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      await controller.dispose();
+      return false;
+    }
+  }
+
+  Future<bool> _waitForTranscodedPlayback() async {
+    for (var attempt = 0; attempt < 24; attempt++) {
+      if (!mounted) {
+        return false;
+      }
+
+      if (attempt > 0) {
+        await Future<void>.delayed(const Duration(seconds: 5));
+      }
+
+      final manifestUrl = await _fetchPlaybackManifestUrl();
+
+      if (manifestUrl == null) {
+        continue;
+      }
+
+      if (await _tryInitializeSource(manifestUrl)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Future<void> _initializePlayer() async {
-    await _controller.initialize();
-    await _controller.setLooping(false);
+    final manifestUrl = await _fetchPlaybackManifestUrl();
+    var initialized = false;
+
+    if (manifestUrl != null) {
+      initialized = await _tryInitializeSource(manifestUrl);
+    }
+
+    if (!initialized) {
+      initialized = await _tryInitializeSource(widget.videoUrl);
+    }
+
+    if (!initialized) {
+      initialized = await _waitForTranscodedPlayback();
+    }
+
+    if (!initialized) {
+      throw StateError(
+        'Neither the HLS stream nor the original video could be played.',
+      );
+    }
 
     final duration = _effectiveDuration();
     final savedPosition = widget.initialPositionSeconds;
@@ -189,8 +284,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   void dispose() {
     _positionTicker?.cancel();
     _fallbackClock.stop();
-    _controller.removeListener(_handleProgress);
-    _controller.dispose();
+
+    if (_controllerCreated) {
+      _controller.removeListener(_handleProgress);
+      _controller.dispose();
+      _controllerCreated = false;
+    }
+
     super.dispose();
   }
 

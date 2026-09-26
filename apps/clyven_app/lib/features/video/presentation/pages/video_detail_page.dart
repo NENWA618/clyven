@@ -500,6 +500,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
   }) {
     return NetworkVideoPlayer(
       key: _persistentPlayerKey,
+      videoId: int.tryParse(video.id),
       videoUrl: video.videoUrl,
       coverUrl: video.coverUrl,
       subtitles: hideSubtitleOverlay

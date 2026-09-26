@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
-  ffmpeg_kit_flutter_new_min
+  ffmpeg_kit_flutter_new_min_gpl
   file_selector_linux
   flutter_secure_storage_linux
   url_launcher_linux

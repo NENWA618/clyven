@@ -5,7 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   desktop_webview_window
-  ffmpeg_kit_flutter_new_min
+  ffmpeg_kit_flutter_new_min_gpl
   file_selector_windows
   flutter_secure_storage_windows
   share_plus
