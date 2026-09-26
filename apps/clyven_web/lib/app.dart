@@ -4,6 +4,7 @@ import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/client_shell.dart';
 import 'l10n/web_l10n.dart';
+import 'pages/explore_page.dart';
 import 'pages/home_page.dart';
 import 'pages/watch_page.dart';
 import 'pages/word_list_page.dart';
@@ -26,6 +27,11 @@ class App extends StatelessComponent {
                   path: '/',
                   title: 'Clyven',
                   builder: (context, state) => const HomePage(),
+                ),
+                Route(
+                  path: '/explore',
+                  title: 'Explore · Clyven',
+                  builder: (context, state) => const ExplorePage(),
                 ),
                 Route(
                   path: '/wordlists/:listId',
