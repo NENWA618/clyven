@@ -3,9 +3,11 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 import '../components/language_category_home_section.dart';
+import '../components/word_lists_home_section.dart';
 
 class HomePage extends StatefulComponent {
   const HomePage({super.key});
@@ -64,32 +66,30 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Component build(BuildContext context) {
+    final l10n = context.l10n;
+
     return div(classes: 'home-page', [
       LanguageCategoryHomeSection(),
+      WordListsHomeSection(),
       section(classes: 'hero', [
         div(classes: 'hero-copy', [
           span(classes: 'hero-eyebrow', [.text('CLYVEN WEB')]),
-          h1([.text('One video. More than one way to read it.')]),
-          p([
-            .text(
-              'Watch ordinary videos while Clyven keeps language, '
-              'subtitle and script choices close to the content.',
-            ),
-          ]),
+          h1([.text(l10n.heroTitle)]),
+          p([.text(l10n.heroBody)]),
         ]),
         div(classes: 'hero-badge-stack', [
-          span([.text('Video')]),
-          span([.text('Subtitles')]),
-          span([.text('Scripts')]),
+          span([.text(l10n.badgeVideo)]),
+          span([.text(l10n.badgeSubtitles)]),
+          span([.text(l10n.badgeScripts)]),
         ]),
       ]),
       div(classes: 'section-heading', [
         div([
-          h2([.text('Latest videos')]),
-          p([.text('Public videos from Clyven creators.')]),
+          h2([.text(l10n.latestVideos)]),
+          p([.text(l10n.latestVideosSubtitle)]),
         ]),
         button(classes: 'secondary-button', onClick: loading ? null : _load, [
-          .text(loading ? 'Loading...' : 'Refresh'),
+          .text(loading ? l10n.loading : l10n.refresh),
         ]),
       ]),
       if (error != null) div(classes: 'page-message error', [.text(error!)]),
@@ -99,8 +99,8 @@ class _HomePageState extends State<HomePage> {
         ])
       else if (items.isEmpty)
         div(classes: 'empty-state', [
-          h3([.text('No public videos yet')]),
-          p([.text('Published videos will appear here.')]),
+          h3([.text(l10n.noPublicVideos)]),
+          p([.text(l10n.noPublicVideosHint)]),
         ])
       else
         div(classes: 'video-grid', [
@@ -139,8 +139,10 @@ class _HomePageState extends State<HomePage> {
           p(classes: 'video-author', [.text(video.authorName)]),
           p(classes: 'video-stats', [
             .text(
-              '${video.viewCount} views · '
-              '${video.languageCode ?? 'unknown'}',
+              context.l10n.viewsAndLanguage(
+                video.viewCount,
+                video.languageCode,
+              ),
             ),
           ]),
         ]),
