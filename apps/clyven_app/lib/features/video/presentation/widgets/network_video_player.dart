@@ -4,11 +4,14 @@ import 'dart:io';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/serverpod/feed_diagnostics.dart';
 import 'interactive_subtitle_overlay.dart';
 
 class NetworkVideoPlayer extends StatefulWidget {
+  final String videoId;
   final String videoUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
@@ -27,6 +30,7 @@ class NetworkVideoPlayer extends StatefulWidget {
 
   const NetworkVideoPlayer({
     super.key,
+    required this.videoId,
     required this.videoUrl,
     required this.coverUrl,
     required this.subtitles,
@@ -51,8 +55,15 @@ class NetworkVideoPlayer extends StatefulWidget {
 }
 
 class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
-  late final VideoPlayerController _controller;
-  late final Future<void> _initializeFuture;
+  late VideoPlayerController _controller;
+  late Future<void> _initializeFuture;
+  final Set<VideoPlayerController> _releasedControllers = {};
+  int _generation = 0;
+  bool _initializationFailed = false;
+  bool _reportedNativeError = false;
+  Timer? _initializationTimer;
+  Completer<void>? _initializationCompleter;
+  String _initializationStage = 'native_initialize';
 
   final Stopwatch _fallbackClock = Stopwatch();
   Timer? _positionTicker;
@@ -62,6 +73,14 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    _startPlayer();
+  }
+
+  void _startPlayer() {
+    final generation = ++_generation;
+    _initializationFailed = false;
+    _reportedNativeError = false;
+    _initializationStage = 'native_initialize';
 
     final isNetworkVideo =
         widget.videoUrl.startsWith('http://') ||
@@ -75,8 +94,84 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
       _controller = VideoPlayerController.file(File(widget.videoUrl));
     }
 
-    _initializeFuture = _initializePlayer();
+    final controller = _controller;
+    feedDiagnostic(
+      'PLAYBACK_INITIALIZING postId=${widget.videoId} '
+      'source=${isNetworkVideo ? 'network' : 'file'} '
+      'host=${Uri.tryParse(widget.videoUrl)?.host ?? ''}',
+    );
+    final completion = Completer<void>();
+    _initializationCompleter = completion;
+    _initializeFuture = completion.future;
+    void fail(Object error, StackTrace stack) {
+      if (completion.isCompleted) return;
+      _initializationTimer?.cancel();
+      if (mounted && generation == _generation) {
+        _initializationFailed = true;
+        final reason = error is TimeoutException
+            ? 'timeout'
+            : error is PlatformException
+            ? error.code
+            : '${error.runtimeType}';
+        feedDiagnostic(
+          'PLAYBACK_INIT_FAILED postId=${widget.videoId} '
+          'stage=$_initializationStage reason=$reason',
+        );
+        _release(controller);
+      }
+      completion.completeError(error, stack);
+    }
+
+    _initializationTimer = Timer(const Duration(seconds: 30), () {
+      fail(
+        TimeoutException('Video initialization timed out'),
+        StackTrace.current,
+      );
+    });
+    unawaited(
+      _initializePlayer(controller, generation).then((_) {
+        if (completion.isCompleted) return;
+        _initializationTimer?.cancel();
+        feedDiagnostic('PLAYBACK_READY postId=${widget.videoId}');
+        completion.complete();
+      }, onError: fail),
+    );
     _controller.addListener(_handleProgress);
+  }
+
+  void _release(VideoPlayerController controller) {
+    if (!_releasedControllers.add(controller)) return;
+    controller.removeListener(_handleProgress);
+    unawaited(
+      controller.dispose().catchError((Object error) {
+        feedDiagnostic('PLAYBACK_DISPOSE_FAILED reason=${error.runtimeType}');
+      }),
+    );
+  }
+
+  void _resetPlayer() {
+    _cancelInitialization();
+    _release(_controller);
+    _positionTicker?.cancel();
+    _positionTicker = null;
+    _fallbackClock
+      ..stop()
+      ..reset();
+    _fallbackBasePosition = Duration.zero;
+    _lastSavedSecond = -1;
+    _startPlayer();
+  }
+
+  void _cancelInitialization() {
+    _initializationTimer?.cancel();
+    final completion = _initializationCompleter;
+    if (completion != null && !completion.isCompleted) completion.complete();
+  }
+
+  @override
+  void didUpdateWidget(covariant NetworkVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.videoUrl != oldWidget.videoUrl) _resetPlayer();
   }
 
   serverpod.SubtitleCueDetail? _findActiveSubtitle(
@@ -96,9 +191,15 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     return null;
   }
 
-  Future<void> _initializePlayer() async {
-    await _controller.initialize();
-    await _controller.setLooping(false);
+  Future<void> _initializePlayer(
+    VideoPlayerController controller,
+    int generation,
+  ) async {
+    await controller.initialize();
+    if (!mounted || generation != _generation || _initializationFailed) return;
+    _initializationStage = 'set_looping';
+    await controller.setLooping(false);
+    if (!mounted || generation != _generation || _initializationFailed) return;
 
     final duration = _effectiveDuration();
     final savedPosition = widget.initialPositionSeconds;
@@ -116,7 +217,8 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     final position = Duration(seconds: savedPosition);
 
     _fallbackBasePosition = position;
-    await _controller.seekTo(position);
+    _initializationStage = 'restore_position';
+    await controller.seekTo(position);
   }
 
   Duration _effectiveDuration() {
@@ -167,6 +269,26 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
   }
 
   void _handleProgress() {
+    if (_controller.value.hasError) {
+      if (!_reportedNativeError) {
+        _reportedNativeError = true;
+        // Emit only an allowlisted category, never the raw native description
+        // (it can contain signed URLs or authentication headers).
+        final description =
+            _controller.value.errorDescription?.toLowerCase() ?? '';
+        final reason = description.contains('decoder')
+            ? 'decoder'
+            : description.contains('source error')
+            ? 'source'
+            : description.contains('renderer')
+            ? 'renderer'
+            : 'native';
+        feedDiagnostic(
+          'PLAYBACK_NATIVE_ERROR postId=${widget.videoId} reason=$reason',
+        );
+      }
+      return;
+    }
     if (!_controller.value.isInitialized) {
       return;
     }
@@ -187,10 +309,11 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
 
   @override
   void dispose() {
+    _cancelInitialization();
     _positionTicker?.cancel();
     _fallbackClock.stop();
-    _controller.removeListener(_handleProgress);
-    _controller.dispose();
+    ++_generation;
+    _release(_controller);
     super.dispose();
   }
 
@@ -215,6 +338,7 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
           return ValueListenableBuilder<VideoPlayerValue>(
             valueListenable: _controller,
             builder: (context, value, child) {
+              if (value.hasError) return _buildPlayerError();
               final duration = _effectiveDuration();
               final position = _effectivePosition();
               final activeSubtitle = _findActiveSubtitle(
@@ -511,6 +635,10 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             Text(
               l10n.videoCannotPlay,
               style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            TextButton(
+              onPressed: () => setState(_resetPlayer),
+              child: Text(l10n.reload),
             ),
           ],
         ),

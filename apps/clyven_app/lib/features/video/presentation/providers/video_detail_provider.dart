@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/serverpod/serverpod_client_provider.dart';
+import '../../../../core/serverpod/feed_diagnostics.dart';
 
 import '../../data/models/video_detail.dart';
 import '../../data/models/video_content_type.dart';
@@ -22,6 +23,7 @@ final videoDetailProvider = FutureProvider.family<VideoDetail, String>((
   ref,
   videoId,
 ) async {
+  ref.watch(authProvider.select((state) => state.value?.id));
   final repository = ref.watch(videoRepositoryProvider);
 
   return repository.loadVideoDetail(videoId);
@@ -37,6 +39,10 @@ final videoDetailProvider = FutureProvider.family<VideoDetail, String>((
 final allPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
   ref,
 ) async {
+  final viewerId = ref.watch(authProvider.select((state) => state.value?.id));
+  feedDiagnostic(
+    'FEED_REQUEST viewerUserId=${viewerId ?? 'anonymous'} type=video',
+  );
   final repository = ref.watch(videoRepositoryProvider);
 
   return repository.loadPublishedVideos();
@@ -44,6 +50,10 @@ final allPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
 
 // Only persisted short-form content. Regular videos never enter this feed.
 final publishedShortsProvider = FutureProvider<List<VideoDetail>>((ref) async {
+  final viewerId = ref.watch(authProvider.select((state) => state.value?.id));
+  feedDiagnostic(
+    'FEED_REQUEST viewerUserId=${viewerId ?? 'anonymous'} type=short',
+  );
   final repository = ref.watch(videoRepositoryProvider);
 
   return repository.loadPublishedVideos(contentType: VideoContentType.short);

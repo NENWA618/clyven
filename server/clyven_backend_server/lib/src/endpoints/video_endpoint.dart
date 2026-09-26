@@ -48,7 +48,7 @@ class VideoEndpoint extends Endpoint {
   }) async {
     final currentUserId = _requireUserId(session);
 
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
     final video = Video(
       authorId: currentUserId,
@@ -81,6 +81,14 @@ class VideoEndpoint extends Endpoint {
       throw Exception('视频创建成功，但没有取得 video id');
     }
 
+    session.log(
+      'POST_CREATED postId=${savedVideo.id} ownerId=$currentUserId '
+      'type=${savedVideo.contentType.name} status=${savedVideo.status.name} '
+      'videoStorageKey=${savedVideo.videoStorageKey} '
+      'createdAt=${savedVideo.createdAt.toIso8601String()} '
+      'publishedAt=${savedVideo.publishedAt?.toIso8601String()}',
+    );
+
     final asrJob = await AsrJob.db.insertRow(
       session,
       AsrJob(
@@ -110,14 +118,22 @@ class VideoEndpoint extends Endpoint {
     Session session, {
     VideoContentType? contentType,
   }) async {
-    return Video.db.find(
+    final videos = await Video.db.find(
       session,
       where: contentType == null
-          ? null
-          : (table) => table.contentType.equals(contentType),
+          ? (table) => table.status.equals(VideoStatus.published)
+          : (table) =>
+                table.status.equals(VideoStatus.published) &
+                table.contentType.equals(contentType),
       orderBy: (table) => table.createdAt,
       orderDescending: true,
     );
+    session.log(
+      'FEED_REQUEST viewerUserId=${session.authenticated?.userIdentifier ?? 'anonymous'} '
+      'filter=status:published,contentType:${contentType?.name ?? 'all'} '
+      'order=createdAt:desc returnedCount=${videos.length}',
+    );
+    return videos;
   }
 
   Future<List<Video>> getMyVideos(Session session) async {
@@ -135,7 +151,13 @@ class VideoEndpoint extends Endpoint {
     Session session,
     int id,
   ) async {
-    return Video.db.findById(session, id);
+    final video = await Video.db.findById(session, id);
+    if (video == null) return null;
+    if (video.status != VideoStatus.published &&
+        video.authorId != session.authenticated?.userIdentifier.toString()) {
+      return null;
+    }
+    return video;
   }
 
   Future<String?> createUploadDescription(

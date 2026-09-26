@@ -7,6 +7,7 @@ import '../../../notifications/presentation/pages/notifications_page.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
 import '../../../profile/presentation/pages/my_profile_page.dart';
 import '../../../video/presentation/pages/create_video_page.dart';
+import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../../video/presentation/widgets/publish_type_sheet.dart';
 import '../widgets/home_navigation_dock.dart';
 import 'discover_page.dart';
@@ -58,6 +59,10 @@ class _MainPageState extends ConsumerState<MainPage> {
         // 导航本身不要求登录。
         // 游客也可以直接进入“回响”和“我的”。
         onSelected: (index) {
+          if (index != _selectedIndex) {
+            if (index == 0) ref.invalidate(allPublishedVideosProvider);
+            if (index == 1) ref.invalidate(publishedShortsProvider);
+          }
           setState(() {
             _selectedIndex = index;
           });

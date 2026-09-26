@@ -46,7 +46,10 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
                       .toList(growable: false);
 
             return RefreshIndicator(
-              onRefresh: () async => ref.invalidate(publishedShortsProvider),
+              onRefresh: () async {
+                ref.invalidate(publishedShortsProvider);
+                await ref.read(publishedShortsProvider.future);
+              },
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(
                   parent: BouncingScrollPhysics(),
