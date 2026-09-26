@@ -41,8 +41,14 @@ class ClientShell extends StatelessComponent {
                 [.text(l10n.navHome)],
               ),
             ),
-            span(classes: 'client-nav-link muted', [.text(l10n.navExplore)]),
-            span(classes: 'client-nav-link muted', [.text(l10n.navLanguages)]),
+            Link(
+              to: '/explore',
+              child: span(
+                classes:
+                    'client-nav-link${path == '/explore' ? ' active' : ''}',
+                [.text(l10n.navExplore)],
+              ),
+            ),
           ]),
           div(classes: 'client-header-actions', [
             a(href: studioUrl, [
