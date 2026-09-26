@@ -200,6 +200,24 @@ class WebStrings {
   String get noVideosInCategory =>
       _('No videos in this category yet', '这个分类暂时还没有视频');
 
+  // Video categories. The backend stores the Chinese names; this mirrors the
+  // app's topic labels and passes unknown categories through unchanged.
+  String topic(String category) {
+    final key = category.trim();
+
+    return switch (key) {
+      '全部' => _('All', '全部'),
+      '影像' => _('Visual', '影像'),
+      '技术' => _('Technology', '技术'),
+      '语言' => _('Language', '语言'),
+      '游戏' => _('Gaming', '游戏'),
+      '音乐' => _('Music', '音乐'),
+      '城市' => _('City', '城市'),
+      '纪录' => _('Documentary', '纪录'),
+      _ => key,
+    };
+  }
+
   // Recommended
   String get recommendedVideos => _('Recommended videos', '推荐视频');
   String get recommendedLoading =>

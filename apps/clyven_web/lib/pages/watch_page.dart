@@ -765,7 +765,7 @@ class _WatchPageState extends State<WatchPage> {
               ]),
               div([
                 strong([.text(video.authorName)]),
-                p([.text(video.category)]),
+                p([.text(context.l10n.topic(video.category))]),
               ]),
             ]),
             if (video.description.trim().isNotEmpty)
