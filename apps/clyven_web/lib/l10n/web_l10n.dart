@@ -131,7 +131,12 @@ class WebStrings {
   String get navExplore => _('Explore', '探索');
   String get navLanguages => _('Languages', '语言');
   String get studio => _('Studio', '创作工坊');
-  String get searchPlaceholder => _('Search coming next', '搜索即将上线');
+  String get searchHint =>
+      _('Search videos, creators or categories', '搜索视频、作者、分类');
+  String get searchPrompt =>
+      _('Enter a title, creator or category', '输入标题、作者或分类');
+  String get searchNoResults => _('No related videos found', '没有找到相关视频');
+  String get searchLoadFailed => _('Failed to load', '加载失败');
 
   // Language switcher (same labels as the app)
   String get language => _('Language', '语言');

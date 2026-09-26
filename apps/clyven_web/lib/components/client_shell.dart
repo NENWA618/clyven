@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import '../l10n/web_l10n.dart';
+import 'search_box.dart';
 import 'web_avatar_upload.dart';
 
 class ClientShell extends StatelessComponent {
@@ -47,9 +48,7 @@ class ClientShell extends StatelessComponent {
             a(href: studioUrl, [
               span(classes: 'studio-entry-button', [.text(l10n.studio)]),
             ]),
-            div(classes: 'client-search-placeholder', [
-              .text(l10n.searchPlaceholder),
-            ]),
+            const SearchBox(),
             const LanguageSwitcher(),
             WebAvatarUpload(),
           ]),
