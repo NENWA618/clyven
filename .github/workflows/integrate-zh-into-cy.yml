@@ -31,6 +31,10 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
+      - name: Generate Flutter localizations
+        working-directory: apps/clyven_app
+        run: flutter gen-l10n
+
       - name: Format merged sources
         run: |
           dart format \
