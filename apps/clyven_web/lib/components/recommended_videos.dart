@@ -2,6 +2,7 @@ import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 class RecommendedVideos extends StatefulComponent {
@@ -155,15 +156,7 @@ class _RecommendedVideosState extends State<RecommendedVideos> {
   }
 
   String _views(int count) {
-    if (count >= 1000000) {
-      return '${(count / 1000000).toStringAsFixed(1)}M views';
-    }
-
-    if (count >= 1000) {
-      return '${(count / 1000).toStringAsFixed(1)}K views';
-    }
-
-    return '$count views';
+    return context.l10n.viewsShort(count);
   }
 
   Component _thumbnail(_Recommendation item) {
@@ -196,9 +189,11 @@ class _RecommendedVideosState extends State<RecommendedVideos> {
         classes: 'recommended-section recommended-sidebar-section',
         [
           div(classes: 'recommended-header', [
-            h2([.text('推荐视频')]),
+            h2([.text(context.l10n.recommendedVideos)]),
           ]),
-          div(classes: 'recommended-loading', [.text('正在加载推荐视频…')]),
+          div(classes: 'recommended-loading', [
+            .text(context.l10n.recommendedLoading),
+          ]),
         ],
       );
     }
@@ -208,7 +203,7 @@ class _RecommendedVideosState extends State<RecommendedVideos> {
         classes: 'recommended-section recommended-sidebar-section',
         [
           div(classes: 'recommended-header', [
-            h2([.text('推荐视频')]),
+            h2([.text(context.l10n.recommendedVideos)]),
           ]),
         ],
       );
@@ -219,16 +214,18 @@ class _RecommendedVideosState extends State<RecommendedVideos> {
         classes: 'recommended-section recommended-sidebar-section',
         [
           div(classes: 'recommended-header', [
-            h2([.text('推荐视频')]),
+            h2([.text(context.l10n.recommendedVideos)]),
           ]),
-          div(classes: 'recommended-empty', [.text('暂时没有其他公开视频')]),
+          div(classes: 'recommended-empty', [
+            .text(context.l10n.recommendedEmpty),
+          ]),
         ],
       );
     }
 
     return section(classes: 'recommended-section recommended-sidebar-section', [
       div(classes: 'recommended-header', [
-        h2([.text('推荐视频')]),
+        h2([.text(context.l10n.recommendedVideos)]),
       ]),
       div(classes: 'recommended-grid recommended-sidebar-list', [
         for (final item in _items)

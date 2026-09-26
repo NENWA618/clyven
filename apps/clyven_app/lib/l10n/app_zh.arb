@@ -255,5 +255,16 @@
   "commentEmpty": "评论内容不能为空",
   "replyEmpty": "回复内容不能为空",
   "commentNotFound": "评论不存在",
-  "replyNotFound": "回复不存在"
+  "replyNotFound": "回复不存在",
+  "wordLists": "词表",
+  "myVocabularyLearning": "我的词汇学习",
+  "wordListLoadFailed": "读取词表失败：{error}",
+  "noWordLists": "暂时没有词表",
+  "wordListNotFound": "找不到这份词表",
+  "wordListEntryCount": "{count} 个词条",
+  "noDefinition": "暂无释义",
+  "markAsKnown": "标记为已会",
+  "unmarkKnown": "取消已会",
+  "entryTypePhrase": "短语",
+  "entryTypeWord": "单词"
 }
