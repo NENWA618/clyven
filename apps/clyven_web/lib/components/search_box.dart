@@ -62,6 +62,7 @@ class _SearchBoxState extends State<SearchBox> {
 
   List<api.Video> _results() {
     final keyword = _query.trim().toLowerCase();
+    final l10n = context.l10n;
     final videos = _videos;
 
     if (keyword.isEmpty || videos == null) return const [];
@@ -70,6 +71,7 @@ class _SearchBoxState extends State<SearchBox> {
       return video.title.toLowerCase().contains(keyword) ||
           video.authorName.toLowerCase().contains(keyword) ||
           video.category.toLowerCase().contains(keyword) ||
+          l10n.topic(video.category).toLowerCase().contains(keyword) ||
           video.description.toLowerCase().contains(keyword);
     }).toList();
   }
@@ -142,7 +144,7 @@ class _SearchBoxState extends State<SearchBox> {
               .text(
                 [
                   video.authorName,
-                  video.category,
+                  context.l10n.topic(video.category),
                 ].where((part) => part.trim().isNotEmpty).join(' · '),
               ),
             ]),

@@ -259,7 +259,7 @@ class _LanguageCategoryHomeSectionState
         div(classes: 'home-language-video-author', [.text(video.authorName)]),
         div(classes: 'home-language-video-meta', [
           if (video.category.trim().isNotEmpty)
-            span([.text(video.category.trim())]),
+            span([.text(context.l10n.topic(video.category))]),
           span([.text(context.l10n.views(video.viewCount))]),
         ]),
       ]),
@@ -340,7 +340,7 @@ class _LanguageCategoryHomeSectionState
           ),
           for (final category in categories)
             _filterButton(
-              label: category,
+              label: l10n.topic(category),
               selected: _selectedCategory == category,
               onClick: () => _selectCategory(category),
             ),
