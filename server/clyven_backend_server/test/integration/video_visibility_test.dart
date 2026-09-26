@@ -27,6 +27,7 @@ void main() {
         tags: [],
         videoStorageKey: 'visibility-fixture-missing.mp4',
         durationSeconds: 12,
+        isPublic: true,
       );
     }
 
