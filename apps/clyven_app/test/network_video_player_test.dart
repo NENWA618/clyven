@@ -54,23 +54,24 @@ class TestVideoPlatform extends VideoPlayerPlatform {
   );
 }
 
-Widget player({String url = 'https://media.example/video.mp4'}) => ProviderScope(
-  child: MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    locale: const Locale('en'),
-    home: Scaffold(
-      body: NetworkVideoPlayer(
-        videoId: null,
-        videoUrl: url,
-        coverUrl: '',
-        subtitles: const [],
-        initialPositionSeconds: 0,
-        fallbackDurationSeconds: 60,
+Widget player({String url = 'https://media.example/video.mp4'}) =>
+    ProviderScope(
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: NetworkVideoPlayer(
+            videoId: null,
+            videoUrl: url,
+            coverUrl: '',
+            subtitles: const [],
+            initialPositionSeconds: 0,
+            fallbackDurationSeconds: 60,
+          ),
+        ),
       ),
-    ),
-  ),
-);
+    );
 
 void main() {
   late TestVideoPlatform platform;

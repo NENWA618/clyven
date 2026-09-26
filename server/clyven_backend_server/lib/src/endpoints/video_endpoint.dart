@@ -94,9 +94,11 @@ class VideoEndpoint extends Endpoint {
         : authorName.trim();
     final normalizedSeriesTitle = seriesTitle?.trim();
     final storedSeriesTitle =
-        normalizedSeriesTitle == null || normalizedSeriesTitle.isEmpty ? null : normalizedSeriesTitle;
+        normalizedSeriesTitle == null || normalizedSeriesTitle.isEmpty
+        ? null
+        : normalizedSeriesTitle;
 
-    final now = DateTime.now();
+    final now = DateTime.now().toUtc();
 
     final video = Video(
       authorId: currentUserId,
@@ -130,6 +132,14 @@ class VideoEndpoint extends Endpoint {
     if (savedVideo.id == null) {
       throw Exception('视频创建成功，但没有取得 video id');
     }
+
+    session.log(
+      'POST_CREATED postId=${savedVideo.id} ownerId=$currentUserId '
+      'type=${savedVideo.contentType.name} status=${savedVideo.status.name} '
+      'videoStorageKey=${savedVideo.videoStorageKey} '
+      'createdAt=${savedVideo.createdAt.toIso8601String()} '
+      'publishedAt=${savedVideo.publishedAt?.toIso8601String()}',
+    );
     try {
       await const VideoTranscodeService().ensure(
         session,
@@ -169,7 +179,7 @@ class VideoEndpoint extends Endpoint {
     Session session, {
     VideoContentType? contentType,
   }) async {
-    return Video.db.find(
+    final videos = await Video.db.find(
       session,
       where: contentType == null
           ? (table) =>
@@ -182,6 +192,14 @@ class VideoEndpoint extends Endpoint {
       orderBy: (table) => table.createdAt,
       orderDescending: true,
     );
+
+    session.log(
+      'FEED_REQUEST viewerUserId=${session.authenticated?.userIdentifier ?? 'anonymous'} '
+      'filter=isPublic:true,status:published,contentType:${contentType?.name ?? 'all'} '
+      'order=createdAt:desc returnedCount=${videos.length}',
+    );
+
+    return videos;
   }
 
   Future<List<Video>> getMyVideos(Session session) async {
@@ -200,17 +218,16 @@ class VideoEndpoint extends Endpoint {
     int id,
   ) async {
     final video = await Video.db.findById(session, id);
+    if (video == null) return null;
 
-    if (video == null) {
+    final currentUserId = session.authenticated?.userIdentifier.toString();
+    final isOwner = currentUserId == video.authorId;
+
+    if (video.status != VideoStatus.published && !isOwner) {
       return null;
     }
 
-    if (video.isPublic) {
-      return video;
-    }
-
-    final currentUserId = session.authenticated?.userIdentifier.toString();
-    if (currentUserId == video.authorId) {
+    if (video.isPublic || isOwner) {
       return video;
     }
 

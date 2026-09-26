@@ -5,9 +5,11 @@ import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/serverpod/feed_diagnostics.dart';
 import 'interactive_subtitle_overlay.dart';
 
 class NetworkVideoPlayer extends ConsumerStatefulWidget {
@@ -56,8 +58,15 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
 
 class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   late VideoPlayerController _controller;
-  late final Future<void> _initializeFuture;
+  late Future<void> _initializeFuture;
   bool _controllerCreated = false;
+  final Set<VideoPlayerController> _releasedControllers = {};
+  int _generation = 0;
+  bool _initializationFailed = false;
+  bool _reportedNativeError = false;
+  Timer? _initializationTimer;
+  Completer<void>? _initializationCompleter;
+  String _initializationStage = 'resolve_source';
 
   final Stopwatch _fallbackClock = Stopwatch();
   Timer? _positionTicker;
@@ -67,7 +76,111 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    _initializeFuture = _initializePlayer();
+    _startPlayer();
+  }
+
+  void _startPlayer() {
+    final generation = ++_generation;
+    _initializationFailed = false;
+    _reportedNativeError = false;
+    _initializationStage = 'resolve_source';
+
+    feedDiagnostic(
+      'PLAYBACK_INITIALIZING postId=${widget.videoId ?? 'unknown'} '
+      'host=${Uri.tryParse(widget.videoUrl)?.host ?? ''}',
+    );
+
+    final completion = Completer<void>();
+    _initializationCompleter = completion;
+    _initializeFuture = completion.future;
+    _initializationTimer?.cancel();
+
+    void fail(Object error, StackTrace stack) {
+      if (completion.isCompleted) return;
+      _initializationTimer?.cancel();
+      if (mounted && generation == _generation) {
+        _initializationFailed = true;
+        final reason = error is TimeoutException
+            ? 'timeout'
+            : error is PlatformException
+            ? error.code
+            : '${error.runtimeType}';
+        feedDiagnostic(
+          'PLAYBACK_INIT_FAILED postId=${widget.videoId ?? 'unknown'} '
+          'stage=$_initializationStage reason=$reason',
+        );
+        ++_generation;
+        _releaseCurrentController();
+      }
+      completion.completeError(error, stack);
+    }
+
+    _initializationTimer = Timer(const Duration(seconds: 30), () {
+      fail(
+        TimeoutException('Video initialization timed out'),
+        StackTrace.current,
+      );
+    });
+
+    unawaited(
+      _initializePlayer(generation).then((_) {
+        if (completion.isCompleted) return;
+        _initializationTimer?.cancel();
+        if (generation != _generation || _initializationFailed) return;
+        feedDiagnostic('PLAYBACK_READY postId=${widget.videoId ?? 'unknown'}');
+        completion.complete();
+      }, onError: fail),
+    );
+  }
+
+  bool _isGenerationActive(int generation) {
+    return mounted && generation == _generation && !_initializationFailed;
+  }
+
+  void _release(VideoPlayerController controller) {
+    if (!_releasedControllers.add(controller)) return;
+    controller.removeListener(_handleProgress);
+    if (_controllerCreated && identical(_controller, controller)) {
+      _controllerCreated = false;
+    }
+    unawaited(
+      controller.dispose().catchError((Object error) {
+        feedDiagnostic('PLAYBACK_DISPOSE_FAILED reason=${error.runtimeType}');
+      }),
+    );
+  }
+
+  void _releaseCurrentController() {
+    if (_controllerCreated) _release(_controller);
+  }
+
+  void _cancelInitialization() {
+    _initializationTimer?.cancel();
+    final completion = _initializationCompleter;
+    if (completion != null && !completion.isCompleted) completion.complete();
+  }
+
+  void _resetPlayer() {
+    _cancelInitialization();
+    ++_generation;
+    _releaseCurrentController();
+    _positionTicker?.cancel();
+    _positionTicker = null;
+    _fallbackClock
+      ..stop()
+      ..reset();
+    _fallbackBasePosition = Duration.zero;
+    _lastSavedSecond = -1;
+    _startPlayer();
+  }
+
+  @override
+  void didUpdateWidget(covariant NetworkVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.videoUrl != oldWidget.videoUrl ||
+        widget.videoId != oldWidget.videoId) {
+      _resetPlayer();
+    }
   }
 
   serverpod.SubtitleCueDetail? _findActiveSubtitle(
@@ -124,70 +237,74 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     }
   }
 
-  Future<bool> _tryInitializeSource(String source) async {
+  Future<bool> _tryInitializeSource(String source, int generation) async {
+    if (!_isGenerationActive(generation)) return false;
+
     final controller = _createController(source);
+    _controller = controller;
+    _controllerCreated = true;
+    _initializationStage = 'native_initialize';
 
     try {
       await controller.initialize();
-      await controller.setLooping(false);
-
-      if (!mounted) {
-        await controller.dispose();
+      if (!_isGenerationActive(generation)) {
+        _release(controller);
         return false;
       }
 
-      _controller = controller;
-      _controllerCreated = true;
-      _controller.addListener(_handleProgress);
+      _initializationStage = 'set_looping';
+      await controller.setLooping(false);
+      if (!_isGenerationActive(generation)) {
+        _release(controller);
+        return false;
+      }
+
+      controller.addListener(_handleProgress);
       return true;
     } catch (error, stackTrace) {
-      debugPrint('Video source failed to initialize: $source');
-      debugPrint('Player error: $error');
+      feedDiagnostic(
+        'PLAYBACK_SOURCE_FAILED postId=${widget.videoId ?? 'unknown'} '
+        'stage=$_initializationStage reason=${error.runtimeType}',
+      );
       debugPrintStack(stackTrace: stackTrace);
-      await controller.dispose();
+      _release(controller);
       return false;
     }
   }
 
-  Future<bool> _waitForTranscodedPlayback() async {
+  Future<bool> _waitForTranscodedPlayback(int generation) async {
     for (var attempt = 0; attempt < 24; attempt++) {
-      if (!mounted) {
-        return false;
-      }
+      if (!_isGenerationActive(generation)) return false;
 
       if (attempt > 0) {
         await Future<void>.delayed(const Duration(seconds: 5));
+        if (!_isGenerationActive(generation)) return false;
       }
 
       final manifestUrl = await _fetchPlaybackManifestUrl();
+      if (!_isGenerationActive(generation)) return false;
+      if (manifestUrl == null) continue;
 
-      if (manifestUrl == null) {
-        continue;
-      }
-
-      if (await _tryInitializeSource(manifestUrl)) {
-        return true;
-      }
+      if (await _tryInitializeSource(manifestUrl, generation)) return true;
     }
-
     return false;
   }
 
-  Future<void> _initializePlayer() async {
+  Future<void> _initializePlayer(int generation) async {
     final manifestUrl = await _fetchPlaybackManifestUrl();
+    if (!_isGenerationActive(generation)) return;
+
     var initialized = false;
-
     if (manifestUrl != null) {
-      initialized = await _tryInitializeSource(manifestUrl);
+      initialized = await _tryInitializeSource(manifestUrl, generation);
     }
-
-    if (!initialized) {
-      initialized = await _tryInitializeSource(widget.videoUrl);
+    if (!initialized && _isGenerationActive(generation)) {
+      initialized = await _tryInitializeSource(widget.videoUrl, generation);
     }
-
-    if (!initialized) {
-      initialized = await _waitForTranscodedPlayback();
+    if (!initialized && _isGenerationActive(generation)) {
+      initialized = await _waitForTranscodedPlayback(generation);
     }
+    if (!_isGenerationActive(generation)) return;
 
     if (!initialized) {
       throw StateError(
@@ -197,20 +314,18 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
     final duration = _effectiveDuration();
     final savedPosition = widget.initialPositionSeconds;
-
     if (savedPosition <= 0) {
       _fallbackBasePosition = Duration.zero;
       return;
     }
-
     if (duration.inSeconds > 0 && savedPosition >= duration.inSeconds - 5) {
       _fallbackBasePosition = Duration.zero;
       return;
     }
 
     final position = Duration(seconds: savedPosition);
-
     _fallbackBasePosition = position;
+    _initializationStage = 'restore_position';
     await _controller.seekTo(position);
   }
 
@@ -262,6 +377,26 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   }
 
   void _handleProgress() {
+    if (_controller.value.hasError) {
+      if (!_reportedNativeError) {
+        _reportedNativeError = true;
+        final description =
+            _controller.value.errorDescription?.toLowerCase() ?? '';
+        final reason = description.contains('decoder')
+            ? 'decoder'
+            : description.contains('source error')
+            ? 'source'
+            : description.contains('renderer')
+            ? 'renderer'
+            : 'native';
+        feedDiagnostic(
+          'PLAYBACK_NATIVE_ERROR postId=${widget.videoId ?? 'unknown'} '
+          'reason=$reason',
+        );
+      }
+      return;
+    }
+
     if (!_controller.value.isInitialized) {
       return;
     }
@@ -282,15 +417,11 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
   @override
   void dispose() {
+    _cancelInitialization();
     _positionTicker?.cancel();
     _fallbackClock.stop();
-
-    if (_controllerCreated) {
-      _controller.removeListener(_handleProgress);
-      _controller.dispose();
-      _controllerCreated = false;
-    }
-
+    ++_generation;
+    _releaseCurrentController();
     super.dispose();
   }
 
@@ -315,6 +446,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
           return ValueListenableBuilder<VideoPlayerValue>(
             valueListenable: _controller,
             builder: (context, value, child) {
+              if (value.hasError) return _buildPlayerError();
               final duration = _effectiveDuration();
               final position = _effectivePosition();
               final activeSubtitle = _findActiveSubtitle(
@@ -611,6 +743,10 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
             Text(
               l10n.videoCannotPlay,
               style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            TextButton(
+              onPressed: () => setState(_resetPlayer),
+              child: Text(l10n.reload),
             ),
           ],
         ),

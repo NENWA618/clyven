@@ -9,7 +9,8 @@ import 'feed_diagnostics.dart';
 final serverpodClientProvider = Provider<Client>((ref) {
   const apiUrl = String.fromEnvironment(
     'CLYVEN_API_URL',
-    defaultValue: 'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    defaultValue:
+        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
   );
   const revision = String.fromEnvironment(
     'CLYVEN_BUILD_REVISION',
