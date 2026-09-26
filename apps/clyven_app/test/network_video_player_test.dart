@@ -4,14 +4,17 @@ import 'package:clyven_app/features/video/presentation/widgets/network_video_pla
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 class TestVideoPlatform extends VideoPlayerPlatform {
   final events = <int, StreamController<VideoEvent>>{};
   final disposed = <int>[];
+
   @override
   Future<void> init() async {}
+
   @override
   Future<int?> createWithOptions(VideoCreationOptions options) async {
     final id = events.length + 1;
@@ -21,6 +24,7 @@ class TestVideoPlatform extends VideoPlayerPlatform {
 
   @override
   Stream<VideoEvent> videoEventsFor(int playerId) => events[playerId]!.stream;
+
   @override
   Future<void> dispose(int playerId) async {
     disposed.add(playerId);
@@ -28,12 +32,16 @@ class TestVideoPlatform extends VideoPlayerPlatform {
 
   @override
   Future<void> setLooping(int playerId, bool looping) async {}
+
   @override
   Future<void> setVolume(int playerId, double volume) async {}
+
   @override
   Future<void> pause(int playerId) async {}
+
   @override
   Future<void> seekTo(int playerId, Duration position) async {}
+
   @override
   Widget buildViewWithOptions(VideoViewOptions options) => const SizedBox();
 
@@ -46,18 +54,20 @@ class TestVideoPlatform extends VideoPlayerPlatform {
   );
 }
 
-Widget player({String url = 'https://media.example/video.mp4'}) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
-  supportedLocales: AppLocalizations.supportedLocales,
-  locale: const Locale('en'),
-  home: Scaffold(
-    body: NetworkVideoPlayer(
-      videoId: '17',
-      videoUrl: url,
-      coverUrl: '',
-      subtitles: const [],
-      initialPositionSeconds: 0,
-      fallbackDurationSeconds: 60,
+Widget player({String url = 'https://media.example/video.mp4'}) => ProviderScope(
+  child: MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    home: Scaffold(
+      body: NetworkVideoPlayer(
+        videoId: null,
+        videoUrl: url,
+        coverUrl: '',
+        subtitles: const [],
+        initialPositionSeconds: 0,
+        fallbackDurationSeconds: 60,
+      ),
     ),
   ),
 );
@@ -65,11 +75,13 @@ Widget player({String url = 'https://media.example/video.mp4'}) => MaterialApp(
 void main() {
   late TestVideoPlatform platform;
   late VideoPlayerPlatform original;
+
   setUp(() {
     original = VideoPlayerPlatform.instance;
     platform = TestVideoPlatform();
     VideoPlayerPlatform.instance = platform;
   });
+
   tearDown(() async {
     VideoPlayerPlatform.instance = original;
     for (final stream in platform.events.values) {
@@ -86,7 +98,6 @@ void main() {
       expect(platform.events.keys, [1]);
       await tester.pump(const Duration(seconds: 31));
       await tester.pumpAndSettle();
-      // Stream cancellation can complete outside the widget fake clock.
       await tester.runAsync(() => Future<void>.delayed(Duration.zero));
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.byIcon(Icons.play_disabled_rounded), findsOneWidget);
@@ -94,9 +105,7 @@ void main() {
       await tester.tap(find.byType(TextButton));
       await tester.pump();
       expect(platform.events.keys, [1, 2]);
-      platform.ready(
-        1,
-      ); // Late native event from failed attempt cannot revive it.
+      platform.ready(1);
       platform.ready(2);
       await tester.pump();
       await tester.pump();
