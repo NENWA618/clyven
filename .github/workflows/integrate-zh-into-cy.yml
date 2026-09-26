@@ -1,0 +1,55 @@
+name: Integrate zh into cy all features
+
+on:
+  push:
+    branches:
+      - merge/cy-zh-all-features
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch zh
+        run: git fetch origin zh
+
+      - name: Cherry-pick zh commit and preserve cy on conflicted files
+        shell: bash
+        run: |
+          set +e
+          git cherry-pick c97c8d6aecd298681436f1f15ff447fa468afdab
+          status=$?
+          if [ $status -eq 0 ]; then
+            echo "NO_CONFLICTS" > .merge-conflicts-zh.txt
+            git add .merge-conflicts-zh.txt
+            git commit --amend --no-edit
+            git push origin HEAD:merge/cy-zh-all-features
+            exit 0
+          fi
+
+          git diff --name-only --diff-filter=U | tee .merge-conflicts-zh.txt
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            git checkout --ours -- "$file"
+            git add "$file"
+          done < .merge-conflicts-zh.txt
+
+          git add -A
+          git cherry-pick --continue
+          git add .merge-conflicts-zh.txt
+          git commit --amend --no-edit
+          git push origin HEAD:merge/cy-zh-all-features
