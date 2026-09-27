@@ -6,6 +6,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/dom.dart' as dom;
 import 'package:jaspr/jaspr.dart';
 
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 class WatchSubtitlePlayer extends StatefulComponent {
@@ -207,11 +208,13 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
 
   Component _qualityControl() {
     if (!_adaptiveReady) {
-      return span(classes: 'watch-quality-original', [.text('原画')]);
+      return span(classes: 'watch-quality-original', [
+        .text(context.l10n.qualityOriginal),
+      ]);
     }
 
     final label = _selectedQualityHeight == null
-        ? '自动'
+        ? context.l10n.qualityAuto
         : '${_selectedQualityHeight}p';
 
     return div(classes: 'watch-quality-control', [
@@ -227,7 +230,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
       ),
       if (_qualityMenuOpen)
         div(classes: 'watch-quality-menu', [
-          _qualityOption(null, '自动'),
+          _qualityOption(null, context.l10n.qualityAuto),
           _qualityOption(720, '720p'),
           _qualityOption(360, '360p'),
         ]),
@@ -561,7 +564,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                 'max': '1000',
                 'step': '1',
                 'value': '$progress',
-                'aria-label': 'Video progress',
+                'aria-label': context.l10n.videoProgress,
               },
               events: events<num>(onInput: _seekToProgress),
             ),
@@ -610,7 +613,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                     'max': '100',
                     'step': '1',
                     'value': '${(_volume * 100).round()}',
-                    'aria-label': 'Volume',
+                    'aria-label': context.l10n.volume,
                   },
                   events: events<num>(onInput: _changeVolume),
                 ),
@@ -625,7 +628,13 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                   type: ButtonType.button,
                   classes: 'watch-player-pill-button watch-display-mode-button',
                   onClick: component.onDisplayModeToggle,
-                  [.text(component.overlayMode ? '视频内' : '视频下')],
+                  [
+                    .text(
+                      component.overlayMode
+                          ? context.l10n.subtitlesInVideo
+                          : context.l10n.subtitlesBelowVideo,
+                    ),
+                  ],
                 ),
                 button(
                   type: ButtonType.button,
@@ -641,7 +650,13 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
                       'watch-player-pill-button watch-wide-mode-button'
                       '',
                   onClick: component.onWideModeToggle,
-                  [.text(component.wideMode ? '标准' : '宽屏')],
+                  [
+                    .text(
+                      component.wideMode
+                          ? context.l10n.standardMode
+                          : context.l10n.wideMode,
+                    ),
+                  ],
                 ),
                 button(
                   type: ButtonType.button,

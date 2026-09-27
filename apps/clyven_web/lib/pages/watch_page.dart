@@ -1,9 +1,10 @@
-﻿import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../components/watch_subtitle_player.dart';
 import '../components/recommended_videos.dart';
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 enum _SubtitleDisplayMode { overlay, learningPanel }
@@ -364,8 +365,8 @@ class _WatchPageState extends State<WatchPage> {
   }
 
   String? _selectionRole(_SubtitleSelection selection) {
-    if (selection.sameAs(_primary)) return '主字幕';
-    if (selection.sameAs(_secondary)) return '第二字幕';
+    if (selection.sameAs(_primary)) return context.l10n.primarySubtitle;
+    if (selection.sameAs(_secondary)) return context.l10n.secondarySubtitle;
     return null;
   }
 
@@ -425,12 +426,14 @@ class _WatchPageState extends State<WatchPage> {
       div(classes: 'watch-subtitle-settings-card', [
         div(classes: 'watch-subtitle-settings-head', [
           div([
-            h2([.text('字幕')]),
+            h2([.text(context.l10n.subtitles)]),
             p([
               .text(
                 openedLanguage == null
-                    ? '选择语言'
-                    : '选择 ${_languageLabel(openedLanguage)} 的文字',
+                    ? context.l10n.chooseLanguage
+                    : context.l10n.chooseScriptFor(
+                        _languageLabel(openedLanguage),
+                      ),
               ),
             ]),
           ]),
@@ -479,13 +482,15 @@ class _WatchPageState extends State<WatchPage> {
             ]),
             div(classes: 'watch-language-row-side', [
               if (_primary?.track.id == item.track.id)
-                span(classes: 'watch-language-active-badge', [.text('主')]),
+                span(classes: 'watch-language-active-badge', [
+                  .text(context.l10n.primaryBadge),
+                ]),
               if (_secondary?.track.id == item.track.id)
                 span(classes: 'watch-language-active-badge secondary', [
-                  .text('副'),
+                  .text(context.l10n.secondaryBadge),
                 ]),
               span(classes: 'watch-language-script-count', [
-                .text('${item.scriptCodes.length} 种文字'),
+                .text(context.l10n.scriptCount(item.scriptCodes.length)),
               ]),
               span(classes: 'watch-language-chevron', [.text('›')]),
             ]),
@@ -506,7 +511,7 @@ class _WatchPageState extends State<WatchPage> {
         },
         [
           span([.text('‹')]),
-          span([.text('语言列表')]),
+          span([.text(context.l10n.languageList)]),
         ],
       ),
       div(classes: 'watch-script-language-heading', [
@@ -544,7 +549,7 @@ class _WatchPageState extends State<WatchPage> {
           classes:
               'watch-script-toggle-state'
               '${active ? ' is-on' : ''}',
-          [.text(active ? '显示中' : '关闭')],
+          [.text(active ? context.l10n.shown : context.l10n.off)],
         ),
       ],
     );
@@ -553,7 +558,9 @@ class _WatchPageState extends State<WatchPage> {
   Component _learningPanel() {
     final primary = _primary;
     if (primary == null) {
-      return div(classes: 'watch-learning-panel empty', [.text('没有可用字幕')]);
+      return div(classes: 'watch-learning-panel empty', [
+        .text(context.l10n.noSubtitlesAvailable),
+      ]);
     }
 
     final primaryDetail = _active(_primaryCues);
@@ -561,7 +568,7 @@ class _WatchPageState extends State<WatchPage> {
 
     if (primaryDetail == null) {
       return div(classes: 'watch-learning-panel empty', [
-        .text('播放到有字幕的位置后，这里会显示逐词内容。'),
+        .text(context.l10n.playToSeeWords),
       ]);
     }
 
@@ -588,7 +595,7 @@ class _WatchPageState extends State<WatchPage> {
             ),
         ])
       else
-        div(classes: 'watch-learning-hint', [.text('这条字幕暂时没有逐词 token 数据。')]),
+        div(classes: 'watch-learning-hint', [.text(context.l10n.noTokenData)]),
     ]);
   }
 
@@ -602,7 +609,9 @@ class _WatchPageState extends State<WatchPage> {
       div(classes: 'watch-dictionary-card', [
         div(classes: 'watch-dictionary-head', [
           div([
-            span(classes: 'watch-dictionary-type', [.text('Dictionary')]),
+            span(classes: 'watch-dictionary-type', [
+              .text(context.l10n.dictionary),
+            ]),
             h2([.text(title)]),
           ]),
           button(
@@ -613,13 +622,15 @@ class _WatchPageState extends State<WatchPage> {
           ),
         ]),
         if (_dictionaryLoading)
-          p([.text('查询中…')])
+          p([.text(context.l10n.lookingUp)])
         else if (_dictionaryError != null)
-          p(classes: 'watch-error-text', [.text('查询失败：$_dictionaryError')])
+          p(classes: 'watch-error-text', [
+            .text(context.l10n.lookupFailed(_dictionaryError!)),
+          ])
         else if (entry == null)
-          p([.text('暂时没有这个词条的释义。')])
+          p([.text(context.l10n.noDefinition)])
         else if (entry.definitions.isEmpty)
-          p([.text('这个词条暂时没有中文释义。')])
+          p([.text(context.l10n.noLocalizedDefinition)])
         else
           div(classes: 'watch-dictionary-definitions', [
             for (final definition in entry.definitions)
@@ -636,11 +647,11 @@ class _WatchPageState extends State<WatchPage> {
   Component _commentsSection() {
     return section(classes: 'watch-comments', [
       div(classes: 'watch-section-title', [
-        h2([.text('Comments')]),
+        h2([.text(context.l10n.comments)]),
         span([.text('${_comments.length}')]),
       ]),
       if (_comments.isEmpty)
-        p(classes: 'watch-muted', [.text('No comments yet.')])
+        p(classes: 'watch-muted', [.text(context.l10n.noComments)])
       else
         for (final comment in _comments)
           article(classes: 'watch-comment', [
@@ -655,7 +666,7 @@ class _WatchPageState extends State<WatchPage> {
               strong([.text(comment.userName)]),
               p([.text(comment.content)]),
               span(classes: 'watch-comment-meta', [
-                .text('${comment.likeCount} likes'),
+                .text(context.l10n.likes(comment.likeCount)),
               ]),
               if (comment.replies.isNotEmpty)
                 div(classes: 'watch-comment-replies', [
@@ -676,8 +687,8 @@ class _WatchPageState extends State<WatchPage> {
       return div(classes: 'watch-page watch-state-page', [
         div(classes: 'watch-state-card', [
           div(classes: 'watch-spinner', []),
-          h2([.text('Loading video…')]),
-          p([.text('Loading video, subtitles and comments.')]),
+          h2([.text(context.l10n.loadingVideo)]),
+          p([.text(context.l10n.loadingVideoDetail)]),
         ]),
       ]);
     }
@@ -685,9 +696,9 @@ class _WatchPageState extends State<WatchPage> {
     if (_error != null || _video == null) {
       return div(classes: 'watch-page watch-state-page', [
         div(classes: 'watch-state-card', [
-          h2([.text('Video unavailable')]),
-          p([.text(_error ?? 'Unknown error')]),
-          a(href: '/', [.text('Back home')]),
+          h2([.text(context.l10n.videoUnavailable)]),
+          p([.text(_error ?? context.l10n.unknownError)]),
+          a(href: '/', [.text(context.l10n.backHome)]),
         ]),
       ]);
     }
@@ -697,7 +708,9 @@ class _WatchPageState extends State<WatchPage> {
     return div(classes: 'watch-page', [
       div(classes: 'watch-layout', [
         main_(classes: 'watch-main-column', [
-          a(href: '/', classes: 'watch-back-link', [.text('← Home')]),
+          a(href: '/', classes: 'watch-back-link', [
+            .text(context.l10n.backHomeArrow),
+          ]),
           WatchSubtitlePlayer(
             videoId: component.videoId,
             videoUrl: _videoUrl,
@@ -737,8 +750,8 @@ class _WatchPageState extends State<WatchPage> {
           section(classes: 'watch-video-info', [
             h1([.text(video.title)]),
             div(classes: 'watch-meta-row', [
-              span([.text('${video.viewCount} views')]),
-              span([.text('${video.likeCount} likes')]),
+              span([.text(context.l10n.views(video.viewCount))]),
+              span([.text(context.l10n.likes(video.likeCount))]),
               if (video.languageCode != null)
                 span([.text(video.languageCode!)]),
             ]),
@@ -752,7 +765,7 @@ class _WatchPageState extends State<WatchPage> {
               ]),
               div([
                 strong([.text(video.authorName)]),
-                p([.text(video.category)]),
+                p([.text(context.l10n.topic(video.category))]),
               ]),
             ]),
             if (video.description.trim().isNotEmpty)
@@ -768,7 +781,7 @@ class _WatchPageState extends State<WatchPage> {
           if (!_wideMode) RecommendedVideos(currentVideoId: component.videoId),
           if (_availability.isNotEmpty)
             div(classes: 'watch-track-summary', [
-              h3([.text('Available')]),
+              h3([.text(context.l10n.available)]),
               for (final item in _availability)
                 div(classes: 'watch-track-summary-row', [
                   strong([

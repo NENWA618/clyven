@@ -6,6 +6,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 class WebAvatarUpload extends StatefulComponent {
@@ -90,7 +91,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
 
     if (email.isEmpty || _password.isEmpty) {
       setState(() {
-        _error = '请输入邮箱和密码';
+        _error = context.l10n.enterEmailAndPassword;
       });
       return;
     }
@@ -124,7 +125,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
       setState(() {
         _loginLoading = false;
         _signedIn = false;
-        _error = '登录失败：$error';
+        _error = context.l10n.loginFailed(error);
       });
     }
   }
@@ -163,7 +164,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
     final file = files.first;
 
     if (file.size > 10 * 1024 * 1024) {
-      html.window.alert('头像图片不能超过 10 MB');
+      html.window.alert(context.l10n.avatarTooLarge);
       return null;
     }
 
@@ -181,7 +182,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
       return result;
     }
 
-    throw StateError('无法读取所选图片');
+    throw StateError(context.l10n.cannotReadImage);
   }
 
   Future<void> _uploadAvatar() async {
@@ -213,7 +214,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         });
       }
 
-      html.window.alert('头像上传失败：$error');
+      html.window.alert(context.l10n.avatarUploadFailed(error));
     }
   }
 
@@ -243,8 +244,8 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
       div(classes: 'web-auth-dialog', [
         div(classes: 'web-auth-dialog-head', [
           div([
-            h2([.text('登录 Clyven')]),
-            p([.text('登录后可同步头像、收藏、历史记录和字幕状态。')]),
+            h2([.text(context.l10n.signInToClyven)]),
+            p([.text(context.l10n.signInBenefits)]),
           ]),
           button(
             type: ButtonType.button,
@@ -261,7 +262,10 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         div(classes: 'web-auth-fields', [
           input<String>(
             type: InputType.email,
-            attributes: {'placeholder': 'Email', 'autocomplete': 'email'},
+            attributes: {
+              'placeholder': context.l10n.email,
+              'autocomplete': 'email',
+            },
             events: events<String>(
               onInput: (value) {
                 _email = value;
@@ -271,7 +275,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
           input<String>(
             type: InputType.password,
             attributes: {
-              'placeholder': 'Password',
+              'placeholder': context.l10n.password,
               'autocomplete': 'current-password',
             },
             events: events<String>(
@@ -285,7 +289,11 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
             classes: 'web-auth-submit',
             attributes: _loginLoading ? {'disabled': 'disabled'} : null,
             onClick: _loginLoading ? null : _login,
-            [.text(_loginLoading ? '登录中...' : '登录')],
+            [
+              .text(
+                _loginLoading ? context.l10n.signingIn : context.l10n.signIn,
+              ),
+            ],
           ),
           if (_error != null) div(classes: 'web-auth-error', [.text(_error!)]),
         ]),
@@ -301,13 +309,17 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         type: ButtonType.button,
         classes: 'web-account-menu-item',
         onClick: _uploadAvatar,
-        [.text(_uploading ? '上传中...' : '更换头像')],
+        [
+          .text(
+            _uploading ? context.l10n.uploading : context.l10n.changeAvatar,
+          ),
+        ],
       ),
       button(
         type: ButtonType.button,
         classes: 'web-account-menu-item danger',
         onClick: _logout,
-        [.text('退出登录')],
+        [.text(context.l10n.signOut)],
       ),
     ]);
   }
@@ -332,7 +344,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
               _error = null;
             });
           },
-          [.text('登录')],
+          [.text(context.l10n.signIn)],
         ),
         if (_loginOpen) _loginModal(),
       ]);
@@ -344,7 +356,10 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         classes:
             'web-avatar-upload-button'
             '${_uploading ? ' is-uploading' : ''}',
-        attributes: {'title': '账号', 'aria-label': '打开账号菜单'},
+        attributes: {
+          'title': context.l10n.account,
+          'aria-label': context.l10n.openAccountMenu,
+        },
         onClick: () {
           setState(() {
             _accountOpen = !_accountOpen;

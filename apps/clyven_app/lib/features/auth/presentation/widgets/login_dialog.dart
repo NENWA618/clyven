@@ -148,7 +148,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               enabled: !_isSubmitting,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                hintText: l10n.account,
+                hintText: l10n.email,
                 prefixIcon: const Icon(Icons.person_outline_rounded),
                 filled: true,
                 fillColor: Colors.white,
