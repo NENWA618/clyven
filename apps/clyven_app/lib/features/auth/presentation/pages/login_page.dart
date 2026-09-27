@@ -75,7 +75,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               TextField(
                 controller: _accountController,
                 decoration: _inputDecoration(
-                  l10n.account,
+                  l10n.email,
                   Icons.person_outline_rounded,
                 ),
               ),

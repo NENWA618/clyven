@@ -2,6 +2,7 @@ import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
+import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
 class LanguageCategoryHomeSection extends StatefulComponent {
@@ -258,8 +259,8 @@ class _LanguageCategoryHomeSectionState
         div(classes: 'home-language-video-author', [.text(video.authorName)]),
         div(classes: 'home-language-video-meta', [
           if (video.category.trim().isNotEmpty)
-            span([.text(video.category.trim())]),
-          span([.text('${video.viewCount} views')]),
+            span([.text(context.l10n.topic(video.category))]),
+          span([.text(context.l10n.views(video.viewCount))]),
         ]),
       ]),
     ]);
@@ -267,15 +268,17 @@ class _LanguageCategoryHomeSectionState
 
   @override
   Component build(BuildContext context) {
+    final l10n = context.l10n;
+
     if (_loading) {
       return section(classes: 'home-language-browser', [
         div(classes: 'home-language-browser-heading', [
           div([
-            h2([.text('按语言浏览')]),
-            p([.text('语言是 Clyven 主页的第一层分类')]),
+            h2([.text(l10n.browseByLanguage)]),
+            p([.text(l10n.browseByLanguageSubtitle)]),
           ]),
         ]),
-        div(classes: 'home-language-loading', [.text('正在加载语言分类…')]),
+        div(classes: 'home-language-loading', [.text(l10n.browseLoading)]),
       ]);
     }
 
@@ -283,8 +286,8 @@ class _LanguageCategoryHomeSectionState
       return section(classes: 'home-language-browser', [
         div(classes: 'home-language-browser-heading', [
           div([
-            h2([.text('按语言浏览')]),
-            p([.text('语言是 Clyven 主页的第一层分类')]),
+            h2([.text(l10n.browseByLanguage)]),
+            p([.text(l10n.browseByLanguageSubtitle)]),
           ]),
         ]),
       ]);
@@ -298,12 +301,12 @@ class _LanguageCategoryHomeSectionState
     return section(classes: 'home-language-browser', [
       div(classes: 'home-language-browser-heading', [
         div([
-          h2([.text('按语言浏览')]),
+          h2([.text(l10n.browseByLanguage)]),
           p([
             .text(
               _selectedLanguage == null
-                  ? '先选语言，再按内容类型继续筛选'
-                  : '${_languageName(_selectedLanguage!)} · 再选择内容分类',
+                  ? l10n.pickLanguageFirst
+                  : l10n.pickCategory(_languageName(_selectedLanguage!)),
             ),
           ]),
         ]),
@@ -311,7 +314,7 @@ class _LanguageCategoryHomeSectionState
 
       div(classes: 'home-language-primary-row', [
         _filterButton(
-          label: '全部语言',
+          label: l10n.allLanguages,
           selected: _selectedLanguage == null,
           count: _videos.length.toString(),
           onClick: () => _selectLanguage(null),
@@ -327,22 +330,24 @@ class _LanguageCategoryHomeSectionState
 
       if (categories.isNotEmpty)
         div(classes: 'home-language-secondary-row', [
-          span(classes: 'home-language-secondary-label', [.text('内容')]),
+          span(classes: 'home-language-secondary-label', [
+            .text(l10n.contentLabel),
+          ]),
           _filterButton(
-            label: '全部',
+            label: l10n.all,
             selected: _selectedCategory == null,
             onClick: () => _selectCategory(null),
           ),
           for (final category in categories)
             _filterButton(
-              label: category,
+              label: l10n.topic(category),
               selected: _selectedCategory == category,
               onClick: () => _selectCategory(category),
             ),
         ]),
 
       if (videos.isEmpty)
-        div(classes: 'home-language-empty', [.text('这个分类暂时还没有视频')])
+        div(classes: 'home-language-empty', [.text(l10n.noVideosInCategory)])
       else
         div(classes: 'home-language-video-grid', [
           for (final item in videos) _videoCard(item),
