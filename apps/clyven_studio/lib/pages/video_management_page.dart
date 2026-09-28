@@ -3,6 +3,7 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../services/studio_client.dart';
+import '../services/upload_manager.dart';
 import '../services/video_file_reader.dart';
 
 class VideoManagementPage extends StatefulComponent {
@@ -16,7 +17,6 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
   final client = studioClient;
 
   bool loading = true;
-  bool uploading = false;
   String? error;
   String? uploadMessage;
 
@@ -37,7 +37,20 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
   @override
   void initState() {
     super.initState();
+    studioUploadManager.addListener(_onUploadChanged);
     _loadVideos();
+  }
+
+  @override
+  void dispose() {
+    studioUploadManager.removeListener(_onUploadChanged);
+    super.dispose();
+  }
+
+  void _onUploadChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadVideos() async {
@@ -88,8 +101,9 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     return safe.isEmpty ? 'mp4' : safe;
   }
 
-  Future<void> _upload() async {
+  void _upload() {
     final file = selectedFile;
+
     if (file == null) {
       setState(() {
         uploadMessage = '请先选择视频文件';
@@ -104,78 +118,37 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
       return;
     }
 
-    setState(() {
-      uploading = true;
-      uploadMessage = '正在上传视频...';
-    });
-
-    try {
-      final userId = await client.video.getCurrentUserId();
-      final safeUserId = userId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
-      final timestamp = DateTime.now().microsecondsSinceEpoch;
-      final extension = _extensionFor(file.name);
-      final storageKey = 'videos/$safeUserId/$timestamp.$extension';
-
-      final uploadDescription = await client.video.createUploadDescription(
-        path: storageKey,
-        fileSize: file.size,
-      );
-
-      if (uploadDescription == null) {
-        throw Exception('无法创建上传任务');
-      }
-
-      final uploader = FileUploader(uploadDescription);
-      final uploaded = await uploader.upload(file.openRead(), file.size);
-
-      if (!uploaded) {
-        throw Exception('视频上传失败');
-      }
-
-      final verified = await client.video.verifyUpload(path: storageKey);
-      if (!verified) {
-        throw Exception('视频上传完成，但服务器校验失败');
-      }
-
+    if (studioUploadManager.busy) {
       setState(() {
-        uploadMessage = '文件已上传，正在创建视频并处理字幕任务...';
+        uploadMessage = '已有视频正在上传，请等待当前任务完成';
       });
-
-      await client.video.create(
-        authorId: userId,
-        authorName: authorName.trim().isEmpty ? userId : authorName.trim(),
-        title: title.trim(),
-        description: descriptionText,
-        category: category.trim().isEmpty ? 'general' : category.trim(),
-        contentType: VideoContentType.video,
-        languageCode: languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
-        tags: tagsText
-            .split(',')
-            .map((value) => value.trim())
-            .where((value) => value.isNotEmpty)
-            .toList(growable: false),
-        videoStorageKey: storageKey,
-        coverStorageKey: null,
-        durationSeconds: file.durationSeconds,
-        isPublic: uploadPublic,
-      );
-
-      setState(() {
-        uploading = false;
-        uploadMessage = '上传完成';
-        selectedFile = null;
-        title = '';
-        description = '';
-        tagsText = '';
-      });
-
-      await _loadVideos();
-    } catch (e) {
-      setState(() {
-        uploading = false;
-        uploadMessage = e.toString();
-      });
+      return;
     }
+
+    final uploadTags = tagsText
+        .split(',')
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+
+    studioUploadManager.startUpload(
+      file: file,
+      title: title.trim(),
+      description: description.trim(),
+      category: category.trim(),
+      languageCode: languageCode.trim(),
+      tags: uploadTags,
+      authorName: authorName.trim(),
+      isPublic: uploadPublic,
+    );
+
+    setState(() {
+      uploadMessage = '已开始上传。你现在可以离开此页面。';
+      selectedFile = null;
+      title = '';
+      description = '';
+      tagsText = '';
+    });
   }
 
   String get descriptionText => description.trim();
@@ -320,12 +293,12 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                       [
                         button(
                           classes: 'sv-segment ${uploadPublic ? 'active' : ''}',
-                          onClick: uploading ? null : () => setState(() => uploadPublic = true),
+                          onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = true),
                           [.text('Public')],
                         ),
                         button(
                           classes: 'sv-segment ${!uploadPublic ? 'active' : ''}',
-                          onClick: uploading ? null : () => setState(() => uploadPublic = false),
+                          onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = false),
                           [.text('Private')],
                         ),
                       ],
@@ -359,9 +332,9 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 ),
                 button(
                   classes: 'sv-primary-button',
-                  attributes: uploading ? {'disabled': 'disabled'} : null,
-                  onClick: uploading ? null : _upload,
-                  [.text(uploading ? 'Uploading / processing...' : 'Upload')],
+                  attributes: studioUploadManager.busy ? {'disabled': 'disabled'} : null,
+                  onClick: studioUploadManager.busy ? null : _upload,
+                  [.text(studioUploadManager.busy ? 'Upload in progress...' : 'Upload')],
                 ),
                 if (uploadMessage != null) div(classes: 'sv-upload-message', [.text(uploadMessage!)]),
               ],

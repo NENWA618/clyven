@@ -1,0 +1,18 @@
+﻿[
+  {
+    "origin": [
+      "http://localhost:8083"
+    ],
+    "method": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "ETag"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

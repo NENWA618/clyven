@@ -104,7 +104,15 @@ video:
   - getVideos:
   - getMyVideos:
   - getVideo:
+  - createSeries:
+  - getCreatorSeries:
+  - getSeries:
+  - getSeriesVideos:
+  - setSeriesById:
+  - recordView:
+  - recordEngagedView:
   - setSeries:
+  - reorderSeriesVideos:
   - setVisibility:
   - deleteVideo:
   - createUploadDescription:

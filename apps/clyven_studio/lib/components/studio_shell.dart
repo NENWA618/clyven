@@ -1,6 +1,8 @@
-﻿import 'package:jaspr/dom.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+
+import 'upload_status_bar.dart';
 
 class StudioShell extends StatelessComponent {
   const StudioShell({
@@ -135,6 +137,7 @@ class StudioShell extends StatelessComponent {
               classes: 'studio-content',
               [child],
             ),
+            const UploadStatusBar(),
           ],
         ),
       ],
