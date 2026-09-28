@@ -1,0 +1,14 @@
+class: PrivacySettings
+table: privacy_settings
+
+fields:
+  userId: String
+  privateAccount: bool, default=false
+  allowComments: bool, default=true
+  showActivityStatus: bool, default=true
+  updatedAt: DateTime, default=now
+
+indexes:
+  privacy_settings_user_unique_idx:
+    fields: userId
+    unique: true

@@ -8,9 +8,9 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: no_leading_underscores_for_library_prefixes
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-// ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
@@ -43,42 +43,48 @@ import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
     as _i19;
 import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
     as _i20;
-import 'package:clyven_backend_server/src/generated/subtitle_review_dashboard.dart'
+import 'package:clyven_backend_server/src/generated/app_notification.dart'
     as _i21;
-import 'package:clyven_backend_server/src/generated/subtitle_review_task_detail.dart'
+import 'package:clyven_backend_server/src/generated/notification_settings.dart'
     as _i22;
-import 'package:clyven_backend_server/src/generated/subtitle_review_task.dart'
+import 'package:clyven_backend_server/src/generated/privacy_settings.dart'
     as _i23;
-import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_review_dashboard.dart'
     as _i24;
-import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_review_task_detail.dart'
     as _i25;
-import 'package:clyven_backend_server/src/generated/script_conversion_import_preview.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_review_task.dart'
     as _i26;
-import 'package:clyven_backend_server/src/generated/script_conversion_commit_result.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
     as _i27;
-import 'package:clyven_backend_server/src/generated/profile_stats.dart' as _i28;
-import 'package:clyven_backend_server/src/generated/watch_history.dart' as _i29;
-import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
+    as _i28;
+import 'package:clyven_backend_server/src/generated/script_conversion_import_preview.dart'
+    as _i29;
+import 'package:clyven_backend_server/src/generated/script_conversion_commit_result.dart'
     as _i30;
+import 'package:clyven_backend_server/src/generated/profile_stats.dart' as _i31;
+import 'package:clyven_backend_server/src/generated/watch_history.dart' as _i32;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
+    as _i33;
 import 'package:clyven_backend_server/src/generated/subtitle_publish_status.dart'
-    as _i31;
-import 'package:clyven_backend_server/src/generated/subtitle_srt_preview.dart'
-    as _i32;
-import 'package:clyven_backend_server/src/generated/subtitle_cue.dart' as _i33;
-import 'package:clyven_backend_server/src/generated/subtitle_cue_text.dart'
     as _i34;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_srt_preview.dart'
     as _i35;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
-    as _i36;
-import 'package:clyven_backend_server/src/generated/video_content_type.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_cue.dart' as _i36;
+import 'package:clyven_backend_server/src/generated/subtitle_cue_text.dart'
     as _i37;
-import 'package:clyven_backend_server/src/generated/word_list.dart' as _i38;
-import 'package:clyven_backend_server/src/generated/word_list_detail.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
+    as _i38;
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
     as _i39;
-import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+import 'package:clyven_backend_server/src/generated/video_content_type.dart'
     as _i40;
+import 'package:clyven_backend_server/src/generated/word_list.dart' as _i41;
+import 'package:clyven_backend_server/src/generated/word_list_detail.dart'
+    as _i42;
+import 'package:clyven_backend_server/src/generated/greetings/greeting.dart'
+    as _i43;
 import 'package:clyven_backend_server/src/generated/protocol.dart';
 import 'package:clyven_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -209,6 +215,12 @@ class TestEndpoints {
 
   late final _KnownEntryEndpoint knownEntry;
 
+  late final _NotificationEndpoint notification;
+
+  late final _NotificationSettingsEndpoint notificationSettings;
+
+  late final _PrivacySettingsEndpoint privacySettings;
+
   late final _ReviewEndpoint review;
 
   late final _ScriptConversionEndpoint scriptConversion;
@@ -260,6 +272,18 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     knownEntry = _KnownEntryEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    notification = _NotificationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    notificationSettings = _NotificationSettingsEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    privacySettings = _PrivacySettingsEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1824,6 +1848,264 @@ class _KnownEntryEndpoint {
   }
 }
 
+class _NotificationEndpoint {
+  _NotificationEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<List<_i21.AppNotification>> list(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'notification',
+            method: 'list',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'notification',
+          methodName: 'list',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i21.AppNotification>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> markAsRead(
+    _i1.TestSessionBuilder sessionBuilder,
+    int notificationId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'notification',
+            method: 'markAsRead',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'notification',
+          methodName: 'markAsRead',
+          parameters: _i1.testObjectToJson({'notificationId': notificationId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> markAllAsRead(_i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'notification',
+            method: 'markAllAsRead',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'notification',
+          methodName: 'markAllAsRead',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _NotificationSettingsEndpoint {
+  _NotificationSettingsEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i22.NotificationSettings> get(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'notificationSettings',
+            method: 'get',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'notificationSettings',
+          methodName: 'get',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i22.NotificationSettings>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i22.NotificationSettings> update(
+    _i1.TestSessionBuilder sessionBuilder, {
+    bool? pushEnabled,
+    bool? likeEnabled,
+    bool? commentEnabled,
+    bool? followEnabled,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'notificationSettings',
+            method: 'update',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'notificationSettings',
+          methodName: 'update',
+          parameters: _i1.testObjectToJson({
+            'pushEnabled': pushEnabled,
+            'likeEnabled': likeEnabled,
+            'commentEnabled': commentEnabled,
+            'followEnabled': followEnabled,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i22.NotificationSettings>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _PrivacySettingsEndpoint {
+  _PrivacySettingsEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i23.PrivacySettings> get(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'privacySettings',
+            method: 'get',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privacySettings',
+          methodName: 'get',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i23.PrivacySettings>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i23.PrivacySettings> update(
+    _i1.TestSessionBuilder sessionBuilder, {
+    bool? privateAccount,
+    bool? allowComments,
+    bool? showActivityStatus,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'privacySettings',
+            method: 'update',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'privacySettings',
+          methodName: 'update',
+          parameters: _i1.testObjectToJson({
+            'privateAccount': privateAccount,
+            'allowComments': allowComments,
+            'showActivityStatus': showActivityStatus,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i23.PrivacySettings>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _ReviewEndpoint {
   _ReviewEndpoint(
     this._endpointDispatch,
@@ -1834,7 +2116,7 @@ class _ReviewEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i21.SubtitleReviewDashboard> getDashboard(
+  _i3.Future<_i24.SubtitleReviewDashboard> getDashboard(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1856,7 +2138,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i21.SubtitleReviewDashboard>);
+                as _i3.Future<_i24.SubtitleReviewDashboard>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1864,7 +2146,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i22.SubtitleReviewTaskDetail> getTaskDetail(
+  _i3.Future<_i25.SubtitleReviewTaskDetail> getTaskDetail(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
   }) async {
@@ -1887,7 +2169,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i22.SubtitleReviewTaskDetail>);
+                as _i3.Future<_i25.SubtitleReviewTaskDetail>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1895,7 +2177,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> generateVietnameseNomDraft(
+  _i3.Future<_i26.SubtitleReviewTask> generateVietnameseNomDraft(
     _i1.TestSessionBuilder sessionBuilder, {
     required int trackId,
   }) async {
@@ -1918,7 +2200,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1926,7 +2208,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> claimTask(
+  _i3.Future<_i26.SubtitleReviewTask> claimTask(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
   }) async {
@@ -1949,7 +2231,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1957,7 +2239,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> startTask(
+  _i3.Future<_i26.SubtitleReviewTask> startTask(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
   }) async {
@@ -1980,7 +2262,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1988,7 +2270,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> submitTask(
+  _i3.Future<_i26.SubtitleReviewTask> submitTask(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
   }) async {
@@ -2011,7 +2293,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2019,7 +2301,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> returnTask(
+  _i3.Future<_i26.SubtitleReviewTask> returnTask(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
     String? note,
@@ -2046,7 +2328,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2054,7 +2336,7 @@ class _ReviewEndpoint {
     });
   }
 
-  _i3.Future<_i23.SubtitleReviewTask> approveAndPublish(
+  _i3.Future<_i26.SubtitleReviewTask> approveAndPublish(
     _i1.TestSessionBuilder sessionBuilder, {
     required int taskId,
   }) async {
@@ -2077,7 +2359,7 @@ class _ReviewEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i23.SubtitleReviewTask>);
+                as _i3.Future<_i26.SubtitleReviewTask>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2096,7 +2378,7 @@ class _ScriptConversionEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i24.ScriptConversionProfile>> listProfiles(
+  _i3.Future<List<_i27.ScriptConversionProfile>> listProfiles(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -2118,7 +2400,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i24.ScriptConversionProfile>>);
+                as _i3.Future<List<_i27.ScriptConversionProfile>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2126,7 +2408,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<_i24.ScriptConversionProfile> createProfile(
+  _i3.Future<_i27.ScriptConversionProfile> createProfile(
     _i1.TestSessionBuilder sessionBuilder, {
     required String name,
     required String languageCode,
@@ -2173,7 +2455,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i24.ScriptConversionProfile>);
+                as _i3.Future<_i27.ScriptConversionProfile>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2181,7 +2463,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<_i24.ScriptConversionProfile> updateProfile(
+  _i3.Future<_i27.ScriptConversionProfile> updateProfile(
     _i1.TestSessionBuilder sessionBuilder, {
     required int profileId,
     required String name,
@@ -2230,7 +2512,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i24.ScriptConversionProfile>);
+                as _i3.Future<_i27.ScriptConversionProfile>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2269,7 +2551,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<List<_i25.ScriptConversionEntry>> listEntries(
+  _i3.Future<List<_i28.ScriptConversionEntry>> listEntries(
     _i1.TestSessionBuilder sessionBuilder, {
     required int profileId,
     required int limit,
@@ -2296,7 +2578,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i25.ScriptConversionEntry>>);
+                as _i3.Future<List<_i28.ScriptConversionEntry>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2304,7 +2586,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<_i25.ScriptConversionEntry> updateEntry(
+  _i3.Future<_i28.ScriptConversionEntry> updateEntry(
     _i1.TestSessionBuilder sessionBuilder, {
     required int entryId,
     required String sourceText,
@@ -2339,7 +2621,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i25.ScriptConversionEntry>);
+                as _i3.Future<_i28.ScriptConversionEntry>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2378,7 +2660,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<_i26.ScriptConversionImportPreview> previewExcelBase64(
+  _i3.Future<_i29.ScriptConversionImportPreview> previewExcelBase64(
     _i1.TestSessionBuilder sessionBuilder, {
     required int profileId,
     required String excelBase64,
@@ -2405,7 +2687,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i26.ScriptConversionImportPreview>);
+                as _i3.Future<_i29.ScriptConversionImportPreview>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2413,7 +2695,7 @@ class _ScriptConversionEndpoint {
     });
   }
 
-  _i3.Future<_i27.ScriptConversionCommitResult> commitExcelBase64(
+  _i3.Future<_i30.ScriptConversionCommitResult> commitExcelBase64(
     _i1.TestSessionBuilder sessionBuilder, {
     required int profileId,
     required String excelBase64,
@@ -2440,7 +2722,7 @@ class _ScriptConversionEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i27.ScriptConversionCommitResult>);
+                as _i3.Future<_i30.ScriptConversionCommitResult>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2496,7 +2778,7 @@ class _SocialEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i28.ProfileStats> getMyProfileStats(
+  _i3.Future<_i31.ProfileStats> getMyProfileStats(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -2518,7 +2800,7 @@ class _SocialEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i28.ProfileStats>);
+                as _i3.Future<_i31.ProfileStats>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2526,7 +2808,7 @@ class _SocialEndpoint {
     });
   }
 
-  _i3.Future<_i28.ProfileStats> getProfileStats(
+  _i3.Future<_i31.ProfileStats> getProfileStats(
     _i1.TestSessionBuilder sessionBuilder,
     String creatorId,
   ) async {
@@ -2549,7 +2831,7 @@ class _SocialEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i28.ProfileStats>);
+                as _i3.Future<_i31.ProfileStats>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2621,8 +2903,9 @@ class _SocialEndpoint {
 
   _i3.Future<bool> toggleFollow(
     _i1.TestSessionBuilder sessionBuilder,
-    String creatorId,
-  ) async {
+    String creatorId, {
+    required String actorName,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -2634,7 +2917,10 @@ class _SocialEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'social',
           methodName: 'toggleFollow',
-          parameters: _i1.testObjectToJson({'creatorId': creatorId}),
+          parameters: _i1.testObjectToJson({
+            'creatorId': creatorId,
+            'actorName': actorName,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -2741,7 +3027,72 @@ class _SocialEndpoint {
     });
   }
 
-  _i3.Future<List<_i29.WatchHistory>> getWatchHistory(
+  _i3.Future<bool> toggleLike(
+    _i1.TestSessionBuilder sessionBuilder,
+    int videoId, {
+    required String actorName,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'social',
+            method: 'toggleLike',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'social',
+          methodName: 'toggleLike',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'actorName': actorName,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<int>> getLikedVideoIds(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'social',
+            method: 'getLikedVideoIds',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'social',
+          methodName: 'getLikedVideoIds',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<int>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i32.WatchHistory>> getWatchHistory(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -2763,7 +3114,7 @@ class _SocialEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i29.WatchHistory>>);
+                as _i3.Future<List<_i32.WatchHistory>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2771,7 +3122,7 @@ class _SocialEndpoint {
     });
   }
 
-  _i3.Future<_i29.WatchHistory> saveWatchProgress(
+  _i3.Future<_i32.WatchHistory> saveWatchProgress(
     _i1.TestSessionBuilder sessionBuilder,
     int videoId,
     int positionSeconds,
@@ -2798,7 +3149,7 @@ class _SocialEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i29.WatchHistory>);
+                as _i3.Future<_i32.WatchHistory>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2878,7 +3229,7 @@ class _SubtitleEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i30.SubtitleCueDetail>> getCueDetails(
+  _i3.Future<List<_i33.SubtitleCueDetail>> getCueDetails(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2907,7 +3258,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i30.SubtitleCueDetail>>);
+                as _i3.Future<List<_i33.SubtitleCueDetail>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2915,7 +3266,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<List<_i30.SubtitleCueDetail>> getPublishedCueDetails(
+  _i3.Future<List<_i33.SubtitleCueDetail>> getPublishedCueDetails(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -2944,7 +3295,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i30.SubtitleCueDetail>>);
+                as _i3.Future<List<_i33.SubtitleCueDetail>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2983,7 +3334,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i31.SubtitlePublishStatus> getSubtitlePublishStatus(
+  _i3.Future<_i34.SubtitlePublishStatus> getSubtitlePublishStatus(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -3010,7 +3361,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i31.SubtitlePublishStatus>);
+                as _i3.Future<_i34.SubtitlePublishStatus>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3018,7 +3369,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i31.SubtitlePublishStatus> publishSubtitleTrack(
+  _i3.Future<_i34.SubtitlePublishStatus> publishSubtitleTrack(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -3045,7 +3396,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i31.SubtitlePublishStatus>);
+                as _i3.Future<_i34.SubtitlePublishStatus>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3084,7 +3435,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i32.SubtitleSrtPreview> previewSrtImport(
+  _i3.Future<_i35.SubtitleSrtPreview> previewSrtImport(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -3113,7 +3464,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i32.SubtitleSrtPreview>);
+                as _i3.Future<_i35.SubtitleSrtPreview>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3195,7 +3546,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i33.SubtitleCue> updateCueText(
+  _i3.Future<_i36.SubtitleCue> updateCueText(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required String text,
@@ -3224,7 +3575,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i33.SubtitleCue>);
+                as _i3.Future<_i36.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3232,7 +3583,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i34.SubtitleCueText> upsertCueScriptText(
+  _i3.Future<_i37.SubtitleCueText> upsertCueScriptText(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required String scriptCode,
@@ -3263,7 +3614,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i34.SubtitleCueText>);
+                as _i3.Future<_i37.SubtitleCueText>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3271,7 +3622,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i33.SubtitleCue> updateCueTiming(
+  _i3.Future<_i36.SubtitleCue> updateCueTiming(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
     required int startMs,
@@ -3300,7 +3651,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i33.SubtitleCue>);
+                as _i3.Future<_i36.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3308,7 +3659,7 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<_i33.SubtitleCue> createCue(
+  _i3.Future<_i36.SubtitleCue> createCue(
     _i1.TestSessionBuilder sessionBuilder, {
     required int videoId,
     required String languageCode,
@@ -3343,7 +3694,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i33.SubtitleCue>);
+                as _i3.Future<_i36.SubtitleCue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3382,10 +3733,10 @@ class _SubtitleEndpoint {
     });
   }
 
-  _i3.Future<List<_i35.SubtitleKaraokeSegment>> replaceKaraokeSegments(
+  _i3.Future<List<_i38.SubtitleKaraokeSegment>> replaceKaraokeSegments(
     _i1.TestSessionBuilder sessionBuilder, {
     required int cueId,
-    required List<_i36.SubtitleKaraokeSegmentInput> segments,
+    required List<_i39.SubtitleKaraokeSegmentInput> segments,
     String? scriptCode,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -3411,7 +3762,7 @@ class _SubtitleEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i35.SubtitleKaraokeSegment>>);
+                as _i3.Future<List<_i38.SubtitleKaraokeSegment>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3468,7 +3819,7 @@ class _VideoEndpoint {
     required String description,
     String? seriesTitle,
     required String category,
-    required _i37.VideoContentType contentType,
+    required _i40.VideoContentType contentType,
     required String languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -3519,7 +3870,7 @@ class _VideoEndpoint {
 
   _i3.Future<List<_i8.Video>> getVideos(
     _i1.TestSessionBuilder sessionBuilder, {
-    _i37.VideoContentType? contentType,
+    _i40.VideoContentType? contentType,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -3849,7 +4200,7 @@ class _WordListEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i38.WordList>> getLists(
+  _i3.Future<List<_i41.WordList>> getLists(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -3871,7 +4222,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i38.WordList>>);
+                as _i3.Future<List<_i41.WordList>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3879,7 +4230,7 @@ class _WordListEndpoint {
     });
   }
 
-  _i3.Future<_i39.WordListDetail?> getListDetail(
+  _i3.Future<_i42.WordListDetail?> getListDetail(
     _i1.TestSessionBuilder sessionBuilder, {
     required int listId,
     required String explanationLanguageCode,
@@ -3906,7 +4257,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i39.WordListDetail?>);
+                as _i3.Future<_i42.WordListDetail?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3925,7 +4276,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i40.Greeting> hello(
+  _i3.Future<_i43.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -3948,7 +4299,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i40.Greeting>);
+                as _i3.Future<_i43.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
