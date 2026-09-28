@@ -1311,7 +1311,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     AppLocalizations l10n,
   ) {
     final interactionAsync = ref.watch(videoInteractionProvider(video.id));
-    final interaction = interactionAsync.value;
+    // Same unwrapPrevious() reasoning as the follow button: don't let a
+    // stale liked/favorited state survive past a sign-out.
+    final interaction = interactionAsync.unwrapPrevious().value;
     final likeCount = interaction?.likeCount ?? video.likeCount;
     final favoriteCount =
         interaction?.favoriteCount ?? video.favoriteCount;
@@ -1335,7 +1337,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
               value: _formatCount(context, likeCount),
               label: l10n.like,
               onTap: () async {
-                final state = interactionAsync.value;
+                final state = interactionAsync.unwrapPrevious().value;
 
                 if (state?.isChangingLike == true) {
                   return;
@@ -1361,7 +1363,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
               value: _formatCount(context, favoriteCount),
               label: l10n.favoriteAction,
               onTap: () async {
-                final state = interactionAsync.value;
+                final state = interactionAsync.unwrapPrevious().value;
 
                 if (state?.isChangingFavorite == true) {
                   return;
@@ -1409,10 +1411,14 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     AppLocalizations l10n,
   ) {
     final creatorAsync = ref.watch(creatorProfileProvider(video.authorId));
-    final creatorState = creatorAsync.value;
+    // unwrapPrevious() drops the stale value Riverpod carries over from
+    // before a sign-out, so a logged-out/errored fetch reads as no data
+    // instead of showing the previous user's follow state.
+    final creatorRaw = creatorAsync.unwrapPrevious();
+    final creatorState = creatorRaw.value;
     final isFollowing = creatorState?.isFollowing ?? false;
     final isChangingFollow =
-        creatorState?.isChangingFollow ?? creatorAsync.isLoading;
+        creatorState?.isChangingFollow ?? creatorRaw.isLoading;
     final scheme = Theme.of(context).colorScheme;
 
     return Padding(
@@ -1485,7 +1491,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () async {
-                  if (creatorState == null || isChangingFollow) {
+                  if (isChangingFollow) {
                     return;
                   }
 
