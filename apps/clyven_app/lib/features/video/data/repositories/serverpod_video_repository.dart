@@ -106,26 +106,24 @@ class ServerpodVideoRepository implements VideoRepository {
       'postIds=${videos.map((video) => video.id).join(',')}',
     );
 
-    final results = <VideoDetail>[];
-
-    for (final video in videos) {
+    final details = await Future.wait(videos.map((video) async {
       try {
-        final detail = await _toVideoDetailWithUrls(video);
-        results.add(detail);
+        return await _toVideoDetailWithUrls(video);
       } on AppException catch (error) {
         feedDiagnostic(
           'FEED_EXCLUDED postId=${video.id} reason=${error.code.name}',
         );
         if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+        return null;
       } catch (error) {
         feedDiagnostic(
           'FEED_FAILED postId=${video.id} reason=${error.runtimeType}',
         );
         rethrow;
       }
-    }
+    }));
 
-    return results;
+    return details.whereType<VideoDetail>().toList();
   }
 
   // ============================================================
@@ -140,21 +138,19 @@ class ServerpodVideoRepository implements VideoRepository {
         .where((video) => video.authorId == userId)
         .toList(growable: false);
 
-    final results = <VideoDetail>[];
-
-    for (final video in userVideos) {
+    final details = await Future.wait(userVideos.map((video) async {
       try {
-        final detail = await _toVideoDetailWithUrls(video);
-        results.add(detail);
+        return await _toVideoDetailWithUrls(video);
       } on AppException catch (error) {
         feedDiagnostic(
           'USER_VIDEO_EXCLUDED postId=${video.id} reason=${error.code.name}',
         );
         if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+        return null;
       }
-    }
+    }));
 
-    return results;
+    return details.whereType<VideoDetail>().toList();
   }
 
   @override
@@ -225,30 +221,31 @@ class ServerpodVideoRepository implements VideoRepository {
   }
 
   Future<VideoDetail> _toVideoDetailWithUrls(serverpod.Video video) async {
-    final rawVideoUrl = await client.video.getVideoUrl(
+    final coverStorageKey = video.coverStorageKey;
+    final hasCover = coverStorageKey != null && coverStorageKey.isNotEmpty;
+
+    final Future<String?> videoUrlFuture = client.video.getVideoUrl(
       path: video.videoStorageKey,
     );
+    final Future<String?> coverUrlFuture = hasCover
+        ? client.video.getVideoUrl(path: coverStorageKey).catchError((error) {
+            feedDiagnostic(
+              'THUMBNAIL_UNAVAILABLE postId=${video.id} reason=${error.runtimeType}',
+            );
+            return null;
+          })
+        : Future.value(null);
 
-    final videoUrl = rawVideoUrl ?? '';
+    final urls = await Future.wait<String?>([videoUrlFuture, coverUrlFuture]);
+
+    final videoUrl = urls[0] ?? '';
+    final coverUrl = urls[1] ?? '';
 
     if (videoUrl.isEmpty) {
       throw AppException(
         AppErrorCode.videoUrlUnavailable,
         technicalDetails: video.videoStorageKey,
       );
-    }
-
-    var coverUrl = '';
-    final coverStorageKey = video.coverStorageKey;
-
-    if (coverStorageKey != null && coverStorageKey.isNotEmpty) {
-      try {
-        coverUrl = await client.video.getVideoUrl(path: coverStorageKey) ?? '';
-      } catch (error) {
-        feedDiagnostic(
-          'THUMBNAIL_UNAVAILABLE postId=${video.id} reason=${error.runtimeType}',
-        );
-      }
     }
 
     return VideoDetail(
