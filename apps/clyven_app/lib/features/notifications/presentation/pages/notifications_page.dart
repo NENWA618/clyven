@@ -17,7 +17,7 @@ class NotificationsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(notificationProvider);
     final settings =
-        ref.watch(notificationSettingsProvider).value ??
+        ref.watch(notificationSettingsProvider).unwrapPrevious().value ??
         NotificationSettings(userId: '');
     final l10n = AppLocalizations.of(context)!;
     final visibleNotifications = (notificationsAsync.value ?? const [])
