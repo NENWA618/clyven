@@ -49,6 +49,16 @@ knownEntry:
   - getKnowledgeStatesByEntryIds:
   - getKnowledgeState:
   - getKnowledgeStates:
+notification:
+  - list:
+  - markAsRead:
+  - markAllAsRead:
+notificationSettings:
+  - get:
+  - update:
+privacySettings:
+  - get:
+  - update:
 review:
   - getDashboard:
   - getTaskDetail:
@@ -78,6 +88,8 @@ social:
   - getFollowingCreatorIds:
   - toggleFavorite:
   - getFavoriteVideoIds:
+  - toggleLike:
+  - getLikedVideoIds:
   - getWatchHistory:
   - saveWatchProgress:
   - removeWatchHistory:

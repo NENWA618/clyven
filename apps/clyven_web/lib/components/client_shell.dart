@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import '../l10n/web_l10n.dart';
+import 'notification_bell.dart';
 import 'search_box.dart';
 import 'web_avatar_upload.dart';
 
@@ -56,6 +57,7 @@ class ClientShell extends StatelessComponent {
             ]),
             const SearchBox(),
             const LanguageSwitcher(),
+            const NotificationBell(),
             WebAvatarUpload(),
           ]),
         ]),

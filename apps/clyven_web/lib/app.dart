@@ -6,6 +6,12 @@ import 'components/client_shell.dart';
 import 'l10n/web_l10n.dart';
 import 'pages/explore_page.dart';
 import 'pages/home_page.dart';
+import 'pages/notifications_page.dart';
+import 'pages/settings/about_page.dart';
+import 'pages/settings/account_settings_page.dart';
+import 'pages/settings/notification_settings_page.dart';
+import 'pages/settings/privacy_settings_page.dart';
+import 'pages/settings/settings_page.dart';
 import 'pages/watch_page.dart';
 import 'pages/word_list_page.dart';
 
@@ -58,6 +64,36 @@ class App extends StatelessComponent {
                     }
                     return WatchPage(videoId: id);
                   },
+                ),
+                Route(
+                  path: '/notifications',
+                  title: 'Echoes · Clyven',
+                  builder: (context, state) => const NotificationsPage(),
+                ),
+                Route(
+                  path: '/settings',
+                  title: 'Settings · Clyven',
+                  builder: (context, state) => const SettingsPage(),
+                ),
+                Route(
+                  path: '/settings/account',
+                  title: 'Account & profile · Clyven',
+                  builder: (context, state) => const AccountSettingsPage(),
+                ),
+                Route(
+                  path: '/settings/privacy',
+                  title: 'Privacy · Clyven',
+                  builder: (context, state) => const PrivacySettingsPage(),
+                ),
+                Route(
+                  path: '/settings/notifications',
+                  title: 'Notifications · Clyven',
+                  builder: (context, state) => const NotificationSettingsPage(),
+                ),
+                Route(
+                  path: '/settings/about',
+                  title: 'About · Clyven',
+                  builder: (context, state) => const AboutPage(),
                 ),
               ],
             ),

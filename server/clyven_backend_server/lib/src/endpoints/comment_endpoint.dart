@@ -1,6 +1,7 @@
 ﻿import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import '../services/notification_service.dart';
 
 class CommentEndpoint extends Endpoint {
   String? _currentUserId(Session session) {
@@ -218,6 +219,16 @@ class CommentEndpoint extends Endpoint {
     video.commentCount += 1;
     video.updatedAt = now;
     await Video.db.updateRow(session, video);
+
+    await createNotification(
+      session,
+      recipientId: video.authorId,
+      actorId: userId,
+      actorName: row.userName,
+      type: NotificationType.comment,
+      videoId: videoId,
+      commentPreview: row.content,
+    );
 
     return VideoCommentDto(
       id: row.id!,
