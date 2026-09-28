@@ -1,12 +1,25 @@
-﻿# Clyven
+# Clyven
 
-> A full-stack Flutter + Serverpod video platform monorepo built with Riverpod.
+> A multilingual video + subtitle language-learning platform, built as a Flutter/Jaspr + Serverpod monorepo.
 
-**Clyven** æ˜¯ä¸€ä¸ªä½¿ç”¨ Flutter å¼€å‘çš„è§†é¢‘å¹³å°é¡¹ç›®ã€‚
+**Clyven** 早期是一个视频平台项目，目前已经演进为一个**多语言视频与字幕学习平台**：用户观看视频的同时可以查看双语/精校字幕，点词查词典、收藏生词、管理生词本，并追踪自己对词汇的掌握程度（Knowledge State）。项目还包含越南语 Chữ Nôm ↔ Quốc Ngữ script 转换、AI 字幕生成（ASR）与人工字幕审核（Review）等围绕"字幕生产"的完整工作流。
 
-é¡¹ç›®æ­£åœ¨å®žçŽ°ä»Žç”¨æˆ·è®¤è¯ã€è§†é¢‘æµè§ˆã€æœç´¢ã€æ’­æ”¾ã€æŠ•ç¨¿ï¼Œåˆ°ç‚¹èµžã€è¯„è®ºã€å…³æ³¨ã€è§‚çœ‹åŽ†å²ã€é€šçŸ¥å’Œä¸ªäººä¸»é¡µç­‰å®Œæ•´çš„è§†é¢‘å¹³å°åŠŸèƒ½ã€‚
+客户端使用 **Riverpod**（Flutter）管理状态，Web 端使用 **Jaspr**（Dart Web 框架），均通过 **Serverpod** 与统一的后端通信。
 
-å®¢æˆ·ç«¯ä½¿ç”¨ **Riverpod** ç®¡ç†çŠ¶æ€ï¼Œå¹¶é€šè¿‡ **Serverpod** ä¸ŽåŽç«¯æœåŠ¡é€šä¿¡ã€‚
+---
+
+# Apps in this Monorepo
+
+Clyven 由 5 个前端应用、1 个后端服务和 3 个共享 package 组成，用 Melos 统一管理。
+
+| App | 技术栈 | 定位 | 本地端口 |
+| --- | --- | --- | --- |
+| `apps/clyven_app` | Flutter (iOS/Android/Desktop) | 面向普通用户的主客户端：视频流、字幕学习、词典、生词本 | - |
+| `apps/clyven_web` | Jaspr (Dart Web) | 面向普通用户的公开 Web 端，功能对齐 `clyven_app` | 8084 |
+| `apps/clyven_studio` | Jaspr (Dart Web) | 创作者后台：视频上传/管理、字幕与词典管理、评论管理 | 8083 |
+| `apps/clyven_admin` | Jaspr (Dart Web) | 内部管理后台：用户管理、越南语 script 转换工具 | 8082 |
+| `apps/clyven_review` | Jaspr (Dart Web) | 字幕审核工作台：审核队列、审核任务详情 | 8081 |
+| `server/clyven_backend_server` | Serverpod | 统一后端服务，所有前端共用 | 8080 |
 
 ---
 
@@ -14,440 +27,271 @@
 
 ### Video
 
-* è§†é¢‘é¦–é¡µ
-* è§†é¢‘åˆ—è¡¨
-* è§†é¢‘è¯¦æƒ…
-* è§†é¢‘æ’­æ”¾
-* è§†é¢‘æœç´¢
-* è§†é¢‘æŠ•ç¨¿
-* æœ¬åœ°è§†é¢‘é€‰æ‹©
-* è§†é¢‘æ—¶é•¿è¯»å–
-* è§†é¢‘å¤„ç†
-* è§†é¢‘åˆ†äº«
+* 视频首页 / 发现页 / 搜索
+* 视频详情与播放（含字幕联动）
+* 视频投稿（本地视频选择、时长读取、FFmpeg 处理、上传）
+* 视频系列（Series）
+* 点赞 / 收藏 / 观看历史
 
-### Creator
+### Subtitles & Language Learning
 
-* åˆ›ä½œè€…ä¸»é¡µ
-* å…³æ³¨åˆ›ä½œè€…
-* å·²å…³æ³¨åˆ›ä½œè€…åˆ—è¡¨
+* 字幕轨道、逐句/逐词（token）级字幕数据结构
+* 卡拉OK式逐字高亮播放（karaoke segments）
+* SRT 字幕导入 / 导出
+* AI 自动生成字幕（基于 Deepgram ASR，`asr_job_processor`）
+* 字幕人工审核工作流：审核队列、审核任务、审核仪表盘（Review Dashboard）
+* 播放页内嵌"字幕学习面板"（点词查词、逐句跟读）
+
+### Dictionary & Vocabulary
+
+* 词典查词（释义 / 例句 / 词形 / 词条关系）
+* 词典批量导入（导入预览、字段映射、提交）
+* 生词本（Word List）管理
+* 用户"已掌握词条"（Known Entry）与掌握程度追踪（Knowledge State）
+
+### Script Conversion
+
+* 越南语 Chữ Nôm ↔ Quốc Ngữ 转换（`clyven_nom_converter`）
+* 转换 profile 管理、批量导入预览与提交
+
+### Creator (Studio)
+
+* 创作者仪表盘
+* 视频管理、字幕管理、词典管理
+* 评论管理
 
 ### Interaction
 
-* ç‚¹èµž
-* è¯„è®º
-* è§†é¢‘äº’åŠ¨çŠ¶æ€
-* åˆ†äº«
+* 点赞、评论（含回复、回复点赞）
+* 关注创作者 / 已关注创作者列表
+* 分享
 
 ### User
 
-* ç”¨æˆ·è®¤è¯
-* Auth Gate
-* ä¸ªäººä¸»é¡µ
-* è§‚çœ‹åŽ†å²
-* é€šçŸ¥
+* 用户认证（Serverpod Auth IDP）、Auth Gate
+* 个人主页 / 个人资料统计
+* 观看历史
+* 通知中心 + 通知设置 + 隐私设置
 
-### Discovery
+### Admin
 
-* é¦–é¡µæŽ¨è
-* å‘çŽ°é¡µé¢
-* è§†é¢‘æœç´¢
+* 用户管理
+* 越南语 script 转换后台工具
+* Excel 数据导入（词典 / 转换表）
 
 ---
 
 # Tech Stack
 
-## Client
+## Client (Mobile / Desktop)
 
-* Flutter
-* Dart
-* Material UI
+* Flutter, Dart
+* Riverpod (`flutter_riverpod`)
+* `video_player`, `video_duration_native`
+* `ffmpeg_kit_flutter_new_min_gpl`（视频处理）
+* `image_picker`, `share_plus`
 
-## State Management
+## Web (public / studio / admin / review)
 
-* Riverpod
+* Jaspr（`jaspr`, `jaspr_router`, `jaspr_flutter_embed`）
 
 ## Backend Communication
 
 * Serverpod
-* Serverpod Client
-* Serverpod Flutter
-* Serverpod Auth
+* `serverpod_client` / `serverpod_flutter`
+* `serverpod_auth_idp_flutter` / `serverpod_auth_core_client`
 
-## Video
+## Backend (Serverpod Server)
 
-* `video_player`
-* `video_duration_native`
-* FFmpeg
+* Serverpod (PostgreSQL, migrations)
+* Deepgram ASR（自动语音识别生成字幕）
+* `excel`（词典 / 转换表导入）
+* `serverpod_cloud_storage_gcp`（媒体存储）
+* `mailer`, `googleapis_auth`
 
-## Media
+## Shared Packages
 
-* `image_picker`
+* `clyven_nom_converter` — 越南语 Latin ↔ Chữ Nôm 转换核心库（含 CLI）
+* `clyven_subtitle_editor` — Studio 与 Review 共用的字幕编辑组件（时间轴、卡拉OK分段、SRT 导入导出）
+* `clyven_backend_client` — Serverpod 自动生成的客户端代码，所有前端共用
 
-## Sharing
+## Monorepo Tooling
 
-* `share_plus`
+* Dart Workspace（`pubspec.yaml` workspace）
+* Melos（`melos.yaml` 脚本，统一 dev / build / analyze / test）
 
 ---
 
 # Architecture
 
-å®¢æˆ·ç«¯é‡‡ç”¨ä»¥ Feature ä¸ºå•ä½çš„æ¨¡å—åŒ–ç»“æž„ã€‚
+`clyven_app` 客户端采用以 Feature 为单位的模块化结构（`clyven_web` / `clyven_studio` / `clyven_admin` / `clyven_review` 遵循类似的 pages/components/services 划分）：
 
 ```text
 lib/
-â”‚
-â”œâ”€â”€ core/
-â”‚   â””â”€â”€ serverpod/
-â”‚
-â”œâ”€â”€ features/
-â”‚   â”œâ”€â”€ auth/
-â”‚   â”œâ”€â”€ comments/
-â”‚   â”œâ”€â”€ creator/
-â”‚   â”œâ”€â”€ history/
-â”‚   â”œâ”€â”€ home/
-â”‚   â”œâ”€â”€ notifications/
-â”‚   â”œâ”€â”€ profile/
-â”‚   â”œâ”€â”€ video/
-â”‚   â””â”€â”€ video_interactions/
-â”‚
-â””â”€â”€ main.dart
+│
+├── core/
+│   ├── serverpod/
+│   ├── navigation/
+│   ├── localization/
+│   ├── theme/
+│   └── errors/
+│
+├── features/
+│   ├── auth/
+│   ├── comments/
+│   ├── creator/
+│   ├── dictionary/
+│   ├── history/
+│   ├── home/
+│   ├── known_entry/
+│   ├── notifications/
+│   ├── profile/
+│   ├── subtitle/
+│   ├── video/
+│   ├── video_interactions/
+│   └── word_list/
+│
+└── main.dart
 ```
 
-æ¯ä¸ª Feature æ ¹æ®éœ€è¦ç»§ç»­æ‹†åˆ†ï¼š
+每个 Feature 根据需要继续拆分：
 
 ```text
 feature/
-â”œâ”€â”€ data/
-â”‚   â”œâ”€â”€ models/
-â”‚   â””â”€â”€ repositories/
-â”‚
-â””â”€â”€ presentation/
-    â”œâ”€â”€ pages/
-    â”œâ”€â”€ providers/
-    â””â”€â”€ widgets/
+├── data/
+│   ├── models/
+│   └── repositories/
+│
+└── presentation/
+    ├── pages/
+    ├── providers/
+    └── widgets/
 ```
 
-æ•´ä½“æ•°æ®æµå¯ä»¥ç†è§£ä¸ºï¼š
+整体数据流可以理解为：
 
 ```text
 UI
- â”‚
- â–¼
+ │
+ ▼
 Riverpod Provider
- â”‚
- â–¼
+ │
+ ▼
 Repository
- â”‚
- â–¼
+ │
+ ▼
 Serverpod Client
- â”‚
- â–¼
-Backend
- â”‚
- â–¼
-Database / Video Storage
+ │
+ ▼
+Backend (Serverpod Endpoint)
+ │
+ ▼
+Database / Cloud Storage
 ```
 
 ---
 
-# Main Modules
-
-## Authentication
+# Backend Modules (Serverpod Endpoints)
 
 ```text
-features/auth/
+video_endpoint                 视频 CRUD、系列、转码触发
+comment_endpoint               评论 / 回复 / 点赞
+social_endpoint                关注、互动状态
+notification_endpoint          通知
+notification_settings_endpoint 通知设置
+privacy_settings_endpoint      隐私设置
+subtitle_endpoint              字幕轨道 / cue / token / karaoke
+review_endpoint                字幕审核队列与任务
+dictionary_endpoint            词典查询
+dictionary_import_endpoint     词典批量导入
+word_list_endpoint             生词本
+known_entry_endpoint           已掌握词条 / 掌握程度
+script_conversion_endpoint     越南语 script 转换
+admin_endpoint                 管理后台相关
 ```
 
-è´Ÿè´£ç”¨æˆ·ç™»å½•çŠ¶æ€ä»¥åŠåº”ç”¨å…¥å£è®¤è¯æµç¨‹ã€‚
-
-åº”ç”¨å¯åŠ¨åŽç”±ï¼š
+后端服务（`lib/src/services/`）还包括：
 
 ```text
-AuthGate
-```
-
-å†³å®šç”¨æˆ·åº”è¯¥è¿›å…¥è®¤è¯æµç¨‹è¿˜æ˜¯ä¸»åº”ç”¨ã€‚
-
----
-
-## Home
-
-```text
-features/home/
-```
-
-é¦–é¡µæ¨¡å—åŒ…å«ï¼š
-
-```text
-home_page.dart
-discover_page.dart
-main_page.dart
-video_search_page.dart
-```
-
-è´Ÿè´£ï¼š
-
-* ä¸»å¯¼èˆª
-* é¦–é¡µè§†é¢‘å†…å®¹
-* å‘çŽ°å†…å®¹
-* è§†é¢‘æœç´¢
-
----
-
-## Video
-
-```text
-features/video/
-```
-
-è§†é¢‘æ¨¡å—è´Ÿè´£å¹³å°çš„æ ¸å¿ƒè§†é¢‘åŠŸèƒ½ã€‚
-
-ä¸»è¦é¡µé¢ï¼š
-
-```text
-create_video_page.dart
-video_detail_page.dart
-```
-
-åŒ…æ‹¬ï¼š
-
-```text
-è§†é¢‘é€‰æ‹©
-   â†“
-è§†é¢‘å¤„ç†
-   â†“
-æŠ•ç¨¿
-   â†“
-ä¸Šä¼ 
-   â†“
-åŽç«¯åˆ›å»ºè§†é¢‘è®°å½•
-   â†“
-é¦–é¡µ / æœç´¢
-   â†“
-è§†é¢‘è¯¦æƒ…
-   â†“
-è§†é¢‘æ’­æ”¾
+asr_job_processor              ASR 字幕生成任务处理
+deepgram_asr_service           Deepgram 语音识别集成
+video_transcode_service        视频转码
+subtitle_analysis_service      字幕分析
+subtitle_review_task_service   字幕审核任务流转
+subtitle_srt_parser / exporter SRT 导入导出
+dictionary_import_writer       词典导入写入
+vietnamese_nom_conversion_service  越南语 Nôm 转换
+notification_service           通知下发
 ```
 
 ---
 
-# Video Upload Flow
-
-æŠ•ç¨¿ä¸åªæ˜¯ç®€å•ä¸Šä¼ ä¸€ä¸ªæ–‡ä»¶ã€‚
-
-å½“å‰å®¢æˆ·ç«¯å·²ç»å¼•å…¥ï¼š
-
-* `image_picker`
-* `video_duration_native`
-* FFmpeg
-
-ç”¨äºŽåª’ä½“é€‰æ‹©ä¸Žè§†é¢‘å¤„ç†ã€‚
-
-æ•´ä½“æµç¨‹è®¾è®¡ä¸ºï¼š
-
-```text
-é€‰æ‹©è§†é¢‘
-   â”‚
-   â–¼
-è¯»å–è§†é¢‘ä¿¡æ¯
-   â”‚
-   â–¼
-å‡†å¤‡æŠ•ç¨¿èµ„æ–™
-   â”‚
-   â–¼
-è§†é¢‘å¤„ç†
-   â”‚
-   â–¼
-ä¸Šä¼ 
-   â”‚
-   â–¼
-Serverpod Backend
-   â”‚
-   â–¼
-ä¿å­˜è§†é¢‘æ•°æ®
-   â”‚
-   â–¼
-è§†é¢‘å‘å¸ƒ
-```
-
-å¯¹äºŽè¾ƒå¤§çš„è§†é¢‘æ–‡ä»¶ï¼Œä¸Šä¼ å±žäºŽç‹¬ç«‹çš„ä»»åŠ¡æµç¨‹ï¼Œè€Œä¸æ˜¯è¦æ±‚ç”¨æˆ·ä¸€ç›´åœç•™åœ¨æŠ•ç¨¿é¡µé¢ã€‚
-
----
-
-# Video Playback
-
-é¡¹ç›®ä½¿ç”¨ï¼š
-
-```text
-video_player
-```
-
-å¤„ç†å®¢æˆ·ç«¯è§†é¢‘æ’­æ”¾ã€‚
-
-è§†é¢‘è¯¦æƒ…é¡µè´Ÿè´£æ•´åˆï¼š
-
-```text
-è§†é¢‘æ’­æ”¾
-+
-è§†é¢‘ä¿¡æ¯
-+
-ä½œè€…ä¿¡æ¯
-+
-äº’åŠ¨çŠ¶æ€
-+
-è¯„è®º
-```
-
-å½¢æˆå®Œæ•´çš„è§†é¢‘è§‚çœ‹é¡µé¢ã€‚
-
----
-
-# Comments
-
-```text
-features/comments/
-```
-
-è¯„è®ºä½œä¸ºç‹¬ç«‹ Feature ç®¡ç†ã€‚
-
-ç»“æž„åŒ…å«ï¼š
-
-```text
-data/
-presentation/
-```
-
-ä½¿è¯„è®ºçš„æ•°æ®è¯·æ±‚ã€çŠ¶æ€å’Œç•Œé¢ä¸Žè§†é¢‘ä¸»ä½“æ¨¡å—ä¿æŒè§£è€¦ã€‚
-
----
-
-# Video Interactions
-
-```text
-features/video_interactions/
-```
-
-äº’åŠ¨é€»è¾‘ä¸Žè§†é¢‘å†…å®¹æœ¬èº«åˆ†ç¦»ã€‚
-
-è¯¥æ¨¡å—ç”¨äºŽç®¡ç†è§†é¢‘ç›¸å…³ç”¨æˆ·è¡Œä¸ºï¼Œä¾‹å¦‚ï¼š
-
-```text
-Like
-Follow
-Interaction State
-```
-
-è¿™ç§æ‹†åˆ†å¯ä»¥é¿å…æŠŠæ‰€æœ‰é€»è¾‘é›†ä¸­åœ¨ `video_detail_page.dart` ä¸­ã€‚
-
----
-
-# Creator
-
-```text
-features/creator/
-```
-
-åˆ›ä½œè€…æ¨¡å—åŒ…å«ï¼š
-
-```text
-creator_profile_page.dart
-following_creators_page.dart
-```
-
-ç”¨äºŽå±•ç¤ºåˆ›ä½œè€…èµ„æ–™ä»¥åŠç”¨æˆ·å·²ç»å…³æ³¨çš„åˆ›ä½œè€…ã€‚
-
----
-
-# History
-
-```text
-features/history/
-```
-
-è´Ÿè´£ä¿å­˜å’Œå±•ç¤ºç”¨æˆ·çš„è§†é¢‘è§‚çœ‹åŽ†å²ã€‚
-
----
-
-# Notifications
-
-```text
-features/notifications/
-```
-
-ç”¨äºŽé›†ä¸­å¤„ç†å¹³å°é€šçŸ¥ç›¸å…³åŠŸèƒ½ã€‚
-
-æœªæ¥å¯ä»¥ç»§ç»­æ‰©å±•ï¼š
-
-```text
-Like Notification
-Comment Notification
-Follow Notification
-Creator Notification
-System Notification
-```
-
----
-
-# Profile
-
-```text
-features/profile/
-```
-
-è´Ÿè´£ç”¨æˆ·è‡ªå·±çš„èµ„æ–™åŠç›¸å…³ä¸ªäººåŠŸèƒ½ã€‚
-
----
-
-# Serverpod
-
-å®¢æˆ·ç«¯é€šè¿‡ï¼š
-
-```text
-serverpod_client
-serverpod_flutter
-serverpod_auth_idp_flutter
-```
-
-è¿žæŽ¥åŽç«¯ã€‚
-
-Serverpod Client Provider ä½äºŽï¼š
-
-```text
-lib/core/serverpod/serverpod_client_provider.dart
-```
-
-å› æ­¤ä¸šåŠ¡æ¨¡å—ä¸éœ€è¦è‡ªè¡Œåˆ›å»ºåŽç«¯ Clientï¼Œè€Œæ˜¯é€šè¿‡ç»Ÿä¸€ Provider èŽ·å–è¿žæŽ¥ã€‚
-
----
-
-# Monorepo
-
-Clyven now uses a single-repository Flutter + Serverpod architecture.
+# Monorepo Layout
 
 ```text
 clyven/
-|-- apps/
-|   `-- clyven_app/
-|-- packages/
-|   `-- clyven_backend_client/
-|-- server/
-|   `-- clyven_backend_server/
-|-- pubspec.yaml
-`-- pubspec.lock
+│
+├── apps/
+│   ├── clyven_app/            # Flutter 主客户端
+│   ├── clyven_web/            # Jaspr 公开 Web 端
+│   ├── clyven_studio/         # Jaspr 创作者后台
+│   ├── clyven_admin/          # Jaspr 内部管理后台
+│   └── clyven_review/         # Jaspr 字幕审核工作台
+│
+├── packages/
+│   ├── clyven_backend_client/    # 生成的 Serverpod 客户端
+│   ├── clyven_subtitle_editor/   # 共享字幕编辑组件
+│   └── clyven_nom_converter/     # 越南语 script 转换核心库
+│
+├── server/
+│   └── clyven_backend_server/    # Serverpod 后端 + 数据库迁移
+│
+├── tool/                      # Melos / dev 辅助脚本
+├── docs/                      # 调查笔记等
+├── pubspec.yaml                # Dart workspace 定义
+└── melos.yaml (embedded)       # Melos 任务脚本
 ```
 
-The Flutter app, generated Serverpod client, and Serverpod backend are managed by one Dart workspace:
-
-```yaml
-workspace:
-  - apps/clyven_app
-  - packages/clyven_backend_client
-  - server/clyven_backend_server
-```
-
-The backend and generated client no longer need to be cloned as separate repositories.
+Flutter App、生成的 Serverpod Client、Serverpod 后端以及各个 Jaspr Web 应用均由同一个 Dart workspace 管理，无需分开克隆多个仓库。
 
 ---
+
+# State Management
+
+应用入口使用：
+
+```dart
+ProviderScope
+```
+
+包装整个应用：
+
+```text
+ProviderScope
+     │
+     ▼
+ClyvenApp
+     │
+     ▼
+AuthGate
+     │
+     ▼
+Application
+```
+
+各个 Feature 拥有自己的 Provider，并通过 Riverpod 管理：
+
+```text
+Loading
+Data
+Error
+User Actions
+```
+
+避免让页面 Widget 直接承担数据请求和业务状态。
+
+---
+
 # Getting Started
 
 ## 1. Clone
@@ -458,8 +302,6 @@ cd clyven
 ```
 
 ## 2. Install Workspace Dependencies
-
-From the repository root:
 
 ```bash
 dart pub get
@@ -480,18 +322,29 @@ cd server/clyven_backend_server
 dart run bin/main.dart --apply-migrations
 ```
 
-## 5. Run Flutter App
+## 5. Run a Frontend
 
-In another terminal:
+Flutter 客户端：
 
 ```bash
 cd apps/clyven_app
 flutter run
 ```
 
+Jaspr Web 应用（任选其一，或用 Melos 一次启动多个）：
+
+```bash
+melos run dev:web      # clyven_web    -> :8084
+melos run dev:studio   # clyven_studio -> :8083
+melos run dev:admin    # clyven_admin  -> :8082
+melos run dev:review   # clyven_review -> :8081
+melos run dev:all      # 同时启动 web / studio / admin / review
+melos run dev:stop     # 停止残留的本地 dev 服务
+```
+
 ## 6. Validate
 
-Flutter app:
+Flutter app：
 
 ```bash
 cd apps/clyven_app
@@ -499,14 +352,14 @@ flutter test
 flutter analyze
 ```
 
-Generated client:
+或在根目录用 Melos 跑全部 workspace 包：
 
 ```bash
-cd packages/clyven_backend_client
-dart analyze
+melos run analyze
+melos run test
 ```
 
-Backend:
+Backend：
 
 ```bash
 cd server/clyven_backend_server
@@ -515,164 +368,26 @@ dart test
 ```
 
 ---
-# Project Structure
-
-```text
-clyven/
-â”‚
-â”œâ”€â”€ lib/
-â”‚   â”‚
-â”‚   â”œâ”€â”€ core/
-â”‚   â”‚   â””â”€â”€ serverpod/
-â”‚   â”‚       â””â”€â”€ serverpod_client_provider.dart
-â”‚   â”‚
-â”‚   â”œâ”€â”€ features/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ auth/
-â”‚   â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ comments/
-â”‚   â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ creator/
-â”‚   â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ history/
-â”‚   â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ home/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚       â”œâ”€â”€ pages/
-â”‚   â”‚   â”‚       â”œâ”€â”€ providers/
-â”‚   â”‚   â”‚       â””â”€â”€ widgets/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ notifications/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ profile/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â”œâ”€â”€ video/
-â”‚   â”‚   â”‚   â”œâ”€â”€ data/
-â”‚   â”‚   â”‚   â””â”€â”€ presentation/
-â”‚   â”‚   â”‚
-â”‚   â”‚   â””â”€â”€ video_interactions/
-â”‚   â”‚       â”œâ”€â”€ data/
-â”‚   â”‚       â””â”€â”€ presentation/
-â”‚   â”‚
-â”‚   â””â”€â”€ main.dart
-â”‚
-â”œâ”€â”€ android/
-â”œâ”€â”€ ios/
-â”œâ”€â”€ linux/
-â”œâ”€â”€ macos/
-â”œâ”€â”€ web/
-â”œâ”€â”€ windows/
-â”‚
-â””â”€â”€ pubspec.yaml
-```
-
----
-
-# State Management
-
-åº”ç”¨å…¥å£ä½¿ç”¨ï¼š
-
-```dart
-ProviderScope
-```
-
-åŒ…è£…æ•´ä¸ªåº”ç”¨ï¼š
-
-```text
-ProviderScope
-     â”‚
-     â–¼
-ClyvenApp
-     â”‚
-     â–¼
-AuthGate
-     â”‚
-     â–¼
-Application
-```
-
-å„ä¸ª Feature å¯ä»¥æ‹¥æœ‰è‡ªå·±çš„ Providerï¼Œå¹¶é€šè¿‡ Riverpod ç®¡ç†ï¼š
-
-```text
-Loading
-Data
-Error
-User Actions
-```
-
-é¿å…è®©é¡µé¢ Widget ç›´æŽ¥æ‰¿æ‹…æ•°æ®è¯·æ±‚å’Œä¸šåŠ¡çŠ¶æ€ã€‚
-
----
-
-# Design Direction
-
-è¿™ä¸ªé¡¹ç›®ä¸æ˜¯å•ç‹¬å®žçŽ°ä¸€ä¸ªï¼š
-
-```text
-VideoPlayer
-```
-
-è€Œæ˜¯åœ¨é€æ­¥å®žçŽ°å®Œæ•´çš„è§†é¢‘å¹³å°ç»“æž„ï¼š
-
-```text
-Authentication
-      â”‚
-      â–¼
-Video Feed
-      â”‚
- â”Œâ”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”
- â–¼    â–¼     â–¼
-Search Video Creator
-      â”‚
-      â–¼
-Video Detail
-      â”‚
- â”Œâ”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”
- â–¼    â–¼        â–¼
-Like Comment Follow
-      â”‚
-      â–¼
-History / Notifications / Profile
-```
-
-å‰ç«¯åŠŸèƒ½æŒ‰ç…§ä¸šåŠ¡é¢†åŸŸæ‹†åˆ†ï¼Œä½¿åŽç»­ç»§ç»­å¢žåŠ åŠŸèƒ½æ—¶èƒ½å¤Ÿä¿æŒä»£ç ç»“æž„æ¸…æ™°ã€‚
-
----
 
 # Roadmap
 
-* [x] Flutter å®¢æˆ·ç«¯åŸºç¡€ç»“æž„
-* [x] Riverpod çŠ¶æ€ç®¡ç†
-* [x] Serverpod Client é›†æˆ
-* [x] ç”¨æˆ·è®¤è¯å…¥å£
-* [x] é¦–é¡µç»“æž„
-* [x] å‘çŽ°é¡µé¢
-* [x] è§†é¢‘æœç´¢
-* [x] è§†é¢‘è¯¦æƒ…
-* [x] è§†é¢‘æ’­æ”¾
-* [x] è§†é¢‘æŠ•ç¨¿åŸºç¡€æµç¨‹
-* [x] è¯„è®ºæ¨¡å—
-* [x] åˆ›ä½œè€…æ¨¡å—
-* [x] è§†é¢‘äº’åŠ¨æ¨¡å—
-* [x] åŽ†å²æ¨¡å—
-* [x] é€šçŸ¥æ¨¡å—
-* [x] ä¸ªäººèµ„æ–™æ¨¡å—
-* [ ] å®Œå–„å¤§åž‹è§†é¢‘ä¸Šä¼ æµç¨‹
-* [ ] å®Œå–„æŠ•ç¨¿ä»»åŠ¡ç®¡ç†
-* [ ] å®Œå–„è§†é¢‘å¤„ç†ä¸Žå°é¢æµç¨‹
-* [ ] å®Œå–„æŽ¨èç³»ç»Ÿ
-* [ ] å®Œå–„é€šçŸ¥ç³»ç»Ÿ
-* [ ] å®Œå–„æ’­æ”¾ä½“éªŒ
-* [ ] å®Œå–„é”™è¯¯æ¢å¤ä¸Žç½‘ç»œçŠ¶æ€å¤„ç†
-* [ ] å®Œå–„ç”Ÿäº§çŽ¯å¢ƒéƒ¨ç½²
+* [x] Flutter 客户端基础结构 + Riverpod 状态管理
+* [x] Serverpod Client 集成 + 用户认证入口
+* [x] 首页 / 发现页 / 视频搜索 / 视频详情 / 播放
+* [x] 视频投稿基础流程 + 视频系列
+* [x] 评论、创作者、视频互动、历史、通知、个人资料模块
+* [x] 字幕数据结构（轨道 / cue / token / karaoke）与播放联动
+* [x] SRT 导入导出 + 字幕人工审核工作流（Review）
+* [x] ASR 自动生成字幕（Deepgram 集成）
+* [x] 词典查词 + 词典批量导入
+* [x] 生词本 + 已掌握词条 / 掌握程度追踪
+* [x] 越南语 Chữ Nôm ↔ Quốc Ngữ script 转换
+* [x] 创作者 Studio / 管理后台 / 审核工作台（Jaspr）
+* [ ] 完善大型视频上传与转码流程
+* [ ] 完善推荐系统
+* [ ] 完善字幕学习体验（跟读、复习提醒等）
+* [ ] 完善错误恢复与网络状态处理
+* [ ] 完善生产环境部署
 
 ---
 
@@ -680,9 +395,9 @@ History / Notifications / Profile
 
 This project is currently under active development.
 
-çŽ°é˜¶æ®µé‡ç‚¹æ˜¯å»ºç«‹è§†é¢‘å¹³å°çš„å®Œæ•´å®¢æˆ·ç«¯æž¶æž„ä¸Ž Serverpod åŽç«¯é€šä¿¡æµç¨‹ã€‚
+现阶段重点是在"视频 + 字幕 + 词汇学习"这条主线上打通客户端、Web 端、创作者后台、审核后台与 Serverpod 后端之间的完整数据流转。
 
-éƒ¨åˆ†åŠŸèƒ½ä»å¤„äºŽå¼€å‘å’Œå®Œå–„é˜¶æ®µï¼Œä¸ä»£è¡¨ç”Ÿäº§çŽ¯å¢ƒæœ€ç»ˆå®žçŽ°ã€‚
+部分功能仍处于开发和完善阶段，不代表生产环境最终实现。
 
 ---
 
@@ -690,6 +405,6 @@ This project is currently under active development.
 
 **Cheng Yang**
 
-A Flutter video platform project exploring modular client architecture, Riverpod state management, Serverpod backend integration, media processing, and scalable video platform features.
+A multilingual video and subtitle learning platform exploring modular client architecture, Riverpod/Jaspr front-ends, Serverpod backend integration, ASR-driven subtitle production, dictionary/vocabulary tooling, and Vietnamese script conversion.
 
-> From video playback to a complete video platform.
+> From video playback to a complete multilingual learning platform.

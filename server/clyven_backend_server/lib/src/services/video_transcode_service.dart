@@ -24,6 +24,16 @@ class VideoTranscodeService {
   static const _scope = 'https://www.googleapis.com/auth/cloud-platform';
   static const _retryPrefix = 'retry1|';
 
+  static AutoRefreshingAuthClient? _cachedClient;
+
+  // The client auto-refreshes its own token, so it's safe to reuse across
+  // calls/instances instead of re-authenticating with GCP on every request.
+  static Future<AutoRefreshingAuthClient> _client() async {
+    return _cachedClient ??= await clientViaApplicationDefaultCredentials(
+      scopes: const [_scope],
+    );
+  }
+
   String _manifestKey(int videoId) => 'transcoded/$videoId/manifest.m3u8';
 
   String _retryManifestKey(int videoId) =>
@@ -65,6 +75,17 @@ class VideoTranscodeService {
     }
 
     final retryJob = _isRetryJob(currentJobName);
+    final expectedManifestKey = retryJob
+        ? _retryManifestKey(videoId)
+        : _manifestKey(videoId);
+
+    // Already finished and recorded: skip the Transcoder API round-trip
+    // entirely instead of re-checking job status on every playback request.
+    if (video.transcodeState == 'SUCCEEDED' &&
+        video.hlsManifestStorageKey == expectedManifestKey) {
+      return video;
+    }
+
     final status = await _getJobStatus(_rawJobName(currentJobName));
 
     if (status.state == 'FAILED') {
@@ -93,10 +114,6 @@ class VideoTranscodeService {
       }
     }
 
-    final expectedManifestKey = retryJob
-        ? _retryManifestKey(videoId)
-        : _manifestKey(videoId);
-
     if (video.hlsManifestStorageKey != expectedManifestKey ||
         video.transcodeState != status.state) {
       video.hlsManifestStorageKey = expectedManifestKey;
@@ -113,91 +130,78 @@ class VideoTranscodeService {
     required String videoStorageKey,
     required String outputPrefix,
   }) async {
-    final client = await clientViaApplicationDefaultCredentials(
-      scopes: const [_scope],
+    final client = await _client();
+
+    final uri = Uri.parse(
+      'https://transcoder.googleapis.com/v1/'
+      'projects/$_projectId/locations/$_location/jobs'
+      '?fields=name,state',
     );
 
-    try {
-      final uri = Uri.parse(
-        'https://transcoder.googleapis.com/v1/'
-        'projects/$_projectId/locations/$_location/jobs'
-        '?fields=name,state',
+    final response = await client.post(
+      uri,
+      headers: const {
+        'content-type': 'application/json; charset=utf-8',
+      },
+      body: jsonEncode({
+        'inputUri': 'gs://$_bucket/$videoStorageKey',
+        'outputUri': 'gs://$_bucket/$outputPrefix',
+        'templateId': 'preset/web-hd',
+      }),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError(
+        'Transcoder create job failed '
+        '(${response.statusCode}): ${response.body}',
       );
-
-      final response = await client.post(
-        uri,
-        headers: const {
-          'content-type': 'application/json; charset=utf-8',
-        },
-        body: jsonEncode({
-          'inputUri': 'gs://$_bucket/$videoStorageKey',
-          'outputUri': 'gs://$_bucket/$outputPrefix',
-          'templateId': 'preset/web-hd',
-        }),
-      );
-
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw StateError(
-          'Transcoder create job failed '
-          '(${response.statusCode}): ${response.body}',
-        );
-      }
-
-      final body = jsonDecode(response.body);
-
-      if (body is! Map<String, dynamic>) {
-        throw StateError('Unexpected Transcoder create response.');
-      }
-
-      final name = body['name']?.toString().trim();
-
-      if (name == null || name.isEmpty) {
-        throw StateError('Transcoder response did not include a job name.');
-      }
-
-      return name;
-    } finally {
-      client.close();
     }
+
+    final body = jsonDecode(response.body);
+
+    if (body is! Map<String, dynamic>) {
+      throw StateError('Unexpected Transcoder create response.');
+    }
+
+    final name = body['name']?.toString().trim();
+
+    if (name == null || name.isEmpty) {
+      throw StateError('Transcoder response did not include a job name.');
+    }
+
+    return name;
   }
 
   Future<_TranscodeJobStatus> _getJobStatus(String jobName) async {
-    final client = await clientViaApplicationDefaultCredentials(
-      scopes: const [_scope],
+    final client = await _client();
+
+    final uri = Uri.parse(
+      'https://transcoder.googleapis.com/v1/$jobName'
+      '?fields=state,error',
     );
 
-    try {
-      final uri = Uri.parse(
-        'https://transcoder.googleapis.com/v1/$jobName'
-        '?fields=state,error',
+    final response = await client.get(uri);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError(
+        'Transcoder get job failed '
+        '(${response.statusCode}): ${response.body}',
       );
-
-      final response = await client.get(uri);
-
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw StateError(
-          'Transcoder get job failed '
-          '(${response.statusCode}): ${response.body}',
-        );
-      }
-
-      final body = jsonDecode(response.body);
-
-      if (body is! Map<String, dynamic>) {
-        throw StateError('Unexpected Transcoder job response.');
-      }
-
-      final state =
-          body['state']?.toString().trim().toUpperCase() ?? 'UNKNOWN';
-      final rawError = body['error'];
-      final error = rawError == null ? null : jsonEncode(rawError);
-
-      return _TranscodeJobStatus(
-        state: state,
-        error: error,
-      );
-    } finally {
-      client.close();
     }
+
+    final body = jsonDecode(response.body);
+
+    if (body is! Map<String, dynamic>) {
+      throw StateError('Unexpected Transcoder job response.');
+    }
+
+    final state = body['state']?.toString().trim().toUpperCase() ?? 'UNKNOWN';
+    final rawError = body['error'];
+    final error = rawError == null ? null : jsonEncode(rawError);
+
+    return _TranscodeJobStatus(
+      state: state,
+      error: error,
+    );
   }
 }
