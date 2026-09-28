@@ -1,0 +1,84 @@
+name: Resolve cy into main
+
+on:
+  push:
+    branches:
+      - merge/cy-main-resolve
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out merge branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Merge main, regenerate Serverpod code, and push
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main cy
+
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "main is already contained in this branch; nothing to resolve."
+            exit 0
+          fi
+
+          set +e
+          git merge --no-ff --no-commit origin/main
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            echo "Resolving generated-code conflicts before regeneration..."
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              echo "conflict: $file"
+              case "$file" in
+                server/clyven_backend_server/migrations/migration_registry.txt)
+                  git show ":2:$file" > /tmp/registry_ours.txt
+                  git show ":3:$file" > /tmp/registry_theirs.txt
+                  cat /tmp/registry_ours.txt /tmp/registry_theirs.txt | awk 'NF && !seen[$0]++' > "$file"
+                  git add "$file"
+                  ;;
+                *)
+                  # Keep cy temporarily for generated/overlapping files. Serverpod
+                  # generation below rebuilds the protocol from the merged source tree.
+                  git checkout --ours -- "$file"
+                  git add "$file"
+                  ;;
+              esac
+            done < <(git diff --name-only --diff-filter=U)
+          fi
+
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Unresolved conflicts remain:"
+            git diff --name-only --diff-filter=U
+            exit 1
+          fi
+
+          flutter pub get
+          dart pub global activate serverpod_cli 3.4.11
+          export PATH="$PATH:$HOME/.pub-cache/bin"
+
+          cd server/clyven_backend_server
+          serverpod generate
+          cd ../..
+
+          git add -A
+          git status --short
+          git commit -m "merge: resolve cy into main"
+          git push origin HEAD:merge/cy-main-resolve
