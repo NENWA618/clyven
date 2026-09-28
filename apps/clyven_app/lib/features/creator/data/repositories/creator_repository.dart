@@ -11,6 +11,7 @@ abstract class CreatorRepository {
     required String userId,
     required String creatorId,
     required bool currentlyFollowing,
+    required String actorName,
   });
 }
 
@@ -72,8 +73,9 @@ class ServerpodCreatorRepository implements CreatorRepository {
     required String userId,
     required String creatorId,
     required bool currentlyFollowing,
+    required String actorName,
   }) {
     if (userId == creatorId) throw StateError('不能关注自己');
-    return client.social.toggleFollow(creatorId);
+    return client.social.toggleFollow(creatorId, actorName: actorName);
   }
 }

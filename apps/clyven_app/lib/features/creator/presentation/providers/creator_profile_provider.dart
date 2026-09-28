@@ -111,6 +111,7 @@ class CreatorProfileNotifier extends AsyncNotifier<CreatorProfileState> {
         userId: user.id,
         creatorId: creatorId,
         currentlyFollowing: current.isFollowing,
+        actorName: user.displayName,
       );
 
       final oldFollowerCount = current.creator.followerCount;

@@ -1,0 +1,16 @@
+class: AppNotification
+table: notification
+
+fields:
+  recipientId: String
+  actorId: String
+  actorName: String
+  type: NotificationType
+  videoId: int?, relation(parent=video)
+  commentPreview: String?
+  isRead: bool, default=false
+  createdAt: DateTime, default=now
+
+indexes:
+  notification_recipient_idx:
+    fields: recipientId
