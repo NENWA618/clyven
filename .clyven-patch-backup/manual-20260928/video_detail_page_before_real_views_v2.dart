@@ -48,8 +48,6 @@ class VideoDetailPage extends ConsumerStatefulWidget {
 }
 
 class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
-  final Set<String> _recordedViewVideoIds = <String>{};
-  final Set<String> _recordedEngagedViewVideoIds = <String>{};
   bool _showSeries = false;
   static const Color _inkColor = Color(0xFF161616);
 
@@ -61,84 +59,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
 
   final ValueNotifier<int> _subtitlePositionMs = ValueNotifier<int>(0);
 
-  Future<void> _recordViewIfNeeded(
-    VideoDetail video,
-    Duration position,
-  ) async {
-    final numericVideoId = int.tryParse(video.id);
-
-    if (numericVideoId == null) {
-      return;
-    }
-
-    // position > 0 代表已经真正开始播放。
-    if (position > Duration.zero &&
-        !_recordedViewVideoIds.contains(video.id)) {
-      _recordedViewVideoIds.add(video.id);
-
-      try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
-
-        await client.video.recordView(
-          videoId: numericVideoId,
-        );
-
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
-
-        final seriesId = video.seriesId;
-
-        if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
-        }
-      } catch (error) {
-        _recordedViewVideoIds.remove(video.id);
-
-        debugPrint(
-          '[Clyven View] recordView failed: $error',
-        );
-      }
-    }
-
-    // 5 秒才算 engaged view。
-    if (position.inSeconds >= 5 &&
-        !_recordedEngagedViewVideoIds.contains(video.id)) {
-      _recordedEngagedViewVideoIds.add(video.id);
-
-      try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
-
-        await client.video.recordEngagedView(
-          videoId: numericVideoId,
-        );
-
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
-
-        final seriesId = video.seriesId;
-
-        if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
-        }
-      } catch (error) {
-        _recordedEngagedViewVideoIds.remove(video.id);
-
-        debugPrint(
-          '[Clyven View] recordEngagedView failed: $error',
-        );
-      }
-    }
-  }
   @override
   void dispose() {
     _subtitlePositionMs.dispose();
@@ -635,10 +555,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       fallbackDurationSeconds: video.durationSeconds,
       compact: compact,
       onProgress: (position, duration) {
-        _recordViewIfNeeded(
-          video,
-          position,
-        );
         ref
             .read(watchHistoryProvider.notifier)
             .saveProgress(

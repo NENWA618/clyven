@@ -35,8 +35,7 @@ fields:
   transcodeState: String?
   durationSeconds: int
 
-  viewCount: int
-  engagedViewCount: int, default=0
+  viewCount: int, default=0
   likeCount: int, default=0
   favoriteCount: int, default=0
   commentCount: int, default=0

@@ -79,40 +79,42 @@ import 'video_comment_row.dart' as _i63;
 import 'video_content_type.dart' as _i64;
 import 'video_favorite.dart' as _i65;
 import 'video_like.dart' as _i66;
-import 'video_status.dart' as _i67;
-import 'watch_history.dart' as _i68;
-import 'word_list.dart' as _i69;
-import 'word_list_detail.dart' as _i70;
-import 'word_list_item.dart' as _i71;
-import 'word_list_item_detail.dart' as _i72;
-import 'package:clyven_backend_server/src/generated/asr_job.dart' as _i73;
-import 'package:clyven_backend_server/src/generated/video.dart' as _i74;
+import 'video_series.dart' as _i67;
+import 'video_status.dart' as _i68;
+import 'watch_history.dart' as _i69;
+import 'word_list.dart' as _i70;
+import 'word_list_detail.dart' as _i71;
+import 'word_list_item.dart' as _i72;
+import 'word_list_item_detail.dart' as _i73;
+import 'package:clyven_backend_server/src/generated/asr_job.dart' as _i74;
+import 'package:clyven_backend_server/src/generated/video.dart' as _i75;
 import 'package:clyven_backend_server/src/generated/subtitle_track.dart'
-    as _i75;
-import 'package:clyven_backend_server/src/generated/dictionary_entry_detail.dart'
     as _i76;
-import 'package:clyven_backend_server/src/generated/dictionary_import_profile.dart'
+import 'package:clyven_backend_server/src/generated/dictionary_entry_detail.dart'
     as _i77;
-import 'package:clyven_backend_server/src/generated/entry_knowledge_state.dart'
+import 'package:clyven_backend_server/src/generated/dictionary_import_profile.dart'
     as _i78;
-import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
+import 'package:clyven_backend_server/src/generated/entry_knowledge_state.dart'
     as _i79;
-import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
+import 'package:clyven_backend_server/src/generated/knowledge_state_result.dart'
     as _i80;
-import 'package:clyven_backend_server/src/generated/app_notification.dart'
+import 'package:clyven_backend_server/src/generated/knowledge_state_query.dart'
     as _i81;
-import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
+import 'package:clyven_backend_server/src/generated/app_notification.dart'
     as _i82;
-import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
+import 'package:clyven_backend_server/src/generated/script_conversion_profile.dart'
     as _i83;
-import 'package:clyven_backend_server/src/generated/watch_history.dart' as _i84;
+import 'package:clyven_backend_server/src/generated/script_conversion_entry.dart'
+    as _i84;
+import 'package:clyven_backend_server/src/generated/watch_history.dart' as _i85;
 import 'package:clyven_backend_server/src/generated/subtitle_cue_detail.dart'
-    as _i85;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
     as _i86;
-import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment.dart'
     as _i87;
-import 'package:clyven_backend_server/src/generated/word_list.dart' as _i88;
+import 'package:clyven_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
+    as _i88;
+import 'package:clyven_backend_server/src/generated/video_series.dart' as _i89;
+import 'package:clyven_backend_server/src/generated/word_list.dart' as _i90;
 export 'app_notification.dart';
 export 'app_profile.dart';
 export 'asr_job.dart';
@@ -175,6 +177,7 @@ export 'video_comment_row.dart';
 export 'video_content_type.dart';
 export 'video_favorite.dart';
 export 'video_like.dart';
+export 'video_series.dart';
 export 'video_status.dart';
 export 'watch_history.dart';
 export 'word_list.dart';
@@ -3041,6 +3044,18 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String?',
         ),
         _i2.ColumnDefinition(
+          name: 'seriesId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'seriesPosition',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
           name: 'title',
           columnType: _i2.ColumnType.text,
           isNullable: false,
@@ -3115,6 +3130,12 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'viewCount',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'engagedViewCount',
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -3429,6 +3450,86 @@ class Protocol extends _i1.SerializationManagerServer {
           type: 'btree',
           isUnique: true,
           isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'video_series',
+      dartName: 'VideoSeries',
+      schema: 'public',
+      module: 'clyven_backend',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'video_series_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'creatorId',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'title',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'description',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'coverStorageKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'languageCode',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'category',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'video_series_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
         ),
       ],
       managed: true,
@@ -3903,23 +4004,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i66.VideoLike) {
       return _i66.VideoLike.fromJson(data) as T;
     }
-    if (t == _i67.VideoStatus) {
-      return _i67.VideoStatus.fromJson(data) as T;
+    if (t == _i67.VideoSeries) {
+      return _i67.VideoSeries.fromJson(data) as T;
     }
-    if (t == _i68.WatchHistory) {
-      return _i68.WatchHistory.fromJson(data) as T;
+    if (t == _i68.VideoStatus) {
+      return _i68.VideoStatus.fromJson(data) as T;
     }
-    if (t == _i69.WordList) {
-      return _i69.WordList.fromJson(data) as T;
+    if (t == _i69.WatchHistory) {
+      return _i69.WatchHistory.fromJson(data) as T;
     }
-    if (t == _i70.WordListDetail) {
-      return _i70.WordListDetail.fromJson(data) as T;
+    if (t == _i70.WordList) {
+      return _i70.WordList.fromJson(data) as T;
     }
-    if (t == _i71.WordListItem) {
-      return _i71.WordListItem.fromJson(data) as T;
+    if (t == _i71.WordListDetail) {
+      return _i71.WordListDetail.fromJson(data) as T;
     }
-    if (t == _i72.WordListItemDetail) {
-      return _i72.WordListItemDetail.fromJson(data) as T;
+    if (t == _i72.WordListItem) {
+      return _i72.WordListItem.fromJson(data) as T;
+    }
+    if (t == _i73.WordListItemDetail) {
+      return _i73.WordListItemDetail.fromJson(data) as T;
     }
     if (t == _i1.getType<_i5.AppNotification?>()) {
       return (data != null ? _i5.AppNotification.fromJson(data) : null) as T;
@@ -4159,23 +4263,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i66.VideoLike?>()) {
       return (data != null ? _i66.VideoLike.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i67.VideoStatus?>()) {
-      return (data != null ? _i67.VideoStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i67.VideoSeries?>()) {
+      return (data != null ? _i67.VideoSeries.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i68.WatchHistory?>()) {
-      return (data != null ? _i68.WatchHistory.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i68.VideoStatus?>()) {
+      return (data != null ? _i68.VideoStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i69.WordList?>()) {
-      return (data != null ? _i69.WordList.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i69.WatchHistory?>()) {
+      return (data != null ? _i69.WatchHistory.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i70.WordListDetail?>()) {
-      return (data != null ? _i70.WordListDetail.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i70.WordList?>()) {
+      return (data != null ? _i70.WordList.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i71.WordListItem?>()) {
-      return (data != null ? _i71.WordListItem.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i71.WordListDetail?>()) {
+      return (data != null ? _i71.WordListDetail.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i72.WordListItemDetail?>()) {
-      return (data != null ? _i72.WordListItemDetail.fromJson(data) : null)
+    if (t == _i1.getType<_i72.WordListItem?>()) {
+      return (data != null ? _i72.WordListItem.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i73.WordListItemDetail?>()) {
+      return (data != null ? _i73.WordListItemDetail.fromJson(data) : null)
           as T;
     }
     if (t == List<_i62.VideoCommentDto>) {
@@ -4293,9 +4400,9 @@ class Protocol extends _i1.SerializationManagerServer {
               .toList()
           as T;
     }
-    if (t == List<_i72.WordListItemDetail>) {
+    if (t == List<_i73.WordListItemDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i72.WordListItemDetail>(e))
+              .map((e) => deserialize<_i73.WordListItemDetail>(e))
               .toList()
           as T;
     }
@@ -4305,29 +4412,29 @@ class Protocol extends _i1.SerializationManagerServer {
           )
           as T;
     }
-    if (t == List<_i73.AsrJob>) {
-      return (data as List).map((e) => deserialize<_i73.AsrJob>(e)).toList()
+    if (t == List<_i74.AsrJob>) {
+      return (data as List).map((e) => deserialize<_i74.AsrJob>(e)).toList()
           as T;
     }
-    if (t == List<_i74.Video>) {
-      return (data as List).map((e) => deserialize<_i74.Video>(e)).toList()
+    if (t == List<_i75.Video>) {
+      return (data as List).map((e) => deserialize<_i75.Video>(e)).toList()
           as T;
     }
-    if (t == List<_i75.SubtitleTrack>) {
+    if (t == List<_i76.SubtitleTrack>) {
       return (data as List)
-              .map((e) => deserialize<_i75.SubtitleTrack>(e))
+              .map((e) => deserialize<_i76.SubtitleTrack>(e))
               .toList()
           as T;
     }
-    if (t == List<_i76.DictionaryEntryDetail>) {
+    if (t == List<_i77.DictionaryEntryDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i76.DictionaryEntryDetail>(e))
+              .map((e) => deserialize<_i77.DictionaryEntryDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i77.DictionaryImportProfile>) {
+    if (t == List<_i78.DictionaryImportProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i77.DictionaryImportProfile>(e))
+              .map((e) => deserialize<_i78.DictionaryImportProfile>(e))
               .toList()
           as T;
     }
@@ -4337,68 +4444,74 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as T;
     }
-    if (t == List<_i78.EntryKnowledgeState>) {
+    if (t == List<_i79.EntryKnowledgeState>) {
       return (data as List)
-              .map((e) => deserialize<_i78.EntryKnowledgeState>(e))
+              .map((e) => deserialize<_i79.EntryKnowledgeState>(e))
               .toList()
           as T;
     }
-    if (t == List<_i79.KnowledgeStateResult>) {
+    if (t == List<_i80.KnowledgeStateResult>) {
       return (data as List)
-              .map((e) => deserialize<_i79.KnowledgeStateResult>(e))
+              .map((e) => deserialize<_i80.KnowledgeStateResult>(e))
               .toList()
           as T;
     }
-    if (t == List<_i80.KnowledgeStateQuery>) {
+    if (t == List<_i81.KnowledgeStateQuery>) {
       return (data as List)
-              .map((e) => deserialize<_i80.KnowledgeStateQuery>(e))
+              .map((e) => deserialize<_i81.KnowledgeStateQuery>(e))
               .toList()
           as T;
     }
-    if (t == List<_i81.AppNotification>) {
+    if (t == List<_i82.AppNotification>) {
       return (data as List)
-              .map((e) => deserialize<_i81.AppNotification>(e))
+              .map((e) => deserialize<_i82.AppNotification>(e))
               .toList()
           as T;
     }
-    if (t == List<_i82.ScriptConversionProfile>) {
+    if (t == List<_i83.ScriptConversionProfile>) {
       return (data as List)
-              .map((e) => deserialize<_i82.ScriptConversionProfile>(e))
+              .map((e) => deserialize<_i83.ScriptConversionProfile>(e))
               .toList()
           as T;
     }
-    if (t == List<_i83.ScriptConversionEntry>) {
+    if (t == List<_i84.ScriptConversionEntry>) {
       return (data as List)
-              .map((e) => deserialize<_i83.ScriptConversionEntry>(e))
+              .map((e) => deserialize<_i84.ScriptConversionEntry>(e))
               .toList()
           as T;
     }
-    if (t == List<_i84.WatchHistory>) {
+    if (t == List<_i85.WatchHistory>) {
       return (data as List)
-              .map((e) => deserialize<_i84.WatchHistory>(e))
+              .map((e) => deserialize<_i85.WatchHistory>(e))
               .toList()
           as T;
     }
-    if (t == List<_i85.SubtitleCueDetail>) {
+    if (t == List<_i86.SubtitleCueDetail>) {
       return (data as List)
-              .map((e) => deserialize<_i85.SubtitleCueDetail>(e))
+              .map((e) => deserialize<_i86.SubtitleCueDetail>(e))
               .toList()
           as T;
     }
-    if (t == List<_i86.SubtitleKaraokeSegment>) {
+    if (t == List<_i87.SubtitleKaraokeSegment>) {
       return (data as List)
-              .map((e) => deserialize<_i86.SubtitleKaraokeSegment>(e))
+              .map((e) => deserialize<_i87.SubtitleKaraokeSegment>(e))
               .toList()
           as T;
     }
-    if (t == List<_i87.SubtitleKaraokeSegmentInput>) {
+    if (t == List<_i88.SubtitleKaraokeSegmentInput>) {
       return (data as List)
-              .map((e) => deserialize<_i87.SubtitleKaraokeSegmentInput>(e))
+              .map((e) => deserialize<_i88.SubtitleKaraokeSegmentInput>(e))
               .toList()
           as T;
     }
-    if (t == List<_i88.WordList>) {
-      return (data as List).map((e) => deserialize<_i88.WordList>(e)).toList()
+    if (t == List<_i89.VideoSeries>) {
+      return (data as List)
+              .map((e) => deserialize<_i89.VideoSeries>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i90.WordList>) {
+      return (data as List).map((e) => deserialize<_i90.WordList>(e)).toList()
           as T;
     }
     try {
@@ -4478,12 +4591,13 @@ class Protocol extends _i1.SerializationManagerServer {
       _i64.VideoContentType => 'VideoContentType',
       _i65.VideoFavorite => 'VideoFavorite',
       _i66.VideoLike => 'VideoLike',
-      _i67.VideoStatus => 'VideoStatus',
-      _i68.WatchHistory => 'WatchHistory',
-      _i69.WordList => 'WordList',
-      _i70.WordListDetail => 'WordListDetail',
-      _i71.WordListItem => 'WordListItem',
-      _i72.WordListItemDetail => 'WordListItemDetail',
+      _i67.VideoSeries => 'VideoSeries',
+      _i68.VideoStatus => 'VideoStatus',
+      _i69.WatchHistory => 'WatchHistory',
+      _i70.WordList => 'WordList',
+      _i71.WordListDetail => 'WordListDetail',
+      _i72.WordListItem => 'WordListItem',
+      _i73.WordListItemDetail => 'WordListItemDetail',
       _ => null,
     };
   }
@@ -4625,17 +4739,19 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'VideoFavorite';
       case _i66.VideoLike():
         return 'VideoLike';
-      case _i67.VideoStatus():
+      case _i67.VideoSeries():
+        return 'VideoSeries';
+      case _i68.VideoStatus():
         return 'VideoStatus';
-      case _i68.WatchHistory():
+      case _i69.WatchHistory():
         return 'WatchHistory';
-      case _i69.WordList():
+      case _i70.WordList():
         return 'WordList';
-      case _i70.WordListDetail():
+      case _i71.WordListDetail():
         return 'WordListDetail';
-      case _i71.WordListItem():
+      case _i72.WordListItem():
         return 'WordListItem';
-      case _i72.WordListItemDetail():
+      case _i73.WordListItemDetail():
         return 'WordListItemDetail';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -4845,23 +4961,26 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'VideoLike') {
       return deserialize<_i66.VideoLike>(data['data']);
     }
+    if (dataClassName == 'VideoSeries') {
+      return deserialize<_i67.VideoSeries>(data['data']);
+    }
     if (dataClassName == 'VideoStatus') {
-      return deserialize<_i67.VideoStatus>(data['data']);
+      return deserialize<_i68.VideoStatus>(data['data']);
     }
     if (dataClassName == 'WatchHistory') {
-      return deserialize<_i68.WatchHistory>(data['data']);
+      return deserialize<_i69.WatchHistory>(data['data']);
     }
     if (dataClassName == 'WordList') {
-      return deserialize<_i69.WordList>(data['data']);
+      return deserialize<_i70.WordList>(data['data']);
     }
     if (dataClassName == 'WordListDetail') {
-      return deserialize<_i70.WordListDetail>(data['data']);
+      return deserialize<_i71.WordListDetail>(data['data']);
     }
     if (dataClassName == 'WordListItem') {
-      return deserialize<_i71.WordListItem>(data['data']);
+      return deserialize<_i72.WordListItem>(data['data']);
     }
     if (dataClassName == 'WordListItemDetail') {
-      return deserialize<_i72.WordListItemDetail>(data['data']);
+      return deserialize<_i73.WordListItemDetail>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -4965,12 +5084,14 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i65.VideoFavorite.t;
       case _i66.VideoLike:
         return _i66.VideoLike.t;
-      case _i68.WatchHistory:
-        return _i68.WatchHistory.t;
-      case _i69.WordList:
-        return _i69.WordList.t;
-      case _i71.WordListItem:
-        return _i71.WordListItem.t;
+      case _i67.VideoSeries:
+        return _i67.VideoSeries.t;
+      case _i69.WatchHistory:
+        return _i69.WatchHistory.t;
+      case _i70.WordList:
+        return _i70.WordList.t;
+      case _i72.WordListItem:
+        return _i72.WordListItem.t;
     }
     return null;
   }
