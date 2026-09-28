@@ -28,7 +28,6 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
   String category = 'general';
   String languageCode = 'auto';
   String tagsText = '';
-  String authorName = '';
   bool uploadPublic = true;
 
   int? pendingDeleteId;
@@ -80,7 +79,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
         selectedFile = file;
         uploadMessage = file == null
             ? null
-            : '${file.name} · ${_formatBytes(file.size)} · ${_formatDuration(file.durationSeconds)}';
+            : '${file.name} · ${_formatBytes(file.size)} · ${_formatDuration(file.durationSeconds)} · 已生成封面';
       });
     } catch (e) {
       setState(() {
@@ -88,17 +87,6 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
         uploadMessage = e.toString();
       });
     }
-  }
-
-  String _extensionFor(String fileName) {
-    final dot = fileName.lastIndexOf('.');
-    if (dot < 0 || dot == fileName.length - 1) {
-      return 'mp4';
-    }
-
-    final raw = fileName.substring(dot + 1).toLowerCase();
-    final safe = raw.replaceAll(RegExp(r'[^a-z0-9]'), '');
-    return safe.isEmpty ? 'mp4' : safe;
   }
 
   void _upload() {
@@ -138,20 +126,17 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
       category: category.trim(),
       languageCode: languageCode.trim(),
       tags: uploadTags,
-      authorName: authorName.trim(),
       isPublic: uploadPublic,
     );
 
     setState(() {
-      uploadMessage = '已开始上传。你现在可以离开此页面。';
+      uploadMessage = '已开始上传。Creator 将使用当前登录账号，封面已自动生成。';
       selectedFile = null;
       title = '';
       description = '';
       tagsText = '';
     });
   }
-
-  String get descriptionText => description.trim();
 
   Future<void> _toggleVisibility(Video video) async {
     final id = video.id;
@@ -235,7 +220,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
             ),
           ],
         ),
-        if (error != null) div(classes: 'sv-alert sv-alert-error', [.text(error!)]),
+        if (error != null)
+          div(classes: 'sv-alert sv-alert-error', [.text(error!)]),
         div(
           classes: 'sv-layout',
           [
@@ -249,11 +235,15 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                   '视频标题',
                   (value) => setState(() => title = value),
                 ),
-                _field(
-                  'Creator name',
-                  authorName,
-                  '留空时使用账号 ID',
-                  (value) => setState(() => authorName = value),
+                div(
+                  classes: 'sv-field',
+                  [
+                    span(classes: 'sv-label', [.text('Creator')]),
+                    p(
+                      classes: 'sv-file-meta',
+                      [.text('使用当前登录 Clyven 账号的显示名称')],
+                    ),
+                  ],
                 ),
                 _field(
                   'Description',
@@ -293,12 +283,16 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                       [
                         button(
                           classes: 'sv-segment ${uploadPublic ? 'active' : ''}',
-                          onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = true),
+                          onClick: studioUploadManager.busy
+                              ? null
+                              : () => setState(() => uploadPublic = true),
                           [.text('Public')],
                         ),
                         button(
                           classes: 'sv-segment ${!uploadPublic ? 'active' : ''}',
-                          onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = false),
+                          onClick: studioUploadManager.busy
+                              ? null
+                              : () => setState(() => uploadPublic = false),
                           [.text('Private')],
                         ),
                       ],
@@ -321,22 +315,34 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                     if (selectedFile != null)
                       p(classes: 'sv-file-meta', [
                         .text(
-                          '${selectedFile!.name} · ${_formatBytes(selectedFile!.size)} · ${_formatDuration(selectedFile!.durationSeconds)}',
+                          '${selectedFile!.name} · ${_formatBytes(selectedFile!.size)} · ${_formatDuration(selectedFile!.durationSeconds)} · 自动封面已就绪',
                         ),
                       ])
                     else
                       p(classes: 'sv-file-meta', [
-                        .text('选择一个视频文件。'),
+                        .text('选择一个视频文件；浏览器会自动抽取封面。'),
                       ]),
                   ],
                 ),
                 button(
                   classes: 'sv-primary-button',
-                  attributes: studioUploadManager.busy ? {'disabled': 'disabled'} : null,
+                  attributes: studioUploadManager.busy
+                      ? {'disabled': 'disabled'}
+                      : null,
                   onClick: studioUploadManager.busy ? null : _upload,
-                  [.text(studioUploadManager.busy ? 'Upload in progress...' : 'Upload')],
+                  [
+                    .text(
+                      studioUploadManager.busy
+                          ? 'Upload in progress...'
+                          : 'Upload',
+                    ),
+                  ],
                 ),
-                if (uploadMessage != null) div(classes: 'sv-upload-message', [.text(uploadMessage!)]),
+                if (uploadMessage != null)
+                  div(
+                    classes: 'sv-upload-message',
+                    [.text(uploadMessage!)],
+                  ),
               ],
             ),
             div(
@@ -400,7 +406,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               [
                 h3([.text(video.title)]),
                 span(
-                  classes: 'sv-visibility ${video.isPublic ? 'public' : 'private'}',
+                  classes:
+                      'sv-visibility ${video.isPublic ? 'public' : 'private'}',
                   [.text(video.isPublic ? 'Public' : 'Private')],
                 ),
               ],
@@ -410,7 +417,11 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 '#${video.id ?? '-'} · ${video.languageCode ?? 'unknown'} · ${_formatDuration(video.durationSeconds)} · ${video.status.name}',
               ),
             ]),
-            if (video.description.isNotEmpty) p(classes: 'sv-video-description', [.text(video.description)]),
+            if (video.description.isNotEmpty)
+              p(
+                classes: 'sv-video-description',
+                [.text(video.description)],
+              ),
           ],
         ),
         div(
@@ -420,24 +431,22 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               classes: 'sv-secondary-button',
               onClick: busy ? null : () => _toggleVisibility(video),
               [
-                .text(
-                  video.isPublic ? 'Make private' : 'Make public',
-                ),
+                .text(video.isPublic ? 'Make private' : 'Make public'),
               ],
             ),
             button(
               classes: 'sv-danger-button${confirmDelete ? ' confirm' : ''}',
               onClick: busy ? null : () => _delete(video),
               [
-                .text(
-                  confirmDelete ? 'Confirm delete' : 'Delete',
-                ),
+                .text(confirmDelete ? 'Confirm delete' : 'Delete'),
               ],
             ),
             if (confirmDelete)
               button(
                 classes: 'sv-link-button',
-                onClick: busy ? null : () => setState(() => pendingDeleteId = null),
+                onClick: busy
+                    ? null
+                    : () => setState(() => pendingDeleteId = null),
                 [.text('Cancel')],
               ),
           ],

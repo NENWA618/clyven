@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 import 'studio_client.dart';
@@ -90,6 +92,40 @@ class StudioUploadManager {
     }
   }
 
+  Future<void> _uploadCover({
+    required String storageKey,
+    required List<int> bytes,
+  }) async {
+    if (bytes.isEmpty) {
+      throw Exception('生成的视频封面为空');
+    }
+
+    final uploadDescription = await client.video.createUploadDescription(
+      path: storageKey,
+      fileSize: bytes.length,
+    );
+
+    if (uploadDescription == null) {
+      throw Exception('无法创建封面上传任务');
+    }
+
+    final uploader = FileUploader(uploadDescription);
+    final uploaded = await uploader.upload(
+      Stream<List<int>>.value(bytes),
+      bytes.length,
+    );
+
+    if (!uploaded) {
+      throw Exception('视频封面上传失败');
+    }
+
+    final verified = await client.video.verifyUpload(path: storageKey);
+
+    if (!verified) {
+      throw Exception('视频封面上传完成，但服务器校验失败');
+    }
+  }
+
   Future<void> startUpload({
     required SelectedVideoFile file,
     required String title,
@@ -97,7 +133,6 @@ class StudioUploadManager {
     required String category,
     required String languageCode,
     required List<String> tags,
-    required String authorName,
     required bool isPublic,
   }) async {
     if (busy) {
@@ -114,6 +149,10 @@ class StudioUploadManager {
 
     try {
       final userId = await client.video.getCurrentUserId();
+      final profile = await client.userProfileEdit.get();
+      final creatorName = (
+        profile.fullName ?? profile.userName ?? profile.email ?? userId
+      ).trim();
 
       final safeUserId =
           userId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
@@ -121,11 +160,10 @@ class StudioUploadManager {
       final timestamp = DateTime.now().microsecondsSinceEpoch;
       final extension = _extensionFor(file.name);
 
-      final storageKey =
-          'videos/$safeUserId/$timestamp.$extension';
+      final storageKey = 'videos/$safeUserId/$timestamp.$extension';
+      final coverStorageKey = 'covers/$safeUserId/$timestamp.jpg';
 
-      final uploadDescription =
-          await client.video.createUploadDescription(
+      final uploadDescription = await client.video.createUploadDescription(
         path: storageKey,
         fileSize: file.size,
       );
@@ -152,32 +190,32 @@ class StudioUploadManager {
       currentTask.stage = StudioUploadStage.verifying;
       _notify();
 
-      final verified =
-          await client.video.verifyUpload(path: storageKey);
+      final verified = await client.video.verifyUpload(path: storageKey);
 
       if (!verified) {
         throw Exception('视频上传完成，但服务器校验失败');
       }
+
+      await _uploadCover(
+        storageKey: coverStorageKey,
+        bytes: file.coverBytes,
+      );
 
       currentTask.stage = StudioUploadStage.processing;
       _notify();
 
       await client.video.create(
         authorId: userId,
-        authorName:
-            authorName.trim().isEmpty ? userId : authorName.trim(),
+        authorName: creatorName.isEmpty ? userId : creatorName,
         title: title.trim(),
         description: description.trim(),
-        category:
-            category.trim().isEmpty ? 'general' : category.trim(),
+        category: category.trim().isEmpty ? 'general' : category.trim(),
         contentType: VideoContentType.video,
         languageCode:
-            languageCode.trim().isEmpty
-                ? 'auto'
-                : languageCode.trim(),
+            languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
         tags: tags,
         videoStorageKey: storageKey,
-        coverStorageKey: null,
+        coverStorageKey: coverStorageKey,
         durationSeconds: file.durationSeconds,
         isPublic: isPublic,
       );
