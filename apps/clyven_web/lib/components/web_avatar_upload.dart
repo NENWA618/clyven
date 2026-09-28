@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'dart:html' as html;
-import 'dart:typed_data';
 
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
 import '../l10n/web_l10n.dart';
+import '../services/auth_ui_state.dart';
 import '../services/web_client.dart';
 
 class WebAvatarUpload extends StatefulComponent {
@@ -22,7 +22,6 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
   bool _loginOpen = false;
   bool _accountOpen = false;
   bool _loginLoading = false;
-  bool _uploading = false;
 
   String _email = '';
   String _password = '';
@@ -30,10 +29,29 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
   String? _avatarUrl;
   String? _displayName;
 
+  StreamSubscription<AuthUiSnapshot>? _authSub;
+
   @override
   void initState() {
     super.initState();
+    _authSub = AuthUiState.instance.stream.listen((snapshot) {
+      if (!mounted) return;
+
+      setState(() {
+        _signedIn = snapshot.signedIn;
+        _avatarUrl = snapshot.avatarUrl;
+        _displayName = snapshot.displayName;
+        _loading = false;
+        _accountOpen = false;
+      });
+    });
     unawaited(_restoreSession());
+  }
+
+  @override
+  void dispose() {
+    unawaited(_authSub?.cancel());
+    super.dispose();
   }
 
   Future<void> _restoreSession() async {
@@ -64,17 +82,27 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
   Future<void> _loadProfile() async {
     try {
       final profile = await webClient.userProfileEdit.get();
+      final avatarUrl = profile.imageUrl?.toString();
+      final displayName =
+          profile.fullName ?? profile.userName ?? profile.email ?? 'Clyven';
 
       if (!mounted) return;
 
       setState(() {
-        _avatarUrl = profile.imageUrl?.toString();
-        _displayName =
-            profile.fullName ?? profile.userName ?? profile.email ?? 'Clyven';
+        _avatarUrl = avatarUrl;
+        _displayName = displayName;
         _signedIn = true;
         _loading = false;
         _error = null;
       });
+
+      AuthUiState.instance.update(
+        AuthUiSnapshot(
+          signedIn: true,
+          avatarUrl: avatarUrl,
+          displayName: displayName,
+        ),
+      );
     } catch (error) {
       if (!mounted) return;
 
@@ -127,94 +155,6 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         _signedIn = false;
         _error = context.l10n.loginFailed(error);
       });
-    }
-  }
-
-  Future<void> _logout() async {
-    try {
-      await webClient.auth.signOutDevice();
-    } catch (_) {}
-
-    if (!mounted) return;
-
-    setState(() {
-      _signedIn = false;
-      _accountOpen = false;
-      _avatarUrl = null;
-      _displayName = null;
-      _email = '';
-      _password = '';
-      _error = null;
-    });
-  }
-
-  Future<Uint8List?> _pickImage() async {
-    final input = html.FileUploadInputElement()
-      ..accept = 'image/jpeg,image/png,image/webp'
-      ..multiple = false;
-
-    input.click();
-    await input.onChange.first;
-
-    final files = input.files;
-    if (files == null || files.isEmpty) {
-      return null;
-    }
-
-    final file = files.first;
-
-    if (file.size > 10 * 1024 * 1024) {
-      html.window.alert(context.l10n.avatarTooLarge);
-      return null;
-    }
-
-    final reader = html.FileReader();
-    reader.readAsArrayBuffer(file);
-    await reader.onLoadEnd.first;
-
-    final result = reader.result;
-
-    if (result is ByteBuffer) {
-      return Uint8List.view(result);
-    }
-
-    if (result is Uint8List) {
-      return result;
-    }
-
-    throw StateError(context.l10n.cannotReadImage);
-  }
-
-  Future<void> _uploadAvatar() async {
-    if (!_signedIn || _uploading) return;
-
-    final bytes = await _pickImage();
-    if (bytes == null || bytes.isEmpty) return;
-
-    setState(() {
-      _uploading = true;
-      _accountOpen = false;
-    });
-
-    try {
-      final profile = await webClient.userProfileEdit.setUserImage(
-        ByteData.sublistView(bytes),
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _avatarUrl = profile.imageUrl?.toString();
-        _uploading = false;
-      });
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          _uploading = false;
-        });
-      }
-
-      html.window.alert(context.l10n.avatarUploadFailed(error));
     }
   }
 
@@ -308,18 +248,11 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
       button(
         type: ButtonType.button,
         classes: 'web-account-menu-item',
-        onClick: _uploadAvatar,
-        [
-          .text(
-            _uploading ? context.l10n.uploading : context.l10n.changeAvatar,
-          ),
-        ],
-      ),
-      button(
-        type: ButtonType.button,
-        classes: 'web-account-menu-item danger',
-        onClick: _logout,
-        [.text(context.l10n.signOut)],
+        onClick: () {
+          setState(() => _accountOpen = false);
+          Router.maybeOf(context)?.push('/settings');
+        },
+        [.text(context.l10n.settings)],
       ),
     ]);
   }
@@ -353,9 +286,7 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
     return div(classes: 'web-auth-control', [
       button(
         type: ButtonType.button,
-        classes:
-            'web-avatar-upload-button'
-            '${_uploading ? ' is-uploading' : ''}',
+        classes: 'web-avatar-upload-button',
         attributes: {
           'title': context.l10n.account,
           'aria-label': context.l10n.openAccountMenu,
