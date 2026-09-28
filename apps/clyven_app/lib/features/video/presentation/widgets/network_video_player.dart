@@ -415,6 +415,207 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     widget.onProgress?.call(position, duration);
   }
 
+  Future<void> _openFullscreen() async {
+    if (!mounted || !_controller.value.isInitialized) return;
+
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+    try {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (fullscreenContext) {
+            return Scaffold(
+              backgroundColor: Colors.black,
+              body: SafeArea(
+                child: ValueListenableBuilder<VideoPlayerValue>(
+                  valueListenable: _controller,
+                  builder: (context, value, child) {
+                    final duration = _effectiveDuration();
+                    final position = _effectivePosition();
+                    final maxMilliseconds = duration.inMilliseconds;
+                    final positionMilliseconds = position.inMilliseconds.clamp(
+                      0,
+                      maxMilliseconds > 0 ? maxMilliseconds : 0,
+                    );
+                    final activeSubtitle = _findActiveSubtitle(
+                      widget.subtitles,
+                      position,
+                    );
+                    final activeSecondarySubtitle = _findActiveSubtitle(
+                      widget.secondarySubtitles,
+                      position,
+                    );
+
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Center(
+                          child: AspectRatio(
+                            aspectRatio: value.aspectRatio == 0
+                                ? 16 / 9
+                                : value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _togglePlay,
+                            child: const SizedBox.expand(),
+                          ),
+                        ),
+                        if (!value.isPlaying)
+                          Center(
+                            child: GestureDetector(
+                              onTap: _togglePlay,
+                              child: Container(
+                                width: 76,
+                                height: 76,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.92),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.play_arrow_rounded,
+                                  size: 48,
+                                  color: Color(0xFF161616),
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (widget.subtitlesEnabled &&
+                            (activeSubtitle != null ||
+                                activeSecondarySubtitle != null))
+                          Positioned(
+                            left: 24,
+                            right: 24,
+                            bottom: 88,
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 9,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.68),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (activeSubtitle != null)
+                                      InteractiveSubtitleOverlay(
+                                        detail: activeSubtitle,
+                                        videoPositionMs: position.inMilliseconds,
+                                        languageCode:
+                                            widget.subtitleLanguageCode ?? 'und',
+                                        scriptCode: widget.subtitleScriptCode,
+                                      ),
+                                    if (activeSubtitle != null &&
+                                        activeSecondarySubtitle != null)
+                                      const SizedBox(height: 4),
+                                    if (activeSecondarySubtitle != null)
+                                      Opacity(
+                                        opacity: 0.82,
+                                        child: InteractiveSubtitleOverlay(
+                                          detail: activeSecondarySubtitle,
+                                          videoPositionMs: position.inMilliseconds,
+                                          languageCode: widget
+                                                  .secondarySubtitleLanguageCode ??
+                                              'und',
+                                          scriptCode:
+                                              widget.secondarySubtitleScriptCode,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        Positioned(
+                          left: 18,
+                          right: 18,
+                          bottom: 14,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (maxMilliseconds > 0)
+                                Slider(
+                                  min: 0,
+                                  max: maxMilliseconds.toDouble(),
+                                  value: positionMilliseconds.toDouble(),
+                                  onChanged: (value) {
+                                    final target = Duration(
+                                      milliseconds: value.round(),
+                                    );
+                                    _fallbackBasePosition = target;
+                                    _fallbackClock
+                                      ..stop()
+                                      ..reset();
+                                    if (_controller.value.isPlaying &&
+                                        _needsFallbackPosition) {
+                                      _fallbackClock.start();
+                                      _startPositionTicker();
+                                    }
+                                    _controller.seekTo(target);
+                                  },
+                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    _playerTime(position),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' / ',
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    _playerTime(duration),
+                                    style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    tooltip: 'Exit fullscreen',
+                                    onPressed: () {
+                                      Navigator.of(fullscreenContext).pop();
+                                    },
+                                    icon: const Icon(
+                                      Icons.fullscreen_exit_rounded,
+                                      color: Colors.white,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    } finally {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
+  }
+
   @override
   void dispose() {
     _cancelInitialization();
@@ -657,10 +858,15 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
                                 ),
                               ),
                               const Spacer(),
-                              const Icon(
-                                Icons.fullscreen_rounded,
-                                color: Colors.white,
-                                size: 23,
+                              IconButton(
+                                tooltip: 'Fullscreen',
+                                visualDensity: VisualDensity.compact,
+                                onPressed: _openFullscreen,
+                                icon: const Icon(
+                                  Icons.fullscreen_rounded,
+                                  color: Colors.white,
+                                  size: 23,
+                                ),
                               ),
                             ],
                           ),
