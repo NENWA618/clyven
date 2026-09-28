@@ -1,14 +1,18 @@
+import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/utils/require_login.dart';
+import '../../../notifications/data/models/notification_settings_filter.dart';
 import '../../../notifications/presentation/pages/notifications_page.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
+import '../../../notifications/presentation/providers/notification_settings_provider.dart';
 import '../../../profile/presentation/pages/my_profile_page.dart';
 import '../../../video/presentation/pages/create_video_page.dart';
 import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../../video/presentation/widgets/publish_type_sheet.dart';
+import '../providers/main_tab_provider.dart';
 import '../widgets/home_navigation_dock.dart';
 import 'discover_page.dart';
 import 'home_page.dart';
@@ -27,6 +31,16 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int?>(mainTabRequestProvider, (previous, requestedIndex) {
+      if (requestedIndex == null) {
+        return;
+      }
+      setState(() {
+        _selectedIndex = requestedIndex;
+      });
+      ref.read(mainTabRequestProvider.notifier).clear();
+    });
+
     final user = ref.watch(authProvider).value;
 
     // 游客不读取私人通知数据，也不显示未读数。
@@ -35,11 +49,18 @@ class _MainPageState extends ConsumerState<MainPage> {
         ? null
         : ref.watch(notificationProvider);
 
-    final unreadCount =
-        notificationsAsync?.value?.where((notification) {
-          return !notification.isRead;
-        }).length ??
-        0;
+    final notificationSettings =
+        (user == null ? null : ref.watch(notificationSettingsProvider).value) ??
+        NotificationSettings(userId: '');
+
+    // 关闭推送后（或某一类型的提醒被关闭），底部导航不再显示对应的未读数。
+    final unreadCount = notificationSettings.pushEnabled
+        ? notificationsAsync?.value?.where((notification) {
+                return !notification.isRead &&
+                    notificationSettings.isEnabledFor(notification.type);
+              }).length ??
+              0
+        : 0;
 
     return Scaffold(
       body: IndexedStack(

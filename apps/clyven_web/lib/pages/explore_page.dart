@@ -6,7 +6,6 @@ import 'package:jaspr_router/jaspr_router.dart';
 import '../l10n/web_l10n.dart';
 import '../services/web_client.dart';
 
-
 class ExplorePage extends StatefulComponent {
   const ExplorePage({super.key});
 
