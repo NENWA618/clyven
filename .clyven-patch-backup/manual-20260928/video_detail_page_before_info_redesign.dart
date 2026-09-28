@@ -48,8 +48,6 @@ class VideoDetailPage extends ConsumerStatefulWidget {
 }
 
 class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
-  final Set<String> _recordedViewVideoIds = <String>{};
-  final Set<String> _recordedEngagedViewVideoIds = <String>{};
   bool _showSeries = false;
   static const Color _inkColor = Color(0xFF161616);
 
@@ -61,84 +59,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
 
   final ValueNotifier<int> _subtitlePositionMs = ValueNotifier<int>(0);
 
-  Future<void> _recordViewIfNeeded(
-    VideoDetail video,
-    Duration position,
-  ) async {
-    final numericVideoId = int.tryParse(video.id);
-
-    if (numericVideoId == null) {
-      return;
-    }
-
-    // position > 0 代表已经真正开始播放。
-    if (position > Duration.zero &&
-        !_recordedViewVideoIds.contains(video.id)) {
-      _recordedViewVideoIds.add(video.id);
-
-      try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
-
-        await client.video.recordView(
-          videoId: numericVideoId,
-        );
-
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
-
-        final seriesId = video.seriesId;
-
-        if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
-        }
-      } catch (error) {
-        _recordedViewVideoIds.remove(video.id);
-
-        debugPrint(
-          '[Clyven View] recordView failed: $error',
-        );
-      }
-    }
-
-    // 5 秒才算 engaged view。
-    if (position.inSeconds >= 5 &&
-        !_recordedEngagedViewVideoIds.contains(video.id)) {
-      _recordedEngagedViewVideoIds.add(video.id);
-
-      try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
-
-        await client.video.recordEngagedView(
-          videoId: numericVideoId,
-        );
-
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
-
-        final seriesId = video.seriesId;
-
-        if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
-        }
-      } catch (error) {
-        _recordedEngagedViewVideoIds.remove(video.id);
-
-        debugPrint(
-          '[Clyven View] recordEngagedView failed: $error',
-        );
-      }
-    }
-  }
   @override
   void dispose() {
     _subtitlePositionMs.dispose();
@@ -635,10 +555,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       fallbackDurationSeconds: video.durationSeconds,
       compact: compact,
       onProgress: (position, duration) {
-        _recordViewIfNeeded(
-          video,
-          position,
-        );
         ref
             .read(watchHistoryProvider.notifier)
             .saveProgress(
@@ -663,146 +579,93 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     final scheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        24,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
+                  horizontal: 11,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(10),
+                  color: scheme.primary,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  localizedTopicLabel(
-                    l10n,
-                    video.category,
-                  ).toUpperCase(),
+                  localizedTopicLabel(l10n, video.category),
                   style: TextStyle(
-                    color: scheme.onPrimaryContainer,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
+                    color: scheme.onPrimary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
               const Spacer(),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    size: 13,
-                    color: Color(0xFF99938A),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    _formatDate(
-                      context,
-                      video.publishedAt,
-                    ),
-                    style: const TextStyle(
-                      color: Color(0xFF8A857D),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              Text(
+                _formatDate(context, video.publishedAt),
+                style: const TextStyle(
+                  color: Color(0xFF8A857D),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 15),
           Text(
             video.title,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: _inkColor,
-              fontSize: 28,
-              height: 1.12,
+              fontSize: 27,
+              height: 1.15,
               fontWeight: FontWeight.w900,
-              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 11,
-            ),
-            decoration: BoxDecoration(
-              color: scheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: scheme.outlineVariant
-                    .withValues(alpha: 0.45),
+          const SizedBox(height: 13),
+          Row(
+            children: [
+              const Icon(
+                Icons.play_circle_outline_rounded,
+                size: 16,
+                color: Color(0xFF77736C),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.play_circle_outline_rounded,
-                  size: 17,
-                  color: scheme.secondary,
+              const SizedBox(width: 5),
+              Text(
+                l10n.viewsCount(_formatCount(context, video.viewCount)),
+                style: const TextStyle(
+                  color: Color(0xFF77736C),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.viewsCount(
-                    _formatCount(
-                      context,
-                      video.viewCount,
-                    ),
-                  ),
-                  style: const TextStyle(
-                    color: Color(0xFF5F5A53),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                width: 3,
+                height: 3,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFAAA49B),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 12),
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFB0AAA0),
-                    shape: BoxShape.circle,
-                  ),
+              ),
+              const SizedBox(width: 14),
+              Text(
+                _formatDuration(video.durationSeconds),
+                style: const TextStyle(
+                  color: Color(0xFF77736C),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(width: 12),
-                const Icon(
-                  Icons.schedule_rounded,
-                  size: 16,
-                  color: Color(0xFF8A857D),
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  _formatDuration(
-                    video.durationSeconds,
-                  ),
-                  style: const TextStyle(
-                    color: Color(0xFF5F5A53),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
+
   Widget _buildSeriesEntry(
     BuildContext context,
     VideoDetail video,
@@ -902,7 +765,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       ),
     );
   }
-
   Widget _buildSeriesVideoCover(
     WidgetRef ref,
     serverpod.Video video,
@@ -935,8 +797,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
           return Container(
             color: scheme.surfaceContainerHighest,
             alignment: Alignment.center,
-            child: snapshot.connectionState ==
-                    ConnectionState.waiting
+            child: snapshot.connectionState == ConnectionState.waiting
                 ? const SizedBox(
                     width: 20,
                     height: 20,
@@ -974,7 +835,6 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       },
     );
   }
-
   Widget _buildFullSeriesPanel(
     BuildContext context,
     WidgetRef ref,
@@ -997,18 +857,12 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              16,
-              10,
-              14,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 16, 10, 14),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         '系列',
@@ -1071,7 +925,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   ),
                   itemCount: videos.length,
                   separatorBuilder: (_, _) =>
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final item = videos[index];
 
@@ -1084,8 +938,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                           ? scheme.primaryContainer
                               .withValues(alpha: 0.38)
                           : scheme.surfaceContainerLow,
-                      borderRadius:
-                          BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(18),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: item.id == null
@@ -1115,27 +968,21 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                       bottom: 7,
                                       child: Container(
                                         padding:
-                                            const EdgeInsets
-                                                .symmetric(
+                                            const EdgeInsets.symmetric(
                                           horizontal: 7,
                                           vertical: 4,
                                         ),
-                                        decoration:
-                                            BoxDecoration(
+                                        decoration: BoxDecoration(
                                           color: Colors.black
-                                              .withValues(
-                                                alpha: 0.78,
-                                              ),
+                                              .withValues(alpha: 0.78),
                                           borderRadius:
-                                              BorderRadius
-                                                  .circular(7),
+                                              BorderRadius.circular(7),
                                         ),
                                         child: Text(
                                           _formatDuration(
                                             item.durationSeconds,
                                           ),
-                                          style:
-                                              const TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 9,
                                             fontWeight:
@@ -1151,19 +998,14 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                         child: Container(
                                           width: 28,
                                           height: 28,
-                                          decoration:
-                                              BoxDecoration(
-                                            color:
-                                                scheme.primary,
-                                            shape:
-                                                BoxShape.circle,
+                                          decoration: BoxDecoration(
+                                            color: scheme.primary,
+                                            shape: BoxShape.circle,
                                           ),
                                           child: Icon(
-                                            Icons
-                                                .play_arrow_rounded,
+                                            Icons.play_arrow_rounded,
                                             size: 18,
-                                            color:
-                                                scheme.onPrimary,
+                                            color: scheme.onPrimary,
                                           ),
                                         ),
                                       ),
@@ -1189,8 +1031,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                         overflow:
                                             TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color:
-                                              scheme.onSurface,
+                                          color: scheme.onSurface,
                                           fontSize: 14,
                                           height: 1.25,
                                           fontWeight: isCurrent
@@ -1205,25 +1046,19 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                             Icons
                                                 .play_circle_outline_rounded,
                                             size: 13,
-                                            color: Color(
-                                              0xFF908A81,
-                                            ),
+                                            color:
+                                                Color(0xFF908A81),
                                           ),
-                                          const SizedBox(
-                                            width: 4,
-                                          ),
+                                          const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               '${_formatCount(context, item.viewCount)} views',
                                               maxLines: 1,
                                               overflow:
-                                                  TextOverflow
-                                                      .ellipsis,
-                                              style:
-                                                  const TextStyle(
-                                                color: Color(
-                                                  0xFF908A81,
-                                                ),
+                                                  TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color:
+                                                    Color(0xFF908A81),
                                                 fontSize: 10,
                                               ),
                                             ),
@@ -1238,48 +1073,41 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                               item.category,
                                               maxLines: 1,
                                               overflow:
-                                                  TextOverflow
-                                                      .ellipsis,
+                                                  TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                color: scheme
-                                                    .secondary,
+                                                color:
+                                                    scheme.secondary,
                                                 fontSize: 10,
                                                 fontWeight:
-                                                    FontWeight
-                                                        .w700,
+                                                    FontWeight.w700,
                                               ),
                                             ),
                                           ),
                                           if (isCurrent) ...[
-                                            const SizedBox(
-                                              width: 6,
-                                            ),
+                                            const SizedBox(width: 6),
                                             Container(
                                               padding:
-                                                  const EdgeInsets
-                                                      .symmetric(
+                                                  const EdgeInsets.symmetric(
                                                 horizontal: 7,
                                                 vertical: 3,
                                               ),
                                               decoration:
                                                   BoxDecoration(
-                                                color: scheme
-                                                    .primary,
+                                                color:
+                                                    scheme.primary,
                                                 borderRadius:
-                                                    BorderRadius
-                                                        .circular(
+                                                    BorderRadius.circular(
                                                   8,
                                                 ),
                                               ),
                                               child: Text(
                                                 '正在播放',
                                                 style: TextStyle(
-                                                  color: scheme
-                                                      .onPrimary,
+                                                  color:
+                                                      scheme.onPrimary,
                                                   fontSize: 9,
                                                   fontWeight:
-                                                      FontWeight
-                                                          .w800,
+                                                      FontWeight.w800,
                                                 ),
                                               ),
                                             ),
@@ -1295,8 +1123,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                         ),
                       ),
                     );
-                  },
-                );
+                  },                );
               },
             ),
           ),

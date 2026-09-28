@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   font-family:
     Inter,
     "Segoe UI",
@@ -4641,3 +4641,89 @@ button:disabled { opacity: .55; cursor: default; }
   .sv-two-columns { grid-template-columns: 1fr; }
 }
 
+
+/* =========================
+   GLOBAL VIDEO UPLOAD
+   ========================= */
+
+.studio-upload-global {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2000;
+
+  width: min(380px, calc(100vw - 48px));
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  padding: 16px 18px;
+
+  border: 1px solid #dfe5ef;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 16px 44px rgba(23, 32, 51, 0.18);
+}
+
+.studio-upload-global.hidden {
+  display: none;
+}
+
+.studio-upload-global-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.studio-upload-global-title {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studio-upload-global-status {
+  margin-top: 5px;
+  color: #61708c;
+  font-size: 12px;
+}
+
+.studio-upload-global-track {
+  height: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7ebf2;
+}
+
+.studio-upload-global-progress {
+  height: 100%;
+  border-radius: inherit;
+  background: #172033;
+  transition: width 120ms linear;
+}
+
+.studio-upload-global-error {
+  margin-top: 8px;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.studio-upload-global.completed {
+  border-color: #b7e4c7;
+}
+
+.studio-upload-global.failed {
+  border-color: #f4b8b8;
+}
+
+.studio-upload-global-close {
+  border: 0;
+  background: transparent;
+  color: #61708c;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+}

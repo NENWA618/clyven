@@ -258,6 +258,8 @@ class ServerpodVideoRepository implements VideoRepository {
       authorId: video.authorId,
       authorName: video.authorName,
       seriesTitle: video.seriesTitle ?? '',
+      seriesId: video.seriesId,
+      seriesPosition: video.seriesPosition,
       category: video.category,
       contentType: switch (video.contentType) {
         serverpod.VideoContentType.video => VideoContentType.video,

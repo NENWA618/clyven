@@ -312,28 +312,23 @@ class MySubmissionsPage extends ConsumerWidget {
     List<VideoDetail> allVideos,
     AppLocalizations l10n,
   ) {
-    final number = (index + 1).toString().padLeft(2, '0');
     final scheme = Theme.of(context).colorScheme;
+    final seriesTitle = video.seriesTitle.trim();
 
-    return GestureDetector(
-      onTap: () {
-        openGlobalVideo(video.id);
-      },
-      child: Container(
-        height: 130,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(23),
-          border: Border.all(color: const Color(0xFFE3DED5)),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(22),
-              ),
-              child: SizedBox(
-                width: 145,
+    return Material(
+      color: Colors.white.withValues(alpha: 0.72),
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          openGlobalVideo(video.id);
+        },
+        child: SizedBox(
+          height: 128,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 142,
                 height: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
@@ -344,12 +339,12 @@ class MySubmissionsPage extends ConsumerWidget {
                       bottom: 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
+                          horizontal: 7,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _ink,
-                          borderRadius: BorderRadius.circular(12),
+                          color: _ink.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           _duration(video.durationSeconds),
@@ -364,95 +359,124 @@ class MySubmissionsPage extends ConsumerWidget {
                   ],
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          l10n.frameNumber(number),
-                          style: TextStyle(
-                            color: scheme.secondary,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.3,
-                          ),
-                        ),
-                        const Spacer(),
-                        _buildSeriesMenu(
-                          context,
-                          ref,
-                          video,
-                          allVideos,
-                          l10n,
-                        ),
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            localizedTopicLabel(l10n, video.category),
-                            style: TextStyle(
-                              color: scheme.onPrimary,
-                              fontSize: 8,
-                              fontWeight: FontWeight.w800,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    14,
+                    11,
+                    8,
+                    11,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              video.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: _ink,
+                                fontSize: 15,
+                                height: 1.25,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 7),
-                    Expanded(
-                      child: Text(
-                        video.title,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _ink,
-                          fontSize: 15,
-                          height: 1.25,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.play_circle_outline_rounded,
-                          size: 12,
-                          color: Color(0xFF908A81),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.viewsCount(_count(context, video.viewCount)),
-                          style: const TextStyle(
-                            color: Color(0xFF908A81),
-                            fontSize: 10,
+                          _buildSeriesMenu(
+                            context,
+                            ref,
+                            video,
+                            allVideos,
+                            l10n,
                           ),
+                        ],
+                      ),
+                      const Spacer(),
+                      if (seriesTitle.isNotEmpty) ...[
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.collections_bookmark_outlined,
+                              size: 13,
+                              color: scheme.secondary,
+                            ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                seriesTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: scheme.secondary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 7),
                       ],
-                    ),
-                  ],
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.play_circle_outline_rounded,
+                            size: 13,
+                            color: Color(0xFF908A81),
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              l10n.viewsCount(
+                                _count(context, video.viewCount),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF908A81),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: scheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              localizedTopicLabel(
+                                l10n,
+                                video.category,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: scheme.onPrimaryContainer,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-
-
   Widget _buildSeriesMenu(
     BuildContext context,
     WidgetRef ref,

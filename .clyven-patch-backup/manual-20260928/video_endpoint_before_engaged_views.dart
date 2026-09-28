@@ -210,7 +210,6 @@ class VideoEndpoint extends Endpoint {
       coverStorageKey: coverStorageKey,
       durationSeconds: durationSeconds,
       viewCount: 0,
-      engagedViewCount: 0,
       likeCount: 0,
       favoriteCount: 0,
       commentCount: 0,
@@ -589,51 +588,6 @@ class VideoEndpoint extends Endpoint {
     );
 
     return updated.viewCount;
-  }
-  Future<int> recordEngagedView(
-    Session session, {
-    required int videoId,
-  }) async {
-    final video = await Video.db.findById(
-      session,
-      videoId,
-    );
-
-    if (video == null) {
-      throw Exception('视频不存在');
-    }
-
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
-
-    final isOwner =
-        currentUserId != null &&
-        currentUserId == video.authorId;
-
-    if (!video.isPublic && !isOwner) {
-      throw Exception('无法记录不可访问视频的有效观看');
-    }
-
-    if (video.status != VideoStatus.published && !isOwner) {
-      throw Exception('无法记录未发布视频的有效观看');
-    }
-
-    video.engagedViewCount =
-        video.engagedViewCount + 1;
-
-    final updated = await Video.db.updateRow(
-      session,
-      video,
-    );
-
-    session.log(
-      'VIDEO_ENGAGED_VIEW_RECORDED '
-      'videoId=$videoId '
-      'viewerUserId=${currentUserId ?? 'anonymous'} '
-      'engagedViewCount=${updated.engagedViewCount}',
-    );
-
-    return updated.engagedViewCount;
   }
   Future<Video> setSeries(
     Session session, {

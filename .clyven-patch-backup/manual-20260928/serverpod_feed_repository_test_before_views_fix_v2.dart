@@ -38,8 +38,6 @@ void main() {
               videoStorageKey: 'video.mp4',
               coverStorageKey: 'cover.jpg',
               durationSeconds: 10,
-              viewCount: 0,
-              engagedViewCount: 0,
               status: VideoStatus.published,
               publishedAt: now,
               createdAt: now,
