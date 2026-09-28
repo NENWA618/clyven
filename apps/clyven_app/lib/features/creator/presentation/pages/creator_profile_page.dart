@@ -53,8 +53,10 @@ class CreatorProfilePage extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final creator = state.creator;
-    final seriesGroups =
-        _groupVideosBySeries(creator.videos, l10n.uncategorizedSeries);
+    final seriesGroups = _groupVideosBySeries(
+      creator.videos,
+      l10n.uncategorizedSeries,
+    );
 
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
@@ -68,12 +70,7 @@ class CreatorProfilePage extends ConsumerWidget {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
               final entry = seriesGroups.entries.elementAt(index);
-              return _buildSeriesSection(
-                context,
-                entry.key,
-                entry.value,
-                l10n,
-              );
+              return _buildSeriesSection(context, entry.key, entry.value, l10n);
             }, childCount: seriesGroups.length),
           ),
         ),

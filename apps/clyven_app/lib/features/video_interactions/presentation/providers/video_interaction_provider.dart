@@ -78,6 +78,7 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
         videoId: videoId,
         userId: user.id,
         currentlyLiked: current.isLiked,
+        actorName: user.displayName,
       );
 
       state = AsyncData(

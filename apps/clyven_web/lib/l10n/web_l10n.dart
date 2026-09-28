@@ -249,6 +249,100 @@ class WebStrings {
   String get signOut => _('Sign out', '退出登录');
   String get account => _('Account', '账号');
   String get openAccountMenu => _('Open account menu', '打开账号菜单');
+  String get settings => _('Settings', '设置');
+
+  // Settings shell
+  String get settingsEyebrow => 'SETTINGS';
+  String get backToSettings => _('← Settings', '← 设置');
+  String get accountSectionTitle => _('Account', '账号');
+  String get accountAndProfile => _('Account & profile', '账号与资料');
+  String get accountAndProfileSubtitle =>
+      _('Display name, avatar and bio', '昵称、头像、个人简介');
+  String get privacy => _('Privacy', '隐私');
+  String get privacySubtitle =>
+      _('Privacy and content visibility', '隐私与内容可见范围');
+  String get notificationsTitle => _('Notifications', '通知');
+  String get notificationsSettingsSubtitle =>
+      _('Manage echoes and push notifications', '管理回响与推送通知');
+  String get about => _('About', '关于');
+  String get aboutSubtitle => _('Version and app information', '版本与应用信息');
+  String get identitySectionTitle => _('Current identity', '当前身份');
+  String get logoutCurrentIdentity => _('Log out of this identity', '退出当前身份');
+  String get settingsSignedOut =>
+      _('Please sign in to view settings.', '请先登录后再查看设置。');
+
+  // Account & profile settings page
+  String get displayName => _('Display name', '显示名称');
+  String get username => _('Username', '用户名');
+  String get bio => _('Bio', '个人简介');
+  String get changeAvatarHint =>
+      _('Choose a clear, recognizable photo.', '选择清晰、容易辨认的照片。');
+  String get saveChanges => _('Save changes', '保存更改');
+  String get saving => _('Saving...', '保存中...');
+  String get saveFailed => _('Could not save profile', '保存失败，请重试');
+
+  // Privacy settings page
+  String get privateAccount => _('Private account', '私密账号');
+  String get privateAccountSubtitle => _(
+    'Only your followers can see your videos when this is on',
+    '开启后，只有关注者能看到你的投稿',
+  );
+  String get allowComments => _('Allow comments', '允许评论');
+  String get allowCommentsSubtitle =>
+      _('Let other people comment on your videos', '允许其他人评论你的投稿');
+  String get showActivityStatus => _('Show activity status', '显示动态状态');
+  String get showActivityStatusSubtitle => _(
+    'Let other people see your recent views and interactions',
+    '让其他人看到你的最近观看与互动',
+  );
+
+  // Notification settings page
+  String get pushNotifications => _('Push notifications', '推送通知');
+  String get pushNotificationsSubtitle =>
+      _('Turn off to stop receiving echo alerts', '关闭后将不再收到回响提醒');
+  String get notificationTypesSectionTitle => _('Notification types', '通知类型');
+  String get likeNotifications => _('Likes', '点赞');
+  String get likeNotificationsSubtitle =>
+      _('Notify me when someone likes my videos', '有人喜欢你的投稿时提醒你');
+  String get commentNotifications => _('Comments', '评论');
+  String get commentNotificationsSubtitle =>
+      _('Notify me when someone comments on my videos', '有人评论你的投稿时提醒你');
+  String get followNotifications => _('Follows', '关注');
+  String get followNotificationsSubtitle =>
+      _('Notify me when someone follows me', '有人关注你时提醒你');
+
+  // Echoes / notifications feed
+  String get echoesEyebrow => 'ECHOES';
+  String get navEchoes => _('Echoes', '回响');
+  String get openNotifications => _('Open echoes', '打开回响');
+  String get noEchoesYet => _('No echoes yet', '暂无回响');
+  String get notificationsLoadFailed => _('Failed to load echoes', '回响加载失败');
+  String get markAllRead => _('Mark all read', '全部已读');
+  String get justNow => _('Just now', '刚刚');
+  String minutesAgo(int count) =>
+      _('$count minute${count == 1 ? '' : 's'} ago', '$count 分钟前');
+  String hoursAgo(int count) =>
+      _('$count hour${count == 1 ? '' : 's'} ago', '$count 小时前');
+  String daysAgo(int count) =>
+      _('$count day${count == 1 ? '' : 's'} ago', '$count 天前');
+  String get notificationCommentTitle => _('New comment', '有人回复了你的投稿');
+  String notificationCommentMessage(String actor, String content) =>
+      _('$actor replied: "$content"', '$actor 回复：“$content”');
+  String get notificationLikeTitle => _('Your video got a like', '你的影像获得了喜欢');
+  String notificationLikeMessage(String actor) =>
+      _('$actor liked your submission.', '$actor 喜欢了你的投稿。');
+  String get notificationFollowTitle => _('New follower', '新的关注');
+  String notificationFollowMessage(String actor) =>
+      _('$actor started following you.', '$actor 开始关注你。');
+
+  // About page
+  String get aboutEyebrow => 'ABOUT';
+  String aboutVersion(String version) => _('Version $version', '版本 $version');
+  String get aboutAppDescription => _(
+    'Clyven is a multilingual video and subtitle community.',
+    'Clyven 是一个多语言视频与字幕社区。',
+  );
+  String get aboutCopyright => '© 2026 Clyven';
 
   // Player
   String get qualityOriginal => _('Original', '原画');

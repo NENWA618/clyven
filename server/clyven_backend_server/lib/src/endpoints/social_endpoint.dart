@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import '../services/notification_service.dart';
 
 class SocialEndpoint extends Endpoint {
   String _userId(Session session) {
@@ -83,7 +84,11 @@ class SocialEndpoint extends Endpoint {
         null;
   }
 
-  Future<bool> toggleFollow(Session session, String creatorId) async {
+  Future<bool> toggleFollow(
+    Session session,
+    String creatorId, {
+    String actorName = 'Clyven user',
+  }) async {
     final userId = _userId(session);
     if (userId == creatorId) throw Exception('不能关注自己');
     final current = await CreatorFollow.db.findFirstRow(
@@ -102,6 +107,13 @@ class SocialEndpoint extends Endpoint {
         creatorId: creatorId,
         createdAt: DateTime.now(),
       ),
+    );
+    await createNotification(
+      session,
+      recipientId: creatorId,
+      actorId: userId,
+      actorName: actorName,
+      type: NotificationType.follow,
     );
     return true;
   }
@@ -141,6 +153,62 @@ class SocialEndpoint extends Endpoint {
   Future<List<int>> getFavoriteVideoIds(Session session) async {
     final userId = _userId(session);
     final rows = await VideoFavorite.db.find(
+      session,
+      where: (row) => row.userId.equals(userId),
+      orderBy: (row) => row.createdAt,
+      orderDescending: true,
+    );
+    return rows.map((row) => row.videoId).toList(growable: false);
+  }
+
+  Future<bool> toggleLike(
+    Session session,
+    int videoId, {
+    String actorName = 'Clyven user',
+  }) async {
+    final userId = _userId(session);
+    final current = await VideoLike.db.findFirstRow(
+      session,
+      where: (row) => row.userId.equals(userId) & row.videoId.equals(videoId),
+    );
+
+    final video = await Video.db.findById(session, videoId);
+
+    if (current != null) {
+      await VideoLike.db.deleteRow(session, current);
+      if (video != null) {
+        if (video.likeCount > 0) {
+          video.likeCount -= 1;
+        }
+        await Video.db.updateRow(session, video);
+      }
+      return false;
+    }
+
+    await VideoLike.db.insertRow(
+      session,
+      VideoLike(userId: userId, videoId: videoId, createdAt: DateTime.now()),
+    );
+
+    if (video != null) {
+      video.likeCount += 1;
+      await Video.db.updateRow(session, video);
+      await createNotification(
+        session,
+        recipientId: video.authorId,
+        actorId: userId,
+        actorName: actorName,
+        type: NotificationType.like,
+        videoId: videoId,
+      );
+    }
+
+    return true;
+  }
+
+  Future<List<int>> getLikedVideoIds(Session session) async {
+    final userId = _userId(session);
+    final rows = await VideoLike.db.find(
       session,
       where: (row) => row.userId.equals(userId),
       orderBy: (row) => row.createdAt,

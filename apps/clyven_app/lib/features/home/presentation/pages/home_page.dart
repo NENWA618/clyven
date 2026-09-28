@@ -1,11 +1,17 @@
 import 'package:clyven_app/core/localization/localized_labels.dart';
 import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../notifications/data/models/notification_settings_filter.dart';
+import '../../../notifications/presentation/providers/notification_provider.dart';
+import '../../../notifications/presentation/providers/notification_settings_provider.dart';
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
+import '../providers/main_tab_provider.dart';
 import '../widgets/home_design_tokens.dart';
 import '../widgets/home_featured_hero.dart';
 import '../widgets/home_section.dart';
@@ -18,6 +24,23 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
+
+    // 游客不读取私人通知数据，铃铛也就不显示未读提示点。
+    final user = ref.watch(authProvider).value;
+    final notificationsAsync = user == null
+        ? null
+        : ref.watch(notificationProvider);
+    final notificationSettings =
+        (user == null ? null : ref.watch(notificationSettingsProvider).value) ??
+        NotificationSettings(userId: '');
+    final hasUnread =
+        notificationSettings.pushEnabled &&
+        (notificationsAsync?.value?.any((notification) {
+              return !notification.isRead &&
+                  notificationSettings.isEnabledFor(notification.type);
+            }) ??
+            false);
+
     return ColoredBox(
       color: HomeDesignTokens.background(context),
       child: home.when(
@@ -26,9 +49,12 @@ class HomePage extends ConsumerWidget {
             _HomeError(onRetry: () => ref.invalidate(homeProvider)),
         data: (state) => _HomeContent(
           state: state,
+          hasUnreadNotifications: hasUnread,
           onRefresh: () => ref.read(homeProvider.notifier).refresh(),
           onTopicSelected: (topic) =>
               ref.read(homeProvider.notifier).selectTopic(topic),
+          onNotificationsTap: () =>
+              ref.read(mainTabRequestProvider.notifier).request(2),
         ),
       ),
     );
@@ -37,13 +63,17 @@ class HomePage extends ConsumerWidget {
 
 class _HomeContent extends StatelessWidget {
   final HomeState state;
+  final bool hasUnreadNotifications;
   final Future<void> Function() onRefresh;
   final ValueChanged<String> onTopicSelected;
+  final VoidCallback onNotificationsTap;
 
   const _HomeContent({
     required this.state,
+    required this.hasUnreadNotifications,
     required this.onRefresh,
     required this.onTopicSelected,
+    required this.onNotificationsTap,
   });
 
   @override
@@ -66,7 +96,13 @@ class _HomeContent extends StatelessWidget {
             parent: BouncingScrollPhysics(),
           ),
           slivers: [
-            SliverToBoxAdapter(child: _HomeHeader(l10n: l10n)),
+            SliverToBoxAdapter(
+              child: _HomeHeader(
+                l10n: l10n,
+                hasUnreadNotifications: hasUnreadNotifications,
+                onNotificationsTap: onNotificationsTap,
+              ),
+            ),
             SliverToBoxAdapter(
               child: _Intro(
                 title: l10n.homeForYou,
@@ -141,7 +177,14 @@ class _HomeContent extends StatelessWidget {
 
 class _HomeHeader extends StatelessWidget {
   final AppLocalizations l10n;
-  const _HomeHeader({required this.l10n});
+  final bool hasUnreadNotifications;
+  final VoidCallback onNotificationsTap;
+
+  const _HomeHeader({
+    required this.l10n,
+    required this.hasUnreadNotifications,
+    required this.onNotificationsTap,
+  });
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -195,8 +238,8 @@ class _HomeHeader extends StatelessWidget {
         _HeaderButton(
           tooltip: l10n.notifications,
           icon: Icons.notifications_none_rounded,
-          onTap: () {},
-          showDot: true,
+          onTap: onNotificationsTap,
+          showDot: hasUnreadNotifications,
         ),
       ],
     ),
