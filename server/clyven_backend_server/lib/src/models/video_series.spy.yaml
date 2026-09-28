@@ -1,0 +1,15 @@
+class: VideoSeries
+table: video_series
+
+fields:
+  creatorId: String
+
+  title: String
+  description: String
+
+  coverStorageKey: String?
+  languageCode: String?
+  category: String
+
+  createdAt: DateTime
+  updatedAt: DateTime

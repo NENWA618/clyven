@@ -8,6 +8,11 @@ fields:
   # Creator-defined series. Null only for legacy videos created before series existed.
   seriesTitle: String?
 
+  # Real series relation. seriesTitle remains temporarily for legacy clients.
+  seriesId: int?
+
+  # Explicit episode order inside a series.
+  seriesPosition: int?
   title: String
   description: String
   category: String
@@ -30,7 +35,8 @@ fields:
   transcodeState: String?
   durationSeconds: int
 
-  viewCount: int, default=0
+  viewCount: int
+  engagedViewCount: int, default=0
   likeCount: int, default=0
   favoriteCount: int, default=0
   commentCount: int, default=0

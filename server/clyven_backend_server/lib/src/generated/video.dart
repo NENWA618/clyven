@@ -22,6 +22,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.authorId,
     required this.authorName,
     this.seriesTitle,
+    this.seriesId,
+    this.seriesPosition,
     required this.title,
     required this.description,
     required this.category,
@@ -34,7 +36,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     this.transcoderJobName,
     this.transcodeState,
     required this.durationSeconds,
-    int? viewCount,
+    required this.viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
@@ -44,7 +47,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.createdAt,
     required this.updatedAt,
   }) : contentType = contentType ?? _i2.VideoContentType.video,
-       viewCount = viewCount ?? 0,
+       engagedViewCount = engagedViewCount ?? 0,
        likeCount = likeCount ?? 0,
        favoriteCount = favoriteCount ?? 0,
        commentCount = commentCount ?? 0,
@@ -56,6 +59,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required String authorId,
     required String authorName,
     String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     required String title,
     required String description,
     required String category,
@@ -68,7 +73,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? transcoderJobName,
     String? transcodeState,
     required int durationSeconds,
-    int? viewCount,
+    required int viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
@@ -85,6 +91,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       authorId: jsonSerialization['authorId'] as String,
       authorName: jsonSerialization['authorName'] as String,
       seriesTitle: jsonSerialization['seriesTitle'] as String?,
+      seriesId: jsonSerialization['seriesId'] as int?,
+      seriesPosition: jsonSerialization['seriesPosition'] as int?,
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
@@ -102,7 +110,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       transcoderJobName: jsonSerialization['transcoderJobName'] as String?,
       transcodeState: jsonSerialization['transcodeState'] as String?,
       durationSeconds: jsonSerialization['durationSeconds'] as int,
-      viewCount: jsonSerialization['viewCount'] as int?,
+      viewCount: jsonSerialization['viewCount'] as int,
+      engagedViewCount: jsonSerialization['engagedViewCount'] as int?,
       likeCount: jsonSerialization['likeCount'] as int?,
       favoriteCount: jsonSerialization['favoriteCount'] as int?,
       commentCount: jsonSerialization['commentCount'] as int?,
@@ -139,6 +148,10 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   String? seriesTitle;
 
+  int? seriesId;
+
+  int? seriesPosition;
+
   String title;
 
   String description;
@@ -164,6 +177,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   int durationSeconds;
 
   int viewCount;
+
+  int engagedViewCount;
 
   int likeCount;
 
@@ -192,6 +207,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? authorId,
     String? authorName,
     String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     String? title,
     String? description,
     String? category,
@@ -205,6 +222,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     String? transcodeState,
     int? durationSeconds,
     int? viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
@@ -222,6 +240,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'authorId': authorId,
       'authorName': authorName,
       if (seriesTitle != null) 'seriesTitle': seriesTitle,
+      if (seriesId != null) 'seriesId': seriesId,
+      if (seriesPosition != null) 'seriesPosition': seriesPosition,
       'title': title,
       'description': description,
       'category': category,
@@ -236,6 +256,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (transcodeState != null) 'transcodeState': transcodeState,
       'durationSeconds': durationSeconds,
       'viewCount': viewCount,
+      'engagedViewCount': engagedViewCount,
       'likeCount': likeCount,
       'favoriteCount': favoriteCount,
       'commentCount': commentCount,
@@ -255,6 +276,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'authorId': authorId,
       'authorName': authorName,
       if (seriesTitle != null) 'seriesTitle': seriesTitle,
+      if (seriesId != null) 'seriesId': seriesId,
+      if (seriesPosition != null) 'seriesPosition': seriesPosition,
       'title': title,
       'description': description,
       'category': category,
@@ -269,6 +292,7 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (transcodeState != null) 'transcodeState': transcodeState,
       'durationSeconds': durationSeconds,
       'viewCount': viewCount,
+      'engagedViewCount': engagedViewCount,
       'likeCount': likeCount,
       'favoriteCount': favoriteCount,
       'commentCount': commentCount,
@@ -318,6 +342,8 @@ class _VideoImpl extends Video {
     required String authorId,
     required String authorName,
     String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     required String title,
     required String description,
     required String category,
@@ -330,7 +356,8 @@ class _VideoImpl extends Video {
     String? transcoderJobName,
     String? transcodeState,
     required int durationSeconds,
-    int? viewCount,
+    required int viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
@@ -344,6 +371,8 @@ class _VideoImpl extends Video {
          authorId: authorId,
          authorName: authorName,
          seriesTitle: seriesTitle,
+         seriesId: seriesId,
+         seriesPosition: seriesPosition,
          title: title,
          description: description,
          category: category,
@@ -357,6 +386,7 @@ class _VideoImpl extends Video {
          transcodeState: transcodeState,
          durationSeconds: durationSeconds,
          viewCount: viewCount,
+         engagedViewCount: engagedViewCount,
          likeCount: likeCount,
          favoriteCount: favoriteCount,
          commentCount: commentCount,
@@ -376,6 +406,8 @@ class _VideoImpl extends Video {
     String? authorId,
     String? authorName,
     Object? seriesTitle = _Undefined,
+    Object? seriesId = _Undefined,
+    Object? seriesPosition = _Undefined,
     String? title,
     String? description,
     String? category,
@@ -389,6 +421,7 @@ class _VideoImpl extends Video {
     Object? transcodeState = _Undefined,
     int? durationSeconds,
     int? viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
@@ -403,6 +436,10 @@ class _VideoImpl extends Video {
       authorId: authorId ?? this.authorId,
       authorName: authorName ?? this.authorName,
       seriesTitle: seriesTitle is String? ? seriesTitle : this.seriesTitle,
+      seriesId: seriesId is int? ? seriesId : this.seriesId,
+      seriesPosition: seriesPosition is int?
+          ? seriesPosition
+          : this.seriesPosition,
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
@@ -424,6 +461,7 @@ class _VideoImpl extends Video {
           : this.transcodeState,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       viewCount: viewCount ?? this.viewCount,
+      engagedViewCount: engagedViewCount ?? this.engagedViewCount,
       likeCount: likeCount ?? this.likeCount,
       favoriteCount: favoriteCount ?? this.favoriteCount,
       commentCount: commentCount ?? this.commentCount,
@@ -451,6 +489,16 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
 
   _i1.ColumnValue<String, String> seriesTitle(String? value) => _i1.ColumnValue(
     table.seriesTitle,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> seriesId(int? value) => _i1.ColumnValue(
+    table.seriesId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> seriesPosition(int? value) => _i1.ColumnValue(
+    table.seriesPosition,
     value,
   );
 
@@ -528,6 +576,11 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
     value,
   );
 
+  _i1.ColumnValue<int, int> engagedViewCount(int value) => _i1.ColumnValue(
+    table.engagedViewCount,
+    value,
+  );
+
   _i1.ColumnValue<int, int> likeCount(int value) => _i1.ColumnValue(
     table.likeCount,
     value,
@@ -589,6 +642,14 @@ class VideoTable extends _i1.Table<int?> {
       'seriesTitle',
       this,
     );
+    seriesId = _i1.ColumnInt(
+      'seriesId',
+      this,
+    );
+    seriesPosition = _i1.ColumnInt(
+      'seriesPosition',
+      this,
+    );
     title = _i1.ColumnString(
       'title',
       this,
@@ -642,6 +703,10 @@ class VideoTable extends _i1.Table<int?> {
     viewCount = _i1.ColumnInt(
       'viewCount',
       this,
+    );
+    engagedViewCount = _i1.ColumnInt(
+      'engagedViewCount',
+      this,
       hasDefault: true,
     );
     likeCount = _i1.ColumnInt(
@@ -692,6 +757,10 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString seriesTitle;
 
+  late final _i1.ColumnInt seriesId;
+
+  late final _i1.ColumnInt seriesPosition;
+
   late final _i1.ColumnString title;
 
   late final _i1.ColumnString description;
@@ -718,6 +787,8 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnInt viewCount;
 
+  late final _i1.ColumnInt engagedViewCount;
+
   late final _i1.ColumnInt likeCount;
 
   late final _i1.ColumnInt favoriteCount;
@@ -740,6 +811,8 @@ class VideoTable extends _i1.Table<int?> {
     authorId,
     authorName,
     seriesTitle,
+    seriesId,
+    seriesPosition,
     title,
     description,
     category,
@@ -753,6 +826,7 @@ class VideoTable extends _i1.Table<int?> {
     transcodeState,
     durationSeconds,
     viewCount,
+    engagedViewCount,
     likeCount,
     favoriteCount,
     commentCount,

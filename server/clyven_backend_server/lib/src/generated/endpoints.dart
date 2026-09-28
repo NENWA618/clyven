@@ -2741,6 +2741,167 @@ class Endpoints extends _i1.EndpointDispatch {
                 params['id'],
               ),
         ),
+        'createSeries': _i1.MethodConnector(
+          name: 'createSeries',
+          params: {
+            'title': _i1.ParameterDescription(
+              name: 'title',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'description': _i1.ParameterDescription(
+              name: 'description',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'coverStorageKey': _i1.ParameterDescription(
+              name: 'coverStorageKey',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'languageCode': _i1.ParameterDescription(
+              name: 'languageCode',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'category': _i1.ParameterDescription(
+              name: 'category',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['video'] as _i17.VideoEndpoint).createSeries(
+                    session,
+                    title: params['title'],
+                    description: params['description'],
+                    coverStorageKey: params['coverStorageKey'],
+                    languageCode: params['languageCode'],
+                    category: params['category'],
+                  ),
+        ),
+        'getCreatorSeries': _i1.MethodConnector(
+          name: 'getCreatorSeries',
+          params: {
+            'creatorId': _i1.ParameterDescription(
+              name: 'creatorId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['video'] as _i17.VideoEndpoint).getCreatorSeries(
+                    session,
+                    creatorId: params['creatorId'],
+                  ),
+        ),
+        'getSeries': _i1.MethodConnector(
+          name: 'getSeries',
+          params: {
+            'seriesId': _i1.ParameterDescription(
+              name: 'seriesId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['video'] as _i17.VideoEndpoint).getSeries(
+                session,
+                seriesId: params['seriesId'],
+              ),
+        ),
+        'getSeriesVideos': _i1.MethodConnector(
+          name: 'getSeriesVideos',
+          params: {
+            'seriesId': _i1.ParameterDescription(
+              name: 'seriesId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['video'] as _i17.VideoEndpoint).getSeriesVideos(
+                    session,
+                    seriesId: params['seriesId'],
+                  ),
+        ),
+        'setSeriesById': _i1.MethodConnector(
+          name: 'setSeriesById',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'seriesId': _i1.ParameterDescription(
+              name: 'seriesId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['video'] as _i17.VideoEndpoint).setSeriesById(
+                    session,
+                    videoId: params['videoId'],
+                    seriesId: params['seriesId'],
+                  ),
+        ),
+        'recordView': _i1.MethodConnector(
+          name: 'recordView',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['video'] as _i17.VideoEndpoint).recordView(
+                session,
+                videoId: params['videoId'],
+              ),
+        ),
+        'recordEngagedView': _i1.MethodConnector(
+          name: 'recordEngagedView',
+          params: {
+            'videoId': _i1.ParameterDescription(
+              name: 'videoId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['video'] as _i17.VideoEndpoint).recordEngagedView(
+                    session,
+                    videoId: params['videoId'],
+                  ),
+        ),
         'setSeries': _i1.MethodConnector(
           name: 'setSeries',
           params: {
@@ -2764,6 +2925,31 @@ class Endpoints extends _i1.EndpointDispatch {
                 videoId: params['videoId'],
                 seriesTitle: params['seriesTitle'],
               ),
+        ),
+        'reorderSeriesVideos': _i1.MethodConnector(
+          name: 'reorderSeriesVideos',
+          params: {
+            'seriesId': _i1.ParameterDescription(
+              name: 'seriesId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'videoIds': _i1.ParameterDescription(
+              name: 'videoIds',
+              type: _i1.getType<List<int>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['video'] as _i17.VideoEndpoint)
+                  .reorderSeriesVideos(
+                    session,
+                    seriesId: params['seriesId'],
+                    videoIds: params['videoIds'],
+                  ),
         ),
         'setVisibility': _i1.MethodConnector(
           name: 'setVisibility',
