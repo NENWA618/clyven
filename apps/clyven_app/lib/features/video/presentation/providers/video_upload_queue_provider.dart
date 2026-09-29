@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:clyven_app/core/errors/app_error.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/return_code.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,6 +21,7 @@ class VideoUploadRequest {
   final String title;
   final String description;
   final String category;
+  final String seriesTitle;
   final VideoContentType contentType;
 
   const VideoUploadRequest({
@@ -30,6 +31,7 @@ class VideoUploadRequest {
     required this.title,
     required this.description,
     required this.category,
+    this.seriesTitle = '',
     this.contentType = VideoContentType.video,
   });
 }
@@ -111,6 +113,7 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
         title: request.title,
         description: request.description,
         category: request.category,
+        seriesTitle: request.seriesTitle,
         durationSeconds: durationSeconds,
         contentType: request.contentType,
       );
@@ -138,7 +141,11 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
 
       debugPrintStack(stackTrace: stackTrace);
 
-      _updateTask(taskId, status: VideoUploadStatus.failed);
+      _updateTask(
+        taskId,
+        status: VideoUploadStatus.failed,
+        errorMessage: error.toString(),
+      );
     }
   }
 
@@ -179,8 +186,20 @@ class VideoUploadQueueNotifier extends Notifier<List<VideoUploadTask>> {
       '0:v:0',
       '-map',
       '0:a?',
-      '-c',
-      'copy',
+      '-c:v',
+      'libx264',
+      '-preset',
+      'veryfast',
+      '-crf',
+      '23',
+      '-vf',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      '-pix_fmt',
+      'yuv420p',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
       '-avoid_negative_ts',
       'make_zero',
       '-movflags',

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>Clyven</title>
+  <link rel="stylesheet" href="app.css">
+  <script defer src="main.client.dart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
+    <script>
+      (() => {
+        const players = new Map();
+
+        const destroyPlayer = (videoId) => {
+          const current = players.get(videoId);
+          if (current) {
+            current.destroy();
+            players.delete(videoId);
+          }
+        };
+
+        document.addEventListener('clyven-hls-attach', (event) => {
+          const detail = event.detail || {};
+          const videoId = detail.videoId;
+          const url = detail.url;
+          const fallbackUrl = detail.fallbackUrl;
+
+          if (!videoId || !url) return;
+
+          const video = document.getElementById(videoId);
+          if (!video) return;
+
+          destroyPlayer(videoId);
+
+          if (window.Hls && window.Hls.isSupported()) {
+            const hls = new window.Hls({
+              capLevelToPlayerSize: true,
+              startLevel: -1,
+            });
+
+            players.set(videoId, hls);
+            hls.loadSource(url);
+            hls.attachMedia(video);
+
+            hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+              video.dispatchEvent(new CustomEvent('clyven-hls-ready'));
+            });
+
+            hls.on(window.Hls.Events.ERROR, (_name, data) => {
+              if (!data || !data.fatal) return;
+
+              destroyPlayer(videoId);
+
+              if (fallbackUrl) {
+                const currentTime = video.currentTime || 0;
+                const wasPaused = video.paused;
+
+                video.src = fallbackUrl;
+                video.currentTime = currentTime;
+
+                if (!wasPaused) {
+                  video.play().catch(() => {});
+                }
+              }
+
+              video.dispatchEvent(
+                new CustomEvent('clyven-hls-unavailable'),
+              );
+            });
+
+            return;
+          }
+
+          if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            video.dispatchEvent(new CustomEvent('clyven-hls-ready'));
+            return;
+          }
+
+          video.dispatchEvent(
+            new CustomEvent('clyven-hls-unavailable'),
+          );
+        });
+
+        document.addEventListener('clyven-hls-quality', (event) => {
+          const detail = event.detail || {};
+          const videoId = detail.videoId;
+          const height = detail.height;
+          const hls = players.get(videoId);
+
+          if (!hls) return;
+
+          if (height === null || height === undefined) {
+            hls.currentLevel = -1;
+            return;
+          }
+
+          const numericHeight = Number(height);
+          const index = hls.levels.findIndex(
+            (level) => Number(level.height) === numericHeight,
+          );
+
+          if (index >= 0) {
+            hls.currentLevel = index;
+          }
+        });
+
+        document.addEventListener('clyven-hls-destroy', (event) => {
+          const detail = event.detail || {};
+          if (detail.videoId) {
+            destroyPlayer(detail.videoId);
+          }
+        });
+      })();
+    </script>
+</head>
+<body>
+</body>
+</html>

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../creator/presentation/providers/creator_profile_provider.dart';
 import '../../../video/data/models/video_detail.dart';
 import '../../../video/presentation/providers/video_detail_provider.dart';
 import '../../../video/presentation/providers/video_upload_queue_provider.dart';
@@ -72,7 +73,14 @@ class MySubmissionsPage extends ConsumerWidget {
                         final videoIndex = index - activeUploadTasks.length;
                         final video = videos[videoIndex];
 
-                        return _buildVideo(context, video, videoIndex, l10n);
+                        return _buildVideo(
+                          context,
+                          ref,
+                          video,
+                          videoIndex,
+                          videos,
+                          l10n,
+                        );
                       },
                     ),
                   );
@@ -298,32 +306,29 @@ class MySubmissionsPage extends ConsumerWidget {
 
   Widget _buildVideo(
     BuildContext context,
+    WidgetRef ref,
     VideoDetail video,
     int index,
+    List<VideoDetail> allVideos,
     AppLocalizations l10n,
   ) {
-    final number = (index + 1).toString().padLeft(2, '0');
     final scheme = Theme.of(context).colorScheme;
+    final seriesTitle = video.seriesTitle.trim();
 
-    return GestureDetector(
-      onTap: () {
-        openGlobalVideo(video.id);
-      },
-      child: Container(
-        height: 130,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(23),
-          border: Border.all(color: const Color(0xFFE3DED5)),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(22),
-              ),
-              child: SizedBox(
-                width: 145,
+    return Material(
+      color: Colors.white.withValues(alpha: 0.72),
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          openGlobalVideo(video.id);
+        },
+        child: SizedBox(
+          height: 128,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 142,
                 height: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
@@ -334,12 +339,12 @@ class MySubmissionsPage extends ConsumerWidget {
                       bottom: 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
+                          horizontal: 7,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: _ink,
-                          borderRadius: BorderRadius.circular(12),
+                          color: _ink.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           _duration(video.durationSeconds),
@@ -354,84 +359,294 @@ class MySubmissionsPage extends ConsumerWidget {
                   ],
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          l10n.frameNumber(number),
-                          style: TextStyle(
-                            color: scheme.secondary,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.3,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            localizedTopicLabel(l10n, video.category),
-                            style: TextStyle(
-                              color: scheme.onPrimary,
-                              fontSize: 8,
-                              fontWeight: FontWeight.w800,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 11, 8, 11),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              video.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: _ink,
+                                fontSize: 15,
+                                height: 1.25,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 7),
-                    Expanded(
-                      child: Text(
-                        video.title,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _ink,
-                          fontSize: 15,
-                          height: 1.25,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.play_circle_outline_rounded,
-                          size: 12,
-                          color: Color(0xFF908A81),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.viewsCount(_count(context, video.viewCount)),
-                          style: const TextStyle(
-                            color: Color(0xFF908A81),
-                            fontSize: 10,
+                          _buildSeriesMenu(
+                            context,
+                            ref,
+                            video,
+                            allVideos,
+                            l10n,
                           ),
+                        ],
+                      ),
+                      const Spacer(),
+                      if (seriesTitle.isNotEmpty) ...[
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.collections_bookmark_outlined,
+                              size: 13,
+                              color: scheme.secondary,
+                            ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                seriesTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: scheme.secondary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 7),
                       ],
-                    ),
-                  ],
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.play_circle_outline_rounded,
+                            size: 13,
+                            color: Color(0xFF908A81),
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              l10n.viewsCount(_count(context, video.viewCount)),
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF908A81),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: scheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              localizedTopicLabel(l10n, video.category),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: scheme.onPrimaryContainer,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildSeriesMenu(
+    BuildContext context,
+    WidgetRef ref,
+    VideoDetail video,
+    List<VideoDetail> allVideos,
+    AppLocalizations l10n,
+  ) {
+    final seriesTitles =
+        allVideos
+            .map((item) => item.seriesTitle.trim())
+            .where((title) => title.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+
+    return PopupMenuButton<String>(
+      tooltip: l10n.moveToSeries,
+      padding: EdgeInsets.zero,
+      icon: const Icon(
+        Icons.more_horiz_rounded,
+        size: 19,
+        color: Color(0xFF908A81),
+      ),
+      onSelected: (value) async {
+        if (value == '__new_series__') {
+          final newSeries = await _promptNewSeries(context, l10n);
+
+          if (newSeries == null) {
+            return;
+          }
+
+          await _moveVideoToSeries(context, ref, video, newSeries, l10n);
+          return;
+        }
+
+        final targetSeries = value == '__uncategorized__' ? '' : value;
+        await _moveVideoToSeries(context, ref, video, targetSeries, l10n);
+      },
+      itemBuilder: (context) => <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: '__uncategorized__',
+          child: Row(
+            children: [
+              const Icon(Icons.folder_off_outlined, size: 18),
+              const SizedBox(width: 10),
+              Text(l10n.uncategorizedSeries),
+            ],
+          ),
+        ),
+        for (final seriesTitle in seriesTitles)
+          PopupMenuItem<String>(
+            value: seriesTitle,
+            child: Row(
+              children: [
+                Icon(
+                  video.seriesTitle.trim() == seriesTitle
+                      ? Icons.check_rounded
+                      : Icons.video_library_outlined,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    seriesTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(
+          value: '__new_series__',
+          child: Row(
+            children: [
+              const Icon(Icons.create_new_folder_outlined, size: 18),
+              const SizedBox(width: 10),
+              Text(l10n.moveNewSeries),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<String?> _promptNewSeries(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    final controller = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.moveNewSeries),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(hintText: l10n.seriesHint),
+            onSubmitted: (value) {
+              final normalized = value.trim();
+              if (normalized.isNotEmpty) {
+                Navigator.pop(dialogContext, normalized);
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                final normalized = controller.text.trim();
+
+                if (normalized.isEmpty) {
+                  return;
+                }
+
+                Navigator.pop(dialogContext, normalized);
+              },
+              child: Text(l10n.moveToSeries),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+    return result;
+  }
+
+  Future<void> _moveVideoToSeries(
+    BuildContext context,
+    WidgetRef ref,
+    VideoDetail video,
+    String seriesTitle,
+    AppLocalizations l10n,
+  ) async {
+    final normalizedTarget = seriesTitle.trim();
+    final normalizedCurrent = video.seriesTitle.trim();
+
+    if (normalizedTarget == normalizedCurrent) {
+      return;
+    }
+
+    try {
+      final repository = ref.read(videoRepositoryProvider);
+
+      await repository.updateVideoSeries(
+        videoId: video.id,
+        seriesTitle: normalizedTarget.isEmpty ? null : normalizedTarget,
+      );
+
+      ref.invalidate(myPublishedVideosProvider);
+      ref.invalidate(videoDetailProvider(video.id));
+      ref.invalidate(allPublishedVideosProvider);
+      ref.invalidate(publishedShortsProvider);
+      ref.invalidate(creatorProfileProvider(video.authorId));
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.seriesMoveSuccess)));
+    } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.seriesMoveFailed)));
+    }
   }
 
   Widget _buildCover(BuildContext context, VideoDetail video) {

@@ -4,9 +4,11 @@ import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/video_content_type.dart';
+import '../providers/video_detail_provider.dart';
 import '../providers/video_upload_queue_provider.dart';
 
 class CreateVideoPage extends ConsumerStatefulWidget {
@@ -26,9 +28,18 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _seriesController = TextEditingController();
+
+  final List<String> _existingSeries = [];
 
   XFile? _video;
+  VideoPlayerController? _previewController;
+  bool _isPreviewLoading = false;
+  String? _previewError;
   String _category = '影像';
+  String? _selectedSeries;
+  bool _createNewSeries = false;
+  bool _isLoadingSeries = true;
   bool _isPublishing = false;
 
   final List<String> _categories = const [
@@ -46,10 +57,68 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   Color get _acid => Theme.of(context).colorScheme.primary;
 
   @override
+  void initState() {
+    super.initState();
+    Future<void>.microtask(_loadExistingSeries);
+  }
+
+  @override
   void dispose() {
+    _previewController?.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
+    _seriesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadExistingSeries() async {
+    try {
+      final user = await ref.read(authProvider.future);
+
+      if (user == null) {
+        if (mounted) {
+          setState(() {
+            _createNewSeries = true;
+          });
+        }
+        return;
+      }
+
+      final repository = ref.read(videoRepositoryProvider);
+      final videos = await repository.loadUserVideos(userId: user.id);
+
+      final values =
+          videos
+              .map((video) => video.seriesTitle.trim())
+              .where((title) => title.isNotEmpty)
+              .toSet()
+              .toList()
+            ..sort();
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _existingSeries
+          ..clear()
+          ..addAll(values);
+        _selectedSeries = values.isEmpty ? null : values.first;
+        _createNewSeries = values.isEmpty;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _createNewSeries = true;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingSeries = false;
+        });
+      }
+    }
   }
 
   Future<void> _pickVideo() async {
@@ -63,9 +132,47 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       return;
     }
 
+    final previousController = _previewController;
+
     setState(() {
       _video = video;
+      _previewController = null;
+      _isPreviewLoading = true;
+      _previewError = null;
     });
+
+    await previousController?.pause();
+    await previousController?.dispose();
+
+    final controller = VideoPlayerController.networkUrl(Uri.parse(video.path));
+
+    try {
+      await controller.initialize();
+
+      if (!mounted || _video?.path != video.path) {
+        await controller.dispose();
+        return;
+      }
+
+      await controller.setLooping(true);
+
+      setState(() {
+        _previewController = controller;
+        _isPreviewLoading = false;
+      });
+    } catch (_) {
+      await controller.dispose();
+
+      if (!mounted || _video?.path != video.path) {
+        return;
+      }
+
+      setState(() {
+        _previewController = null;
+        _isPreviewLoading = false;
+        _previewError = '无法预览这个视频';
+      });
+    }
   }
 
   Future<void> _publish() async {
@@ -76,6 +183,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     final l10n = AppLocalizations.of(context)!;
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
+    final seriesTitle = _createNewSeries
+        ? _seriesController.text.trim()
+        : (_selectedSeries ?? '').trim();
 
     if (_video == null) {
       _showMessage(l10n.chooseVideoRequired);
@@ -84,6 +194,11 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
 
     if (title.isEmpty) {
       _showMessage(l10n.titleRequired);
+      return;
+    }
+
+    if (seriesTitle.isEmpty) {
+      _showMessage(l10n.seriesRequired);
       return;
     }
 
@@ -117,6 +232,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
               title: title,
               description: description,
               category: _category,
+              seriesTitle: seriesTitle,
               contentType: widget.contentType,
             ),
           );
@@ -179,6 +295,10 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                     hintText: l10n.videoTitleHint,
                     maxLines: 2,
                   ),
+                  const SizedBox(height: 24),
+                  _buildLabel(l10n.seriesEyebrow, l10n.seriesLabel),
+                  const SizedBox(height: 12),
+                  _buildSeriesPicker(l10n),
                   const SizedBox(height: 24),
                   _buildLabel(l10n.aboutEyebrow, l10n.descriptionLabel),
                   const SizedBox(height: 10),
@@ -268,7 +388,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     final isDark = scheme.brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: _isPublishing ? null : _pickVideo,
+      onTap: _video == null && !_isPublishing ? _pickVideo : null,
       child: Container(
         height: widget.contentType == VideoContentType.short ? 330 : 210,
         decoration: BoxDecoration(
@@ -303,44 +423,130 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                   ),
                 ],
               )
-            : Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check_circle_rounded, color: _acid, size: 42),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.videoSelected,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      _video!.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      l10n.tapToReselect,
-                      style: TextStyle(
-                        color: _acid,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+            : _buildVideoPreview(l10n),
+      ),
+    );
+  }
+
+  Widget _buildVideoPreview(AppLocalizations l10n) {
+    final controller = _previewController;
+
+    if (_isPreviewLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_previewError != null ||
+        controller == null ||
+        !controller.value.isInitialized) {
+      return Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white70,
+              size: 36,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _previewError ?? '无法预览这个视频',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
               ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _video!.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white54, fontSize: 11),
+            ),
+            const SizedBox(height: 14),
+            TextButton.icon(
+              onPressed: _isPublishing ? null : _pickVideo,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(l10n.tapToReselect),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ColoredBox(
+            color: Colors.black,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: controller.value.aspectRatio,
+                child: VideoPlayer(controller),
+              ),
+            ),
+          ),
+          ValueListenableBuilder<VideoPlayerValue>(
+            valueListenable: controller,
+            builder: (context, value, _) {
+              return Center(
+                child: IconButton.filled(
+                  onPressed: () {
+                    if (value.isPlaying) {
+                      controller.pause();
+                    } else {
+                      controller.play();
+                    }
+                  },
+                  iconSize: 34,
+                  icon: Icon(
+                    value.isPlaying
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                  ),
+                ),
+              );
+            },
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: FilledButton.tonalIcon(
+              onPressed: _isPublishing ? null : _pickVideo,
+              icon: const Icon(Icons.refresh_rounded, size: 17),
+              label: Text(l10n.tapToReselect),
+            ),
+          ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _video!.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    shadows: [Shadow(blurRadius: 8, color: Colors.black)],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                VideoProgressIndicator(
+                  controller,
+                  allowScrubbing: true,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -438,6 +644,99 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
           borderSide: BorderSide(color: _purple, width: 1.5),
         ),
       ),
+    );
+  }
+
+  Widget _buildSeriesPicker(AppLocalizations l10n) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = scheme.brightness == Brightness.dark;
+
+    if (_isLoadingSeries) {
+      return const Align(
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_existingSeries.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            runSpacing: 9,
+            children: [
+              for (final series in _existingSeries)
+                ChoiceChip(
+                  label: Text(series),
+                  selected: !_createNewSeries && _selectedSeries == series,
+                  onSelected: _isPublishing
+                      ? null
+                      : (selected) {
+                          if (!selected) {
+                            return;
+                          }
+
+                          setState(() {
+                            _selectedSeries = series;
+                            _createNewSeries = false;
+                          });
+                        },
+                ),
+              ChoiceChip(
+                label: Text(l10n.createNewSeries),
+                selected: _createNewSeries,
+                onSelected: _isPublishing
+                    ? null
+                    : (selected) {
+                        if (!selected) {
+                          return;
+                        }
+
+                        setState(() {
+                          _createNewSeries = true;
+                          _selectedSeries = null;
+                        });
+                      },
+              ),
+            ],
+          )
+        else
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF222222)
+                  : Colors.white.withValues(alpha: 0.72),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF383838)
+                    : const Color(0xFFE3DED5),
+              ),
+            ),
+            child: Text(
+              l10n.noExistingSeries,
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.70),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        if (_createNewSeries) ...[
+          const SizedBox(height: 12),
+          _buildTextField(
+            controller: _seriesController,
+            hintText: l10n.seriesHint,
+            maxLines: 1,
+          ),
+        ],
+      ],
     );
   }
 

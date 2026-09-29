@@ -2,6 +2,8 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
+import 'upload_status_bar.dart';
+
 class StudioShell extends StatelessComponent {
   const StudioShell({
     required this.child,
@@ -56,6 +58,12 @@ class StudioShell extends StatelessComponent {
                   path: '/videos',
                   icon: '▶',
                   label: 'Videos',
+                ),
+                _navItem(
+                  activePath: activePath,
+                  path: '/comments',
+                  icon: '☰',
+                  label: 'Comments',
                 ),
                 _navItem(
                   activePath: activePath,
@@ -129,6 +137,7 @@ class StudioShell extends StatelessComponent {
               classes: 'studio-content',
               [child],
             ),
+            const UploadStatusBar(),
           ],
         ),
       ],
@@ -188,6 +197,9 @@ class StudioShell extends StatelessComponent {
 
     if (path.startsWith('/videos')) {
       return 'Videos';
+    }
+    if (path.startsWith('/comments')) {
+      return 'Comments';
     }
 
     if (path.startsWith('/nom')) {

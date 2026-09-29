@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
@@ -14,7 +14,7 @@ class SubtitleEndpoint extends Endpoint {
     final auth = session.authenticated;
 
     if (auth == null) {
-      throw Exception('需要登录 Clyven Studio');
+      throw Exception('éœ€è¦ç™»å½• Clyven Studio');
     }
 
     return auth.userIdentifier.toString();
@@ -32,7 +32,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('找不到视频');
+      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
     }
 
     final auth = session.authenticated!;
@@ -42,7 +42,7 @@ class SubtitleEndpoint extends Endpoint {
     }
 
     if (video.authorId != userId) {
-      throw Exception('只能编辑自己账号名下的视频');
+      throw Exception('åªèƒ½ç¼–è¾‘è‡ªå·±è´¦å·åä¸‹çš„è§†é¢‘');
     }
 
     return video;
@@ -58,7 +58,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('找不到字幕');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -67,7 +67,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null) {
-      throw Exception('找不到字幕轨');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
     }
 
     return _requireOwnedVideo(
@@ -325,7 +325,7 @@ class SubtitleEndpoint extends Endpoint {
     await _requireOwnedVideo(session, videoId);
 
     if (session.authenticated == null) {
-      throw Exception('需要登录 Studio 后才能发布字幕');
+      throw Exception('éœ€è¦ç™»å½• Studio åŽæ‰èƒ½å‘å¸ƒå­—å¹•');
     }
 
     final track = await SubtitleTrack.db.findFirstRow(
@@ -333,13 +333,13 @@ class SubtitleEndpoint extends Endpoint {
       where: (t) =>
           t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
     );
-    if (track == null || track.id == null) throw Exception('找不到字幕轨');
+    if (track == null || track.id == null) throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
 
     final cue = await SubtitleCue.db.findFirstRow(
       session,
       where: (c) => c.trackId.equals(track.id!),
     );
-    if (cue == null) throw Exception('当前字幕轨没有可发布的字幕');
+    if (cue == null) throw Exception('å½“å‰å­—å¹•è½¨æ²¡æœ‰å¯å‘å¸ƒçš„å­—å¹•');
 
     final payload = await _buildPublishedPayload(session, track);
     var state = await SubtitlePublishState.db.findFirstRow(
@@ -432,7 +432,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能导入字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å…¥å­—å¹•',
       );
     }
 
@@ -442,7 +442,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('找不到视频');
+      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
     }
 
     final parser = SubtitleSrtParser();
@@ -479,7 +479,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能导入字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å…¥å­—å¹•',
       );
     }
 
@@ -489,7 +489,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('找不到视频');
+      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
     }
 
     final parser = SubtitleSrtParser();
@@ -509,15 +509,15 @@ class SubtitleEndpoint extends Endpoint {
 
     if (!result.canImport) {
       throw Exception(
-        'SRT 存在 '
+        'SRT å­˜åœ¨ '
         '${result.errors.length} '
-        '个错误，无法导入',
+        'ä¸ªé”™è¯¯ï¼Œæ— æ³•å¯¼å…¥',
       );
     }
 
     if (result.cues.isEmpty) {
       throw Exception(
-        'SRT 中没有可导入的字幕',
+        'SRT ä¸­æ²¡æœ‰å¯å¯¼å…¥çš„å­—å¹•',
       );
     }
 
@@ -699,7 +699,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能导出字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å‡ºå­—å¹•',
       );
     }
 
@@ -713,7 +713,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null || track.id == null) {
-      throw Exception('找不到字幕轨');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
     }
 
     final cues = await SubtitleCue.db.find(
@@ -724,7 +724,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (cues.isEmpty) {
       throw Exception(
-        '当前字幕轨没有可导出的字幕',
+        'å½“å‰å­—å¹•è½¨æ²¡æœ‰å¯å¯¼å‡ºçš„å­—å¹•',
       );
     }
 
@@ -745,7 +745,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能修改字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹å­—å¹•',
       );
     }
 
@@ -753,7 +753,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (normalizedText.isEmpty) {
       throw Exception(
-        '字幕内容不能为空',
+        'å­—å¹•å†…å®¹ä¸èƒ½ä¸ºç©º',
       );
     }
 
@@ -763,7 +763,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('找不到字幕');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -956,19 +956,19 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能修改字幕时间',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹å­—å¹•æ—¶é—´',
       );
     }
 
     if (startMs < 0) {
       throw Exception(
-        '开始时间不能小于 0',
+        'å¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
       );
     }
 
     if (endMs <= startMs) {
       throw Exception(
-        '结束时间必须大于开始时间',
+        'ç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
       );
     }
 
@@ -978,7 +978,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('找不到字幕');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
     }
 
     await _ensurePublishBaseline(session, cue.trackId);
@@ -1001,7 +1001,7 @@ class SubtitleEndpoint extends Endpoint {
     for (final segment in karaokeSegments) {
       if (segment.endOffsetMs > newDurationMs) {
         throw Exception(
-          'Karaoke 片段超出新的字幕时长，请先调整 Karaoke 时间。',
+          'Karaoke ç‰‡æ®µè¶…å‡ºæ–°çš„å­—å¹•æ—¶é•¿ï¼Œè¯·å…ˆè°ƒæ•´ Karaoke æ—¶é—´ã€‚',
         );
       }
     }
@@ -1041,7 +1041,7 @@ class SubtitleEndpoint extends Endpoint {
 
       if (overlaps) {
         throw Exception(
-          '字幕时间与现有字幕重叠：'
+          'å­—å¹•æ—¶é—´ä¸ŽçŽ°æœ‰å­—å¹•é‡å ï¼š'
           '${existing.startMs}ms - '
           '${existing.endMs}ms',
         );
@@ -1062,25 +1062,25 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能新增字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½æ–°å¢žå­—å¹•',
       );
     }
 
     if (text.trim().isEmpty) {
       throw Exception(
-        '字幕内容不能为空',
+        'å­—å¹•å†…å®¹ä¸èƒ½ä¸ºç©º',
       );
     }
 
     if (startMs < 0) {
       throw Exception(
-        '开始时间不能小于 0',
+        'å¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
       );
     }
 
     if (endMs <= startMs) {
       throw Exception(
-        '结束时间必须大于开始时间',
+        'ç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
       );
     }
 
@@ -1094,7 +1094,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null || track.id == null) {
-      throw Exception('找不到字幕轨');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
     }
 
     await _ensurePublishBaseline(session, track.id!);
@@ -1159,7 +1159,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        '需要登录后才能删除字幕',
+        'éœ€è¦ç™»å½•åŽæ‰èƒ½åˆ é™¤å­—å¹•',
       );
     }
 
@@ -1169,7 +1169,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('找不到字幕');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
     }
 
     await _ensurePublishBaseline(session, cue.trackId);
@@ -1211,7 +1211,7 @@ class SubtitleEndpoint extends Endpoint {
     await _requireOwnedCueVideo(session, cueId);
 
     if (session.authenticated == null) {
-      throw Exception('需要登录后才能修改 Karaoke 字幕');
+      throw Exception('éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹ Karaoke å­—å¹•');
     }
 
     final cue = await SubtitleCue.db.findById(
@@ -1220,7 +1220,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('找不到字幕');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -1229,7 +1229,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null) {
-      throw Exception('找不到字幕轨');
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
     }
 
     await _ensurePublishBaseline(session, track.id!);
@@ -1250,23 +1250,23 @@ class SubtitleEndpoint extends Endpoint {
       final cleanText = segment.text.trim();
 
       if (cleanText.isEmpty) {
-        throw Exception('第 ${index + 1} 个 Karaoke 片段不能为空');
+        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸èƒ½ä¸ºç©º');
       }
 
       if (segment.startOffsetMs < 0) {
-        throw Exception('第 ${index + 1} 个 Karaoke 片段开始时间不能小于 0');
+        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µå¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0');
       }
 
       if (segment.endOffsetMs <= segment.startOffsetMs) {
-        throw Exception('第 ${index + 1} 个 Karaoke 片段结束时间必须大于开始时间');
+        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´');
       }
 
       if (segment.endOffsetMs > cueDurationMs) {
-        throw Exception('第 ${index + 1} 个 Karaoke 片段超出当前字幕时长');
+        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µè¶…å‡ºå½“å‰å­—å¹•æ—¶é•¿');
       }
 
       if (segment.startOffsetMs < previousEndMs) {
-        throw Exception('第 ${index + 1} 个 Karaoke 片段与前一片段重叠');
+        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸Žå‰ä¸€ç‰‡æ®µé‡å ');
       }
 
       previousEndMs = segment.endOffsetMs;
@@ -1725,8 +1725,8 @@ class SubtitleEndpoint extends Endpoint {
     for (final cue in cues) {
       if (cue.startMs >= videoDurationMs) {
         errors.add(
-          '第 ${cue.sourceNumber} '
-          '条字幕开始时间超出视频时长',
+          'ç¬¬ ${cue.sourceNumber} '
+          'æ¡å­—å¹•å¼€å§‹æ—¶é—´è¶…å‡ºè§†é¢‘æ—¶é•¿',
         );
 
         continue;
@@ -1734,8 +1734,8 @@ class SubtitleEndpoint extends Endpoint {
 
       if (cue.endMs > videoDurationMs) {
         errors.add(
-          '第 ${cue.sourceNumber} '
-          '条字幕结束时间超出视频时长',
+          'ç¬¬ ${cue.sourceNumber} '
+          'æ¡å­—å¹•ç»“æŸæ—¶é—´è¶…å‡ºè§†é¢‘æ—¶é•¿',
         );
       }
     }
@@ -1743,3 +1743,4 @@ class SubtitleEndpoint extends Endpoint {
     return errors;
   }
 }
+

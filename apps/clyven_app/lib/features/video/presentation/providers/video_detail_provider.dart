@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/serverpod/serverpod_client_provider.dart';
@@ -77,4 +78,21 @@ final myPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
   final repository = ref.watch(videoRepositoryProvider);
 
   return repository.loadUserVideos(userId: user.id);
+});
+
+// ============================================================
+// 系列中的视频
+//
+// seriesPosition 只负责排序，不代表“集数”。
+// ============================================================
+
+final seriesVideosProvider = FutureProvider.family<List<serverpod.Video>, int>((
+  ref,
+  seriesId,
+) async {
+  ref.watch(authProvider.select((state) => state.value?.id));
+
+  final client = ref.watch(serverpodClientProvider);
+
+  return client.video.getSeriesVideos(seriesId: seriesId);
 });

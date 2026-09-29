@@ -1,0 +1,103 @@
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+  - hasAccount:
+jwtRefresh:
+  - refreshAccessToken:
+userProfileEdit:
+  - removeUserImage:
+  - setUserImage:
+  - changeUserName:
+  - changeFullName:
+  - get:
+admin:
+  - ping:
+  - getUserEmails:
+  - getAsrJobs:
+  - retryVideoAsr:
+  - getAllVideos:
+  - getVideosWithSubtitles:
+  - getSubtitleTracks:
+comment:
+  - loadComments:
+  - createComment:
+  - createReply:
+  - toggleCommentLike:
+  - toggleReplyLike:
+  - deleteManagedComment:
+  - deleteManagedReply:
+dictionary:
+  - lookup:
+  - getById:
+  - listEntries:
+  - updateEntryRow:
+dictionaryImport:
+  - getProfiles:
+  - getProfile:
+  - createVietnameseVocabularyProfile:
+  - previewRows:
+  - previewExcelBase64:
+  - commitExcelBase64:
+knownEntry:
+  - getKnownEntryIds:
+  - setKnown:
+  - getKnowledgeStatesByEntryIds:
+  - getKnowledgeState:
+  - getKnowledgeStates:
+review:
+  - getDashboard:
+  - getTaskDetail:
+  - generateVietnameseNomDraft:
+  - claimTask:
+  - startTask:
+  - submitTask:
+  - returnTask:
+  - approveAndPublish:
+scriptConversion:
+  - listProfiles:
+  - createProfile:
+  - updateProfile:
+  - deleteProfile:
+  - listEntries:
+  - updateEntry:
+  - deleteEntry:
+  - previewExcelBase64:
+  - commitExcelBase64:
+  - testConvert:
+subtitle:
+  - getCueDetails:
+  - getPublishedCueDetails:
+  - getPublishedAvailableTracks:
+  - getSubtitlePublishStatus:
+  - publishSubtitleTrack:
+  - getAvailableTracks:
+  - previewSrtImport:
+  - confirmReplaceSrtImport:
+  - exportSrt:
+  - updateCueText:
+  - upsertCueScriptText:
+  - updateCueTiming:
+  - createCue:
+  - deleteCue:
+  - replaceKaraokeSegments:
+video:
+  - getCurrentUserId:
+  - create:
+  - getVideos:
+  - getMyVideos:
+  - getVideo:
+  - setVisibility:
+  - deleteVideo:
+  - createUploadDescription:
+  - verifyUpload:
+  - getVideoUrl:
+wordList:
+  - getLists:
+  - getListDetail:
+greeting:
+  - hello:

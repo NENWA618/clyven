@@ -1,0 +1,15 @@
+class: NotificationSettings
+table: notification_settings
+
+fields:
+  userId: String
+  pushEnabled: bool, default=true
+  likeEnabled: bool, default=true
+  commentEnabled: bool, default=true
+  followEnabled: bool, default=true
+  updatedAt: DateTime, default=now
+
+indexes:
+  notification_settings_user_unique_idx:
+    fields: userId
+    unique: true

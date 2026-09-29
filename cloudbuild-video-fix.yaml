@@ -1,0 +1,11 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - 'asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:video-transcode-fix'
+    - '-f'
+    - 'server/clyven_backend_server/Dockerfile'
+    - '.'
+images:
+- 'asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:video-transcode-fix'

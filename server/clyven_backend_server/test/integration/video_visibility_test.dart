@@ -25,12 +25,37 @@ void main() {
         contentType: type,
         languageCode: 'auto',
         tags: [],
-        videoStorageKey: 'visibility-fixture-missing.mp4',
+        videoStorageKey:
+            'videos/${identical(owner, a) ? 'user-a' : 'user-b'}/visibility-fixture-missing.mp4',
         durationSeconds: 12,
+        isPublic: true,
       );
     }
 
     for (final type in VideoContentType.values) {
+      test('$type: private content is visible only to its owner', () async {
+        final video = await publish(a, type);
+        await endpoints.video.setVisibility(
+          a,
+          videoId: video.id!,
+          isPublic: false,
+        );
+        for (final viewer in [a, b, builder]) {
+          final feed = await endpoints.video.getVideos(
+            viewer,
+            contentType: type,
+          );
+          expect(feed.map((row) => row.id), isNot(contains(video.id)));
+        }
+        expect(await endpoints.video.getVideo(b, video.id!), isNull);
+        expect(await endpoints.video.getVideo(builder, video.id!), isNull);
+        expect(await endpoints.video.getVideo(a, video.id!), isNotNull);
+        expect(
+          (await endpoints.video.getMyVideos(a)).map((row) => row.id),
+          contains(video.id),
+        );
+      });
+
       test('$type: A publishes, B sees; B publishes, A sees', () async {
         final videoA = await publish(a, type);
         final videoB = await publish(b, type);

@@ -1,3 +1,4 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,10 +10,11 @@ class WordListsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final listsAsync = ref.watch(wordListsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('词表')),
+      appBar: AppBar(title: Text(l10n.wordLists)),
       body: listsAsync.when(
         loading: () {
           return const Center(child: CircularProgressIndicator());
@@ -21,13 +23,16 @@ class WordListsPage extends ConsumerWidget {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Text('读取词表失败：$error', textAlign: TextAlign.center),
+              child: Text(
+                l10n.wordListLoadFailed(error.toString()),
+                textAlign: TextAlign.center,
+              ),
             ),
           );
         },
         data: (lists) {
           if (lists.isEmpty) {
-            return const Center(child: Text('暂时没有词表'));
+            return Center(child: Text(l10n.noWordLists));
           }
 
           return ListView.separated(

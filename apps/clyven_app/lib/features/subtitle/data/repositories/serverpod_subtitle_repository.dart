@@ -13,7 +13,7 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
     required String languageCode,
     String? scriptCode,
   }) async {
-    return client.subtitle.getPublishedCueDetails(
+    return client.subtitle.getCueDetails(
       videoId: videoId,
       languageCode: languageCode,
       scriptCode: scriptCode,

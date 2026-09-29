@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/localization/app_locale_provider.dart';
+import 'core/navigation/app_navigator.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_theme_provider.dart';
 import 'features/auth/presentation/auth_gate.dart';
@@ -24,6 +25,7 @@ class ClyvenApp extends ConsumerWidget {
     final themeSettings = ref.watch(appThemeProvider);
 
     return MaterialApp(
+      navigatorKey: appNavigatorKey,
       debugShowCheckedModeBanner: false,
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

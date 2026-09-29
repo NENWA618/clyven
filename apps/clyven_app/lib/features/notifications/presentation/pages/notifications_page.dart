@@ -1,11 +1,12 @@
+import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/app_notification.dart';
+import '../../data/models/notification_settings_filter.dart';
 import '../providers/notification_provider.dart';
-
-import 'package:clyven_app/features/video/presentation/controllers/global_video_player_controller.dart';
+import '../providers/notification_settings_provider.dart';
 
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
@@ -15,14 +16,20 @@ class NotificationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(notificationProvider);
+    final settings =
+        ref.watch(notificationSettingsProvider).unwrapPrevious().value ??
+        NotificationSettings(userId: '');
     final l10n = AppLocalizations.of(context)!;
+    final visibleNotifications = (notificationsAsync.value ?? const [])
+        .where((notification) => settings.isEnabledFor(notification.type))
+        .toList(growable: false);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context, l10n),
+            _buildHeader(context, ref, l10n, visibleNotifications),
             Expanded(
               child: notificationsAsync.when(
                 loading: () {
@@ -32,19 +39,20 @@ class NotificationsPage extends ConsumerWidget {
                   return Center(child: Text(l10n.notificationsLoadFailed));
                 },
                 data: (notifications) {
+                  final visible = visibleNotifications;
+
+                  if (visible.isEmpty) {
+                    return _buildEmpty(l10n);
+                  }
+
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(18, 10, 18, 40),
-                    itemCount: notifications.length,
+                    itemCount: visible.length,
                     separatorBuilder: (context, index) {
                       return const SizedBox(height: 12);
                     },
                     itemBuilder: (context, index) {
-                      return _buildItem(
-                        context,
-                        ref,
-                        notifications[index],
-                        l10n,
-                      );
+                      return _buildItem(context, ref, visible[index], l10n);
                     },
                   );
                 },
@@ -56,35 +64,81 @@ class NotificationsPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    List<AppNotification> notifications,
+  ) {
     final scheme = Theme.of(context).colorScheme;
+    final hasUnread = notifications.any((notification) {
+      return !notification.isRead;
+    });
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.echoesEyebrow,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.echoesEyebrow,
+                  style: TextStyle(
+                    color: scheme.secondary,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  l10n.navEchoes,
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (hasUnread)
+            TextButton(
+              onPressed: () {
+                ref.read(notificationProvider.notifier).markAllAsRead();
+              },
+              child: Text(
+                l10n.markAllRead,
                 style: TextStyle(
                   color: scheme.secondary,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 3),
-              Text(
-                l10n.navEchoes,
-                style: TextStyle(
-                  color: scheme.onSurface,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmpty(AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.notifications_none_rounded,
+            size: 45,
+            color: Color(0xFFAAA49B),
+          ),
+          const SizedBox(height: 13),
+          Text(
+            l10n.noEchoesYet,
+            style: const TextStyle(
+              color: Color(0xFF77736C),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -106,14 +160,14 @@ class NotificationsPage extends ConsumerWidget {
       onTap: () async {
         await ref
             .read(notificationProvider.notifier)
-            .markAsRead(notification.id);
+            .markAsRead(notification.id!);
 
         if (!context.mounted) {
           return;
         }
 
         if (notification.videoId != null) {
-          openGlobalVideo(notification.videoId!);
+          openGlobalVideo(notification.videoId!.toString());
         }
       },
       child: Container(
@@ -203,41 +257,41 @@ class NotificationsPage extends ConsumerWidget {
     );
   }
 
-  String _title(AppNotificationType type, AppLocalizations l10n) {
+  String _title(NotificationType type, AppLocalizations l10n) {
     return switch (type) {
-      AppNotificationType.comment => l10n.notificationCommentTitle,
-      AppNotificationType.like => l10n.notificationLikeTitle,
-      AppNotificationType.follow => l10n.notificationFollowTitle,
+      NotificationType.comment => l10n.notificationCommentTitle,
+      NotificationType.like => l10n.notificationLikeTitle,
+      NotificationType.follow => l10n.notificationFollowTitle,
     };
   }
 
   String _message(AppNotification notification, AppLocalizations l10n) {
     return switch (notification.type) {
-      AppNotificationType.comment => l10n.notificationCommentMessage(
+      NotificationType.comment => l10n.notificationCommentMessage(
         notification.actorName,
-        notification.contentPreview ?? '',
+        notification.commentPreview ?? '',
       ),
-      AppNotificationType.like => l10n.notificationLikeMessage(
+      NotificationType.like => l10n.notificationLikeMessage(
         notification.actorName,
       ),
-      AppNotificationType.follow => l10n.notificationFollowMessage(
+      NotificationType.follow => l10n.notificationFollowMessage(
         notification.actorName,
       ),
     };
   }
 
-  IconData _icon(AppNotificationType type) {
+  IconData _icon(NotificationType type) {
     switch (type) {
-      case AppNotificationType.like:
+      case NotificationType.like:
         return Icons.favorite_rounded;
-      case AppNotificationType.comment:
+      case NotificationType.comment:
         return Icons.mode_comment_rounded;
-      case AppNotificationType.follow:
+      case NotificationType.follow:
         return Icons.person_add_alt_1_rounded;
     }
   }
 
-  Color _iconColor(BuildContext context, AppNotificationType type) {
+  Color _iconColor(BuildContext context, NotificationType type) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = scheme.brightness == Brightness.dark;
 
@@ -246,27 +300,27 @@ class NotificationsPage extends ConsumerWidget {
       final darkBase = Theme.of(context).cardColor;
 
       switch (type) {
-        case AppNotificationType.like:
+        case NotificationType.like:
           return Color.alphaBlend(
             scheme.primary.withValues(alpha: 0.34),
             darkBase,
           );
-        case AppNotificationType.comment:
+        case NotificationType.comment:
           return Color.alphaBlend(
             scheme.secondary.withValues(alpha: 0.38),
             darkBase,
           );
-        case AppNotificationType.follow:
+        case NotificationType.follow:
           return const Color(0xFF29463E);
       }
     }
 
     switch (type) {
-      case AppNotificationType.like:
+      case NotificationType.like:
         return scheme.primary;
-      case AppNotificationType.comment:
+      case NotificationType.comment:
         return scheme.secondary.withValues(alpha: 0.22);
-      case AppNotificationType.follow:
+      case NotificationType.follow:
         return const Color(0xFFD7EEE3);
     }
   }

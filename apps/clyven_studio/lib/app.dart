@@ -1,4 +1,4 @@
-import 'package:jaspr/dom.dart';
+﻿import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -11,6 +11,8 @@ import 'pages/dashboard_page.dart';
 import 'pages/dictionary_page.dart';
 import 'pages/home.dart';
 import 'pages/placeholder_page.dart';
+import 'pages/video_management_page.dart';
+import 'pages/comments_management_page.dart';
 import 'services/studio_client.dart';
 
 class App extends StatelessComponent {
@@ -43,10 +45,14 @@ class App extends StatelessComponent {
                   path: '/videos',
                   title: 'Videos · Clyven Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Videos',
-                      description: '管理视频、状态、封面与发布信息。',
-                    );
+                    return const VideoManagementPage();
+                  },
+                ),
+                Route(
+                  path: '/comments',
+                  title: 'Comments · Clyven Studio',
+                  builder: (context, state) {
+                    return const CommentsManagementPage();
                   },
                 ),
                 Route(
