@@ -1,3 +1,4 @@
+import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +17,7 @@ class WordListPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final query = (
       listId: listId,
       explanationLanguageCode: explanationLanguageCode,
@@ -28,7 +30,7 @@ class WordListPage extends ConsumerWidget {
     final knownEntryIds = knownAsync.value ?? <int>{};
 
     return Scaffold(
-      appBar: AppBar(title: const Text('词表')),
+      appBar: AppBar(title: Text(l10n.wordLists)),
       body: detailAsync.when(
         loading: () {
           return const Center(child: CircularProgressIndicator());
@@ -37,13 +39,16 @@ class WordListPage extends ConsumerWidget {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Text('读取词表失败：$error', textAlign: TextAlign.center),
+              child: Text(
+                l10n.wordListLoadFailed(error.toString()),
+                textAlign: TextAlign.center,
+              ),
             ),
           );
         },
         data: (detail) {
           if (detail == null) {
-            return const Center(child: Text('找不到这份词表'));
+            return Center(child: Text(l10n.wordListNotFound));
           }
 
           return Column(
@@ -70,7 +75,7 @@ class WordListPage extends ConsumerWidget {
                   horizontal: 20,
                   vertical: 8,
                 ),
-                child: Text('${detail.items.length} 个词条'),
+                child: Text(l10n.wordListEntryCount(detail.items.length)),
               ),
 
               const Divider(height: 1),
@@ -87,7 +92,7 @@ class WordListPage extends ConsumerWidget {
                     final entryId = item.entry.id;
 
                     final meaning = item.definitions.isEmpty
-                        ? '暂无释义'
+                        ? l10n.noDefinition
                         : item.definitions.first.gloss;
 
                     final isKnown =
@@ -100,7 +105,7 @@ class WordListPage extends ConsumerWidget {
                       ),
 
                       leading: IconButton(
-                        tooltip: isKnown ? '取消已会' : '标记为已会',
+                        tooltip: isKnown ? l10n.unmarkKnown : l10n.markAsKnown,
                         onPressed: entryId == null
                             ? null
                             : () async {
@@ -144,7 +149,9 @@ class WordListPage extends ConsumerWidget {
                       ),
 
                       trailing: Text(
-                        item.entry.entryType == 'phrase' ? 'Phrase' : 'Word',
+                        item.entry.entryType == 'phrase'
+                            ? l10n.entryTypePhrase
+                            : l10n.entryTypeWord,
                       ),
                     );
                   },

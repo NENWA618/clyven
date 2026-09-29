@@ -15,7 +15,7 @@ dependencies:
   share_plus: ^13.3.0
   image_picker: ^1.2.3
   video_duration_native: ^0.2.3
-  ffmpeg_kit_flutter_new_min: ^3.6.2
+  ffmpeg_kit_flutter_new_min_gpl: ^2.6.0
   clyven_backend_client:
     path: ../../packages/clyven_backend_client
   glyphora_language_core:

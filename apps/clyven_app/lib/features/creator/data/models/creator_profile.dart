@@ -3,6 +3,7 @@ class CreatorVideoPreview {
   final String title;
   final String coverUrl;
   final int viewCount;
+  final String seriesTitle;
   final int durationSeconds;
 
   const CreatorVideoPreview({
@@ -10,6 +11,7 @@ class CreatorVideoPreview {
     required this.title,
     required this.coverUrl,
     required this.viewCount,
+    required this.seriesTitle,
     required this.durationSeconds,
   });
 }

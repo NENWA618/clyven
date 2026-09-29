@@ -21,6 +21,9 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     this.id,
     required this.authorId,
     required this.authorName,
+    this.seriesTitle,
+    this.seriesId,
+    this.seriesPosition,
     required this.title,
     required this.description,
     required this.category,
@@ -29,26 +32,35 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required this.tags,
     required this.videoStorageKey,
     this.coverStorageKey,
+    this.hlsManifestStorageKey,
+    this.transcoderJobName,
+    this.transcodeState,
     required this.durationSeconds,
-    int? viewCount,
+    required this.viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i3.VideoStatus? status,
+    bool? isPublic,
     this.publishedAt,
     required this.createdAt,
     required this.updatedAt,
   }) : contentType = contentType ?? _i2.VideoContentType.video,
-       viewCount = viewCount ?? 0,
+       engagedViewCount = engagedViewCount ?? 0,
        likeCount = likeCount ?? 0,
        favoriteCount = favoriteCount ?? 0,
        commentCount = commentCount ?? 0,
-       status = status ?? _i3.VideoStatus.uploading;
+       status = status ?? _i3.VideoStatus.uploading,
+       isPublic = isPublic ?? true;
 
   factory Video({
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     required String title,
     required String description,
     required String category,
@@ -57,12 +69,17 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     required int durationSeconds,
-    int? viewCount,
+    required int viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i3.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -73,6 +90,9 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       id: jsonSerialization['id'] as int?,
       authorId: jsonSerialization['authorId'] as String,
       authorName: jsonSerialization['authorName'] as String,
+      seriesTitle: jsonSerialization['seriesTitle'] as String?,
+      seriesId: jsonSerialization['seriesId'] as int?,
+      seriesPosition: jsonSerialization['seriesPosition'] as int?,
       title: jsonSerialization['title'] as String,
       description: jsonSerialization['description'] as String,
       category: jsonSerialization['category'] as String,
@@ -85,14 +105,22 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       tags: _i4.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
+      hlsManifestStorageKey:
+          jsonSerialization['hlsManifestStorageKey'] as String?,
+      transcoderJobName: jsonSerialization['transcoderJobName'] as String?,
+      transcodeState: jsonSerialization['transcodeState'] as String?,
       durationSeconds: jsonSerialization['durationSeconds'] as int,
-      viewCount: jsonSerialization['viewCount'] as int?,
+      viewCount: jsonSerialization['viewCount'] as int,
+      engagedViewCount: jsonSerialization['engagedViewCount'] as int?,
       likeCount: jsonSerialization['likeCount'] as int?,
       favoriteCount: jsonSerialization['favoriteCount'] as int?,
       commentCount: jsonSerialization['commentCount'] as int?,
       status: jsonSerialization['status'] == null
           ? null
           : _i3.VideoStatus.fromJson((jsonSerialization['status'] as String)),
+      isPublic: jsonSerialization['isPublic'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['isPublic']),
       publishedAt: jsonSerialization['publishedAt'] == null
           ? null
           : _i1.DateTimeJsonExtension.fromJson(
@@ -118,6 +146,12 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   String authorName;
 
+  String? seriesTitle;
+
+  int? seriesId;
+
+  int? seriesPosition;
+
   String title;
 
   String description;
@@ -134,9 +168,17 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   String? coverStorageKey;
 
+  String? hlsManifestStorageKey;
+
+  String? transcoderJobName;
+
+  String? transcodeState;
+
   int durationSeconds;
 
   int viewCount;
+
+  int engagedViewCount;
 
   int likeCount;
 
@@ -145,6 +187,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   int commentCount;
 
   _i3.VideoStatus status;
+
+  bool isPublic;
 
   DateTime? publishedAt;
 
@@ -162,6 +206,9 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     int? id,
     String? authorId,
     String? authorName,
+    String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     String? title,
     String? description,
     String? category,
@@ -170,12 +217,17 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     List<String>? tags,
     String? videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     int? durationSeconds,
     int? viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i3.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -187,6 +239,9 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (id != null) 'id': id,
       'authorId': authorId,
       'authorName': authorName,
+      if (seriesTitle != null) 'seriesTitle': seriesTitle,
+      if (seriesId != null) 'seriesId': seriesId,
+      if (seriesPosition != null) 'seriesPosition': seriesPosition,
       'title': title,
       'description': description,
       'category': category,
@@ -195,12 +250,18 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
+      if (hlsManifestStorageKey != null)
+        'hlsManifestStorageKey': hlsManifestStorageKey,
+      if (transcoderJobName != null) 'transcoderJobName': transcoderJobName,
+      if (transcodeState != null) 'transcodeState': transcodeState,
       'durationSeconds': durationSeconds,
       'viewCount': viewCount,
+      'engagedViewCount': engagedViewCount,
       'likeCount': likeCount,
       'favoriteCount': favoriteCount,
       'commentCount': commentCount,
       'status': status.toJson(),
+      'isPublic': isPublic,
       if (publishedAt != null) 'publishedAt': publishedAt?.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -214,6 +275,9 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       if (id != null) 'id': id,
       'authorId': authorId,
       'authorName': authorName,
+      if (seriesTitle != null) 'seriesTitle': seriesTitle,
+      if (seriesId != null) 'seriesId': seriesId,
+      if (seriesPosition != null) 'seriesPosition': seriesPosition,
       'title': title,
       'description': description,
       'category': category,
@@ -222,12 +286,18 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'tags': tags.toJson(),
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
+      if (hlsManifestStorageKey != null)
+        'hlsManifestStorageKey': hlsManifestStorageKey,
+      if (transcoderJobName != null) 'transcoderJobName': transcoderJobName,
+      if (transcodeState != null) 'transcodeState': transcodeState,
       'durationSeconds': durationSeconds,
       'viewCount': viewCount,
+      'engagedViewCount': engagedViewCount,
       'likeCount': likeCount,
       'favoriteCount': favoriteCount,
       'commentCount': commentCount,
       'status': status.toJson(),
+      'isPublic': isPublic,
       if (publishedAt != null) 'publishedAt': publishedAt?.toJson(),
       'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
@@ -271,6 +341,9 @@ class _VideoImpl extends Video {
     int? id,
     required String authorId,
     required String authorName,
+    String? seriesTitle,
+    int? seriesId,
+    int? seriesPosition,
     required String title,
     required String description,
     required String category,
@@ -279,12 +352,17 @@ class _VideoImpl extends Video {
     required List<String> tags,
     required String videoStorageKey,
     String? coverStorageKey,
+    String? hlsManifestStorageKey,
+    String? transcoderJobName,
+    String? transcodeState,
     required int durationSeconds,
-    int? viewCount,
+    required int viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i3.VideoStatus? status,
+    bool? isPublic,
     DateTime? publishedAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -292,6 +370,9 @@ class _VideoImpl extends Video {
          id: id,
          authorId: authorId,
          authorName: authorName,
+         seriesTitle: seriesTitle,
+         seriesId: seriesId,
+         seriesPosition: seriesPosition,
          title: title,
          description: description,
          category: category,
@@ -300,12 +381,17 @@ class _VideoImpl extends Video {
          tags: tags,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
+         hlsManifestStorageKey: hlsManifestStorageKey,
+         transcoderJobName: transcoderJobName,
+         transcodeState: transcodeState,
          durationSeconds: durationSeconds,
          viewCount: viewCount,
+         engagedViewCount: engagedViewCount,
          likeCount: likeCount,
          favoriteCount: favoriteCount,
          commentCount: commentCount,
          status: status,
+         isPublic: isPublic,
          publishedAt: publishedAt,
          createdAt: createdAt,
          updatedAt: updatedAt,
@@ -319,6 +405,9 @@ class _VideoImpl extends Video {
     Object? id = _Undefined,
     String? authorId,
     String? authorName,
+    Object? seriesTitle = _Undefined,
+    Object? seriesId = _Undefined,
+    Object? seriesPosition = _Undefined,
     String? title,
     String? description,
     String? category,
@@ -327,12 +416,17 @@ class _VideoImpl extends Video {
     List<String>? tags,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
+    Object? hlsManifestStorageKey = _Undefined,
+    Object? transcoderJobName = _Undefined,
+    Object? transcodeState = _Undefined,
     int? durationSeconds,
     int? viewCount,
+    int? engagedViewCount,
     int? likeCount,
     int? favoriteCount,
     int? commentCount,
     _i3.VideoStatus? status,
+    bool? isPublic,
     Object? publishedAt = _Undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -341,6 +435,11 @@ class _VideoImpl extends Video {
       id: id is int? ? id : this.id,
       authorId: authorId ?? this.authorId,
       authorName: authorName ?? this.authorName,
+      seriesTitle: seriesTitle is String? ? seriesTitle : this.seriesTitle,
+      seriesId: seriesId is int? ? seriesId : this.seriesId,
+      seriesPosition: seriesPosition is int?
+          ? seriesPosition
+          : this.seriesPosition,
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
@@ -351,12 +450,23 @@ class _VideoImpl extends Video {
       coverStorageKey: coverStorageKey is String?
           ? coverStorageKey
           : this.coverStorageKey,
+      hlsManifestStorageKey: hlsManifestStorageKey is String?
+          ? hlsManifestStorageKey
+          : this.hlsManifestStorageKey,
+      transcoderJobName: transcoderJobName is String?
+          ? transcoderJobName
+          : this.transcoderJobName,
+      transcodeState: transcodeState is String?
+          ? transcodeState
+          : this.transcodeState,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       viewCount: viewCount ?? this.viewCount,
+      engagedViewCount: engagedViewCount ?? this.engagedViewCount,
       likeCount: likeCount ?? this.likeCount,
       favoriteCount: favoriteCount ?? this.favoriteCount,
       commentCount: commentCount ?? this.commentCount,
       status: status ?? this.status,
+      isPublic: isPublic ?? this.isPublic,
       publishedAt: publishedAt is DateTime? ? publishedAt : this.publishedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -374,6 +484,21 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
 
   _i1.ColumnValue<String, String> authorName(String value) => _i1.ColumnValue(
     table.authorName,
+    value,
+  );
+
+  _i1.ColumnValue<String, String> seriesTitle(String? value) => _i1.ColumnValue(
+    table.seriesTitle,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> seriesId(int? value) => _i1.ColumnValue(
+    table.seriesId,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> seriesPosition(int? value) => _i1.ColumnValue(
+    table.seriesPosition,
     value,
   );
 
@@ -423,6 +548,24 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
         value,
       );
 
+  _i1.ColumnValue<String, String> hlsManifestStorageKey(String? value) =>
+      _i1.ColumnValue(
+        table.hlsManifestStorageKey,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> transcoderJobName(String? value) =>
+      _i1.ColumnValue(
+        table.transcoderJobName,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> transcodeState(String? value) =>
+      _i1.ColumnValue(
+        table.transcodeState,
+        value,
+      );
+
   _i1.ColumnValue<int, int> durationSeconds(int value) => _i1.ColumnValue(
     table.durationSeconds,
     value,
@@ -430,6 +573,11 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
 
   _i1.ColumnValue<int, int> viewCount(int value) => _i1.ColumnValue(
     table.viewCount,
+    value,
+  );
+
+  _i1.ColumnValue<int, int> engagedViewCount(int value) => _i1.ColumnValue(
+    table.engagedViewCount,
     value,
   );
 
@@ -452,6 +600,11 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
     _i3.VideoStatus value,
   ) => _i1.ColumnValue(
     table.status,
+    value,
+  );
+
+  _i1.ColumnValue<bool, bool> isPublic(bool value) => _i1.ColumnValue(
+    table.isPublic,
     value,
   );
 
@@ -483,6 +636,18 @@ class VideoTable extends _i1.Table<int?> {
     );
     authorName = _i1.ColumnString(
       'authorName',
+      this,
+    );
+    seriesTitle = _i1.ColumnString(
+      'seriesTitle',
+      this,
+    );
+    seriesId = _i1.ColumnInt(
+      'seriesId',
+      this,
+    );
+    seriesPosition = _i1.ColumnInt(
+      'seriesPosition',
       this,
     );
     title = _i1.ColumnString(
@@ -519,12 +684,28 @@ class VideoTable extends _i1.Table<int?> {
       'coverStorageKey',
       this,
     );
+    hlsManifestStorageKey = _i1.ColumnString(
+      'hlsManifestStorageKey',
+      this,
+    );
+    transcoderJobName = _i1.ColumnString(
+      'transcoderJobName',
+      this,
+    );
+    transcodeState = _i1.ColumnString(
+      'transcodeState',
+      this,
+    );
     durationSeconds = _i1.ColumnInt(
       'durationSeconds',
       this,
     );
     viewCount = _i1.ColumnInt(
       'viewCount',
+      this,
+    );
+    engagedViewCount = _i1.ColumnInt(
+      'engagedViewCount',
       this,
       hasDefault: true,
     );
@@ -549,6 +730,11 @@ class VideoTable extends _i1.Table<int?> {
       _i1.EnumSerialization.byName,
       hasDefault: true,
     );
+    isPublic = _i1.ColumnBool(
+      'isPublic',
+      this,
+      hasDefault: true,
+    );
     publishedAt = _i1.ColumnDateTime(
       'publishedAt',
       this,
@@ -569,6 +755,12 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString authorName;
 
+  late final _i1.ColumnString seriesTitle;
+
+  late final _i1.ColumnInt seriesId;
+
+  late final _i1.ColumnInt seriesPosition;
+
   late final _i1.ColumnString title;
 
   late final _i1.ColumnString description;
@@ -585,9 +777,17 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString coverStorageKey;
 
+  late final _i1.ColumnString hlsManifestStorageKey;
+
+  late final _i1.ColumnString transcoderJobName;
+
+  late final _i1.ColumnString transcodeState;
+
   late final _i1.ColumnInt durationSeconds;
 
   late final _i1.ColumnInt viewCount;
+
+  late final _i1.ColumnInt engagedViewCount;
 
   late final _i1.ColumnInt likeCount;
 
@@ -596,6 +796,8 @@ class VideoTable extends _i1.Table<int?> {
   late final _i1.ColumnInt commentCount;
 
   late final _i1.ColumnEnum<_i3.VideoStatus> status;
+
+  late final _i1.ColumnBool isPublic;
 
   late final _i1.ColumnDateTime publishedAt;
 
@@ -608,6 +810,9 @@ class VideoTable extends _i1.Table<int?> {
     id,
     authorId,
     authorName,
+    seriesTitle,
+    seriesId,
+    seriesPosition,
     title,
     description,
     category,
@@ -616,12 +821,17 @@ class VideoTable extends _i1.Table<int?> {
     tags,
     videoStorageKey,
     coverStorageKey,
+    hlsManifestStorageKey,
+    transcoderJobName,
+    transcodeState,
     durationSeconds,
     viewCount,
+    engagedViewCount,
     likeCount,
     favoriteCount,
     commentCount,
     status,
+    isPublic,
     publishedAt,
     createdAt,
     updatedAt,

@@ -7,7 +7,7 @@ import Foundation
 
 import connectivity_plus
 import desktop_webview_window
-import ffmpeg_kit_flutter_new_min
+import ffmpeg_kit_flutter_new_min_gpl
 import file_selector_macos
 import flutter_secure_storage_darwin
 import flutter_web_auth_2

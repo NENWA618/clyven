@@ -29,6 +29,8 @@ comment:
   - createReply:
   - toggleCommentLike:
   - toggleReplyLike:
+  - deleteManagedComment:
+  - deleteManagedReply:
 dictionary:
   - lookup:
   - getById:
@@ -47,6 +49,16 @@ knownEntry:
   - getKnowledgeStatesByEntryIds:
   - getKnowledgeState:
   - getKnowledgeStates:
+notification:
+  - list:
+  - markAsRead:
+  - markAllAsRead:
+notificationSettings:
+  - get:
+  - update:
+privacySettings:
+  - get:
+  - update:
 review:
   - getDashboard:
   - getTaskDetail:
@@ -56,6 +68,17 @@ review:
   - submitTask:
   - returnTask:
   - approveAndPublish:
+scriptConversion:
+  - listProfiles:
+  - createProfile:
+  - updateProfile:
+  - deleteProfile:
+  - listEntries:
+  - updateEntry:
+  - deleteEntry:
+  - previewExcelBase64:
+  - commitExcelBase64:
+  - testConvert:
 social:
   - getMyProfileStats:
   - getProfileStats:
@@ -65,6 +88,8 @@ social:
   - getFollowingCreatorIds:
   - toggleFavorite:
   - getFavoriteVideoIds:
+  - toggleLike:
+  - getLikedVideoIds:
   - getWatchHistory:
   - saveWatchProgress:
   - removeWatchHistory:
@@ -86,13 +111,26 @@ subtitle:
   - deleteCue:
   - replaceKaraokeSegments:
 video:
+  - getCurrentUserId:
   - create:
   - getVideos:
   - getMyVideos:
   - getVideo:
+  - createSeries:
+  - getCreatorSeries:
+  - getSeries:
+  - getSeriesVideos:
+  - setSeriesById:
+  - recordView:
+  - recordEngagedView:
+  - setSeries:
+  - reorderSeriesVideos:
+  - setVisibility:
+  - deleteVideo:
   - createUploadDescription:
   - verifyUpload:
   - getVideoUrl:
+  - getPlaybackManifestUrl:
 wordList:
   - getLists:
   - getListDetail:

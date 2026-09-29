@@ -1,4 +1,4 @@
-name: clyven_workspace
+﻿name: clyven_workspace
 publish_to: none
 
 environment:
@@ -7,6 +7,7 @@ environment:
 workspace:
   - apps/clyven_app
   - apps/clyven_studio
+  - apps/clyven_web
   - apps/clyven_admin
   - apps/clyven_review
   - packages/clyven_backend_client
@@ -16,3 +17,97 @@ workspace:
   
 dependencies:
   serverpod_auth_core_client: 3.4.11
+dev_dependencies:
+  melos: ^8.2.2
+# Clyven Melos task runner v1
+melos:
+  command:
+    run:
+      noSelect: true
+
+  scripts:
+    dev:
+      description: Run Clyven Web and Studio with compact output.
+      run: dart run tool/clyven_dev.dart
+      stdio: inherit
+    dev:all:
+      description: Run Web, Studio, Admin, and Review together.
+      exec:
+        command: dart run "$MELOS_ROOT_PATH/tool/melos_jaspr_dev.dart"
+        concurrency: 4
+        failFast: true
+      packageFilters:
+        scope:
+          - clyven_web
+          - clyven_studio
+          - clyven_admin
+          - clyven_review
+
+    dev:stop:
+      description: Stop leftover Clyven local dev servers on ports 8081-8084.
+      run: dart run tool/melos_stop_dev.dart
+    dev:web:
+      description: Run the public Jaspr web client on port 8084.
+      run: cd apps/clyven_web && jaspr serve --port 8084
+      stdio: inherit
+
+    dev:studio:
+      description: Run Clyven Studio on port 8083.
+      run: cd apps/clyven_studio && jaspr serve --port 8083
+      stdio: inherit
+
+    dev:admin:
+      description: Run Clyven Admin on port 8082.
+      run: cd apps/clyven_admin && jaspr serve --port 8082
+      stdio: inherit
+
+    dev:review:
+      description: Run Clyven Review on port 8081.
+      run: cd apps/clyven_review && jaspr serve --port 8081
+      stdio: inherit
+
+    analyze:
+      description: Analyze lib/ in every workspace package.
+      exec:
+        command: dart analyze lib
+        concurrency: 4
+        failFast: false
+      packageFilters:
+        dirExists:
+          - lib
+
+    format:
+      description: Format lib/ in every workspace package.
+      exec:
+        command: dart format lib
+        concurrency: 4
+        failFast: false
+      packageFilters:
+        dirExists:
+          - lib
+
+    test:
+      description: Run Dart or Flutter tests in packages that have test/.
+      exec:
+        command: dart run "$MELOS_ROOT_PATH/tool/melos_test.dart"
+        concurrency: 2
+        failFast: false
+      packageFilters:
+        dirExists:
+          - test
+
+    build:web:
+      description: Build the public Jaspr web client.
+      run: cd apps/clyven_web && jaspr build
+
+    build:studio:
+      description: Build Clyven Studio.
+      run: cd apps/clyven_studio && jaspr build
+
+    build:admin:
+      description: Build Clyven Admin.
+      run: cd apps/clyven_admin && jaspr build
+
+    build:review:
+      description: Build Clyven Review.
+      run: cd apps/clyven_review && jaspr build

@@ -14,6 +14,7 @@ abstract class VideoInteractionRepository {
     required String videoId,
     required String userId,
     required bool currentlyLiked,
+    required String actorName,
   });
 
   Future<bool> toggleFavorite({
@@ -31,15 +32,6 @@ class ServerpodVideoInteractionRepository
 
   ServerpodVideoInteractionRepository({required this.client});
 
-  final Set<String> _likes = {};
-
-  final Map<String, int> _likeCounts = {};
-  final Map<String, int> _favoriteCounts = {};
-
-  String _key({required String userId, required String videoId}) {
-    return '$userId::$videoId';
-  }
-
   @override
   Future<VideoInteractionState> load({
     required String videoId,
@@ -47,20 +39,15 @@ class ServerpodVideoInteractionRepository
     required int initialLikeCount,
     required int initialFavoriteCount,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 180));
-
-    _likeCounts.putIfAbsent(videoId, () => initialLikeCount);
-
-    _favoriteCounts.putIfAbsent(videoId, () => initialFavoriteCount);
-
-    final key = _key(userId: userId, videoId: videoId);
-
+    final likedIds = await client.social.getLikedVideoIds();
     final favoriteIds = await client.social.getFavoriteVideoIds();
+    final id = int.parse(videoId);
+
     return VideoInteractionState(
-      likeCount: _likeCounts[videoId] ?? 0,
-      favoriteCount: _favoriteCounts[videoId] ?? 0,
-      isLiked: _likes.contains(key),
-      isFavorited: favoriteIds.contains(int.parse(videoId)),
+      likeCount: initialLikeCount,
+      favoriteCount: initialFavoriteCount,
+      isLiked: likedIds.contains(id),
+      isFavorited: favoriteIds.contains(id),
     );
   }
 
@@ -69,26 +56,9 @@ class ServerpodVideoInteractionRepository
     required String videoId,
     required String userId,
     required bool currentlyLiked,
-  }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-
-    final key = _key(userId: userId, videoId: videoId);
-
-    final currentCount = _likeCounts[videoId] ?? 0;
-
-    if (currentlyLiked) {
-      _likes.remove(key);
-
-      _likeCounts[videoId] = currentCount > 0 ? currentCount - 1 : 0;
-
-      return false;
-    }
-
-    _likes.add(key);
-
-    _likeCounts[videoId] = currentCount + 1;
-
-    return true;
+    required String actorName,
+  }) {
+    return client.social.toggleLike(int.parse(videoId), actorName: actorName);
   }
 
   @override
@@ -96,9 +66,7 @@ class ServerpodVideoInteractionRepository
     required String videoId,
     required String userId,
     required bool currentlyFavorited,
-  }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-
+  }) {
     return client.social.toggleFavorite(int.parse(videoId));
   }
 

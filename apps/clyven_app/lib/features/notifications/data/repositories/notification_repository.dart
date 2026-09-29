@@ -1,81 +1,30 @@
-import '../models/app_notification.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 abstract class NotificationRepository {
   Future<List<AppNotification>> loadNotifications();
 
-  Future<void> markAsRead(String notificationId);
+  Future<void> markAsRead(int notificationId);
+
+  Future<void> markAllAsRead();
 }
 
-class MockNotificationRepository implements NotificationRepository {
-  final List<AppNotification> _notifications = [
-    AppNotification(
-      id: 'notification-001',
-      type: AppNotificationType.comment,
-      actorName: 'Harbor Signal',
-      contentPreview: 'This perspective is really interesting.',
-      createdAt: DateTime(2026, 8, 7, 12, 30),
-      isRead: false,
-      videoId: 'video-001',
-    ),
-    AppNotification(
-      id: 'notification-002',
-      type: AppNotificationType.like,
-      actorName: 'Atlas of Voices',
-      createdAt: DateTime(2026, 8, 7, 10, 15),
-      isRead: false,
-      videoId: 'video-002',
-    ),
-    AppNotification(
-      id: 'notification-003',
-      type: AppNotificationType.follow,
-      actorName: 'Boundary Archive',
-      createdAt: DateTime(2026, 8, 6, 20, 40),
-      isRead: true,
-    ),
+class ServerpodNotificationRepository implements NotificationRepository {
+  final Client client;
 
-    AppNotification(
-      id: 'notification-001',
-      type: AppNotificationType.comment,
-      actorName: '远岸信号',
-      contentPreview: '这个角度很有意思。',
-      createdAt: DateTime(2026, 8, 7, 12, 30),
-      isRead: false,
-      videoId: 'video-001',
-    ),
-    AppNotification(
-      id: 'notification-002',
-      type: AppNotificationType.like,
-      actorName: '语言群岛',
-      createdAt: DateTime(2026, 8, 7, 10, 15),
-      isRead: false,
-      videoId: 'video-002',
-    ),
-    AppNotification(
-      id: 'notification-003',
-      type: AppNotificationType.follow,
-      actorName: '边界记录室',
-      createdAt: DateTime(2026, 8, 6, 20, 40),
-      isRead: true,
-    ),
-  ];
+  ServerpodNotificationRepository({required this.client});
 
   @override
-  Future<List<AppNotification>> loadNotifications() async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-
-    return List.unmodifiable(_notifications);
+  Future<List<AppNotification>> loadNotifications() {
+    return client.notification.list();
   }
 
   @override
-  Future<void> markAsRead(String notificationId) async {
-    final index = _notifications.indexWhere((notification) {
-      return notification.id == notificationId;
-    });
+  Future<void> markAsRead(int notificationId) {
+    return client.notification.markAsRead(notificationId);
+  }
 
-    if (index == -1) {
-      return;
-    }
-
-    _notifications[index] = _notifications[index].copyWith(isRead: true);
+  @override
+  Future<void> markAllAsRead() {
+    return client.notification.markAllAsRead();
   }
 }

@@ -1,0 +1,7 @@
+enum: NotificationType
+serialized: byName
+
+values:
+  - like
+  - comment
+  - follow

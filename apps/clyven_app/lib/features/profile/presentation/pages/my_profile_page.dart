@@ -597,8 +597,8 @@ class MyProfilePage extends ConsumerWidget {
               child: _libraryItem(
                 context: context,
                 icon: Icons.menu_book_rounded,
-                title: '词表',
-                subtitle: '我的词汇学习',
+                title: l10n.wordLists,
+                subtitle: l10n.myVocabularyLearning,
                 onTap: wordListsTap,
               ),
             ),

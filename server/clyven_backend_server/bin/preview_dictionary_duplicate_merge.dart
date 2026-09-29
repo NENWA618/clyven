@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 
 void main() {
-  const filePath =
-      r'C:\Users\USER\Downloads\越南语.xlsx';
+  const filePath = r'C:\Users\USER\Downloads\越南语.xlsx';
 
   final bytes = File(filePath).readAsBytesSync();
   final excel = Excel.decodeBytes(bytes);
@@ -48,8 +47,7 @@ void main() {
     return cellText(row[index]);
   }
 
-  final groups =
-      <String, List<Map<String, String>>>{};
+  final groups = <String, List<Map<String, String>>>{};
 
   for (var i = 1; i < sheet.rows.length; i++) {
     final row = sheet.rows[i];
@@ -76,23 +74,21 @@ void main() {
       '喃字': valueAt(row, '喃字'),
       '中文': valueAt(row, '中文'),
       '词性': valueAt(row, '词性'),
-      '国语字例句':
-          valueAt(row, '国语字例句'),
-      '喃字例句':
-          valueAt(row, '喃字例句'),
-      '中文例句':
-          valueAt(row, '中文例句'),
+      '国语字例句': valueAt(row, '国语字例句'),
+      '喃字例句': valueAt(row, '喃字例句'),
+      '中文例句': valueAt(row, '中文例句'),
     });
   }
 
-  final duplicates = groups.entries
-      .where(
-        (entry) => entry.value.length > 1,
-      )
-      .toList()
-    ..sort(
-      (a, b) => a.key.compareTo(b.key),
-    );
+  final duplicates =
+      groups.entries
+          .where(
+            (entry) => entry.value.length > 1,
+          )
+          .toList()
+        ..sort(
+          (a, b) => a.key.compareTo(b.key),
+        );
 
   print(
     '重复国语字组数: ${duplicates.length}',
@@ -227,8 +223,7 @@ List<String> uniqueNonEmpty(
   final result = <String>[];
 
   for (final row in rows) {
-    final value =
-        row[field]?.trim() ?? '';
+    final value = row[field]?.trim() ?? '';
 
     if (value.isEmpty) {
       continue;

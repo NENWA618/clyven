@@ -53,3 +53,5 @@ app.*.map.json
 secrets/
 *.key
 *.pem
+
+apps/clyven_web/build/jaspr/

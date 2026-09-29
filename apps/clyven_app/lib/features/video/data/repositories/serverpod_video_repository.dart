@@ -5,7 +5,6 @@ import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:serverpod_client/serverpod_client.dart';
 
 import '../../../../core/serverpod/feed_diagnostics.dart';
-
 import '../models/video_detail.dart';
 import '../models/video_content_type.dart';
 import '../models/video_upload_draft.dart';
@@ -67,6 +66,7 @@ class ServerpodVideoRepository implements VideoRepository {
       authorName: authorName,
       title: draft.title,
       description: draft.description,
+      seriesTitle: draft.seriesTitle,
       category: draft.category,
       contentType: switch (draft.contentType) {
         VideoContentType.video => serverpod.VideoContentType.video,
@@ -77,6 +77,7 @@ class ServerpodVideoRepository implements VideoRepository {
       videoStorageKey: videoStorageKey,
       coverStorageKey: coverStorageKey,
       durationSeconds: draft.durationSeconds,
+      isPublic: true,
     );
 
     return _toVideoDetailWithUrls(video);
@@ -92,6 +93,7 @@ class ServerpodVideoRepository implements VideoRepository {
     VideoContentType contentType = VideoContentType.video,
   }) async {
     feedDiagnostic('FEED_REQUEST contentType=${contentType.name}');
+
     final videos = await client.video.getVideos(
       contentType: switch (contentType) {
         VideoContentType.video => serverpod.VideoContentType.video,
@@ -104,34 +106,30 @@ class ServerpodVideoRepository implements VideoRepository {
       'postIds=${videos.map((video) => video.id).join(',')}',
     );
 
-    final results = <VideoDetail>[];
+    final details = await Future.wait(
+      videos.map((video) async {
+        try {
+          return await _toVideoDetailWithUrls(video);
+        } on AppException catch (error) {
+          feedDiagnostic(
+            'FEED_EXCLUDED postId=${video.id} reason=${error.code.name}',
+          );
+          if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+          return null;
+        } catch (error) {
+          feedDiagnostic(
+            'FEED_FAILED postId=${video.id} reason=${error.runtimeType}',
+          );
+          rethrow;
+        }
+      }),
+    );
 
-    for (final video in videos) {
-      try {
-        final detail = await _toVideoDetailWithUrls(video);
-
-        results.add(detail);
-      } on AppException catch (error) {
-        feedDiagnostic(
-          'FEED_EXCLUDED postId=${video.id} '
-          'reason=${error.code.name}',
-        );
-        if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
-      } catch (error) {
-        feedDiagnostic(
-          'FEED_FAILED postId=${video.id} '
-          'reason=${error.runtimeType}',
-        );
-        rethrow;
-      }
-    }
-
-    return results;
+    return details.whereType<VideoDetail>().toList();
   }
 
   // ============================================================
   // 指定用户的视频
-  // 我的投稿使用
   // ============================================================
 
   @override
@@ -139,33 +137,38 @@ class ServerpodVideoRepository implements VideoRepository {
     final videos = await client.video.getVideos();
 
     final userVideos = videos
-        .where((video) {
-          return video.authorId == userId;
-        })
+        .where((video) => video.authorId == userId)
         .toList(growable: false);
 
-    final results = <VideoDetail>[];
+    final details = await Future.wait(
+      userVideos.map((video) async {
+        try {
+          return await _toVideoDetailWithUrls(video);
+        } on AppException catch (error) {
+          feedDiagnostic(
+            'USER_VIDEO_EXCLUDED postId=${video.id} reason=${error.code.name}',
+          );
+          if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+          return null;
+        }
+      }),
+    );
 
-    for (final video in userVideos) {
-      try {
-        final detail = await _toVideoDetailWithUrls(video);
-
-        results.add(detail);
-      } on AppException catch (error) {
-        feedDiagnostic(
-          'USER_VIDEO_EXCLUDED postId=${video.id} '
-          'reason=${error.code.name}',
-        );
-        if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
-      }
-    }
-
-    return results;
+    return details.whereType<VideoDetail>().toList();
   }
 
-  // ============================================================
-  // 上传文件
-  // ============================================================
+  @override
+  Future<VideoDetail> updateVideoSeries({
+    required String videoId,
+    String? seriesTitle,
+  }) async {
+    final video = await client.video.setSeries(
+      videoId: int.parse(videoId),
+      seriesTitle: seriesTitle,
+    );
+
+    return _toVideoDetailWithUrls(video);
+  }
 
   Future<void> _uploadFile({
     required String localPath,
@@ -202,7 +205,6 @@ class ServerpodVideoRepository implements VideoRepository {
     }
 
     final uploader = FileUploader(uploadDescription);
-
     final uploaded = await uploader.upload(file.openRead(), fileSize);
 
     if (!uploaded) {
@@ -222,16 +224,26 @@ class ServerpodVideoRepository implements VideoRepository {
     }
   }
 
-  // ============================================================
-  // Serverpod Video -> Flutter VideoDetail
-  // ============================================================
-
   Future<VideoDetail> _toVideoDetailWithUrls(serverpod.Video video) async {
-    final rawVideoUrl = await client.video.getVideoUrl(
+    final coverStorageKey = video.coverStorageKey;
+    final hasCover = coverStorageKey != null && coverStorageKey.isNotEmpty;
+
+    final Future<String?> videoUrlFuture = client.video.getVideoUrl(
       path: video.videoStorageKey,
     );
+    final Future<String?> coverUrlFuture = hasCover
+        ? client.video.getVideoUrl(path: coverStorageKey).catchError((error) {
+            feedDiagnostic(
+              'THUMBNAIL_UNAVAILABLE postId=${video.id} reason=${error.runtimeType}',
+            );
+            return null;
+          })
+        : Future.value(null);
 
-    final videoUrl = rawVideoUrl ?? '';
+    final urls = await Future.wait<String?>([videoUrlFuture, coverUrlFuture]);
+
+    final videoUrl = urls[0] ?? '';
+    final coverUrl = urls[1] ?? '';
 
     if (videoUrl.isEmpty) {
       throw AppException(
@@ -240,28 +252,15 @@ class ServerpodVideoRepository implements VideoRepository {
       );
     }
 
-    var coverUrl = '';
-
-    final coverStorageKey = video.coverStorageKey;
-
-    if (coverStorageKey != null && coverStorageKey.isNotEmpty) {
-      try {
-        coverUrl = await client.video.getVideoUrl(path: coverStorageKey) ?? '';
-      } catch (error) {
-        // A missing thumbnail must not remove a playable video from the feed.
-        feedDiagnostic(
-          'THUMBNAIL_UNAVAILABLE postId=${video.id} '
-          'reason=${error.runtimeType}',
-        );
-      }
-    }
-
     return VideoDetail(
       id: video.id!.toString(),
       title: video.title,
       description: video.description,
       authorId: video.authorId,
       authorName: video.authorName,
+      seriesTitle: video.seriesTitle ?? '',
+      seriesId: video.seriesId,
+      seriesPosition: video.seriesPosition,
       category: video.category,
       contentType: switch (video.contentType) {
         serverpod.VideoContentType.video => VideoContentType.video,

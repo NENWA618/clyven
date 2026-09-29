@@ -1,0 +1,18 @@
+class: ScriptConversionProfile
+table: script_conversion_profile
+fields:
+  name: String
+  languageCode: String
+  sourceScriptCode: String
+  targetScriptCode: String
+  sheetName: String?
+  sourceColumn: String
+  targetColumn: String
+  priorityColumn: String?
+  noteColumn: String?
+  conversionMode: String?
+  typeColumn: String?
+  description: String?
+  isActive: bool, default=true
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now

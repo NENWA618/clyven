@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/serverpod/feed_diagnostics.dart';
 import 'interactive_subtitle_overlay.dart';
 
-class NetworkVideoPlayer extends StatefulWidget {
-  final String videoId;
+class NetworkVideoPlayer extends ConsumerStatefulWidget {
+  final int? videoId;
   final String videoUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
@@ -49,26 +51,30 @@ class NetworkVideoPlayer extends StatefulWidget {
   });
 
   @override
-  State<NetworkVideoPlayer> createState() {
+  ConsumerState<NetworkVideoPlayer> createState() {
     return _NetworkVideoPlayerState();
   }
 }
 
-class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
+class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   late VideoPlayerController _controller;
   late Future<void> _initializeFuture;
+  bool _controllerCreated = false;
   final Set<VideoPlayerController> _releasedControllers = {};
   int _generation = 0;
   bool _initializationFailed = false;
   bool _reportedNativeError = false;
   Timer? _initializationTimer;
   Completer<void>? _initializationCompleter;
-  String _initializationStage = 'native_initialize';
+  String _initializationStage = 'resolve_source';
 
   final Stopwatch _fallbackClock = Stopwatch();
   Timer? _positionTicker;
   Duration _fallbackBasePosition = Duration.zero;
   int _lastSavedSecond = -1;
+  OverlayEntry? _fullscreenOverlay;
+  Timer? _fullscreenControlsTimer;
+  bool _fullscreenControlsVisible = true;
 
   @override
   void initState() {
@@ -80,29 +86,18 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     final generation = ++_generation;
     _initializationFailed = false;
     _reportedNativeError = false;
-    _initializationStage = 'native_initialize';
+    _initializationStage = 'resolve_source';
 
-    final isNetworkVideo =
-        widget.videoUrl.startsWith('http://') ||
-        widget.videoUrl.startsWith('https://');
-
-    if (isNetworkVideo) {
-      _controller = VideoPlayerController.networkUrl(
-        Uri.parse(widget.videoUrl),
-      );
-    } else {
-      _controller = VideoPlayerController.file(File(widget.videoUrl));
-    }
-
-    final controller = _controller;
     feedDiagnostic(
-      'PLAYBACK_INITIALIZING postId=${widget.videoId} '
-      'source=${isNetworkVideo ? 'network' : 'file'} '
+      'PLAYBACK_INITIALIZING postId=${widget.videoId ?? 'unknown'} '
       'host=${Uri.tryParse(widget.videoUrl)?.host ?? ''}',
     );
+
     final completion = Completer<void>();
     _initializationCompleter = completion;
     _initializeFuture = completion.future;
+    _initializationTimer?.cancel();
+
     void fail(Object error, StackTrace stack) {
       if (completion.isCompleted) return;
       _initializationTimer?.cancel();
@@ -114,10 +109,11 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             ? error.code
             : '${error.runtimeType}';
         feedDiagnostic(
-          'PLAYBACK_INIT_FAILED postId=${widget.videoId} '
+          'PLAYBACK_INIT_FAILED postId=${widget.videoId ?? 'unknown'} '
           'stage=$_initializationStage reason=$reason',
         );
-        _release(controller);
+        ++_generation;
+        _releaseCurrentController();
       }
       completion.completeError(error, stack);
     }
@@ -128,20 +124,28 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
         StackTrace.current,
       );
     });
+
     unawaited(
-      _initializePlayer(controller, generation).then((_) {
+      _initializePlayer(generation).then((_) {
         if (completion.isCompleted) return;
         _initializationTimer?.cancel();
-        feedDiagnostic('PLAYBACK_READY postId=${widget.videoId}');
+        if (generation != _generation || _initializationFailed) return;
+        feedDiagnostic('PLAYBACK_READY postId=${widget.videoId ?? 'unknown'}');
         completion.complete();
       }, onError: fail),
     );
-    _controller.addListener(_handleProgress);
+  }
+
+  bool _isGenerationActive(int generation) {
+    return mounted && generation == _generation && !_initializationFailed;
   }
 
   void _release(VideoPlayerController controller) {
     if (!_releasedControllers.add(controller)) return;
     controller.removeListener(_handleProgress);
+    if (_controllerCreated && identical(_controller, controller)) {
+      _controllerCreated = false;
+    }
     unawaited(
       controller.dispose().catchError((Object error) {
         feedDiagnostic('PLAYBACK_DISPOSE_FAILED reason=${error.runtimeType}');
@@ -149,9 +153,21 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     );
   }
 
+  void _releaseCurrentController() {
+    if (_controllerCreated) _release(_controller);
+  }
+
+  void _cancelInitialization() {
+    _initializationTimer?.cancel();
+    final completion = _initializationCompleter;
+    if (completion != null && !completion.isCompleted) completion.complete();
+  }
+
   void _resetPlayer() {
+    _closeFullscreen();
     _cancelInitialization();
-    _release(_controller);
+    ++_generation;
+    _releaseCurrentController();
     _positionTicker?.cancel();
     _positionTicker = null;
     _fallbackClock
@@ -162,16 +178,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     _startPlayer();
   }
 
-  void _cancelInitialization() {
-    _initializationTimer?.cancel();
-    final completion = _initializationCompleter;
-    if (completion != null && !completion.isCompleted) completion.complete();
-  }
-
   @override
   void didUpdateWidget(covariant NetworkVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.videoUrl != oldWidget.videoUrl) _resetPlayer();
+    if (widget.videoUrl != oldWidget.videoUrl ||
+        widget.videoId != oldWidget.videoId) {
+      _resetPlayer();
+    }
   }
 
   serverpod.SubtitleCueDetail? _findActiveSubtitle(
@@ -191,34 +204,133 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     return null;
   }
 
-  Future<void> _initializePlayer(
-    VideoPlayerController controller,
-    int generation,
-  ) async {
-    await controller.initialize();
-    if (!mounted || generation != _generation || _initializationFailed) return;
-    _initializationStage = 'set_looping';
-    await controller.setLooping(false);
-    if (!mounted || generation != _generation || _initializationFailed) return;
+  VideoPlayerController _createController(String source) {
+    final isNetworkVideo =
+        source.startsWith('http://') || source.startsWith('https://');
+
+    if (isNetworkVideo) {
+      return VideoPlayerController.networkUrl(Uri.parse(source));
+    }
+
+    return VideoPlayerController.file(File(source));
+  }
+
+  Future<String?> _fetchPlaybackManifestUrl() async {
+    final videoId = widget.videoId;
+
+    if (videoId == null) {
+      return null;
+    }
+
+    try {
+      final client = ref.read(serverpodClientProvider);
+      final manifestUrl = await client.video.getPlaybackManifestUrl(
+        videoId: videoId,
+      );
+      final normalized = manifestUrl?.trim();
+
+      if (normalized == null || normalized.isEmpty) {
+        return null;
+      }
+
+      return normalized;
+    } catch (error, stackTrace) {
+      debugPrint('Failed to resolve HLS manifest for video $videoId: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  Future<bool> _tryInitializeSource(String source, int generation) async {
+    if (!_isGenerationActive(generation)) return false;
+
+    final controller = _createController(source);
+    _controller = controller;
+    _controllerCreated = true;
+    _initializationStage = 'native_initialize';
+
+    try {
+      await controller.initialize();
+      if (!_isGenerationActive(generation)) {
+        _release(controller);
+        return false;
+      }
+
+      _initializationStage = 'set_looping';
+      await controller.setLooping(false);
+      if (!_isGenerationActive(generation)) {
+        _release(controller);
+        return false;
+      }
+
+      controller.addListener(_handleProgress);
+      return true;
+    } catch (error, stackTrace) {
+      feedDiagnostic(
+        'PLAYBACK_SOURCE_FAILED postId=${widget.videoId ?? 'unknown'} '
+        'stage=$_initializationStage reason=${error.runtimeType}',
+      );
+      debugPrintStack(stackTrace: stackTrace);
+      _release(controller);
+      return false;
+    }
+  }
+
+  Future<bool> _waitForTranscodedPlayback(int generation) async {
+    for (var attempt = 0; attempt < 24; attempt++) {
+      if (!_isGenerationActive(generation)) return false;
+
+      if (attempt > 0) {
+        await Future<void>.delayed(const Duration(seconds: 5));
+        if (!_isGenerationActive(generation)) return false;
+      }
+
+      final manifestUrl = await _fetchPlaybackManifestUrl();
+      if (!_isGenerationActive(generation)) return false;
+      if (manifestUrl == null) continue;
+
+      if (await _tryInitializeSource(manifestUrl, generation)) return true;
+    }
+    return false;
+  }
+
+  Future<void> _initializePlayer(int generation) async {
+    final manifestUrl = await _fetchPlaybackManifestUrl();
+    if (!_isGenerationActive(generation)) return;
+
+    var initialized = false;
+    if (manifestUrl != null) {
+      initialized = await _tryInitializeSource(manifestUrl, generation);
+    }
+    if (!initialized && _isGenerationActive(generation)) {
+      initialized = await _tryInitializeSource(widget.videoUrl, generation);
+    }
+    if (!initialized && _isGenerationActive(generation)) {
+      initialized = await _waitForTranscodedPlayback(generation);
+    }
+    if (!_isGenerationActive(generation)) return;
+
+    if (!initialized) {
+      throw StateError(
+        'Neither the HLS stream nor the original video could be played.',
+      );
+    }
 
     final duration = _effectiveDuration();
     final savedPosition = widget.initialPositionSeconds;
-
     if (savedPosition <= 0) {
       _fallbackBasePosition = Duration.zero;
       return;
     }
-
     if (duration.inSeconds > 0 && savedPosition >= duration.inSeconds - 5) {
       _fallbackBasePosition = Duration.zero;
       return;
     }
 
     final position = Duration(seconds: savedPosition);
-
     _fallbackBasePosition = position;
     _initializationStage = 'restore_position';
-    await controller.seekTo(position);
+    await _controller.seekTo(position);
   }
 
   Duration _effectiveDuration() {
@@ -272,8 +384,6 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     if (_controller.value.hasError) {
       if (!_reportedNativeError) {
         _reportedNativeError = true;
-        // Emit only an allowlisted category, never the raw native description
-        // (it can contain signed URLs or authentication headers).
         final description =
             _controller.value.errorDescription?.toLowerCase() ?? '';
         final reason = description.contains('decoder')
@@ -284,11 +394,13 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
             ? 'renderer'
             : 'native';
         feedDiagnostic(
-          'PLAYBACK_NATIVE_ERROR postId=${widget.videoId} reason=$reason',
+          'PLAYBACK_NATIVE_ERROR postId=${widget.videoId ?? 'unknown'} '
+          'reason=$reason',
         );
       }
       return;
     }
+
     if (!_controller.value.isInitialized) {
       return;
     }
@@ -307,13 +419,410 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     widget.onProgress?.call(position, duration);
   }
 
+  void _scheduleFullscreenControlsHide() {
+    _fullscreenControlsTimer?.cancel();
+
+    if (!_controller.value.isPlaying) {
+      _fullscreenControlsVisible = true;
+      _fullscreenOverlay?.markNeedsBuild();
+      return;
+    }
+
+    _fullscreenControlsTimer = Timer(const Duration(seconds: 3), () {
+      if (_fullscreenOverlay == null) return;
+      _fullscreenControlsVisible = false;
+      _fullscreenOverlay?.markNeedsBuild();
+    });
+  }
+
+  void _showFullscreenControls() {
+    _fullscreenControlsVisible = true;
+    _fullscreenOverlay?.markNeedsBuild();
+    _scheduleFullscreenControlsHide();
+  }
+
+  void _toggleFullscreenControls() {
+    _fullscreenControlsVisible = !_fullscreenControlsVisible;
+    _fullscreenOverlay?.markNeedsBuild();
+
+    if (_fullscreenControlsVisible) {
+      _scheduleFullscreenControlsHide();
+    } else {
+      _fullscreenControlsTimer?.cancel();
+    }
+  }
+
+  void _seekFullscreenBy(Duration delta) {
+    final duration = _effectiveDuration();
+    if (duration <= Duration.zero) return;
+
+    final current = _effectivePosition();
+    var target = current + delta;
+
+    if (target < Duration.zero) target = Duration.zero;
+    if (target > duration) target = duration;
+
+    _fallbackBasePosition = target;
+    _fallbackClock
+      ..stop()
+      ..reset();
+
+    if (_controller.value.isPlaying && _needsFallbackPosition) {
+      _fallbackClock.start();
+      _startPositionTicker();
+    }
+
+    unawaited(_controller.seekTo(target));
+    _showFullscreenControls();
+  }
+
+  Future<void> _openFullscreen() async {
+    if (!mounted || !_controller.value.isInitialized) return;
+
+    if (_fullscreenOverlay != null) {
+      _closeFullscreen();
+      return;
+    }
+
+    final overlay = Overlay.of(context, rootOverlay: true);
+
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (overlayContext) {
+        return Material(
+          color: Colors.black,
+          child: ValueListenableBuilder<VideoPlayerValue>(
+            valueListenable: _controller,
+            builder: (context, value, child) {
+              final duration = _effectiveDuration();
+              final position = _effectivePosition();
+              final maxMilliseconds = duration.inMilliseconds;
+              final positionMilliseconds = position.inMilliseconds.clamp(
+                0,
+                maxMilliseconds > 0 ? maxMilliseconds : 0,
+              );
+
+              final activeSubtitle = _findActiveSubtitle(
+                widget.subtitles,
+                position,
+              );
+              final activeSecondarySubtitle = _findActiveSubtitle(
+                widget.secondarySubtitles,
+                position,
+              );
+
+              final controlsVisible =
+                  _fullscreenControlsVisible || !value.isPlaying;
+
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  const ColoredBox(color: Colors.black),
+                  Center(
+                    child: AspectRatio(
+                      aspectRatio: value.aspectRatio == 0
+                          ? 16 / 9
+                          : value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _toggleFullscreenControls,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onDoubleTap: () => _seekFullscreenBy(
+                                const Duration(seconds: -10),
+                              ),
+                              child: const SizedBox.expand(),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onDoubleTap: () => _seekFullscreenBy(
+                                const Duration(seconds: 10),
+                              ),
+                              child: const SizedBox.expand(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (widget.subtitlesEnabled &&
+                      (activeSubtitle != null ||
+                          activeSecondarySubtitle != null))
+                    Positioned(
+                      left: 24,
+                      right: 24,
+                      bottom: controlsVisible ? 96 : 36,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 9,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.60),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (activeSubtitle != null)
+                                InteractiveSubtitleOverlay(
+                                  detail: activeSubtitle,
+                                  videoPositionMs: position.inMilliseconds,
+                                  languageCode:
+                                      widget.subtitleLanguageCode ?? 'und',
+                                  scriptCode: widget.subtitleScriptCode,
+                                ),
+                              if (activeSubtitle != null &&
+                                  activeSecondarySubtitle != null)
+                                const SizedBox(height: 4),
+                              if (activeSecondarySubtitle != null)
+                                Opacity(
+                                  opacity: 0.82,
+                                  child: InteractiveSubtitleOverlay(
+                                    detail: activeSecondarySubtitle,
+                                    videoPositionMs: position.inMilliseconds,
+                                    languageCode:
+                                        widget.secondarySubtitleLanguageCode ??
+                                        'und',
+                                    scriptCode:
+                                        widget.secondarySubtitleScriptCode,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  Center(
+                    child: IgnorePointer(
+                      ignoring: !controlsVisible,
+                      child: AnimatedOpacity(
+                        opacity: controlsVisible ? 1 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        child: InkResponse(
+                          onTap: () {
+                            _togglePlay();
+                            _showFullscreenControls();
+                          },
+                          radius: 44,
+                          child: Container(
+                            width: 76,
+                            height: 76,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.42),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              value.isPlaying
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 48,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 8,
+                    right: 8,
+                    top: 8,
+                    child: IgnorePointer(
+                      ignoring: !controlsVisible,
+                      child: AnimatedOpacity(
+                        opacity: controlsVisible ? 1 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        child: SafeArea(
+                          bottom: false,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                tooltip: 'Exit fullscreen',
+                                onPressed: _closeFullscreen,
+                                icon: const Icon(
+                                  Icons.arrow_back_rounded,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 12,
+                    right: 12,
+                    bottom: 4,
+                    child: IgnorePointer(
+                      ignoring: !controlsVisible,
+                      child: AnimatedOpacity(
+                        opacity: controlsVisible ? 1 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        child: SafeArea(
+                          top: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (maxMilliseconds > 0)
+                                SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    trackHeight: 2.5,
+                                    thumbShape: const RoundSliderThumbShape(
+                                      enabledThumbRadius: 5,
+                                    ),
+                                    overlayShape: const RoundSliderOverlayShape(
+                                      overlayRadius: 10,
+                                    ),
+                                  ),
+                                  child: Slider(
+                                    min: 0,
+                                    max: maxMilliseconds.toDouble(),
+                                    value: positionMilliseconds.toDouble(),
+                                    onChanged: (value) {
+                                      final target = Duration(
+                                        milliseconds: value.round(),
+                                      );
+
+                                      _fallbackBasePosition = target;
+                                      _fallbackClock
+                                        ..stop()
+                                        ..reset();
+
+                                      if (_controller.value.isPlaying &&
+                                          _needsFallbackPosition) {
+                                        _fallbackClock.start();
+                                        _startPositionTicker();
+                                      }
+
+                                      unawaited(_controller.seekTo(target));
+                                      _showFullscreenControls();
+                                    },
+                                  ),
+                                ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 36,
+                                      minHeight: 36,
+                                    ),
+                                    onPressed: () {
+                                      _togglePlay();
+                                      _showFullscreenControls();
+                                    },
+                                    icon: Icon(
+                                      value.isPlaying
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_playerTime(position)} / ${_playerTime(duration)}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 36,
+                                      minHeight: 36,
+                                    ),
+                                    tooltip: 'Exit fullscreen',
+                                    onPressed: _closeFullscreen,
+                                    icon: const Icon(
+                                      Icons.fullscreen_exit_rounded,
+                                      color: Colors.white,
+                                      size: 26,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    _fullscreenOverlay = entry;
+    overlay.insert(entry);
+    _scheduleFullscreenControlsHide();
+
+    try {
+      await SystemChrome.setPreferredOrientations(const [
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    } catch (error, stackTrace) {
+      debugPrint('FULLSCREEN_SYSTEM_UI_FAILED: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  void _closeFullscreen() {
+    final entry = _fullscreenOverlay;
+    if (entry == null) return;
+
+    _fullscreenControlsTimer?.cancel();
+    _fullscreenControlsTimer = null;
+    _fullscreenOverlay = null;
+    entry.remove();
+
+    unawaited(
+      Future<void>(() async {
+        try {
+          await SystemChrome.setPreferredOrientations(const [
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
+          await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        } catch (error, stackTrace) {
+          debugPrint('FULLSCREEN_RESTORE_UI_FAILED: $error');
+          debugPrintStack(stackTrace: stackTrace);
+        }
+      }),
+    );
+  }
+
   @override
   void dispose() {
+    _closeFullscreen();
     _cancelInitialization();
     _positionTicker?.cancel();
     _fallbackClock.stop();
     ++_generation;
-    _release(_controller);
+    _releaseCurrentController();
     super.dispose();
   }
 
@@ -322,8 +831,16 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
     final accent = Theme.of(context).colorScheme.primary;
     final isPhoneSubtitleLayout = MediaQuery.sizeOf(context).width < 600;
 
+    final playerAspectRatio =
+        _controllerCreated &&
+            _controller.value.isInitialized &&
+            !widget.compact &&
+            _controller.value.aspectRatio > 0
+        ? _controller.value.aspectRatio.clamp(9 / 20, 16 / 9).toDouble()
+        : 16 / 9;
+
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: playerAspectRatio,
       child: FutureBuilder<void>(
         future: _initializeFuture,
         builder: (context, snapshot) {
@@ -549,10 +1066,15 @@ class _NetworkVideoPlayerState extends State<NetworkVideoPlayer> {
                                 ),
                               ),
                               const Spacer(),
-                              const Icon(
-                                Icons.fullscreen_rounded,
-                                color: Colors.white,
-                                size: 23,
+                              IconButton(
+                                tooltip: 'Fullscreen',
+                                visualDensity: VisualDensity.compact,
+                                onPressed: _openFullscreen,
+                                icon: const Icon(
+                                  Icons.fullscreen_rounded,
+                                  color: Colors.white,
+                                  size: 23,
+                                ),
                               ),
                             ],
                           ),

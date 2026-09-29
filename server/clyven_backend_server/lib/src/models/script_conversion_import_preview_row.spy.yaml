@@ -1,0 +1,9 @@
+class: ScriptConversionImportPreviewRow
+fields:
+  rowNumber: int
+  sourceText: String?
+  targetText: String?
+  priority: int
+  entryType: String
+  status: String
+  message: String?

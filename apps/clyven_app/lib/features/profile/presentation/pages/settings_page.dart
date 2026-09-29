@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../notifications/presentation/pages/notification_settings_page.dart';
+import '../providers/my_profile_provider.dart';
+import 'about_page.dart';
+import 'edit_profile_page.dart';
+import 'privacy_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -41,8 +46,21 @@ class SettingsPage extends ConsumerWidget {
                     icon: Icons.person_outline_rounded,
                     title: l10n.accountAndProfile,
                     subtitle: l10n.accountAndProfileSubtitle,
-                    onTap: () {
-                      // TODO: open account and profile settings
+                    onTap: () async {
+                      final profile = ref.read(myProfileProvider).value;
+                      if (profile == null) {
+                        return;
+                      }
+
+                      final changed = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditProfilePage(profile: profile),
+                        ),
+                      );
+                      if (changed == true) {
+                        ref.invalidate(myProfileProvider);
+                      }
                     },
                   ),
                   const SizedBox(height: 10),
@@ -51,7 +69,10 @@ class SettingsPage extends ConsumerWidget {
                     title: l10n.privacy,
                     subtitle: l10n.privacySubtitle,
                     onTap: () {
-                      // TODO: open privacy settings
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PrivacyPage()),
+                      );
                     },
                   ),
                   const SizedBox(height: 30),
@@ -119,7 +140,12 @@ class SettingsPage extends ConsumerWidget {
                     title: l10n.notifications,
                     subtitle: l10n.notificationsSettingsSubtitle,
                     onTap: () {
-                      // TODO: open notification settings
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationSettingsPage(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 10),
@@ -128,7 +154,10 @@ class SettingsPage extends ConsumerWidget {
                     title: l10n.about,
                     subtitle: l10n.aboutSubtitle,
                     onTap: () {
-                      // TODO: open about page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AboutPage()),
+                      );
                     },
                   ),
                   const SizedBox(height: 36),
