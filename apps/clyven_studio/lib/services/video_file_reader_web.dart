@@ -72,7 +72,7 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
 
     video.onerror = ((web.Event event) {
       metadataCompleter.completeError(
-        Exception('无法读取视频资料'),
+        Exception('无法读取该文件作为视频。文件可能已损坏、格式不受浏览器支持，或只是修改了文件扩展名。'),
       );
     }).toJS;
 
@@ -165,9 +165,7 @@ Stream<List<int>> _openFile(web.File file) async* {
   var offset = 0;
 
   while (offset < file.size) {
-    final end = (offset + chunkSize) > file.size
-        ? file.size
-        : offset + chunkSize;
+    final end = (offset + chunkSize) > file.size ? file.size : offset + chunkSize;
 
     final blob = file.slice(offset, end);
 

@@ -5,6 +5,7 @@ import 'package:jaspr_router/jaspr_router.dart';
 import 'components/admin_auth_gate.dart';
 import 'components/admin_shell.dart';
 import 'pages/users_page.dart';
+import 'pages/members_page.dart';
 import 'pages/script_conversion_page.dart';
 
 class App extends StatelessComponent {
@@ -29,6 +30,11 @@ class App extends StatelessComponent {
                 path: '/users',
                 title: 'Users · Clyven Admin',
                 builder: (context, state) => const UsersPage(),
+              ),
+              Route(
+                path: '/members',
+                title: 'Members · Clyven Admin',
+                builder: (context, state) => const MembersPage(),
               ),
               Route(
                 path: '/script-conversion',
