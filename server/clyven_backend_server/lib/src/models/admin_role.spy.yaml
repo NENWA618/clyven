@@ -1,0 +1,14 @@
+class: AdminRole
+table: admin_role
+
+fields:
+  workspaceId: int
+  key: String
+  name: String
+  isSystem: bool, default=false
+  createdAt: DateTime, default=now
+
+indexes:
+  admin_role_workspace_key_unique_idx:
+    fields: workspaceId, key
+    unique: true

@@ -1321,3 +1321,248 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================
+   ADMIN MEMBERS V1
+   ========================= */
+
+.admin-members-page { display: grid; gap: 18px; }
+
+.admin-members-heading,
+.admin-members-card-title,
+.admin-role-permission-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-members-heading h2 { margin: 0; }
+
+.admin-members-heading p,
+.admin-members-card-title span,
+.admin-role-permission-header span {
+  margin: 6px 0 0;
+  color: #7b8494;
+  font-size: 13px;
+}
+
+.admin-members-card {
+  padding: 20px;
+  border: 1px solid #e4e8ef;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.admin-members-success {
+  padding: 11px 14px;
+  border: 1px solid #b9e8c9;
+  border-radius: 10px;
+  background: #effbf3;
+  color: #257446;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-members-add-form {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-members-add-form input { min-height: 42px; }
+
+.admin-role-choice-row,
+.admin-member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.admin-role-choice,
+.admin-mini-button,
+.admin-permission-toggle {
+  border: 1px solid #dce2eb;
+  background: #fff;
+  cursor: pointer;
+}
+
+.admin-role-choice {
+  min-height: 38px;
+  padding: 0 13px;
+  border-radius: 9px;
+}
+
+.admin-role-choice.is-selected,
+.admin-mini-button.is-current {
+  border-color: #355fe7;
+  background: #edf2ff;
+  color: #244cc8;
+}
+
+.admin-members-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-member-row {
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #edf0f4;
+  border-radius: 12px;
+}
+
+.admin-member-row.is-removed { opacity: .52; }
+
+.admin-member-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.admin-member-identity > div:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-member-identity strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-member-identity span {
+  margin-top: 3px;
+  color: #87909f;
+  font-size: 12px;
+}
+
+.admin-member-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eef2f8;
+  color: #39465a;
+  font-weight: 800;
+}
+
+.admin-owner-badge {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #171d29;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-mini-button {
+  min-height: 32px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.admin-transfer-button {
+  border-color: #cfb6ff;
+  color: #673ab7;
+}
+
+.admin-danger-button {
+  border-color: #ffc9c9;
+  color: #c73939;
+}
+
+.admin-role-permission-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-role-permission-card {
+  padding: 16px;
+  border: 1px solid #e5e9f0;
+  border-radius: 13px;
+  background: #fafbfd;
+}
+
+.admin-role-permission-header > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-permission-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 7px;
+}
+
+.admin-permission-toggle {
+  width: 100%;
+  padding: 9px 10px;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 9px;
+  align-items: center;
+  border-radius: 9px;
+  text-align: left;
+}
+
+.admin-permission-toggle.is-enabled {
+  border-color: #9fb6ff;
+  background: #f2f5ff;
+}
+
+.admin-permission-toggle > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-permission-toggle strong { font-size: 12px; }
+
+.admin-permission-toggle span {
+  margin-top: 2px;
+  color: #8891a0;
+  font-size: 10px;
+}
+
+.admin-permission-check {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #cad2df;
+  border-radius: 6px;
+  color: #3156cf !important;
+  font-size: 13px !important;
+  font-weight: 900;
+}
+
+.admin-members-state {
+  padding: 30px;
+  color: #7e8797;
+  text-align: center;
+}
+
+@media (max-width: 1050px) {
+  .admin-role-permission-grid { grid-template-columns: 1fr; }
+  .admin-members-add-form { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .admin-member-row,
+  .admin-members-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

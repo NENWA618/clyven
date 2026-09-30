@@ -21,72 +21,80 @@ import 'package:clyven_backend_client/src/protocol/asr_job.dart' as _i6;
 import 'package:clyven_backend_client/src/protocol/asr_job_status.dart' as _i7;
 import 'package:clyven_backend_client/src/protocol/video.dart' as _i8;
 import 'package:clyven_backend_client/src/protocol/subtitle_track.dart' as _i9;
-import 'package:clyven_backend_client/src/protocol/comment_page_dto.dart'
+import 'package:clyven_backend_client/src/protocol/admin_workspace.dart'
     as _i10;
-import 'package:clyven_backend_client/src/protocol/video_comment_dto.dart'
-    as _i11;
-import 'package:clyven_backend_client/src/protocol/comment_reply_dto.dart'
-    as _i12;
-import 'package:clyven_backend_client/src/protocol/dictionary_entry_detail.dart'
+import 'package:clyven_backend_client/src/protocol/admin_member.dart' as _i11;
+import 'package:clyven_backend_client/src/protocol/admin_role.dart' as _i12;
+import 'package:clyven_backend_client/src/protocol/admin_permission.dart'
     as _i13;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
+import 'package:clyven_backend_client/src/protocol/admin_role_permission.dart'
     as _i14;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_profile_detail.dart'
+import 'package:clyven_backend_client/src/protocol/comment_page_dto.dart'
     as _i15;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_preview.dart'
+import 'package:clyven_backend_client/src/protocol/video_comment_dto.dart'
     as _i16;
-import 'package:clyven_backend_client/src/protocol/dictionary_import_commit_result.dart'
+import 'package:clyven_backend_client/src/protocol/comment_reply_dto.dart'
     as _i17;
-import 'package:clyven_backend_client/src/protocol/entry_knowledge_state.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_entry_detail.dart'
     as _i18;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile.dart'
     as _i19;
-import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_profile_detail.dart'
     as _i20;
-import 'package:clyven_backend_client/src/protocol/app_notification.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_preview.dart'
     as _i21;
-import 'package:clyven_backend_client/src/protocol/notification_settings.dart'
+import 'package:clyven_backend_client/src/protocol/dictionary_import_commit_result.dart'
     as _i22;
-import 'package:clyven_backend_client/src/protocol/privacy_settings.dart'
+import 'package:clyven_backend_client/src/protocol/entry_knowledge_state.dart'
     as _i23;
-import 'package:clyven_backend_client/src/protocol/subtitle_review_dashboard.dart'
+import 'package:clyven_backend_client/src/protocol/knowledge_state_result.dart'
     as _i24;
-import 'package:clyven_backend_client/src/protocol/subtitle_review_task_detail.dart'
+import 'package:clyven_backend_client/src/protocol/knowledge_state_query.dart'
     as _i25;
-import 'package:clyven_backend_client/src/protocol/subtitle_review_task.dart'
+import 'package:clyven_backend_client/src/protocol/app_notification.dart'
     as _i26;
-import 'package:clyven_backend_client/src/protocol/script_conversion_profile.dart'
+import 'package:clyven_backend_client/src/protocol/notification_settings.dart'
     as _i27;
-import 'package:clyven_backend_client/src/protocol/script_conversion_entry.dart'
+import 'package:clyven_backend_client/src/protocol/privacy_settings.dart'
     as _i28;
-import 'package:clyven_backend_client/src/protocol/script_conversion_import_preview.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_review_dashboard.dart'
     as _i29;
-import 'package:clyven_backend_client/src/protocol/script_conversion_commit_result.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_review_task_detail.dart'
     as _i30;
-import 'package:clyven_backend_client/src/protocol/profile_stats.dart' as _i31;
-import 'package:clyven_backend_client/src/protocol/watch_history.dart' as _i32;
-import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_review_task.dart'
+    as _i31;
+import 'package:clyven_backend_client/src/protocol/script_conversion_profile.dart'
+    as _i32;
+import 'package:clyven_backend_client/src/protocol/script_conversion_entry.dart'
     as _i33;
-import 'package:clyven_backend_client/src/protocol/subtitle_publish_status.dart'
+import 'package:clyven_backend_client/src/protocol/script_conversion_import_preview.dart'
     as _i34;
-import 'package:clyven_backend_client/src/protocol/subtitle_srt_preview.dart'
+import 'package:clyven_backend_client/src/protocol/script_conversion_commit_result.dart'
     as _i35;
-import 'package:clyven_backend_client/src/protocol/subtitle_cue.dart' as _i36;
-import 'package:clyven_backend_client/src/protocol/subtitle_cue_text.dart'
-    as _i37;
-import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment.dart'
+import 'package:clyven_backend_client/src/protocol/profile_stats.dart' as _i36;
+import 'package:clyven_backend_client/src/protocol/watch_history.dart' as _i37;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue_detail.dart'
     as _i38;
-import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment_input.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_publish_status.dart'
     as _i39;
-import 'package:clyven_backend_client/src/protocol/video_content_type.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_srt_preview.dart'
     as _i40;
-import 'package:clyven_backend_client/src/protocol/video_series.dart' as _i41;
-import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i42;
-import 'package:clyven_backend_client/src/protocol/word_list_detail.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_cue.dart' as _i41;
+import 'package:clyven_backend_client/src/protocol/subtitle_cue_text.dart'
+    as _i42;
+import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment.dart'
     as _i43;
-import 'package:clyven_backend_client/src/protocol/greetings/greeting.dart'
+import 'package:clyven_backend_client/src/protocol/subtitle_karaoke_segment_input.dart'
     as _i44;
-import 'protocol.dart' as _i45;
+import 'package:clyven_backend_client/src/protocol/video_content_type.dart'
+    as _i45;
+import 'package:clyven_backend_client/src/protocol/video_series.dart' as _i46;
+import 'package:clyven_backend_client/src/protocol/word_list.dart' as _i47;
+import 'package:clyven_backend_client/src/protocol/word_list_detail.dart'
+    as _i48;
+import 'package:clyven_backend_client/src/protocol/greetings/greeting.dart'
+    as _i49;
+import 'protocol.dart' as _i50;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -427,17 +435,112 @@ class EndpointAdmin extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointAdminMembership extends _i2.EndpointRef {
+  EndpointAdminMembership(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'adminMembership';
+
+  _i3.Future<_i10.AdminWorkspace> getWorkspace() =>
+      caller.callServerEndpoint<_i10.AdminWorkspace>(
+        'adminMembership',
+        'getWorkspace',
+        {},
+      );
+
+  _i3.Future<List<_i11.AdminMember>> listMembers() =>
+      caller.callServerEndpoint<List<_i11.AdminMember>>(
+        'adminMembership',
+        'listMembers',
+        {},
+      );
+
+  _i3.Future<List<_i12.AdminRole>> listRoles() =>
+      caller.callServerEndpoint<List<_i12.AdminRole>>(
+        'adminMembership',
+        'listRoles',
+        {},
+      );
+
+  _i3.Future<List<_i13.AdminPermission>> listPermissions() =>
+      caller.callServerEndpoint<List<_i13.AdminPermission>>(
+        'adminMembership',
+        'listPermissions',
+        {},
+      );
+
+  _i3.Future<List<_i14.AdminRolePermission>> listRolePermissions({
+    required int roleId,
+  }) => caller.callServerEndpoint<List<_i14.AdminRolePermission>>(
+    'adminMembership',
+    'listRolePermissions',
+    {'roleId': roleId},
+  );
+
+  _i3.Future<_i11.AdminMember> addMemberByEmail({
+    required String email,
+    required int roleId,
+  }) => caller.callServerEndpoint<_i11.AdminMember>(
+    'adminMembership',
+    'addMemberByEmail',
+    {
+      'email': email,
+      'roleId': roleId,
+    },
+  );
+
+  _i3.Future<_i11.AdminMember> updateMemberRole({
+    required int memberId,
+    required int roleId,
+  }) => caller.callServerEndpoint<_i11.AdminMember>(
+    'adminMembership',
+    'updateMemberRole',
+    {
+      'memberId': memberId,
+      'roleId': roleId,
+    },
+  );
+
+  _i3.Future<bool> removeMember({required int memberId}) =>
+      caller.callServerEndpoint<bool>(
+        'adminMembership',
+        'removeMember',
+        {'memberId': memberId},
+      );
+
+  _i3.Future<_i10.AdminWorkspace> transferOwnership({
+    required int newOwnerMemberId,
+  }) => caller.callServerEndpoint<_i10.AdminWorkspace>(
+    'adminMembership',
+    'transferOwnership',
+    {'newOwnerMemberId': newOwnerMemberId},
+  );
+
+  _i3.Future<bool> setRolePermissions({
+    required int roleId,
+    required List<String> permissionCodes,
+  }) => caller.callServerEndpoint<bool>(
+    'adminMembership',
+    'setRolePermissions',
+    {
+      'roleId': roleId,
+      'permissionCodes': permissionCodes,
+    },
+  );
+}
+
+/// {@category Endpoint}
 class EndpointComment extends _i2.EndpointRef {
   EndpointComment(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'comment';
 
-  _i3.Future<_i10.CommentPageDto> loadComments({
+  _i3.Future<_i15.CommentPageDto> loadComments({
     required int videoId,
     required int page,
     required int limit,
-  }) => caller.callServerEndpoint<_i10.CommentPageDto>(
+  }) => caller.callServerEndpoint<_i15.CommentPageDto>(
     'comment',
     'loadComments',
     {
@@ -447,11 +550,11 @@ class EndpointComment extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i11.VideoCommentDto> createComment({
+  _i3.Future<_i16.VideoCommentDto> createComment({
     required int videoId,
     required String userName,
     required String content,
-  }) => caller.callServerEndpoint<_i11.VideoCommentDto>(
+  }) => caller.callServerEndpoint<_i16.VideoCommentDto>(
     'comment',
     'createComment',
     {
@@ -461,12 +564,12 @@ class EndpointComment extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i12.CommentReplyDto> createReply({
+  _i3.Future<_i17.CommentReplyDto> createReply({
     required int videoId,
     required int commentId,
     required String userName,
     required String content,
-  }) => caller.callServerEndpoint<_i12.CommentReplyDto>(
+  }) => caller.callServerEndpoint<_i17.CommentReplyDto>(
     'comment',
     'createReply',
     {
@@ -477,10 +580,10 @@ class EndpointComment extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i11.VideoCommentDto> toggleCommentLike({
+  _i3.Future<_i16.VideoCommentDto> toggleCommentLike({
     required int videoId,
     required int commentId,
-  }) => caller.callServerEndpoint<_i11.VideoCommentDto>(
+  }) => caller.callServerEndpoint<_i16.VideoCommentDto>(
     'comment',
     'toggleCommentLike',
     {
@@ -489,11 +592,11 @@ class EndpointComment extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i12.CommentReplyDto> toggleReplyLike({
+  _i3.Future<_i17.CommentReplyDto> toggleReplyLike({
     required int videoId,
     required int commentId,
     required int replyId,
-  }) => caller.callServerEndpoint<_i12.CommentReplyDto>(
+  }) => caller.callServerEndpoint<_i17.CommentReplyDto>(
     'comment',
     'toggleReplyLike',
     {
@@ -537,12 +640,12 @@ class EndpointDictionary extends _i2.EndpointRef {
   @override
   String get name => 'dictionary';
 
-  _i3.Future<_i13.DictionaryEntryDetail?> lookup({
+  _i3.Future<_i18.DictionaryEntryDetail?> lookup({
     required String languageCode,
     required String normalizedText,
     required String entryType,
     required String explanationLanguageCode,
-  }) => caller.callServerEndpoint<_i13.DictionaryEntryDetail?>(
+  }) => caller.callServerEndpoint<_i18.DictionaryEntryDetail?>(
     'dictionary',
     'lookup',
     {
@@ -553,10 +656,10 @@ class EndpointDictionary extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i13.DictionaryEntryDetail?> getById({
+  _i3.Future<_i18.DictionaryEntryDetail?> getById({
     required int entryId,
     required String explanationLanguageCode,
-  }) => caller.callServerEndpoint<_i13.DictionaryEntryDetail?>(
+  }) => caller.callServerEndpoint<_i18.DictionaryEntryDetail?>(
     'dictionary',
     'getById',
     {
@@ -565,11 +668,11 @@ class EndpointDictionary extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i13.DictionaryEntryDetail>> listEntries({
+  _i3.Future<List<_i18.DictionaryEntryDetail>> listEntries({
     required String languageCode,
     required int offset,
     required int limit,
-  }) => caller.callServerEndpoint<List<_i13.DictionaryEntryDetail>>(
+  }) => caller.callServerEndpoint<List<_i18.DictionaryEntryDetail>>(
     'dictionary',
     'listEntries',
     {
@@ -611,34 +714,34 @@ class EndpointDictionaryImport extends _i2.EndpointRef {
   @override
   String get name => 'dictionaryImport';
 
-  _i3.Future<List<_i14.DictionaryImportProfile>> getProfiles({
+  _i3.Future<List<_i19.DictionaryImportProfile>> getProfiles({
     String? languageCode,
-  }) => caller.callServerEndpoint<List<_i14.DictionaryImportProfile>>(
+  }) => caller.callServerEndpoint<List<_i19.DictionaryImportProfile>>(
     'dictionaryImport',
     'getProfiles',
     {'languageCode': languageCode},
   );
 
-  _i3.Future<_i15.DictionaryImportProfileDetail?> getProfile({
+  _i3.Future<_i20.DictionaryImportProfileDetail?> getProfile({
     required int profileId,
-  }) => caller.callServerEndpoint<_i15.DictionaryImportProfileDetail?>(
+  }) => caller.callServerEndpoint<_i20.DictionaryImportProfileDetail?>(
     'dictionaryImport',
     'getProfile',
     {'profileId': profileId},
   );
 
-  _i3.Future<_i15.DictionaryImportProfileDetail>
+  _i3.Future<_i20.DictionaryImportProfileDetail>
   createVietnameseVocabularyProfile() =>
-      caller.callServerEndpoint<_i15.DictionaryImportProfileDetail>(
+      caller.callServerEndpoint<_i20.DictionaryImportProfileDetail>(
         'dictionaryImport',
         'createVietnameseVocabularyProfile',
         {},
       );
 
-  _i3.Future<_i16.DictionaryImportPreview?> previewRows({
+  _i3.Future<_i21.DictionaryImportPreview?> previewRows({
     required int profileId,
     required List<String> rowsJson,
-  }) => caller.callServerEndpoint<_i16.DictionaryImportPreview?>(
+  }) => caller.callServerEndpoint<_i21.DictionaryImportPreview?>(
     'dictionaryImport',
     'previewRows',
     {
@@ -647,10 +750,10 @@ class EndpointDictionaryImport extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i16.DictionaryImportPreview?> previewExcelBase64({
+  _i3.Future<_i21.DictionaryImportPreview?> previewExcelBase64({
     required int profileId,
     required String excelBase64,
-  }) => caller.callServerEndpoint<_i16.DictionaryImportPreview?>(
+  }) => caller.callServerEndpoint<_i21.DictionaryImportPreview?>(
     'dictionaryImport',
     'previewExcelBase64',
     {
@@ -659,10 +762,10 @@ class EndpointDictionaryImport extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i17.DictionaryImportCommitResult> commitExcelBase64({
+  _i3.Future<_i22.DictionaryImportCommitResult> commitExcelBase64({
     required int profileId,
     required String excelBase64,
-  }) => caller.callServerEndpoint<_i17.DictionaryImportCommitResult>(
+  }) => caller.callServerEndpoint<_i22.DictionaryImportCommitResult>(
     'dictionaryImport',
     'commitExcelBase64',
     {
@@ -698,9 +801,9 @@ class EndpointKnownEntry extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i18.EntryKnowledgeState>> getKnowledgeStatesByEntryIds({
+  _i3.Future<List<_i23.EntryKnowledgeState>> getKnowledgeStatesByEntryIds({
     required List<int> entryIds,
-  }) => caller.callServerEndpoint<List<_i18.EntryKnowledgeState>>(
+  }) => caller.callServerEndpoint<List<_i23.EntryKnowledgeState>>(
     'knownEntry',
     'getKnowledgeStatesByEntryIds',
     {'entryIds': entryIds},
@@ -720,9 +823,9 @@ class EndpointKnownEntry extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i19.KnowledgeStateResult>> getKnowledgeStates({
-    required List<_i20.KnowledgeStateQuery> queries,
-  }) => caller.callServerEndpoint<List<_i19.KnowledgeStateResult>>(
+  _i3.Future<List<_i24.KnowledgeStateResult>> getKnowledgeStates({
+    required List<_i25.KnowledgeStateQuery> queries,
+  }) => caller.callServerEndpoint<List<_i24.KnowledgeStateResult>>(
     'knownEntry',
     'getKnowledgeStates',
     {'queries': queries},
@@ -736,8 +839,8 @@ class EndpointNotification extends _i2.EndpointRef {
   @override
   String get name => 'notification';
 
-  _i3.Future<List<_i21.AppNotification>> list() =>
-      caller.callServerEndpoint<List<_i21.AppNotification>>(
+  _i3.Future<List<_i26.AppNotification>> list() =>
+      caller.callServerEndpoint<List<_i26.AppNotification>>(
         'notification',
         'list',
         {},
@@ -764,19 +867,19 @@ class EndpointNotificationSettings extends _i2.EndpointRef {
   @override
   String get name => 'notificationSettings';
 
-  _i3.Future<_i22.NotificationSettings> get() =>
-      caller.callServerEndpoint<_i22.NotificationSettings>(
+  _i3.Future<_i27.NotificationSettings> get() =>
+      caller.callServerEndpoint<_i27.NotificationSettings>(
         'notificationSettings',
         'get',
         {},
       );
 
-  _i3.Future<_i22.NotificationSettings> update({
+  _i3.Future<_i27.NotificationSettings> update({
     bool? pushEnabled,
     bool? likeEnabled,
     bool? commentEnabled,
     bool? followEnabled,
-  }) => caller.callServerEndpoint<_i22.NotificationSettings>(
+  }) => caller.callServerEndpoint<_i27.NotificationSettings>(
     'notificationSettings',
     'update',
     {
@@ -795,18 +898,18 @@ class EndpointPrivacySettings extends _i2.EndpointRef {
   @override
   String get name => 'privacySettings';
 
-  _i3.Future<_i23.PrivacySettings> get() =>
-      caller.callServerEndpoint<_i23.PrivacySettings>(
+  _i3.Future<_i28.PrivacySettings> get() =>
+      caller.callServerEndpoint<_i28.PrivacySettings>(
         'privacySettings',
         'get',
         {},
       );
 
-  _i3.Future<_i23.PrivacySettings> update({
+  _i3.Future<_i28.PrivacySettings> update({
     bool? privateAccount,
     bool? allowComments,
     bool? showActivityStatus,
-  }) => caller.callServerEndpoint<_i23.PrivacySettings>(
+  }) => caller.callServerEndpoint<_i28.PrivacySettings>(
     'privacySettings',
     'update',
     {
@@ -824,54 +927,54 @@ class EndpointReview extends _i2.EndpointRef {
   @override
   String get name => 'review';
 
-  _i3.Future<_i24.SubtitleReviewDashboard> getDashboard() =>
-      caller.callServerEndpoint<_i24.SubtitleReviewDashboard>(
+  _i3.Future<_i29.SubtitleReviewDashboard> getDashboard() =>
+      caller.callServerEndpoint<_i29.SubtitleReviewDashboard>(
         'review',
         'getDashboard',
         {},
       );
 
-  _i3.Future<_i25.SubtitleReviewTaskDetail> getTaskDetail({
+  _i3.Future<_i30.SubtitleReviewTaskDetail> getTaskDetail({
     required int taskId,
-  }) => caller.callServerEndpoint<_i25.SubtitleReviewTaskDetail>(
+  }) => caller.callServerEndpoint<_i30.SubtitleReviewTaskDetail>(
     'review',
     'getTaskDetail',
     {'taskId': taskId},
   );
 
-  _i3.Future<_i26.SubtitleReviewTask> generateVietnameseNomDraft({
+  _i3.Future<_i31.SubtitleReviewTask> generateVietnameseNomDraft({
     required int trackId,
-  }) => caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  }) => caller.callServerEndpoint<_i31.SubtitleReviewTask>(
     'review',
     'generateVietnameseNomDraft',
     {'trackId': trackId},
   );
 
-  _i3.Future<_i26.SubtitleReviewTask> claimTask({required int taskId}) =>
-      caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  _i3.Future<_i31.SubtitleReviewTask> claimTask({required int taskId}) =>
+      caller.callServerEndpoint<_i31.SubtitleReviewTask>(
         'review',
         'claimTask',
         {'taskId': taskId},
       );
 
-  _i3.Future<_i26.SubtitleReviewTask> startTask({required int taskId}) =>
-      caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  _i3.Future<_i31.SubtitleReviewTask> startTask({required int taskId}) =>
+      caller.callServerEndpoint<_i31.SubtitleReviewTask>(
         'review',
         'startTask',
         {'taskId': taskId},
       );
 
-  _i3.Future<_i26.SubtitleReviewTask> submitTask({required int taskId}) =>
-      caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  _i3.Future<_i31.SubtitleReviewTask> submitTask({required int taskId}) =>
+      caller.callServerEndpoint<_i31.SubtitleReviewTask>(
         'review',
         'submitTask',
         {'taskId': taskId},
       );
 
-  _i3.Future<_i26.SubtitleReviewTask> returnTask({
+  _i3.Future<_i31.SubtitleReviewTask> returnTask({
     required int taskId,
     String? note,
-  }) => caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  }) => caller.callServerEndpoint<_i31.SubtitleReviewTask>(
     'review',
     'returnTask',
     {
@@ -880,9 +983,9 @@ class EndpointReview extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i26.SubtitleReviewTask> approveAndPublish({
+  _i3.Future<_i31.SubtitleReviewTask> approveAndPublish({
     required int taskId,
-  }) => caller.callServerEndpoint<_i26.SubtitleReviewTask>(
+  }) => caller.callServerEndpoint<_i31.SubtitleReviewTask>(
     'review',
     'approveAndPublish',
     {'taskId': taskId},
@@ -896,14 +999,14 @@ class EndpointScriptConversion extends _i2.EndpointRef {
   @override
   String get name => 'scriptConversion';
 
-  _i3.Future<List<_i27.ScriptConversionProfile>> listProfiles() =>
-      caller.callServerEndpoint<List<_i27.ScriptConversionProfile>>(
+  _i3.Future<List<_i32.ScriptConversionProfile>> listProfiles() =>
+      caller.callServerEndpoint<List<_i32.ScriptConversionProfile>>(
         'scriptConversion',
         'listProfiles',
         {},
       );
 
-  _i3.Future<_i27.ScriptConversionProfile> createProfile({
+  _i3.Future<_i32.ScriptConversionProfile> createProfile({
     required String name,
     required String languageCode,
     required String sourceScriptCode,
@@ -916,7 +1019,7 @@ class EndpointScriptConversion extends _i2.EndpointRef {
     required String conversionMode,
     String? typeColumn,
     String? description,
-  }) => caller.callServerEndpoint<_i27.ScriptConversionProfile>(
+  }) => caller.callServerEndpoint<_i32.ScriptConversionProfile>(
     'scriptConversion',
     'createProfile',
     {
@@ -935,7 +1038,7 @@ class EndpointScriptConversion extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i27.ScriptConversionProfile> updateProfile({
+  _i3.Future<_i32.ScriptConversionProfile> updateProfile({
     required int profileId,
     required String name,
     required String languageCode,
@@ -949,7 +1052,7 @@ class EndpointScriptConversion extends _i2.EndpointRef {
     required String conversionMode,
     String? typeColumn,
     String? description,
-  }) => caller.callServerEndpoint<_i27.ScriptConversionProfile>(
+  }) => caller.callServerEndpoint<_i32.ScriptConversionProfile>(
     'scriptConversion',
     'updateProfile',
     {
@@ -976,10 +1079,10 @@ class EndpointScriptConversion extends _i2.EndpointRef {
         {'profileId': profileId},
       );
 
-  _i3.Future<List<_i28.ScriptConversionEntry>> listEntries({
+  _i3.Future<List<_i33.ScriptConversionEntry>> listEntries({
     required int profileId,
     required int limit,
-  }) => caller.callServerEndpoint<List<_i28.ScriptConversionEntry>>(
+  }) => caller.callServerEndpoint<List<_i33.ScriptConversionEntry>>(
     'scriptConversion',
     'listEntries',
     {
@@ -988,14 +1091,14 @@ class EndpointScriptConversion extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i28.ScriptConversionEntry> updateEntry({
+  _i3.Future<_i33.ScriptConversionEntry> updateEntry({
     required int entryId,
     required String sourceText,
     required String targetText,
     required int priority,
     String? note,
     String? entryType,
-  }) => caller.callServerEndpoint<_i28.ScriptConversionEntry>(
+  }) => caller.callServerEndpoint<_i33.ScriptConversionEntry>(
     'scriptConversion',
     'updateEntry',
     {
@@ -1015,10 +1118,10 @@ class EndpointScriptConversion extends _i2.EndpointRef {
         {'entryId': entryId},
       );
 
-  _i3.Future<_i29.ScriptConversionImportPreview> previewExcelBase64({
+  _i3.Future<_i34.ScriptConversionImportPreview> previewExcelBase64({
     required int profileId,
     required String excelBase64,
-  }) => caller.callServerEndpoint<_i29.ScriptConversionImportPreview>(
+  }) => caller.callServerEndpoint<_i34.ScriptConversionImportPreview>(
     'scriptConversion',
     'previewExcelBase64',
     {
@@ -1027,10 +1130,10 @@ class EndpointScriptConversion extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i30.ScriptConversionCommitResult> commitExcelBase64({
+  _i3.Future<_i35.ScriptConversionCommitResult> commitExcelBase64({
     required int profileId,
     required String excelBase64,
-  }) => caller.callServerEndpoint<_i30.ScriptConversionCommitResult>(
+  }) => caller.callServerEndpoint<_i35.ScriptConversionCommitResult>(
     'scriptConversion',
     'commitExcelBase64',
     {
@@ -1061,15 +1164,15 @@ class EndpointSocial extends _i2.EndpointRef {
   @override
   String get name => 'social';
 
-  _i3.Future<_i31.ProfileStats> getMyProfileStats() =>
-      caller.callServerEndpoint<_i31.ProfileStats>(
+  _i3.Future<_i36.ProfileStats> getMyProfileStats() =>
+      caller.callServerEndpoint<_i36.ProfileStats>(
         'social',
         'getMyProfileStats',
         {},
       );
 
-  _i3.Future<_i31.ProfileStats> getProfileStats(String creatorId) =>
-      caller.callServerEndpoint<_i31.ProfileStats>(
+  _i3.Future<_i36.ProfileStats> getProfileStats(String creatorId) =>
+      caller.callServerEndpoint<_i36.ProfileStats>(
         'social',
         'getProfileStats',
         {'creatorId': creatorId},
@@ -1140,17 +1243,17 @@ class EndpointSocial extends _i2.EndpointRef {
         {},
       );
 
-  _i3.Future<List<_i32.WatchHistory>> getWatchHistory() =>
-      caller.callServerEndpoint<List<_i32.WatchHistory>>(
+  _i3.Future<List<_i37.WatchHistory>> getWatchHistory() =>
+      caller.callServerEndpoint<List<_i37.WatchHistory>>(
         'social',
         'getWatchHistory',
         {},
       );
 
-  _i3.Future<_i32.WatchHistory> saveWatchProgress(
+  _i3.Future<_i37.WatchHistory> saveWatchProgress(
     int videoId,
     int positionSeconds,
-  ) => caller.callServerEndpoint<_i32.WatchHistory>(
+  ) => caller.callServerEndpoint<_i37.WatchHistory>(
     'social',
     'saveWatchProgress',
     {
@@ -1180,11 +1283,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
   @override
   String get name => 'subtitle';
 
-  _i3.Future<List<_i33.SubtitleCueDetail>> getCueDetails({
+  _i3.Future<List<_i38.SubtitleCueDetail>> getCueDetails({
     required int videoId,
     required String languageCode,
     String? scriptCode,
-  }) => caller.callServerEndpoint<List<_i33.SubtitleCueDetail>>(
+  }) => caller.callServerEndpoint<List<_i38.SubtitleCueDetail>>(
     'subtitle',
     'getCueDetails',
     {
@@ -1194,11 +1297,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i33.SubtitleCueDetail>> getPublishedCueDetails({
+  _i3.Future<List<_i38.SubtitleCueDetail>> getPublishedCueDetails({
     required int videoId,
     required String languageCode,
     String? scriptCode,
-  }) => caller.callServerEndpoint<List<_i33.SubtitleCueDetail>>(
+  }) => caller.callServerEndpoint<List<_i38.SubtitleCueDetail>>(
     'subtitle',
     'getPublishedCueDetails',
     {
@@ -1216,10 +1319,10 @@ class EndpointSubtitle extends _i2.EndpointRef {
     {'videoId': videoId},
   );
 
-  _i3.Future<_i34.SubtitlePublishStatus> getSubtitlePublishStatus({
+  _i3.Future<_i39.SubtitlePublishStatus> getSubtitlePublishStatus({
     required int videoId,
     required String languageCode,
-  }) => caller.callServerEndpoint<_i34.SubtitlePublishStatus>(
+  }) => caller.callServerEndpoint<_i39.SubtitlePublishStatus>(
     'subtitle',
     'getSubtitlePublishStatus',
     {
@@ -1228,10 +1331,10 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i34.SubtitlePublishStatus> publishSubtitleTrack({
+  _i3.Future<_i39.SubtitlePublishStatus> publishSubtitleTrack({
     required int videoId,
     required String languageCode,
-  }) => caller.callServerEndpoint<_i34.SubtitlePublishStatus>(
+  }) => caller.callServerEndpoint<_i39.SubtitlePublishStatus>(
     'subtitle',
     'publishSubtitleTrack',
     {
@@ -1248,11 +1351,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
     {'videoId': videoId},
   );
 
-  _i3.Future<_i35.SubtitleSrtPreview> previewSrtImport({
+  _i3.Future<_i40.SubtitleSrtPreview> previewSrtImport({
     required int videoId,
     required String languageCode,
     required String content,
-  }) => caller.callServerEndpoint<_i35.SubtitleSrtPreview>(
+  }) => caller.callServerEndpoint<_i40.SubtitleSrtPreview>(
     'subtitle',
     'previewSrtImport',
     {
@@ -1290,11 +1393,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i36.SubtitleCue> updateCueText({
+  _i3.Future<_i41.SubtitleCue> updateCueText({
     required int cueId,
     required String text,
     String? scriptCode,
-  }) => caller.callServerEndpoint<_i36.SubtitleCue>(
+  }) => caller.callServerEndpoint<_i41.SubtitleCue>(
     'subtitle',
     'updateCueText',
     {
@@ -1304,12 +1407,12 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i37.SubtitleCueText> upsertCueScriptText({
+  _i3.Future<_i42.SubtitleCueText> upsertCueScriptText({
     required int cueId,
     required String scriptCode,
     required String text,
     required bool isPrimary,
-  }) => caller.callServerEndpoint<_i37.SubtitleCueText>(
+  }) => caller.callServerEndpoint<_i42.SubtitleCueText>(
     'subtitle',
     'upsertCueScriptText',
     {
@@ -1320,11 +1423,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i36.SubtitleCue> updateCueTiming({
+  _i3.Future<_i41.SubtitleCue> updateCueTiming({
     required int cueId,
     required int startMs,
     required int endMs,
-  }) => caller.callServerEndpoint<_i36.SubtitleCue>(
+  }) => caller.callServerEndpoint<_i41.SubtitleCue>(
     'subtitle',
     'updateCueTiming',
     {
@@ -1334,14 +1437,14 @@ class EndpointSubtitle extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i36.SubtitleCue> createCue({
+  _i3.Future<_i41.SubtitleCue> createCue({
     required int videoId,
     required String languageCode,
     required int startMs,
     required int endMs,
     required String text,
     String? scriptCode,
-  }) => caller.callServerEndpoint<_i36.SubtitleCue>(
+  }) => caller.callServerEndpoint<_i41.SubtitleCue>(
     'subtitle',
     'createCue',
     {
@@ -1361,11 +1464,11 @@ class EndpointSubtitle extends _i2.EndpointRef {
         {'cueId': cueId},
       );
 
-  _i3.Future<List<_i38.SubtitleKaraokeSegment>> replaceKaraokeSegments({
+  _i3.Future<List<_i43.SubtitleKaraokeSegment>> replaceKaraokeSegments({
     required int cueId,
-    required List<_i39.SubtitleKaraokeSegmentInput> segments,
+    required List<_i44.SubtitleKaraokeSegmentInput> segments,
     String? scriptCode,
-  }) => caller.callServerEndpoint<List<_i38.SubtitleKaraokeSegment>>(
+  }) => caller.callServerEndpoint<List<_i43.SubtitleKaraokeSegment>>(
     'subtitle',
     'replaceKaraokeSegments',
     {
@@ -1396,7 +1499,7 @@ class EndpointVideo extends _i2.EndpointRef {
     required String description,
     String? seriesTitle,
     required String category,
-    required _i40.VideoContentType contentType,
+    required _i45.VideoContentType contentType,
     required String languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -1423,7 +1526,7 @@ class EndpointVideo extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i8.Video>> getVideos({_i40.VideoContentType? contentType}) =>
+  _i3.Future<List<_i8.Video>> getVideos({_i45.VideoContentType? contentType}) =>
       caller.callServerEndpoint<List<_i8.Video>>(
         'video',
         'getVideos',
@@ -1444,13 +1547,13 @@ class EndpointVideo extends _i2.EndpointRef {
         {'id': id},
       );
 
-  _i3.Future<_i41.VideoSeries> createSeries({
+  _i3.Future<_i46.VideoSeries> createSeries({
     required String title,
     required String description,
     String? coverStorageKey,
     String? languageCode,
     required String category,
-  }) => caller.callServerEndpoint<_i41.VideoSeries>(
+  }) => caller.callServerEndpoint<_i46.VideoSeries>(
     'video',
     'createSeries',
     {
@@ -1462,16 +1565,16 @@ class EndpointVideo extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<List<_i41.VideoSeries>> getCreatorSeries({
+  _i3.Future<List<_i46.VideoSeries>> getCreatorSeries({
     required String creatorId,
-  }) => caller.callServerEndpoint<List<_i41.VideoSeries>>(
+  }) => caller.callServerEndpoint<List<_i46.VideoSeries>>(
     'video',
     'getCreatorSeries',
     {'creatorId': creatorId},
   );
 
-  _i3.Future<_i41.VideoSeries?> getSeries({required int seriesId}) =>
-      caller.callServerEndpoint<_i41.VideoSeries?>(
+  _i3.Future<_i46.VideoSeries?> getSeries({required int seriesId}) =>
+      caller.callServerEndpoint<_i46.VideoSeries?>(
         'video',
         'getSeries',
         {'seriesId': seriesId},
@@ -1616,17 +1719,17 @@ class EndpointWordList extends _i2.EndpointRef {
   @override
   String get name => 'wordList';
 
-  _i3.Future<List<_i42.WordList>> getLists() =>
-      caller.callServerEndpoint<List<_i42.WordList>>(
+  _i3.Future<List<_i47.WordList>> getLists() =>
+      caller.callServerEndpoint<List<_i47.WordList>>(
         'wordList',
         'getLists',
         {},
       );
 
-  _i3.Future<_i43.WordListDetail?> getListDetail({
+  _i3.Future<_i48.WordListDetail?> getListDetail({
     required int listId,
     required String explanationLanguageCode,
-  }) => caller.callServerEndpoint<_i43.WordListDetail?>(
+  }) => caller.callServerEndpoint<_i48.WordListDetail?>(
     'wordList',
     'getListDetail',
     {
@@ -1646,8 +1749,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i44.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i44.Greeting>(
+  _i3.Future<_i49.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i49.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -1685,7 +1788,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i45.Protocol(),
+         _i50.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -1698,6 +1801,7 @@ class Client extends _i2.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     userProfileEdit = EndpointUserProfileEdit(this);
     admin = EndpointAdmin(this);
+    adminMembership = EndpointAdminMembership(this);
     comment = EndpointComment(this);
     dictionary = EndpointDictionary(this);
     dictionaryImport = EndpointDictionaryImport(this);
@@ -1722,6 +1826,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointUserProfileEdit userProfileEdit;
 
   late final EndpointAdmin admin;
+
+  late final EndpointAdminMembership adminMembership;
 
   late final EndpointComment comment;
 
@@ -1759,6 +1865,7 @@ class Client extends _i2.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'userProfileEdit': userProfileEdit,
     'admin': admin,
+    'adminMembership': adminMembership,
     'comment': comment,
     'dictionary': dictionary,
     'dictionaryImport': dictionaryImport,

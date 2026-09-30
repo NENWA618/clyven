@@ -1,0 +1,17 @@
+class: AdminMember
+table: admin_member
+
+fields:
+  workspaceId: int
+  userId: String
+  email: String
+  roleId: int
+  status: String, default='active'
+  invitedByUserId: String?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+
+indexes:
+  admin_member_workspace_user_unique_idx:
+    fields: workspaceId, userId
+    unique: true
