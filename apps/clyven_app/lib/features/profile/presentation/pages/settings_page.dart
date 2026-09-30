@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/utils/require_login.dart';
 import '../../../notifications/presentation/pages/notification_settings_page.dart';
 import '../providers/my_profile_provider.dart';
 import 'about_page.dart';
@@ -20,6 +21,8 @@ class SettingsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final selectedLocale = ref.watch(appLocaleProvider);
     final themeSettings = ref.watch(appThemeProvider);
+    final authAsync = ref.watch(authProvider);
+    final isAuthenticated = authAsync.value != null;
     final colors = Theme.of(context).colorScheme;
     final isNight = themeSettings.displayMode == ClyvenDisplayMode.night;
     final isZh = Localizations.localeOf(context).languageCode == 'zh';
@@ -42,39 +45,52 @@ class SettingsPage extends ConsumerWidget {
                     colors,
                   ),
                   const SizedBox(height: 12),
-                  _SettingsItem(
-                    icon: Icons.person_outline_rounded,
-                    title: l10n.accountAndProfile,
-                    subtitle: l10n.accountAndProfileSubtitle,
-                    onTap: () async {
-                      final profile = ref.read(myProfileProvider).value;
-                      if (profile == null) {
-                        return;
-                      }
+                  if (isAuthenticated) ...[
+                    _SettingsItem(
+                      icon: Icons.person_outline_rounded,
+                      title: l10n.accountAndProfile,
+                      subtitle: l10n.accountAndProfileSubtitle,
+                      onTap: () async {
+                        final profile = ref.read(myProfileProvider).value;
+                        if (profile == null) {
+                          ref.invalidate(myProfileProvider);
+                          return;
+                        }
 
-                      final changed = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EditProfilePage(profile: profile),
-                        ),
-                      );
-                      if (changed == true) {
-                        ref.invalidate(myProfileProvider);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  _SettingsItem(
-                    icon: Icons.lock_outline_rounded,
-                    title: l10n.privacy,
-                    subtitle: l10n.privacySubtitle,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const PrivacyPage()),
-                      );
-                    },
-                  ),
+                        final changed = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditProfilePage(profile: profile),
+                          ),
+                        );
+                        if (changed == true) {
+                          ref.invalidate(myProfileProvider);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    _SettingsItem(
+                      icon: Icons.lock_outline_rounded,
+                      title: l10n.privacy,
+                      subtitle: l10n.privacySubtitle,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const PrivacyPage()),
+                        );
+                      },
+                    ),
+                  ] else
+                    _SettingsItem(
+                      icon: Icons.login_rounded,
+                      title: isZh ? '登录 / 注册' : 'Sign in / Register',
+                      subtitle: isZh
+                          ? '登录后管理账号与个人资料'
+                          : 'Sign in to manage your account and profile',
+                      onTap: () async {
+                        await requireLogin(context, ref);
+                      },
+                    ),
                   const SizedBox(height: 30),
                   _buildSectionTitle(
                     l10n.appSectionEyebrow,
@@ -99,10 +115,10 @@ class SettingsPage extends ConsumerWidget {
                     subtitle: isNight
                         ? (isZh
                               ? '已开启 · 使用 Clyven 深色背景'
-                              : 'On · Clyven dark background')
+                              : 'On 路 Clyven dark background')
                         : (isZh
                               ? '白天模式 · 保持 F4F1EA 背景'
-                              : 'Day mode · Keep the F4F1EA background'),
+                              : 'Day mode 路 Keep the F4F1EA background'),
                     onTap: () {
                       ref
                           .read(appThemeProvider.notifier)
@@ -126,19 +142,21 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  _SettingsItem(
-                    icon: Icons.notifications_none_rounded,
-                    title: l10n.notifications,
-                    subtitle: l10n.notificationsSettingsSubtitle,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationSettingsPage(),
-                        ),
-                      );
-                    },
-                  ),
+                  if (isAuthenticated) ...[
+                    _SettingsItem(
+                      icon: Icons.notifications_none_rounded,
+                      title: l10n.notifications,
+                      subtitle: l10n.notificationsSettingsSubtitle,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationSettingsPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   _SettingsItem(
                     icon: Icons.info_outline_rounded,
@@ -151,46 +169,48 @@ class SettingsPage extends ConsumerWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 36),
-                  _buildSectionTitle(
-                    l10n.identitySectionEyebrow,
-                    l10n.currentIdentity,
-                    colors,
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await ref.read(authProvider.notifier).logout();
-
-                        if (!context.mounted) {
-                          return;
-                        }
-
-                        Navigator.pop(context);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colors.onSurface,
-                        side: const BorderSide(color: Color(0xFFCAC5BB)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
+                  if (isAuthenticated) ...[
+                    const SizedBox(height: 36),
+                    _buildSectionTitle(
+                      l10n.identitySectionEyebrow,
+                      l10n.currentIdentity,
+                      colors,
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          await ref.read(authProvider.notifier).logout();
+  
+                          if (!context.mounted) {
+                            return;
+                          }
+  
+                          Navigator.pop(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: colors.onSurface,
+                          side: const BorderSide(color: Color(0xFFCAC5BB)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.logout_rounded, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.logoutCurrentIdentity,
+                              style: TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.logout_rounded, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.logoutCurrentIdentity,
-                            style: TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
+                  ],
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
@@ -498,3 +518,4 @@ class _SettingsItem extends StatelessWidget {
     );
   }
 }
+
