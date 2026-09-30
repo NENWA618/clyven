@@ -51,7 +51,6 @@ class VideoEndpoint extends Endpoint {
     return video;
   }
 
-
   Future<VideoSeries?> _findSeriesByTitle(
     Session session, {
     required String creatorId,
@@ -60,8 +59,7 @@ class VideoEndpoint extends Endpoint {
     return VideoSeries.db.findFirstRow(
       session,
       where: (table) =>
-          table.creatorId.equals(creatorId) &
-          table.title.equals(title),
+          table.creatorId.equals(creatorId) & table.title.equals(title),
     );
   }
 
@@ -124,6 +122,7 @@ class VideoEndpoint extends Endpoint {
       ),
     );
   }
+
   Future<String> getCurrentUserId(Session session) async {
     return _requireUserId(session);
   }
@@ -384,8 +383,7 @@ class VideoEndpoint extends Endpoint {
       orderDescending: true,
     );
 
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
+    final currentUserId = session.authenticated?.userIdentifier.toString();
 
     if (currentUserId == creatorId) {
       return series;
@@ -415,6 +413,7 @@ class VideoEndpoint extends Endpoint {
 
     return visible;
   }
+
   Future<VideoSeries?> getSeries(
     Session session, {
     required int seriesId,
@@ -428,8 +427,7 @@ class VideoEndpoint extends Endpoint {
       return null;
     }
 
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
+    final currentUserId = session.authenticated?.userIdentifier.toString();
 
     if (currentUserId == series.creatorId) {
       return series;
@@ -445,6 +443,7 @@ class VideoEndpoint extends Endpoint {
 
     return publicVideo == null ? null : series;
   }
+
   Future<List<Video>> getSeriesVideos(
     Session session, {
     required int seriesId,
@@ -458,17 +457,14 @@ class VideoEndpoint extends Endpoint {
       return [];
     }
 
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
+    final currentUserId = session.authenticated?.userIdentifier.toString();
 
-    final isOwner =
-        currentUserId == series.creatorId;
+    final isOwner = currentUserId == series.creatorId;
 
     final videos = await Video.db.find(
       session,
       where: isOwner
-          ? (table) =>
-                table.seriesId.equals(seriesId)
+          ? (table) => table.seriesId.equals(seriesId)
           : (table) =>
                 table.seriesId.equals(seriesId) &
                 table.isPublic.equals(true) &
@@ -476,13 +472,10 @@ class VideoEndpoint extends Endpoint {
     );
 
     videos.sort((a, b) {
-      final aPosition =
-          a.seriesPosition ?? 0x7fffffff;
-      final bPosition =
-          b.seriesPosition ?? 0x7fffffff;
+      final aPosition = a.seriesPosition ?? 0x7fffffff;
+      final bPosition = b.seriesPosition ?? 0x7fffffff;
 
-      final result =
-          aPosition.compareTo(bPosition);
+      final result = aPosition.compareTo(bPosition);
 
       if (result != 0) {
         return result;
@@ -495,6 +488,7 @@ class VideoEndpoint extends Endpoint {
 
     return videos;
   }
+
   Future<Video> setSeriesById(
     Session session, {
     required int videoId,
@@ -559,12 +553,9 @@ class VideoEndpoint extends Endpoint {
       throw Exception('视频不存在');
     }
 
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
+    final currentUserId = session.authenticated?.userIdentifier.toString();
 
-    final isOwner =
-        currentUserId != null &&
-        currentUserId == video.authorId;
+    final isOwner = currentUserId != null && currentUserId == video.authorId;
 
     if (!video.isPublic && !isOwner) {
       throw Exception('无法记录不可访问视频的观看次数');
@@ -590,6 +581,7 @@ class VideoEndpoint extends Endpoint {
 
     return updated.viewCount;
   }
+
   Future<int> recordEngagedView(
     Session session, {
     required int videoId,
@@ -603,12 +595,9 @@ class VideoEndpoint extends Endpoint {
       throw Exception('视频不存在');
     }
 
-    final currentUserId =
-        session.authenticated?.userIdentifier.toString();
+    final currentUserId = session.authenticated?.userIdentifier.toString();
 
-    final isOwner =
-        currentUserId != null &&
-        currentUserId == video.authorId;
+    final isOwner = currentUserId != null && currentUserId == video.authorId;
 
     if (!video.isPublic && !isOwner) {
       throw Exception('无法记录不可访问视频的有效观看');
@@ -618,8 +607,7 @@ class VideoEndpoint extends Endpoint {
       throw Exception('无法记录未发布视频的有效观看');
     }
 
-    video.engagedViewCount =
-        video.engagedViewCount + 1;
+    video.engagedViewCount = video.engagedViewCount + 1;
 
     final updated = await Video.db.updateRow(
       session,
@@ -635,6 +623,7 @@ class VideoEndpoint extends Endpoint {
 
     return updated.engagedViewCount;
   }
+
   Future<Video> setSeries(
     Session session, {
     required int videoId,
@@ -648,8 +637,7 @@ class VideoEndpoint extends Endpoint {
     final userId = _requireUserId(session);
     final normalizedTitle = seriesTitle?.trim();
 
-    if (normalizedTitle == null ||
-        normalizedTitle.isEmpty) {
+    if (normalizedTitle == null || normalizedTitle.isEmpty) {
       video.seriesId = null;
       video.seriesTitle = null;
       video.seriesPosition = null;
@@ -718,14 +706,12 @@ class VideoEndpoint extends Endpoint {
 
     final videos = await Video.db.find(
       session,
-      where: (table) =>
-          table.seriesId.equals(seriesId),
+      where: (table) => table.seriesId.equals(seriesId),
     );
 
     final byId = <int, Video>{
       for (final video in videos)
-        if (video.id != null)
-          video.id!: video,
+        if (video.id != null) video.id!: video,
     };
 
     if (videoIds.length != byId.length ||
@@ -733,9 +719,7 @@ class VideoEndpoint extends Endpoint {
       throw Exception('系列排序列表与实际视频不一致');
     }
 
-    for (var index = 0;
-        index < videoIds.length;
-        index++) {
+    for (var index = 0; index < videoIds.length; index++) {
       final video = byId[videoIds[index]]!;
 
       video.seriesPosition = index + 1;
@@ -754,6 +738,59 @@ class VideoEndpoint extends Endpoint {
       series,
     );
   }
+
+  Future<Video> updateMetadata(
+    Session session, {
+    required int videoId,
+    required String title,
+    required String description,
+    required String category,
+    required String languageCode,
+    required List<String> tags,
+    required bool isPublic,
+  }) async {
+    final video = await _requireOwnedVideo(session, videoId);
+
+    final normalizedTitle = title.trim();
+    if (normalizedTitle.isEmpty) {
+      throw Exception('视频标题不能为空');
+    }
+
+    final now = DateTime.now().toUtc();
+    final normalizedLanguageCode = languageCode.trim().isEmpty
+        ? 'auto'
+        : languageCode.trim().toLowerCase();
+
+    final normalizedTags = <String>[];
+    final seenTags = <String>{};
+
+    for (final rawTag in tags) {
+      final tag = rawTag.trim();
+      if (tag.isEmpty) {
+        continue;
+      }
+
+      final key = tag.toLowerCase();
+      if (seenTags.add(key)) {
+        normalizedTags.add(tag);
+      }
+    }
+
+    video.title = normalizedTitle;
+    video.description = description.trim();
+    video.category = category.trim().isEmpty ? 'general' : category.trim();
+    video.languageCode = normalizedLanguageCode;
+    video.tags = normalizedTags;
+    video.isPublic = isPublic;
+    video.updatedAt = now;
+
+    if (isPublic && video.publishedAt == null) {
+      video.publishedAt = now;
+    }
+
+    return Video.db.updateRow(session, video);
+  }
+
   Future<Video> setVisibility(
     Session session, {
     required int videoId,

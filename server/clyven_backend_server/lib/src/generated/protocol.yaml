@@ -23,6 +23,17 @@ admin:
   - getAllVideos:
   - getVideosWithSubtitles:
   - getSubtitleTracks:
+adminMembership:
+  - getWorkspace:
+  - listMembers:
+  - listRoles:
+  - listPermissions:
+  - listRolePermissions:
+  - addMemberByEmail:
+  - updateMemberRole:
+  - removeMember:
+  - transferOwnership:
+  - setRolePermissions:
 comment:
   - loadComments:
   - createComment:
@@ -125,6 +136,7 @@ video:
   - recordEngagedView:
   - setSeries:
   - reorderSeriesVideos:
+  - updateMetadata:
   - setVisibility:
   - deleteVideo:
   - createUploadDescription:
