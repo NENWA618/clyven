@@ -61,10 +61,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
 
   final ValueNotifier<int> _subtitlePositionMs = ValueNotifier<int>(0);
 
-  Future<void> _recordViewIfNeeded(
-    VideoDetail video,
-    Duration position,
-  ) async {
+  Future<void> _recordViewIfNeeded(VideoDetail video, Duration position) async {
     final numericVideoId = int.tryParse(video.id);
 
     if (numericVideoId == null) {
@@ -72,36 +69,25 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     }
 
     // position > 0 代表已经真正开始播放。
-    if (position > Duration.zero &&
-        !_recordedViewVideoIds.contains(video.id)) {
+    if (position > Duration.zero && !_recordedViewVideoIds.contains(video.id)) {
       _recordedViewVideoIds.add(video.id);
 
       try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
+        final client = ref.read(serverpodClientProvider);
 
-        await client.video.recordView(
-          videoId: numericVideoId,
-        );
+        await client.video.recordView(videoId: numericVideoId);
 
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
+        ref.invalidate(videoDetailProvider(video.id));
 
         final seriesId = video.seriesId;
 
         if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
+          ref.invalidate(seriesVideosProvider(seriesId));
         }
       } catch (error) {
         _recordedViewVideoIds.remove(video.id);
 
-        debugPrint(
-          '[Clyven View] recordView failed: $error',
-        );
+        debugPrint('[Clyven View] recordView failed: $error');
       }
     }
 
@@ -111,34 +97,25 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       _recordedEngagedViewVideoIds.add(video.id);
 
       try {
-        final client = ref.read(
-          serverpodClientProvider,
-        );
+        final client = ref.read(serverpodClientProvider);
 
-        await client.video.recordEngagedView(
-          videoId: numericVideoId,
-        );
+        await client.video.recordEngagedView(videoId: numericVideoId);
 
-        ref.invalidate(
-          videoDetailProvider(video.id),
-        );
+        ref.invalidate(videoDetailProvider(video.id));
 
         final seriesId = video.seriesId;
 
         if (seriesId != null) {
-          ref.invalidate(
-            seriesVideosProvider(seriesId),
-          );
+          ref.invalidate(seriesVideosProvider(seriesId));
         }
       } catch (error) {
         _recordedEngagedViewVideoIds.remove(video.id);
 
-        debugPrint(
-          '[Clyven View] recordEngagedView failed: $error',
-        );
+        debugPrint('[Clyven View] recordEngagedView failed: $error');
       }
     }
   }
+
   @override
   void dispose() {
     _subtitlePositionMs.dispose();
@@ -184,6 +161,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       _showSeries = false;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final videoId = widget.videoId;
@@ -411,11 +389,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     onClose: _closeComments,
                   )
                 : _showSeries
-                ? _buildFullSeriesPanel(
-                    context,
-                    ref,
-                    video,
-                  )
+                ? _buildFullSeriesPanel(context, ref, video)
                 : CustomScrollView(
                     key: const PageStorageKey<String>(
                       'video-detail-information',
@@ -428,15 +402,12 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                       if (video.seriesId != null &&
                           video.seriesTitle.trim().isNotEmpty)
                         SliverToBoxAdapter(
-                          child: _buildSeriesEntry(
-                            context,
-                            video,
-                          ),
+                          child: _buildSeriesEntry(context, video),
                         ),
                       if (video.seriesId != null)
-                      SliverToBoxAdapter(
-                        child: _buildActions(context, ref, video, l10n),
-                      ),
+                        SliverToBoxAdapter(
+                          child: _buildActions(context, ref, video, l10n),
+                        ),
                       SliverToBoxAdapter(
                         child: _buildCreator(context, ref, video, l10n),
                       ),
@@ -635,10 +606,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       fallbackDurationSeconds: video.durationSeconds,
       compact: compact,
       onProgress: (position, duration) {
-        _recordViewIfNeeded(
-          video,
-          position,
-        );
+        _recordViewIfNeeded(video, position);
         ref
             .read(watchHistoryProvider.notifier)
             .saveProgress(
@@ -663,12 +631,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     final scheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        24,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -685,10 +648,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  localizedTopicLabel(
-                    l10n,
-                    video.category,
-                  ).toUpperCase(),
+                  localizedTopicLabel(l10n, video.category).toUpperCase(),
                   style: TextStyle(
                     color: scheme.onPrimaryContainer,
                     fontSize: 10,
@@ -707,10 +667,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    _formatDate(
-                      context,
-                      video.publishedAt,
-                    ),
+                    _formatDate(context, video.publishedAt),
                     style: const TextStyle(
                       color: Color(0xFF8A857D),
                       fontSize: 11,
@@ -736,16 +693,12 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 11,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             decoration: BoxDecoration(
               color: scheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: scheme.outlineVariant
-                    .withValues(alpha: 0.45),
+                color: scheme.outlineVariant.withValues(alpha: 0.45),
               ),
             ),
             child: Row(
@@ -758,12 +711,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  l10n.viewsCount(
-                    _formatCount(
-                      context,
-                      video.viewCount,
-                    ),
-                  ),
+                  l10n.viewsCount(_formatCount(context, video.viewCount)),
                   style: const TextStyle(
                     color: Color(0xFF5F5A53),
                     fontSize: 12,
@@ -787,9 +735,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  _formatDuration(
-                    video.durationSeconds,
-                  ),
+                  _formatDuration(video.durationSeconds),
                   style: const TextStyle(
                     color: Color(0xFF5F5A53),
                     fontSize: 12,
@@ -803,10 +749,8 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       ),
     );
   }
-  Widget _buildSeriesEntry(
-    BuildContext context,
-    VideoDetail video,
-  ) {
+
+  Widget _buildSeriesEntry(BuildContext context, VideoDetail video) {
     final seriesId = video.seriesId;
     final title = video.seriesTitle.trim();
 
@@ -817,12 +761,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     final scheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        18,
-        20,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
       child: Material(
         color: Colors.white.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(24),
@@ -830,12 +769,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
         child: InkWell(
           onTap: _openSeries,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              18,
-              15,
-              15,
-              15,
-            ),
+            padding: const EdgeInsets.fromLTRB(18, 15, 15, 15),
             child: Row(
               children: [
                 Container(
@@ -925,9 +859,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     final client = ref.read(serverpodClientProvider);
 
     return FutureBuilder<String?>(
-      future: client.video.getVideoUrl(
-        path: coverKey,
-      ),
+      future: client.video.getVideoUrl(path: coverKey),
       builder: (context, snapshot) {
         final coverUrl = snapshot.data?.trim();
 
@@ -935,14 +867,11 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
           return Container(
             color: scheme.surfaceContainerHighest,
             alignment: Alignment.center,
-            child: snapshot.connectionState ==
-                    ConnectionState.waiting
+            child: snapshot.connectionState == ConnectionState.waiting
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Icon(
                     Icons.video_library_outlined,
@@ -955,11 +884,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
         return Image.network(
           coverUrl,
           fit: BoxFit.cover,
-          errorBuilder: (
-            context,
-            error,
-            stackTrace,
-          ) {
+          errorBuilder: (context, error, stackTrace) {
             return Container(
               color: scheme.surfaceContainerHighest,
               alignment: Alignment.center,
@@ -986,9 +911,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       return const SizedBox.shrink();
     }
 
-    final videosAsync = ref.watch(
-      seriesVideosProvider(seriesId),
-    );
+    final videosAsync = ref.watch(seriesVideosProvider(seriesId));
 
     final scheme = Theme.of(context).colorScheme;
 
@@ -997,18 +920,12 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              16,
-              10,
-              14,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 16, 10, 14),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         '系列',
@@ -1034,66 +951,42 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                 ),
                 IconButton(
                   onPressed: _closeSeries,
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    size: 26,
-                  ),
+                  icon: const Icon(Icons.close_rounded, size: 26),
                 ),
               ],
             ),
           ),
-          Divider(
-            height: 1,
-            color: scheme.outlineVariant,
-          ),
+          Divider(height: 1, color: scheme.outlineVariant),
           Expanded(
             child: videosAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (_, _) => const Center(
-                child: Text('系列内容加载失败'),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, _) => const Center(child: Text('系列内容加载失败')),
               data: (videos) {
                 if (videos.isEmpty) {
-                  return const Center(
-                    child: Text('这个系列暂时没有视频'),
-                  );
+                  return const Center(child: Text('这个系列暂时没有视频'));
                 }
 
                 return ListView.separated(
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(
-                    16,
-                    14,
-                    16,
-                    40,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 40),
                   itemCount: videos.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final item = videos[index];
 
-                    final isCurrent =
-                        item.id?.toString() ==
-                        currentVideo.id;
+                    final isCurrent = item.id?.toString() == currentVideo.id;
 
                     return Material(
                       color: isCurrent
-                          ? scheme.primaryContainer
-                              .withValues(alpha: 0.38)
+                          ? scheme.primaryContainer.withValues(alpha: 0.38)
                           : scheme.surfaceContainerLow,
-                      borderRadius:
-                          BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(18),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: item.id == null
                             ? null
                             : () {
-                                openGlobalVideo(
-                                  item.id!.toString(),
-                                );
+                                openGlobalVideo(item.id!.toString());
                               },
                         child: SizedBox(
                           height: 105,
@@ -1105,41 +998,29 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                 child: Stack(
                                   fit: StackFit.expand,
                                   children: [
-                                    _buildSeriesVideoCover(
-                                      ref,
-                                      item,
-                                      scheme,
-                                    ),
+                                    _buildSeriesVideoCover(ref, item, scheme),
                                     Positioned(
                                       right: 7,
                                       bottom: 7,
                                       child: Container(
-                                        padding:
-                                            const EdgeInsets
-                                                .symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 7,
                                           vertical: 4,
                                         ),
-                                        decoration:
-                                            BoxDecoration(
-                                          color: Colors.black
-                                              .withValues(
-                                                alpha: 0.78,
-                                              ),
-                                          borderRadius:
-                                              BorderRadius
-                                                  .circular(7),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.78,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            7,
+                                          ),
                                         ),
                                         child: Text(
-                                          _formatDuration(
-                                            item.durationSeconds,
-                                          ),
-                                          style:
-                                              const TextStyle(
+                                          _formatDuration(item.durationSeconds),
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 9,
-                                            fontWeight:
-                                                FontWeight.w800,
+                                            fontWeight: FontWeight.w800,
                                           ),
                                         ),
                                       ),
@@ -1151,19 +1032,14 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                         child: Container(
                                           width: 28,
                                           height: 28,
-                                          decoration:
-                                              BoxDecoration(
-                                            color:
-                                                scheme.primary,
-                                            shape:
-                                                BoxShape.circle,
+                                          decoration: BoxDecoration(
+                                            color: scheme.primary,
+                                            shape: BoxShape.circle,
                                           ),
                                           child: Icon(
-                                            Icons
-                                                .play_arrow_rounded,
+                                            Icons.play_arrow_rounded,
                                             size: 18,
-                                            color:
-                                                scheme.onPrimary,
+                                            color: scheme.onPrimary,
                                           ),
                                         ),
                                       ),
@@ -1172,8 +1048,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                               ),
                               Expanded(
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(
+                                  padding: const EdgeInsets.fromLTRB(
                                     13,
                                     10,
                                     12,
@@ -1186,11 +1061,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                       Text(
                                         item.title,
                                         maxLines: 2,
-                                        overflow:
-                                            TextOverflow.ellipsis,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color:
-                                              scheme.onSurface,
+                                          color: scheme.onSurface,
                                           fontSize: 14,
                                           height: 1.25,
                                           fontWeight: isCurrent
@@ -1202,28 +1075,18 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                       Row(
                                         children: [
                                           const Icon(
-                                            Icons
-                                                .play_circle_outline_rounded,
+                                            Icons.play_circle_outline_rounded,
                                             size: 13,
-                                            color: Color(
-                                              0xFF908A81,
-                                            ),
+                                            color: Color(0xFF908A81),
                                           ),
-                                          const SizedBox(
-                                            width: 4,
-                                          ),
+                                          const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               '${_formatCount(context, item.viewCount)} views',
                                               maxLines: 1,
-                                              overflow:
-                                                  TextOverflow
-                                                      .ellipsis,
-                                              style:
-                                                  const TextStyle(
-                                                color: Color(
-                                                  0xFF908A81,
-                                                ),
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Color(0xFF908A81),
                                                 fontSize: 10,
                                               ),
                                             ),
@@ -1237,49 +1100,33 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                             child: Text(
                                               item.category,
                                               maxLines: 1,
-                                              overflow:
-                                                  TextOverflow
-                                                      .ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                color: scheme
-                                                    .secondary,
+                                                color: scheme.secondary,
                                                 fontSize: 10,
-                                                fontWeight:
-                                                    FontWeight
-                                                        .w700,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                             ),
                                           ),
                                           if (isCurrent) ...[
-                                            const SizedBox(
-                                              width: 6,
-                                            ),
+                                            const SizedBox(width: 6),
                                             Container(
                                               padding:
-                                                  const EdgeInsets
-                                                      .symmetric(
-                                                horizontal: 7,
-                                                vertical: 3,
-                                              ),
-                                              decoration:
-                                                  BoxDecoration(
-                                                color: scheme
-                                                    .primary,
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 3,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: scheme.primary,
                                                 borderRadius:
-                                                    BorderRadius
-                                                        .circular(
-                                                  8,
-                                                ),
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 '正在播放',
                                                 style: TextStyle(
-                                                  color: scheme
-                                                      .onPrimary,
+                                                  color: scheme.onPrimary,
                                                   fontSize: 9,
-                                                  fontWeight:
-                                                      FontWeight
-                                                          .w800,
+                                                  fontWeight: FontWeight.w800,
                                                 ),
                                               ),
                                             ),
@@ -1304,6 +1151,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       ),
     );
   }
+
   Widget _buildActions(
     BuildContext context,
     WidgetRef ref,
@@ -1315,8 +1163,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     // stale liked/favorited state survive past a sign-out.
     final interaction = interactionAsync.unwrapPrevious().value;
     final likeCount = interaction?.likeCount ?? video.likeCount;
-    final favoriteCount =
-        interaction?.favoriteCount ?? video.favoriteCount;
+    final favoriteCount = interaction?.favoriteCount ?? video.favoriteCount;
     final isLiked = interaction?.isLiked ?? false;
     final isFavorited = interaction?.isFavorited ?? false;
 
@@ -1350,9 +1197,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                 }
 
                 await ref
-                    .read(
-                      videoInteractionProvider(video.id).notifier,
-                    )
+                    .read(videoInteractionProvider(video.id).notifier)
                     .toggleLike();
               },
             ),
@@ -1376,18 +1221,13 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                 }
 
                 await ref
-                    .read(
-                      videoInteractionProvider(video.id).notifier,
-                    )
+                    .read(videoInteractionProvider(video.id).notifier)
                     .toggleFavorite();
               },
             ),
             _ActionButton(
               icon: Icons.mode_comment_outlined,
-              value: _formatCount(
-                context,
-                video.commentCount,
-              ),
+              value: _formatCount(context, video.commentCount),
               label: l10n.discussion,
               onTap: _openComments,
             ),
@@ -1404,6 +1244,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       ),
     );
   }
+
   Widget _buildCreator(
     BuildContext context,
     WidgetRef ref,

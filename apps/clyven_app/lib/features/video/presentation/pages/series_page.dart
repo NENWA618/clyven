@@ -8,10 +8,7 @@ import '../controllers/global_video_player_controller.dart';
 class SeriesPage extends ConsumerStatefulWidget {
   final int seriesId;
 
-  const SeriesPage({
-    super.key,
-    required this.seriesId,
-  });
+  const SeriesPage({super.key, required this.seriesId});
 
   @override
   ConsumerState<SeriesPage> createState() => _SeriesPageState();
@@ -29,9 +26,7 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
   Future<_SeriesBundle> _load() async {
     final client = ref.read(serverpodClientProvider);
 
-    final series = await client.video.getSeries(
-      seriesId: widget.seriesId,
-    );
+    final series = await client.video.getSeries(seriesId: widget.seriesId);
 
     if (series == null) {
       throw Exception('系列不存在或不可访问');
@@ -47,16 +42,12 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
       final videoId = video.id;
       final key = video.coverStorageKey;
 
-      if (videoId == null ||
-          key == null ||
-          key.trim().isEmpty) {
+      if (videoId == null || key == null || key.trim().isEmpty) {
         continue;
       }
 
       try {
-        final url = await client.video.getVideoUrl(
-          path: key,
-        );
+        final url = await client.video.getVideoUrl(path: key);
 
         if (url != null && url.isNotEmpty) {
           coverUrls[videoId] = url;
@@ -66,11 +57,7 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
       }
     }
 
-    return _SeriesBundle(
-      series: series,
-      videos: videos,
-      coverUrls: coverUrls,
-    );
+    return _SeriesBundle(series: series, videos: videos, coverUrls: coverUrls);
   }
 
   void _reload() {
@@ -90,19 +77,14 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
           future: _future,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError || !snapshot.hasData) {
               return _buildError(context);
             }
 
-            return _buildContent(
-              context,
-              snapshot.data!,
-            );
+            return _buildContent(context, snapshot.data!);
           },
         ),
       ),
@@ -118,23 +100,14 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.collections_bookmark_outlined,
-                  size: 44,
-                ),
+                const Icon(Icons.collections_bookmark_outlined, size: 44),
                 const SizedBox(height: 14),
                 const Text(
                   '无法加载系列',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _reload,
-                  child: const Text('重试'),
-                ),
+                FilledButton(onPressed: _reload, child: const Text('重试')),
               ],
             ),
           ),
@@ -143,26 +116,16 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
     );
   }
 
-  Widget _buildContent(
-    BuildContext context,
-    _SeriesBundle bundle,
-  ) {
+  Widget _buildContent(BuildContext context, _SeriesBundle bundle) {
     final series = bundle.series;
 
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        SliverToBoxAdapter(
-          child: _buildTopBar(context),
-        ),
+        SliverToBoxAdapter(child: _buildTopBar(context)),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              18,
-              20,
-              8,
-            ),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -179,10 +142,9 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
                   Text(
                     series.description,
                     style: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.65),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.65),
                       fontSize: 14,
                       height: 1.6,
                     ),
@@ -195,22 +157,14 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
         if (bundle.videos.isEmpty)
           const SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(
-              child: Text('这个系列暂时没有视频'),
-            ),
+            child: Center(child: Text('这个系列暂时没有视频')),
           )
         else
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              14,
-              16,
-              42,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 42),
             sliver: SliverList.separated(
               itemCount: bundle.videos.length,
-              separatorBuilder: (_, __) =>
-                  const SizedBox(height: 14),
+              separatorBuilder: (_, __) => const SizedBox(height: 14),
               itemBuilder: (context, index) {
                 final video = bundle.videos[index];
 
@@ -233,17 +187,12 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-            ),
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
           const Spacer(),
           const Text(
             '系列',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
           ),
         ],
       ),
@@ -262,14 +211,11 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
       onTap: video.id == null
           ? null
           : () {
-              openGlobalVideo(
-                video.id!.toString(),
-              );
+              openGlobalVideo(video.id!.toString());
             },
       child: Container(
         decoration: BoxDecoration(
-          color: scheme.surfaceContainerHighest
-              .withValues(alpha: 0.45),
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(22),
         ),
         clipBehavior: Clip.antiAlias,
@@ -290,11 +236,7 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
                   : Image.network(
                       coverUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (
-                        context,
-                        error,
-                        stackTrace,
-                      ) {
+                      errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: scheme.surfaceContainerHighest,
                           alignment: Alignment.center,
@@ -328,8 +270,7 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: scheme.onSurface
-                            .withValues(alpha: 0.55),
+                        color: scheme.onSurface.withValues(alpha: 0.55),
                         fontSize: 11,
                       ),
                     ),
@@ -339,9 +280,7 @@ class _SeriesPageState extends ConsumerState<SeriesPage> {
             ),
             const Padding(
               padding: EdgeInsets.only(right: 12),
-              child: Icon(
-                Icons.chevron_right_rounded,
-              ),
+              child: Icon(Icons.chevron_right_rounded),
             ),
           ],
         ),

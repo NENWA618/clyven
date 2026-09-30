@@ -106,22 +106,24 @@ class ServerpodVideoRepository implements VideoRepository {
       'postIds=${videos.map((video) => video.id).join(',')}',
     );
 
-    final details = await Future.wait(videos.map((video) async {
-      try {
-        return await _toVideoDetailWithUrls(video);
-      } on AppException catch (error) {
-        feedDiagnostic(
-          'FEED_EXCLUDED postId=${video.id} reason=${error.code.name}',
-        );
-        if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
-        return null;
-      } catch (error) {
-        feedDiagnostic(
-          'FEED_FAILED postId=${video.id} reason=${error.runtimeType}',
-        );
-        rethrow;
-      }
-    }));
+    final details = await Future.wait(
+      videos.map((video) async {
+        try {
+          return await _toVideoDetailWithUrls(video);
+        } on AppException catch (error) {
+          feedDiagnostic(
+            'FEED_EXCLUDED postId=${video.id} reason=${error.code.name}',
+          );
+          if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+          return null;
+        } catch (error) {
+          feedDiagnostic(
+            'FEED_FAILED postId=${video.id} reason=${error.runtimeType}',
+          );
+          rethrow;
+        }
+      }),
+    );
 
     return details.whereType<VideoDetail>().toList();
   }
@@ -138,17 +140,19 @@ class ServerpodVideoRepository implements VideoRepository {
         .where((video) => video.authorId == userId)
         .toList(growable: false);
 
-    final details = await Future.wait(userVideos.map((video) async {
-      try {
-        return await _toVideoDetailWithUrls(video);
-      } on AppException catch (error) {
-        feedDiagnostic(
-          'USER_VIDEO_EXCLUDED postId=${video.id} reason=${error.code.name}',
-        );
-        if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
-        return null;
-      }
-    }));
+    final details = await Future.wait(
+      userVideos.map((video) async {
+        try {
+          return await _toVideoDetailWithUrls(video);
+        } on AppException catch (error) {
+          feedDiagnostic(
+            'USER_VIDEO_EXCLUDED postId=${video.id} reason=${error.code.name}',
+          );
+          if (error.code != AppErrorCode.videoUrlUnavailable) rethrow;
+          return null;
+        }
+      }),
+    );
 
     return details.whereType<VideoDetail>().toList();
   }

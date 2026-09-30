@@ -420,8 +420,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       final tokenStart = tokenCursor;
       final tokenEnd = tokenCursor + length;
 
-      if (token.position >= startPosition &&
-          token.position <= endPosition) {
+      if (token.position >= startPosition && token.position <= endPosition) {
         requestedStart ??= tokenStart;
         requestedEnd = tokenEnd;
       }
