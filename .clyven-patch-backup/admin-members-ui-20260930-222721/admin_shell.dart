@@ -12,9 +12,7 @@ class AdminShell extends StatelessComponent {
     final path = RouteState.of(context).location;
     final pageTitle = path == '/script-conversion'
         ? 'Script Conversion'
-        : path == '/members'
-        ? '成员与权限'
-        : '用户管理';
+        : '\u7528\u6237\u7ba1\u7406';
 
     return div(classes: 'clyven-admin-shell', [
       aside(classes: 'clyven-admin-sidebar', [
@@ -34,17 +32,6 @@ class AdminShell extends StatelessComponent {
               [
                 span(classes: 'clyven-admin-nav-icon', [.text('U')]),
                 span([.text('\u7528\u6237\u7ba1\u7406')]),
-              ],
-            ),
-          ),
-          Link(
-            to: '/members',
-            child: div(
-              classes:
-                  'clyven-admin-nav-item${path == '/members' ? ' is-active' : ''}',
-              [
-                span(classes: 'clyven-admin-nav-icon', [.text('M')]),
-                span([.text('成员与权限')]),
               ],
             ),
           ),

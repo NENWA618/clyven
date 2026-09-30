@@ -58,7 +58,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
 
   Future<void> _verifyAdmin() async {
     try {
-      await adminClient.adminMembership.getWorkspace();
+      await adminClient.admin.ping();
 
       if (!mounted) return;
 
@@ -75,7 +75,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
         _loading = false;
         _signedIn = true;
         _authorized = false;
-        _error = '当前 Clyven 账号不是 Admin Workspace 的有效成员。';
+        _error = '当前 Clyven 账号没有管理员权限。';
       });
     }
   }

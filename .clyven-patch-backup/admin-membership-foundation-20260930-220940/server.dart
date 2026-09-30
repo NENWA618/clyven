@@ -8,7 +8,6 @@ import 'package:serverpod_auth_idp_server/providers/email.dart';
 
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
-import 'src/services/admin_membership_service.dart';
 import 'src/web/routes/app_config_route.dart';
 import 'src/web/routes/root.dart';
 import 'package:serverpod_cloud_storage_gcp/serverpod_cloud_storage_gcp.dart'
@@ -115,11 +114,11 @@ void run(List<String> args) async {
   await pod.start();
 
   if (!isMaintenance) {
-    await _ensureConfiguredAdminAccess();
+    await _ensureConfiguredAdminScope();
   }
 }
 
-Future<void> _ensureConfiguredAdminAccess() async {
+Future<void> _ensureConfiguredAdminScope() async {
   final configuredEmail = Platform.environment['CLYVEN_ADMIN_EMAIL']
       ?.trim()
       .toLowerCase();
@@ -127,89 +126,52 @@ Future<void> _ensureConfiguredAdminAccess() async {
   if (configuredEmail == null || configuredEmail.isEmpty) {
     print(
       '[Clyven Admin] CLYVEN_ADMIN_EMAIL is not configured; '
-      'admin bootstrap skipped.',
+      'no admin scope bootstrap was performed.',
     );
     return;
   }
 
-  print('[Clyven Admin] Bootstrap start for $configuredEmail.');
-
-  Session? session;
+  final session = await Serverpod.instance.createSession();
 
   try {
-    print('[Clyven Admin] Creating bootstrap session...');
-    session = await Serverpod.instance.createSession().timeout(
-      const Duration(seconds: 15),
+    final emailAccount = await AuthServices.instance.emailIdp.admin.findAccount(
+      session,
+      email: configuredEmail,
     );
-    print('[Clyven Admin] Bootstrap session ready.');
-
-    print('[Clyven Admin] Looking up email account...');
-    final emailAccount = await AuthServices.instance.emailIdp.admin
-        .findAccount(
-          session,
-          email: configuredEmail,
-        )
-        .timeout(const Duration(seconds: 15));
 
     if (emailAccount == null) {
       print(
         '[Clyven Admin] No existing Clyven email account found for '
-        '$configuredEmail.',
+        '$configuredEmail. Register/login with this email first.',
       );
       return;
     }
 
-    print(
-      '[Clyven Admin] Email account found: ${emailAccount.authUserId}.',
+    final authUser = await AuthServices.instance.authUsers.get(
+      session,
+      authUserId: emailAccount.authUserId,
     );
-
-    print('[Clyven Admin] Ensuring Scope.admin...');
-    final authUser = await AuthServices.instance.authUsers
-        .get(
-          session,
-          authUserId: emailAccount.authUserId,
-        )
-        .timeout(const Duration(seconds: 15));
 
     if (authUser.scopes.contains(Scope.admin)) {
-      print(
-        '[Clyven Admin] Admin scope already present for $configuredEmail.',
-      );
-    } else {
-      await AuthServices.instance.authUsers
-          .update(
-            session,
-            authUserId: emailAccount.authUserId,
-            scopes: {
-              ...authUser.scopes,
-              Scope.admin,
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-
-      print('[Clyven Admin] Granted Scope.admin to $configuredEmail.');
+      print('[Clyven Admin] Admin scope already present for $configuredEmail.');
+      return;
     }
 
-    print('[Clyven Admin] Ensuring membership workspace...');
-    final workspace = await AdminMembershipService.ensureBootstrapOwner(
+    await AuthServices.instance.authUsers.update(
       session,
-      userId: emailAccount.authUserId.toString(),
-      email: configuredEmail,
-    ).timeout(const Duration(seconds: 30));
-
-    print(
-      '[Clyven Admin] Membership workspace ready: '
-      '${workspace.name} (#${workspace.id}).',
+      authUserId: emailAccount.authUserId,
+      scopes: {
+        ...authUser.scopes,
+        Scope.admin,
+      },
     );
 
-    print('[Clyven Admin] Bootstrap complete for $configuredEmail.');
+    print('[Clyven Admin] Granted Scope.admin to $configuredEmail.');
   } catch (e, st) {
-    print('[Clyven Admin] Bootstrap failed: $e');
+    print('[Clyven Admin] Failed to bootstrap admin scope: $e');
     print(st);
   } finally {
-    if (session != null) {
-      await session.close();
-    }
+    await session.close();
   }
 }
 

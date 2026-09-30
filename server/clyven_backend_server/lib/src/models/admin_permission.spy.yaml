@@ -1,0 +1,12 @@
+class: AdminPermission
+table: admin_permission
+
+fields:
+  code: String
+  name: String
+  createdAt: DateTime, default=now
+
+indexes:
+  admin_permission_code_unique_idx:
+    fields: code
+    unique: true
