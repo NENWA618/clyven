@@ -4,6 +4,7 @@ import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/video_content_type.dart';
@@ -32,6 +33,9 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
   final List<String> _existingSeries = [];
 
   XFile? _video;
+  VideoPlayerController? _previewController;
+  bool _isPreviewLoading = false;
+  String? _previewError;
   String _category = '影像';
   String? _selectedSeries;
   bool _createNewSeries = false;
@@ -60,6 +64,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
 
   @override
   void dispose() {
+    _previewController?.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
     _seriesController.dispose();
@@ -82,12 +87,13 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       final repository = ref.read(videoRepositoryProvider);
       final videos = await repository.loadUserVideos(userId: user.id);
 
-      final values = videos
-          .map((video) => video.seriesTitle.trim())
-          .where((title) => title.isNotEmpty)
-          .toSet()
-          .toList()
-        ..sort();
+      final values =
+          videos
+              .map((video) => video.seriesTitle.trim())
+              .where((title) => title.isNotEmpty)
+              .toSet()
+              .toList()
+            ..sort();
 
       if (!mounted) {
         return;
@@ -126,9 +132,47 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
       return;
     }
 
+    final previousController = _previewController;
+
     setState(() {
       _video = video;
+      _previewController = null;
+      _isPreviewLoading = true;
+      _previewError = null;
     });
+
+    await previousController?.pause();
+    await previousController?.dispose();
+
+    final controller = VideoPlayerController.networkUrl(Uri.parse(video.path));
+
+    try {
+      await controller.initialize();
+
+      if (!mounted || _video?.path != video.path) {
+        await controller.dispose();
+        return;
+      }
+
+      await controller.setLooping(true);
+
+      setState(() {
+        _previewController = controller;
+        _isPreviewLoading = false;
+      });
+    } catch (_) {
+      await controller.dispose();
+
+      if (!mounted || _video?.path != video.path) {
+        return;
+      }
+
+      setState(() {
+        _previewController = null;
+        _isPreviewLoading = false;
+        _previewError = '无法预览这个视频';
+      });
+    }
   }
 
   Future<void> _publish() async {
@@ -344,7 +388,7 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
     final isDark = scheme.brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: _isPublishing ? null : _pickVideo,
+      onTap: _video == null && !_isPublishing ? _pickVideo : null,
       child: Container(
         height: widget.contentType == VideoContentType.short ? 330 : 210,
         decoration: BoxDecoration(
@@ -379,44 +423,130 @@ class _CreateVideoPageState extends ConsumerState<CreateVideoPage> {
                   ),
                 ],
               )
-            : Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check_circle_rounded, color: _acid, size: 42),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.videoSelected,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      _video!.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      l10n.tapToReselect,
-                      style: TextStyle(
-                        color: _acid,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
+            : _buildVideoPreview(l10n),
+      ),
+    );
+  }
+
+  Widget _buildVideoPreview(AppLocalizations l10n) {
+    final controller = _previewController;
+
+    if (_isPreviewLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_previewError != null ||
+        controller == null ||
+        !controller.value.isInitialized) {
+      return Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white70,
+              size: 36,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _previewError ?? '无法预览这个视频',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
               ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _video!.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white54, fontSize: 11),
+            ),
+            const SizedBox(height: 14),
+            TextButton.icon(
+              onPressed: _isPublishing ? null : _pickVideo,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(l10n.tapToReselect),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ColoredBox(
+            color: Colors.black,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: controller.value.aspectRatio,
+                child: VideoPlayer(controller),
+              ),
+            ),
+          ),
+          ValueListenableBuilder<VideoPlayerValue>(
+            valueListenable: controller,
+            builder: (context, value, _) {
+              return Center(
+                child: IconButton.filled(
+                  onPressed: () {
+                    if (value.isPlaying) {
+                      controller.pause();
+                    } else {
+                      controller.play();
+                    }
+                  },
+                  iconSize: 34,
+                  icon: Icon(
+                    value.isPlaying
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                  ),
+                ),
+              );
+            },
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: FilledButton.tonalIcon(
+              onPressed: _isPublishing ? null : _pickVideo,
+              icon: const Icon(Icons.refresh_rounded, size: 17),
+              label: Text(l10n.tapToReselect),
+            ),
+          ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _video!.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    shadows: [Shadow(blurRadius: 8, color: Colors.black)],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                VideoProgressIndicator(
+                  controller,
+                  allowScrubbing: true,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -86,8 +86,7 @@ final myPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
 // seriesPosition 只负责排序，不代表“集数”。
 // ============================================================
 
-final seriesVideosProvider =
-    FutureProvider.family<List<serverpod.Video>, int>((
+final seriesVideosProvider = FutureProvider.family<List<serverpod.Video>, int>((
   ref,
   seriesId,
 ) async {
@@ -95,7 +94,5 @@ final seriesVideosProvider =
 
   final client = ref.watch(serverpodClientProvider);
 
-  return client.video.getSeriesVideos(
-    seriesId: seriesId,
-  );
+  return client.video.getSeriesVideos(seriesId: seriesId);
 });

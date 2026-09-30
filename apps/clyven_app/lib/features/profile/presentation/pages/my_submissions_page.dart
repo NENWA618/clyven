@@ -361,12 +361,7 @@ class MySubmissionsPage extends ConsumerWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    14,
-                    11,
-                    8,
-                    11,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(14, 11, 8, 11),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -431,9 +426,7 @@ class MySubmissionsPage extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              l10n.viewsCount(
-                                _count(context, video.viewCount),
-                              ),
+                              l10n.viewsCount(_count(context, video.viewCount)),
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Color(0xFF908A81),
@@ -452,10 +445,7 @@ class MySubmissionsPage extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              localizedTopicLabel(
-                                l10n,
-                                video.category,
-                              ),
+                              localizedTopicLabel(l10n, video.category),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -477,6 +467,7 @@ class MySubmissionsPage extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildSeriesMenu(
     BuildContext context,
     WidgetRef ref,
@@ -484,12 +475,13 @@ class MySubmissionsPage extends ConsumerWidget {
     List<VideoDetail> allVideos,
     AppLocalizations l10n,
   ) {
-    final seriesTitles = allVideos
-        .map((item) => item.seriesTitle.trim())
-        .where((title) => title.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final seriesTitles =
+        allVideos
+            .map((item) => item.seriesTitle.trim())
+            .where((title) => title.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
 
     return PopupMenuButton<String>(
       tooltip: l10n.moveToSeries,
@@ -643,17 +635,17 @@ class MySubmissionsPage extends ConsumerWidget {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.seriesMoveSuccess)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.seriesMoveSuccess)));
     } catch (_) {
       if (!context.mounted) {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.seriesMoveFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.seriesMoveFailed)));
     }
   }
 

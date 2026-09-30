@@ -164,6 +164,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   }
 
   void _resetPlayer() {
+    _closeFullscreen();
     _cancelInitialization();
     ++_generation;
     _releaseCurrentController();
@@ -519,8 +520,9 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
                   const ColoredBox(color: Colors.black),
                   Center(
                     child: AspectRatio(
-                      aspectRatio:
-                          value.aspectRatio == 0 ? 16 / 9 : value.aspectRatio,
+                      aspectRatio: value.aspectRatio == 0
+                          ? 16 / 9
+                          : value.aspectRatio,
                       child: VideoPlayer(_controller),
                     ),
                   ),
@@ -589,8 +591,8 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
                                   child: InteractiveSubtitleOverlay(
                                     detail: activeSecondarySubtitle,
                                     videoPositionMs: position.inMilliseconds,
-                                    languageCode: widget
-                                            .secondarySubtitleLanguageCode ??
+                                    languageCode:
+                                        widget.secondarySubtitleLanguageCode ??
                                         'und',
                                     scriptCode:
                                         widget.secondarySubtitleScriptCode,
@@ -682,8 +684,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
                                     thumbShape: const RoundSliderThumbShape(
                                       enabledThumbRadius: 5,
                                     ),
-                                    overlayShape:
-                                        const RoundSliderOverlayShape(
+                                    overlayShape: const RoundSliderOverlayShape(
                                       overlayRadius: 10,
                                     ),
                                   ),
@@ -782,9 +783,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
-      await SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.immersiveSticky,
-      );
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     } catch (error, stackTrace) {
       debugPrint('FULLSCREEN_SYSTEM_UI_FAILED: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -815,8 +814,10 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
       }),
     );
   }
+
   @override
   void dispose() {
+    _closeFullscreen();
     _cancelInitialization();
     _positionTicker?.cancel();
     _fallbackClock.stop();
@@ -830,8 +831,16 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     final accent = Theme.of(context).colorScheme.primary;
     final isPhoneSubtitleLayout = MediaQuery.sizeOf(context).width < 600;
 
+    final playerAspectRatio =
+        _controllerCreated &&
+            _controller.value.isInitialized &&
+            !widget.compact &&
+            _controller.value.aspectRatio > 0
+        ? _controller.value.aspectRatio.clamp(9 / 20, 16 / 9).toDouble()
+        : 16 / 9;
+
     return AspectRatio(
-      aspectRatio: 16 / 9,
+      aspectRatio: playerAspectRatio,
       child: FutureBuilder<void>(
         future: _initializeFuture,
         builder: (context, snapshot) {

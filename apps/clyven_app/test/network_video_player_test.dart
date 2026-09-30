@@ -147,4 +147,24 @@ void main() {
       expect(platform.disposed, [1]);
     },
   );
+
+  testWidgets(
+    'switching source releases the old player and ignores late initialization',
+    (tester) async {
+      await tester.pumpWidget(player());
+      await tester.pump();
+      await tester.pumpWidget(player(url: 'https://media.example/short.mp4'));
+      await tester.pump();
+      platform.ready(1);
+      platform.ready(2);
+      await tester.pump();
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      expect(platform.disposed, [1]);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      expect(platform.disposed, [1, 2]);
+    },
+  );
 }

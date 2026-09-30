@@ -1,4 +1,4 @@
-﻿import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 import 'subtitle_repository.dart';
 
@@ -27,4 +27,3 @@ class ServerpodSubtitleRepository implements SubtitleRepository {
     return client.subtitle.getPublishedAvailableTracks(videoId: videoId);
   }
 }
-

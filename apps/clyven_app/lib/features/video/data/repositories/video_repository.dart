@@ -113,7 +113,6 @@ class MockVideoRepository implements VideoRepository {
     return List.unmodifiable(videos);
   }
 
-
   @override
   Future<VideoDetail> updateVideoSeries({
     required String videoId,
