@@ -112,6 +112,13 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
+    final isDark = colors.brightness == Brightness.dark;
+    final primaryText = isDark ? const Color(0xFFF4F1EA) : _inkColor;
+    final fieldBackground = isDark ? const Color(0xFF1C1C1B) : Colors.white;
+    final fieldText = isDark
+        ? const Color(0xFFF4F1EA)
+        : const Color(0xFF24211E);
+    final hintText = isDark ? const Color(0xFFAAA59D) : const Color(0xFF9B958C);
 
     return AlertDialog(
       backgroundColor: colors.surface,
@@ -130,10 +137,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
           const SizedBox(width: 12),
           Text(
             l10n.login,
-            style: const TextStyle(
-              color: _inkColor,
-              fontWeight: FontWeight.w900,
-            ),
+            style: TextStyle(color: primaryText, fontWeight: FontWeight.w900),
           ),
         ],
       ),
@@ -147,11 +151,14 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               autofocus: true,
               enabled: !_isSubmitting,
               textInputAction: TextInputAction.next,
+              style: TextStyle(color: fieldText),
+              cursorColor: colors.primary,
               decoration: InputDecoration(
                 hintText: l10n.email,
-                prefixIcon: const Icon(Icons.person_outline_rounded),
+                hintStyle: TextStyle(color: hintText),
+                prefixIcon: Icon(Icons.person_outline_rounded, color: hintText),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: fieldBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -167,11 +174,14 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
               onSubmitted: (_) {
                 _login();
               },
+              style: TextStyle(color: fieldText),
+              cursorColor: colors.primary,
               decoration: InputDecoration(
                 hintText: l10n.password,
-                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                hintStyle: TextStyle(color: hintText),
+                prefixIcon: Icon(Icons.lock_outline_rounded, color: hintText),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: fieldBackground,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -206,7 +216,7 @@ class _LoginDialogState extends ConsumerState<LoginDialog> {
         ),
         FilledButton(
           style: FilledButton.styleFrom(
-            backgroundColor: _inkColor,
+            backgroundColor: isDark ? const Color(0xFF242321) : _inkColor,
             foregroundColor: colors.primary,
           ),
           onPressed: _isSubmitting ? null : _login,

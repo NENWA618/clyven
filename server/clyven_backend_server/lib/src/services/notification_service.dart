@@ -13,6 +13,7 @@ Future<void> createNotification(
   required NotificationType type,
   int? videoId,
   String? commentPreview,
+  Transaction? transaction,
 }) async {
   if (recipientId == actorId) {
     return;
@@ -30,5 +31,6 @@ Future<void> createNotification(
       isRead: false,
       createdAt: DateTime.now(),
     ),
+    transaction: transaction,
   );
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
@@ -132,6 +133,8 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
         if (generation != _generation || _initializationFailed) return;
         feedDiagnostic('PLAYBACK_READY postId=${widget.videoId ?? 'unknown'}');
         completion.complete();
+        // Recompute the outer layout once the native dimensions are available.
+        if (mounted) setState(() {});
       }, onError: fail),
     );
   }
@@ -836,273 +839,295 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
             _controller.value.isInitialized &&
             !widget.compact &&
             _controller.value.aspectRatio > 0
-        ? _controller.value.aspectRatio.clamp(9 / 20, 16 / 9).toDouble()
+        ? _controller.value.aspectRatio
         : 16 / 9;
 
-    return AspectRatio(
-      aspectRatio: playerAspectRatio,
-      child: FutureBuilder<void>(
-        future: _initializeFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return _buildPlayerError();
-          }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final viewport = MediaQuery.of(context);
+        final maxWidth = constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : viewport.size.width;
+        final maxHeight = math.min(
+          constraints.maxHeight,
+          math.max(
+            0.0,
+            viewport.size.height -
+                viewport.padding.vertical -
+                viewport.viewInsets.vertical,
+          ),
+        );
+        final height = math.min(maxWidth / playerAspectRatio, maxHeight);
+        final content = FutureBuilder<void>(
+          future: _initializeFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return _buildPlayerError();
+            }
 
-          if (snapshot.connectionState != ConnectionState.done) {
-            return _buildLoadingCover();
-          }
+            if (snapshot.connectionState != ConnectionState.done) {
+              return _buildLoadingCover();
+            }
 
-          return ValueListenableBuilder<VideoPlayerValue>(
-            valueListenable: _controller,
-            builder: (context, value, child) {
-              if (value.hasError) return _buildPlayerError();
-              final duration = _effectiveDuration();
-              final position = _effectivePosition();
-              final activeSubtitle = _findActiveSubtitle(
-                widget.subtitles,
-                position,
-              );
-              final activeSecondarySubtitle = _findActiveSubtitle(
-                widget.secondarySubtitles,
-                position,
-              );
-              final maxMilliseconds = duration.inMilliseconds;
-              final positionMilliseconds = position.inMilliseconds.clamp(
-                0,
-                maxMilliseconds > 0 ? maxMilliseconds : 0,
-              );
+            return ValueListenableBuilder<VideoPlayerValue>(
+              valueListenable: _controller,
+              builder: (context, value, child) {
+                if (value.hasError) return _buildPlayerError();
+                final duration = _effectiveDuration();
+                final position = _effectivePosition();
+                final activeSubtitle = _findActiveSubtitle(
+                  widget.subtitles,
+                  position,
+                );
+                final activeSecondarySubtitle = _findActiveSubtitle(
+                  widget.secondarySubtitles,
+                  position,
+                );
+                final maxMilliseconds = duration.inMilliseconds;
+                final positionMilliseconds = position.inMilliseconds.clamp(
+                  0,
+                  maxMilliseconds > 0 ? maxMilliseconds : 0,
+                );
 
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    color: Colors.black,
-                    child: Center(
-                      child: AspectRatio(
-                        aspectRatio: value.aspectRatio == 0
-                            ? 16 / 9
-                            : value.aspectRatio,
-                        child: VideoPlayer(_controller),
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      color: Colors.black,
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: value.aspectRatio == 0
+                              ? 16 / 9
+                              : value.aspectRatio,
+                          child: VideoPlayer(_controller),
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned.fill(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: _togglePlay,
-                      child: const SizedBox.expand(),
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _togglePlay,
+                        child: const SizedBox.expand(),
+                      ),
                     ),
-                  ),
-                  if (!widget.compact && widget.onSubtitlesPressed != null)
-                    Positioned(
-                      right: 10,
-                      top: 10,
-                      child: Material(
-                        color: Colors.black.withValues(alpha: 0.52),
-                        shape: const CircleBorder(),
-                        child: Listener(
-                          behavior: HitTestBehavior.opaque,
-                          onPointerDown: (_) {
-                            widget.onSubtitlesPressed?.call();
-                          },
-                          child: SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: Icon(
-                              widget.subtitlesEnabled
-                                  ? Icons.closed_caption_rounded
-                                  : Icons.closed_caption_off_rounded,
-                              color: Colors.white,
-                              size: 25,
+                    if (!widget.compact && widget.onSubtitlesPressed != null)
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: Material(
+                          color: Colors.black.withValues(alpha: 0.52),
+                          shape: const CircleBorder(),
+                          child: Listener(
+                            behavior: HitTestBehavior.opaque,
+                            onPointerDown: (_) {
+                              widget.onSubtitlesPressed?.call();
+                            },
+                            child: SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Icon(
+                                widget.subtitlesEnabled
+                                    ? Icons.closed_caption_rounded
+                                    : Icons.closed_caption_off_rounded,
+                                color: Colors.white,
+                                size: 25,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  if (!widget.compact && !value.isPlaying)
-                    Center(
-                      child: GestureDetector(
-                        onTap: _togglePlay,
-                        child: Container(
-                          width: 68,
-                          height: 68,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            size: 42,
-                            color: Color(0xFF161616),
+                    if (!widget.compact && !value.isPlaying)
+                      Center(
+                        child: GestureDetector(
+                          onTap: _togglePlay,
+                          child: Container(
+                            width: 68,
+                            height: 68,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.92),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 42,
+                              color: Color(0xFF161616),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  if (!widget.compact &&
-                      widget.subtitlesEnabled &&
-                      (activeSubtitle != null ||
-                          activeSecondarySubtitle != null))
-                    Positioned(
-                      left: isPhoneSubtitleLayout ? 12 : 24,
-                      right: isPhoneSubtitleLayout ? 12 : 24,
-                      bottom: isPhoneSubtitleLayout ? 52 : 58,
-                      child: Center(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isPhoneSubtitleLayout ? 8 : 12,
-                            vertical: isPhoneSubtitleLayout ? 5 : 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.68),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (activeSubtitle != null)
-                                InteractiveSubtitleOverlay(
-                                  detail: activeSubtitle,
-                                  videoPositionMs: position.inMilliseconds,
-                                  languageCode:
-                                      widget.subtitleLanguageCode ?? 'und',
-                                  scriptCode: widget.subtitleScriptCode,
-                                ),
-                              if (activeSubtitle != null &&
-                                  activeSecondarySubtitle != null)
-                                SizedBox(height: isPhoneSubtitleLayout ? 2 : 4),
-                              if (activeSecondarySubtitle != null)
-                                Opacity(
-                                  opacity: 0.82,
-                                  child: InteractiveSubtitleOverlay(
-                                    detail: activeSecondarySubtitle,
+                    if (!widget.compact &&
+                        widget.subtitlesEnabled &&
+                        (activeSubtitle != null ||
+                            activeSecondarySubtitle != null))
+                      Positioned(
+                        left: isPhoneSubtitleLayout ? 12 : 24,
+                        right: isPhoneSubtitleLayout ? 12 : 24,
+                        bottom: isPhoneSubtitleLayout ? 52 : 58,
+                        child: Center(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isPhoneSubtitleLayout ? 8 : 12,
+                              vertical: isPhoneSubtitleLayout ? 5 : 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.68),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (activeSubtitle != null)
+                                  InteractiveSubtitleOverlay(
+                                    detail: activeSubtitle,
                                     videoPositionMs: position.inMilliseconds,
                                     languageCode:
-                                        widget.secondarySubtitleLanguageCode ??
-                                        'und',
-                                    scriptCode:
-                                        widget.secondarySubtitleScriptCode,
+                                        widget.subtitleLanguageCode ?? 'und',
+                                    scriptCode: widget.subtitleScriptCode,
+                                  ),
+                                if (activeSubtitle != null &&
+                                    activeSecondarySubtitle != null)
+                                  SizedBox(
+                                    height: isPhoneSubtitleLayout ? 2 : 4,
+                                  ),
+                                if (activeSecondarySubtitle != null)
+                                  Opacity(
+                                    opacity: 0.82,
+                                    child: InteractiveSubtitleOverlay(
+                                      detail: activeSecondarySubtitle,
+                                      videoPositionMs: position.inMilliseconds,
+                                      languageCode:
+                                          widget
+                                              .secondarySubtitleLanguageCode ??
+                                          'und',
+                                      scriptCode:
+                                          widget.secondarySubtitleScriptCode,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (!widget.compact)
+                      Positioned(
+                        left: 14,
+                        right: 14,
+                        bottom: 10,
+                        child: Column(
+                          children: [
+                            if (maxMilliseconds > 0)
+                              SliderTheme(
+                                data: SliderTheme.of(context).copyWith(
+                                  trackHeight: 4,
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 5,
+                                  ),
+                                  overlayShape: const RoundSliderOverlayShape(
+                                    overlayRadius: 12,
                                   ),
                                 ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (!widget.compact)
-                    Positioned(
-                      left: 14,
-                      right: 14,
-                      bottom: 10,
-                      child: Column(
-                        children: [
-                          if (maxMilliseconds > 0)
-                            SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                trackHeight: 4,
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 5,
+                                child: Slider(
+                                  min: 0,
+                                  max: maxMilliseconds.toDouble(),
+                                  value: positionMilliseconds.toDouble(),
+                                  activeColor: accent,
+                                  inactiveColor: Colors.white24,
+                                  onChanged: (value) {
+                                    final position = Duration(
+                                      milliseconds: value.round(),
+                                    );
+
+                                    _fallbackBasePosition = position;
+                                    _fallbackClock
+                                      ..stop()
+                                      ..reset();
+
+                                    if (_controller.value.isPlaying &&
+                                        _needsFallbackPosition) {
+                                      _fallbackClock.start();
+                                      _startPositionTicker();
+                                    }
+
+                                    _controller.seekTo(position);
+                                    setState(() {});
+                                  },
                                 ),
-                                overlayShape: const RoundSliderOverlayShape(
-                                  overlayRadius: 12,
+                              )
+                            else
+                              LinearProgressIndicator(
+                                value: 0,
+                                minHeight: 4,
+                                color: accent,
+                                backgroundColor: Colors.white24,
+                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  _playerTime(position),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                              child: Slider(
-                                min: 0,
-                                max: maxMilliseconds.toDouble(),
-                                value: positionMilliseconds.toDouble(),
-                                activeColor: accent,
-                                inactiveColor: Colors.white24,
-                                onChanged: (value) {
-                                  final position = Duration(
-                                    milliseconds: value.round(),
-                                  );
-
-                                  _fallbackBasePosition = position;
-                                  _fallbackClock
-                                    ..stop()
-                                    ..reset();
-
-                                  if (_controller.value.isPlaying &&
-                                      _needsFallbackPosition) {
-                                    _fallbackClock.start();
-                                    _startPositionTicker();
-                                  }
-
-                                  _controller.seekTo(position);
-                                  setState(() {});
-                                },
-                              ),
-                            )
-                          else
-                            LinearProgressIndicator(
-                              value: 0,
-                              minHeight: 4,
-                              color: accent,
-                              backgroundColor: Colors.white24,
+                                const Text(
+                                  ' / ',
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  _playerTime(duration),
+                                  style: const TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  tooltip: 'Fullscreen',
+                                  visualDensity: VisualDensity.compact,
+                                  onPressed: _openFullscreen,
+                                  icon: const Icon(
+                                    Icons.fullscreen_rounded,
+                                    color: Colors.white,
+                                    size: 23,
+                                  ),
+                                ),
+                              ],
                             ),
-                          Row(
-                            children: [
-                              Text(
-                                _playerTime(position),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Text(
-                                ' / ',
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 10,
-                                ),
-                              ),
-                              Text(
-                                _playerTime(duration),
-                                style: const TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                tooltip: 'Fullscreen',
-                                visualDensity: VisualDensity.compact,
-                                onPressed: _openFullscreen,
-                                icon: const Icon(
-                                  Icons.fullscreen_rounded,
-                                  color: Colors.white,
-                                  size: 23,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (widget.compact)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: IgnorePointer(
-                        child: LinearProgressIndicator(
-                          value: maxMilliseconds > 0
-                              ? positionMilliseconds / maxMilliseconds
-                              : 0,
-                          minHeight: 2,
-                          color: accent,
-                          backgroundColor: Colors.white24,
+                          ],
                         ),
                       ),
-                    ),
-                ],
-              );
-            },
-          );
-        },
-      ),
+                    if (widget.compact)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: IgnorePointer(
+                          child: LinearProgressIndicator(
+                            value: maxMilliseconds > 0
+                                ? positionMilliseconds / maxMilliseconds
+                                : 0,
+                            minHeight: 2,
+                            color: accent,
+                            backgroundColor: Colors.white24,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+        if (widget.compact) {
+          return AspectRatio(aspectRatio: 16 / 9, child: content);
+        }
+        return SizedBox(width: maxWidth, height: height, child: content);
+      },
     );
   }
 

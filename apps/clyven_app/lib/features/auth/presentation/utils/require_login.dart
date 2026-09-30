@@ -9,15 +9,26 @@ Future<bool> requireLogin(BuildContext context, WidgetRef ref) async {
     return true;
   }
 
+  // Some action widgets pass a BuildContext that is outside the app Navigator
+  // (for example a builder/overlay context). The WidgetRef belongs to the
+  // Consumer widget itself, so use that as the safe fallback for dialogs.
+  final dialogContext = Navigator.maybeOf(context) != null
+      ? context
+      : ref.context;
+
+  if (!dialogContext.mounted || Navigator.maybeOf(dialogContext) == null) {
+    return false;
+  }
+
   final loggedIn = await showDialog<bool>(
-    context: context,
+    context: dialogContext,
     barrierDismissible: false,
     builder: (context) {
       return const LoginDialog();
     },
   );
 
-  if (loggedIn != true || !context.mounted) {
+  if (loggedIn != true || !dialogContext.mounted) {
     return false;
   }
 

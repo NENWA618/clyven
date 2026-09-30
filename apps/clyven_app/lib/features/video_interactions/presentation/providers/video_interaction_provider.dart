@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:clyven_app/core/errors/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +18,7 @@ final videoInteractionRepositoryProvider = Provider<VideoInteractionRepository>(
 );
 
 final favoriteVideoIdsProvider = FutureProvider<List<String>>((ref) async {
+  ref.watch(authProvider);
   final user = await ref.watch(authProvider.future);
 
   if (user == null) {
@@ -29,6 +32,7 @@ final favoriteVideoIdsProvider = FutureProvider<List<String>>((ref) async {
 
 class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
   final String videoId;
+  int _generation = 0;
 
   VideoInteractionNotifier(this.videoId);
 
@@ -38,40 +42,51 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
 
   @override
   Future<VideoInteractionState> build() async {
-    final user = await ref.watch(authProvider.future);
+    ++_generation;
+    ref.watch(authProvider);
+    try {
+      final user = await ref.watch(authProvider.future);
 
-    if (user == null) {
-      throw const AppException(AppErrorCode.notLoggedIn);
+      if (user == null) {
+        throw const AppException(AppErrorCode.notLoggedIn);
+      }
+
+      final video = await ref.watch(videoDetailProvider(videoId).future);
+
+      return await _repository.load(
+        videoId: videoId,
+        userId: user.id,
+        initialLikeCount: video.likeCount,
+        initialFavoriteCount: video.favoriteCount,
+      );
+    } catch (error, stackTrace) {
+      if (error is! AppException || error.code != AppErrorCode.notLoggedIn) {
+        _report('VIDEO_INTERACTION_LOAD_FAILED', error, stackTrace);
+      }
+      rethrow;
     }
-
-    final video = await ref.watch(videoDetailProvider(videoId).future);
-
-    return _repository.load(
-      videoId: videoId,
-      userId: user.id,
-      initialLikeCount: video.likeCount,
-      initialFavoriteCount: video.favoriteCount,
-    );
   }
 
   Future<void> toggleLike() async {
-    final current = state.value;
+    if (await _readyState() == null) return;
+    final current = state.unwrapPrevious().value;
 
     if (current == null) {
       return;
     }
 
-    if (current.isChangingLike) {
+    if (current.isChangingLike || current.isChangingFavorite) {
       return;
     }
 
-    final user = await ref.read(authProvider.future);
+    final user = ref.read(authProvider).value;
 
     if (user == null) {
       return;
     }
 
     state = AsyncData(current.copyWith(isChangingLike: true));
+    final generation = _generation;
 
     try {
       final liked = await _repository.toggleLike(
@@ -80,11 +95,14 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
         currentlyLiked: current.isLiked,
         actorName: user.displayName,
       );
+      if (!ref.mounted || generation != _generation) return;
 
       state = AsyncData(
         current.copyWith(
           isLiked: liked,
-          likeCount: liked
+          likeCount: liked == current.isLiked
+              ? current.likeCount
+              : liked
               ? current.likeCount + 1
               : current.likeCount > 0
               ? current.likeCount - 1
@@ -92,29 +110,35 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
           isChangingLike: false,
         ),
       );
-    } catch (_) {
+
+      ref.invalidate(videoDetailProvider(videoId));
+    } catch (error, stackTrace) {
+      _report('VIDEO_LIKE_FAILED', error, stackTrace);
+      if (!ref.mounted || generation != _generation) return;
       state = AsyncData(current.copyWith(isChangingLike: false));
     }
   }
 
   Future<void> toggleFavorite() async {
-    final current = state.value;
+    if (await _readyState() == null) return;
+    final current = state.unwrapPrevious().value;
 
     if (current == null) {
       return;
     }
 
-    if (current.isChangingFavorite) {
+    if (current.isChangingLike || current.isChangingFavorite) {
       return;
     }
 
-    final user = await ref.read(authProvider.future);
+    final user = ref.read(authProvider).value;
 
     if (user == null) {
       return;
     }
 
     state = AsyncData(current.copyWith(isChangingFavorite: true));
+    final generation = _generation;
 
     try {
       final favorited = await _repository.toggleFavorite(
@@ -122,11 +146,14 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
         userId: user.id,
         currentlyFavorited: current.isFavorited,
       );
+      if (!ref.mounted || generation != _generation) return;
 
       state = AsyncData(
         current.copyWith(
           isFavorited: favorited,
-          favoriteCount: favorited
+          favoriteCount: favorited == current.isFavorited
+              ? current.favoriteCount
+              : favorited
               ? current.favoriteCount + 1
               : current.favoriteCount > 0
               ? current.favoriteCount - 1
@@ -135,10 +162,38 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
         ),
       );
 
+      ref.invalidate(videoDetailProvider(videoId));
       ref.invalidate(favoriteVideoIdsProvider);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _report('VIDEO_FAVORITE_FAILED', error, stackTrace);
+      if (!ref.mounted || generation != _generation) return;
       state = AsyncData(current.copyWith(isChangingFavorite: false));
     }
+  }
+
+  Future<VideoInteractionState?> _readyState() async {
+    try {
+      if (state.hasError && ref.read(authProvider).value != null) {
+        ref.invalidateSelf();
+      }
+      // A login dialog can finish before the authenticated interaction load.
+      // Await that load instead of silently dropping the first action.
+      await future;
+      if (!ref.mounted) return null;
+      return state.unwrapPrevious().value;
+    } catch (error, stackTrace) {
+      _report('VIDEO_INTERACTION_ACTION_FAILED', error, stackTrace);
+      return null;
+    }
+  }
+
+  void _report(String event, Object error, StackTrace stackTrace) {
+    developer.log(
+      '$event videoId=$videoId',
+      name: 'video_interactions',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -147,4 +202,9 @@ final videoInteractionProvider =
       VideoInteractionNotifier,
       VideoInteractionState,
       String
-    >(VideoInteractionNotifier.new);
+    >(
+      VideoInteractionNotifier.new,
+      // Authentication/missing-method failures need login or a backend fix,
+      // not Riverpod's automatic retry loop. A new action can retry explicitly.
+      retry: (retryCount, error) => null,
+    );
