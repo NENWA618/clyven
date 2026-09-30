@@ -131,23 +131,52 @@ class SocialEndpoint extends Endpoint {
 
   Future<bool> toggleFavorite(Session session, int videoId) async {
     final userId = _userId(session);
-    final current = await VideoFavorite.db.findFirstRow(
-      session,
-      where: (row) => row.userId.equals(userId) & row.videoId.equals(videoId),
-    );
-    if (current != null) {
-      await VideoFavorite.db.deleteRow(session, current);
-      return false;
-    }
-    await VideoFavorite.db.insertRow(
-      session,
-      VideoFavorite(
-        userId: userId,
-        videoId: videoId,
-        createdAt: DateTime.now(),
-      ),
-    );
-    return true;
+    return session.db.transaction((transaction) async {
+      // Lock before reading membership so concurrent toggles cannot lose updates.
+      final video = await Video.db.findById(
+        session,
+        videoId,
+        transaction: transaction,
+        lockMode: LockMode.forUpdate,
+      );
+      if (video == null) throw StateError('Video $videoId does not exist');
+      final current = await VideoFavorite.db.findFirstRow(
+        session,
+        where: (row) => row.userId.equals(userId) & row.videoId.equals(videoId),
+        transaction: transaction,
+      );
+
+      if (current != null) {
+        await VideoFavorite.db.deleteRow(
+          session,
+          current,
+          transaction: transaction,
+        );
+      } else {
+        await VideoFavorite.db.insertRow(
+          session,
+          VideoFavorite(
+            userId: userId,
+            videoId: videoId,
+            createdAt: DateTime.now(),
+          ),
+          transaction: transaction,
+        );
+      }
+      // Recount also repairs counts left stale by older endpoint versions.
+      video.favoriteCount = await VideoFavorite.db.count(
+        session,
+        where: (row) => row.videoId.equals(videoId),
+        transaction: transaction,
+      );
+      await Video.db.updateRow(
+        session,
+        video,
+        columns: (row) => [row.favoriteCount],
+        transaction: transaction,
+      );
+      return current == null;
+    });
   }
 
   Future<List<int>> getFavoriteVideoIds(Session session) async {
@@ -167,43 +196,59 @@ class SocialEndpoint extends Endpoint {
     String actorName = 'Clyven user',
   }) async {
     final userId = _userId(session);
-    final current = await VideoLike.db.findFirstRow(
-      session,
-      where: (row) => row.userId.equals(userId) & row.videoId.equals(videoId),
-    );
-
-    final video = await Video.db.findById(session, videoId);
-
-    if (current != null) {
-      await VideoLike.db.deleteRow(session, current);
-      if (video != null) {
-        if (video.likeCount > 0) {
-          video.likeCount -= 1;
-        }
-        await Video.db.updateRow(session, video);
-      }
-      return false;
-    }
-
-    await VideoLike.db.insertRow(
-      session,
-      VideoLike(userId: userId, videoId: videoId, createdAt: DateTime.now()),
-    );
-
-    if (video != null) {
-      video.likeCount += 1;
-      await Video.db.updateRow(session, video);
-      await createNotification(
+    return session.db.transaction((transaction) async {
+      final video = await Video.db.findById(
         session,
-        recipientId: video.authorId,
-        actorId: userId,
-        actorName: actorName,
-        type: NotificationType.like,
-        videoId: videoId,
+        videoId,
+        transaction: transaction,
+        lockMode: LockMode.forUpdate,
       );
-    }
+      if (video == null) throw StateError('Video $videoId does not exist');
+      final current = await VideoLike.db.findFirstRow(
+        session,
+        where: (row) => row.userId.equals(userId) & row.videoId.equals(videoId),
+        transaction: transaction,
+      );
 
-    return true;
+      if (current != null) {
+        await VideoLike.db.deleteRow(
+          session,
+          current,
+          transaction: transaction,
+        );
+      } else {
+        await VideoLike.db.insertRow(
+          session,
+          VideoLike(
+            userId: userId,
+            videoId: videoId,
+            createdAt: DateTime.now(),
+          ),
+          transaction: transaction,
+        );
+        await createNotification(
+          session,
+          recipientId: video.authorId,
+          actorId: userId,
+          actorName: actorName,
+          type: NotificationType.like,
+          videoId: videoId,
+          transaction: transaction,
+        );
+      }
+      video.likeCount = await VideoLike.db.count(
+        session,
+        where: (row) => row.videoId.equals(videoId),
+        transaction: transaction,
+      );
+      await Video.db.updateRow(
+        session,
+        video,
+        columns: (row) => [row.likeCount],
+        transaction: transaction,
+      );
+      return current == null;
+    });
   }
 
   Future<List<int>> getLikedVideoIds(Session session) async {

@@ -649,7 +649,7 @@ class MyProfilePage extends ConsumerWidget {
               overflow: TextOverflow.clip,
               softWrap: false,
               style: TextStyle(
-                color: scheme.onSurface,
+                color: isDark ? const Color(0xFFF1EEE7) : scheme.onSurface,
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
               ),
@@ -662,7 +662,7 @@ class MyProfilePage extends ConsumerWidget {
               softWrap: false,
               style: TextStyle(
                 color: isDark
-                    ? const Color(0xFF9E9991)
+                    ? const Color(0xFFB8B3AA)
                     : const Color(0xFF99938A),
                 fontSize: 9,
               ),

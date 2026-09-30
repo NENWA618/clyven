@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
+import 'package:video_player/video_player.dart';
 
 class TestVideoPlatform extends VideoPlayerPlatform {
   final events = <int, StreamController<VideoEvent>>{};
@@ -45,33 +46,47 @@ class TestVideoPlatform extends VideoPlayerPlatform {
   @override
   Widget buildViewWithOptions(VideoViewOptions options) => const SizedBox();
 
-  void ready(int id) => events[id]!.add(
+  void ready(int id, {Size size = const Size(640, 360)}) => events[id]!.add(
     VideoEvent(
       eventType: VideoEventType.initialized,
       duration: const Duration(seconds: 60),
-      size: const Size(640, 360),
+      size: size,
     ),
   );
 }
 
-Widget player({String url = 'https://media.example/video.mp4'}) =>
-    ProviderScope(
-      child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: NetworkVideoPlayer(
-            videoId: null,
-            videoUrl: url,
-            coverUrl: '',
-            subtitles: const [],
-            initialPositionSeconds: 0,
-            fallbackDurationSeconds: 60,
+Widget player({
+  String url = 'https://media.example/video.mp4',
+  bool compact = false,
+  double? maxHeight,
+}) => ProviderScope(
+  child: MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    home: Scaffold(
+      body: Column(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: maxHeight ?? double.infinity,
+            ),
+            child: NetworkVideoPlayer(
+              compact: compact,
+              videoId: null,
+              videoUrl: url,
+              coverUrl: '',
+              subtitles: const [],
+              initialPositionSeconds: 0,
+              fallbackDurationSeconds: 60,
+            ),
           ),
-        ),
+          const Expanded(child: SizedBox()),
+        ],
       ),
-    );
+    ),
+  ),
+);
 
 void main() {
   late TestVideoPlatform platform;
@@ -88,6 +103,75 @@ void main() {
     for (final stream in platform.events.values) {
       await stream.close();
     }
+  });
+
+  for (final viewport in [
+    const Size(360, 640),
+    const Size(640, 360),
+    const Size(1280, 720),
+  ]) {
+    for (final source in [const Size(1080, 1920), const Size(1920, 1080)]) {
+      testWidgets('fits $source into $viewport with full source ratio', (
+        tester,
+      ) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = viewport;
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+        final availableHeight = viewport.height * 0.6;
+        await tester.pumpWidget(player(maxHeight: availableHeight));
+        await tester.pump();
+        platform.ready(1, size: source);
+        await tester.pumpAndSettle();
+        final frame = tester.getSize(find.byType(NetworkVideoPlayer));
+        final video = tester.getSize(find.byType(VideoPlayer));
+        expect(frame.height, lessThanOrEqualTo(availableHeight));
+        expect(video.width / video.height, closeTo(source.aspectRatio, 0.001));
+        expect(video.width, lessThanOrEqualTo(frame.width));
+        expect(video.height, lessThanOrEqualTo(frame.height));
+        expect(tester.takeException(), isNull);
+        await tester.tap(find.byIcon(Icons.fullscreen_rounded));
+        await tester.pumpAndSettle();
+        final fullscreen = tester.getSize(find.byType(VideoPlayer).last);
+        expect(
+          fullscreen.width / fullscreen.height,
+          closeTo(source.aspectRatio, 0.001),
+        );
+        expect(fullscreen.height, lessThanOrEqualTo(viewport.height));
+        expect(fullscreen.width, lessThanOrEqualTo(viewport.width));
+        await tester.tap(find.byIcon(Icons.fullscreen_exit_rounded));
+        await tester.pumpAndSettle();
+        expect(find.byType(VideoPlayer), findsOneWidget);
+        await tester.pumpWidget(const SizedBox());
+        await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      });
+    }
+  }
+
+  testWidgets('compact keeps its 16:9 frame for portrait content', (
+    tester,
+  ) async {
+    await tester.pumpWidget(player(compact: true));
+    await tester.pump();
+    platform.ready(1, size: const Size(1080, 1920));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSize(find.byType(NetworkVideoPlayer)).aspectRatio,
+      closeTo(16 / 9, 0.001),
+    );
+    expect(
+      tester.getSize(find.byType(VideoPlayer)).aspectRatio,
+      closeTo(9 / 16, 0.001),
+    );
+    await tester.pumpWidget(player(compact: true, maxHeight: 100));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSize(find.byType(NetworkVideoPlayer)).aspectRatio,
+      closeTo(16 / 9, 0.001),
+    );
+    expect(tester.getSize(find.byType(NetworkVideoPlayer)).height, 100);
+    await tester.pumpWidget(const SizedBox());
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
   });
 
   testWidgets(
