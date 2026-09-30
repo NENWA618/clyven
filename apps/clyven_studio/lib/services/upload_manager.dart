@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:clyven_backend_client/clyven_backend_client.dart';
 
 import 'studio_client.dart';
+import 'upload_hardening.dart';
 import 'video_file_reader.dart';
 
 typedef StudioUploadListener = void Function();
@@ -25,6 +26,7 @@ class StudioUploadTask {
   final int fileSize;
 
   int uploadedBytes = 0;
+  int attempt = 1;
   StudioUploadStage stage = StudioUploadStage.uploading;
   String? error;
 
@@ -42,6 +44,9 @@ class StudioUploadTask {
 class StudioUploadManager {
   final client = studioClient;
   final List<StudioUploadListener> _listeners = [];
+
+  static const int _maxUploadAttempts = 3;
+  static const Duration _uploadTimeout = Duration(hours: 2);
 
   StudioUploadTask? task;
 
@@ -64,16 +69,16 @@ class StudioUploadManager {
   }
 
   String _extensionFor(String fileName) {
-    final dot = fileName.lastIndexOf('.');
+    return videoFileExtension(fileName);
+  }
 
-    if (dot < 0 || dot == fileName.length - 1) {
-      return 'mp4';
-    }
-
-    final raw = fileName.substring(dot + 1).toLowerCase();
-    final safe = raw.replaceAll(RegExp(r'[^a-z0-9]'), '');
-
-    return safe.isEmpty ? 'mp4' : safe;
+  void _validateVideoFile(SelectedVideoFile file) {
+    validateVideoMetadata(
+      fileName: file.name,
+      fileSize: file.size,
+      durationSeconds: file.durationSeconds,
+      coverBytes: file.coverBytes,
+    );
   }
 
   Stream<List<int>> _trackProgress(
@@ -92,38 +97,67 @@ class StudioUploadManager {
     }
   }
 
+  Future<T> _retry<T>(
+    Future<T> Function(int attempt) action, {
+    required StudioUploadTask currentTask,
+    int attempts = _maxUploadAttempts,
+  }) {
+    return retryAsync<T>(
+      action: action,
+      attempts: attempts,
+      onAttempt: (attempt) {
+        currentTask.attempt = attempt;
+        currentTask.error = null;
+        _notify();
+      },
+      onRetry: (attempt, error) {
+        currentTask.error = '第 $attempt 次失败，准备自动重试：$error';
+        _notify();
+      },
+    );
+  }
+
   Future<void> _uploadCover({
     required String storageKey,
     required List<int> bytes,
+    required StudioUploadTask currentTask,
   }) async {
     if (bytes.isEmpty) {
       throw Exception('生成的视频封面为空');
     }
 
-    final uploadDescription = await client.video.createUploadDescription(
-      path: storageKey,
-      fileSize: bytes.length,
+    await _retry<void>(
+      (attempt) async {
+        final uploadDescription = await client.video.createUploadDescription(
+          path: storageKey,
+          fileSize: bytes.length,
+        );
+
+        if (uploadDescription == null) {
+          throw Exception('无法创建封面上传任务');
+        }
+
+        final uploader = FileUploader(uploadDescription);
+
+        final uploaded = await uploader
+            .upload(
+              Stream<List<int>>.value(bytes),
+              bytes.length,
+            )
+            .timeout(_uploadTimeout);
+
+        if (!uploaded) {
+          throw Exception('视频封面上传失败');
+        }
+
+        final verified = await client.video.verifyUpload(path: storageKey);
+
+        if (!verified) {
+          throw Exception('视频封面上传完成，但服务器校验失败');
+        }
+      },
+      currentTask: currentTask,
     );
-
-    if (uploadDescription == null) {
-      throw Exception('无法创建封面上传任务');
-    }
-
-    final uploader = FileUploader(uploadDescription);
-    final uploaded = await uploader.upload(
-      Stream<List<int>>.value(bytes),
-      bytes.length,
-    );
-
-    if (!uploaded) {
-      throw Exception('视频封面上传失败');
-    }
-
-    final verified = await client.video.verifyUpload(path: storageKey);
-
-    if (!verified) {
-      throw Exception('视频封面上传完成，但服务器校验失败');
-    }
   }
 
   Future<void> startUpload({
@@ -139,6 +173,14 @@ class StudioUploadManager {
       throw StateError('当前已有视频正在上传');
     }
 
+    _validateVideoFile(file);
+
+    final normalizedTitle = title.trim();
+
+    if (normalizedTitle.isEmpty) {
+      throw Exception('视频标题不能为空');
+    }
+
     final currentTask = StudioUploadTask(
       fileName: file.name,
       fileSize: file.size,
@@ -150,12 +192,9 @@ class StudioUploadManager {
     try {
       final userId = await client.video.getCurrentUserId();
       final profile = await client.userProfileEdit.get();
-      final creatorName = (
-        profile.fullName ?? profile.userName ?? profile.email ?? userId
-      ).trim();
+      final creatorName = (profile.fullName ?? profile.userName ?? profile.email ?? userId).trim();
 
-      final safeUserId =
-          userId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+      final safeUserId = userId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
 
       final timestamp = DateTime.now().microsecondsSinceEpoch;
       final extension = _extensionFor(file.name);
@@ -163,56 +202,68 @@ class StudioUploadManager {
       final storageKey = 'videos/$safeUserId/$timestamp.$extension';
       final coverStorageKey = 'covers/$safeUserId/$timestamp.jpg';
 
-      final uploadDescription = await client.video.createUploadDescription(
-        path: storageKey,
-        fileSize: file.size,
+      await _retry<void>(
+        (attempt) async {
+          currentTask.stage = StudioUploadStage.uploading;
+          currentTask.uploadedBytes = 0;
+          _notify();
+
+          final uploadDescription = await client.video.createUploadDescription(
+            path: storageKey,
+            fileSize: file.size,
+          );
+
+          if (uploadDescription == null) {
+            throw Exception('无法创建上传任务');
+          }
+
+          final uploader = FileUploader(uploadDescription);
+
+          final uploaded = await uploader
+              .upload(
+                _trackProgress(
+                  file.openRead(),
+                  currentTask,
+                ),
+                file.size,
+              )
+              .timeout(_uploadTimeout);
+
+          if (!uploaded) {
+            throw Exception('视频上传失败');
+          }
+
+          currentTask.uploadedBytes = file.size;
+          currentTask.stage = StudioUploadStage.verifying;
+          _notify();
+
+          final verified = await client.video.verifyUpload(path: storageKey);
+
+          if (!verified) {
+            throw Exception('视频上传完成，但服务器校验失败');
+          }
+        },
+        currentTask: currentTask,
       );
-
-      if (uploadDescription == null) {
-        throw Exception('无法创建上传任务');
-      }
-
-      final uploader = FileUploader(uploadDescription);
-
-      final uploaded = await uploader.upload(
-        _trackProgress(
-          file.openRead(),
-          currentTask,
-        ),
-        file.size,
-      );
-
-      if (!uploaded) {
-        throw Exception('视频上传失败');
-      }
-
-      currentTask.uploadedBytes = file.size;
-      currentTask.stage = StudioUploadStage.verifying;
-      _notify();
-
-      final verified = await client.video.verifyUpload(path: storageKey);
-
-      if (!verified) {
-        throw Exception('视频上传完成，但服务器校验失败');
-      }
 
       await _uploadCover(
         storageKey: coverStorageKey,
         bytes: file.coverBytes,
+        currentTask: currentTask,
       );
 
       currentTask.stage = StudioUploadStage.processing;
+      currentTask.error = null;
       _notify();
 
       await client.video.create(
         authorId: userId,
         authorName: creatorName.isEmpty ? userId : creatorName,
-        title: title.trim(),
+        title: normalizedTitle,
         description: description.trim(),
         category: category.trim().isEmpty ? 'general' : category.trim(),
         contentType: VideoContentType.video,
-        languageCode:
-            languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
+        languageCode: languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
         tags: tags,
         videoStorageKey: storageKey,
         coverStorageKey: coverStorageKey,
@@ -221,6 +272,7 @@ class StudioUploadManager {
       );
 
       currentTask.stage = StudioUploadStage.completed;
+      currentTask.error = null;
       _notify();
     } catch (e) {
       currentTask.error = e.toString();

@@ -8,9 +8,9 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
-// ignore_for_file: no_leading_underscores_for_library_prefixes
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+// ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
@@ -4255,6 +4255,51 @@ class _VideoEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i8.Video> updateMetadata(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required int videoId,
+    required String title,
+    required String description,
+    required String category,
+    required String languageCode,
+    required List<String> tags,
+    required bool isPublic,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'video',
+            method: 'updateMetadata',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'video',
+          methodName: 'updateMetadata',
+          parameters: _i1.testObjectToJson({
+            'videoId': videoId,
+            'title': title,
+            'description': description,
+            'category': category,
+            'languageCode': languageCode,
+            'tags': tags,
+            'isPublic': isPublic,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i8.Video>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
