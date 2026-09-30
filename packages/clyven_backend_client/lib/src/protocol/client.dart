@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
@@ -1532,6 +1531,28 @@ class EndpointVideo extends _i2.EndpointRef {
     {
       'seriesId': seriesId,
       'videoIds': videoIds,
+    },
+  );
+
+  _i3.Future<_i8.Video> updateMetadata({
+    required int videoId,
+    required String title,
+    required String description,
+    required String category,
+    required String languageCode,
+    required List<String> tags,
+    required bool isPublic,
+  }) => caller.callServerEndpoint<_i8.Video>(
+    'video',
+    'updateMetadata',
+    {
+      'videoId': videoId,
+      'title': title,
+      'description': description,
+      'category': category,
+      'languageCode': languageCode,
+      'tags': tags,
+      'isPublic': isPublic,
     },
   );
 
