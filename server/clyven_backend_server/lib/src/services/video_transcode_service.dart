@@ -4,6 +4,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import 'transcode_retry_policy.dart';
 
 class _TranscodeJobStatus {
   const _TranscodeJobStatus({
@@ -22,7 +23,6 @@ class VideoTranscodeService {
   static const _location = 'asia-southeast1';
   static const _bucket = 'glyphora-video-storage-11129163384';
   static const _scope = 'https://www.googleapis.com/auth/cloud-platform';
-  static const _retryPrefix = 'retry1|';
 
   static AutoRefreshingAuthClient? _cachedClient;
 
@@ -33,20 +33,6 @@ class VideoTranscodeService {
       scopes: const [_scope],
     );
   }
-
-  String _manifestKey(int videoId) => 'transcoded/$videoId/manifest.m3u8';
-
-  String _retryManifestKey(int videoId) =>
-      'transcoded/$videoId/retry-1/manifest.m3u8';
-
-  String _outputPrefix(int videoId) => 'transcoded/$videoId/';
-
-  String _retryOutputPrefix(int videoId) => 'transcoded/$videoId/retry-1/';
-
-  bool _isRetryJob(String value) => value.startsWith(_retryPrefix);
-
-  String _rawJobName(String value) =>
-      _isRetryJob(value) ? value.substring(_retryPrefix.length) : value;
 
   Future<Video> ensure(
     Session session,
@@ -63,51 +49,70 @@ class VideoTranscodeService {
     if (currentJobName == null || currentJobName.isEmpty) {
       final jobName = await _createJob(
         videoStorageKey: video.videoStorageKey,
-        outputPrefix: _outputPrefix(videoId),
+        outputPrefix: TranscodeRetryPolicy.outputPrefix(videoId, 0),
       );
 
-      video.hlsManifestStorageKey = _manifestKey(videoId);
+      video.hlsManifestStorageKey = TranscodeRetryPolicy.manifestKey(
+        videoId,
+        0,
+      );
       video.transcoderJobName = jobName;
       video.transcodeState = 'PENDING';
-      video.updatedAt = DateTime.now();
+      video.updatedAt = DateTime.now().toUtc();
+
+      session.log(
+        'TRANSCODE_CREATED videoId=$videoId attempt=0 job=$jobName',
+      );
 
       return Video.db.updateRow(session, video);
     }
 
-    final retryJob = _isRetryJob(currentJobName);
-    final expectedManifestKey = retryJob
-        ? _retryManifestKey(videoId)
-        : _manifestKey(videoId);
+    final parsed = TranscodeRetryPolicy.parseJobName(currentJobName);
 
-    // Already finished and recorded: skip the Transcoder API round-trip
-    // entirely instead of re-checking job status on every playback request.
+    final expectedManifestKey = TranscodeRetryPolicy.manifestKey(
+      videoId,
+      parsed.attempt,
+    );
+
+    // 已成功的转码不再重复请求 GCP Transcoder API。
     if (video.transcodeState == 'SUCCEEDED' &&
         video.hlsManifestStorageKey == expectedManifestKey) {
       return video;
     }
 
-    final status = await _getJobStatus(_rawJobName(currentJobName));
+    final status = await _getJobStatus(parsed.rawJobName);
 
     if (status.state == 'FAILED') {
-      print(
-        '[Clyven Transcoder] Video $videoId failed'
-        '${retryJob ? ' after retry' : ''}: ${status.error ?? 'unknown error'}',
+      session.log(
+        'TRANSCODE_FAILED videoId=$videoId '
+        'attempt=${parsed.attempt} '
+        'error=${status.error ?? 'unknown error'}',
+        level: LogLevel.warning,
       );
 
-      if (!retryJob) {
+      if (TranscodeRetryPolicy.canRetry(parsed.attempt)) {
+        final nextAttempt = parsed.attempt + 1;
+
         final retryJobName = await _createJob(
           videoStorageKey: video.videoStorageKey,
-          outputPrefix: _retryOutputPrefix(videoId),
+          outputPrefix: TranscodeRetryPolicy.outputPrefix(videoId, nextAttempt),
         );
 
-        video.hlsManifestStorageKey = _retryManifestKey(videoId);
-        video.transcoderJobName = '$_retryPrefix$retryJobName';
+        video.hlsManifestStorageKey = TranscodeRetryPolicy.manifestKey(
+          videoId,
+          nextAttempt,
+        );
+        video.transcoderJobName = TranscodeRetryPolicy.encodeJobName(
+          nextAttempt,
+          retryJobName,
+        );
         video.transcodeState = 'PENDING';
-        video.updatedAt = DateTime.now();
+        video.updatedAt = DateTime.now().toUtc();
 
-        print(
-          '[Clyven Transcoder] Retrying video $videoId once with job '
-          '$retryJobName',
+        session.log(
+          'TRANSCODE_RETRY videoId=$videoId '
+          'attempt=$nextAttempt job=$retryJobName',
+          level: LogLevel.warning,
         );
 
         return Video.db.updateRow(session, video);
@@ -118,7 +123,7 @@ class VideoTranscodeService {
         video.transcodeState != status.state) {
       video.hlsManifestStorageKey = expectedManifestKey;
       video.transcodeState = status.state;
-      video.updatedAt = DateTime.now();
+      video.updatedAt = DateTime.now().toUtc();
 
       return Video.db.updateRow(session, video);
     }

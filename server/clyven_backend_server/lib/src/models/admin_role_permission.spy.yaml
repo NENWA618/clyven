@@ -1,0 +1,12 @@
+class: AdminRolePermission
+table: admin_role_permission
+
+fields:
+  roleId: int
+  permissionCode: String
+  createdAt: DateTime, default=now
+
+indexes:
+  admin_role_permission_unique_idx:
+    fields: roleId, permissionCode
+    unique: true

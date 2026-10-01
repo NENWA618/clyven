@@ -1,4 +1,4 @@
-﻿import 'package:jaspr/dom.dart';
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
@@ -12,6 +12,7 @@ import 'pages/dictionary_page.dart';
 import 'pages/home.dart';
 import 'pages/placeholder_page.dart';
 import 'pages/video_management_page.dart';
+import 'pages/video_edit_page.dart';
 import 'pages/comments_management_page.dart';
 import 'services/studio_client.dart';
 
@@ -39,6 +40,24 @@ class App extends StatelessComponent {
                   title: 'Dashboard · Clyven Studio',
                   builder: (context, state) {
                     return const DashboardPage();
+                  },
+                ),
+                Route(
+                  path: '/videos/:videoId/edit',
+                  title: 'Edit video · Clyven Studio',
+                  builder: (context, state) {
+                    final videoId = int.tryParse(
+                      state.params['videoId'] ?? '',
+                    );
+
+                    if (videoId == null) {
+                      return const PlaceholderPage(
+                        title: 'Edit video',
+                        description: '无效的视频 ID。',
+                      );
+                    }
+
+                    return VideoEditPage(videoId: videoId);
                   },
                 ),
                 Route(

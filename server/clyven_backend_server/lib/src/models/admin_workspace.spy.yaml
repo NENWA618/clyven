@@ -1,0 +1,8 @@
+class: AdminWorkspace
+table: admin_workspace
+
+fields:
+  name: String
+  ownerMemberId: int?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
