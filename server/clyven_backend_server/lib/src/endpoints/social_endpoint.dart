@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_idp_server/core.dart' as auth_core;
 
 import '../generated/protocol.dart';
 import '../services/notification_service.dart';
@@ -312,5 +313,74 @@ class SocialEndpoint extends Endpoint {
       session,
       where: (row) => row.userId.equals(userId),
     );
+  }
+
+  Future<List<Map<String, String>>> searchExistingUserProfiles(
+    Session session,
+    String query, {
+    required int limit,
+  }) async {
+    final normalized = query.trim().toLowerCase();
+    if (normalized.isEmpty) return const [];
+
+    final profiles = await auth_core.AuthServices.instance.userProfiles.admin
+        .listUserProfiles(
+          session,
+          limit: 500,
+        );
+
+    final result = <Map<String, String>>[];
+
+    for (final profile in profiles) {
+      final displayName = (
+        profile.fullName ??
+        profile.userName ??
+        profile.authUserId.toString()
+      ).trim();
+
+      final userName = (profile.userName ?? '').trim();
+
+      if (!displayName.toLowerCase().contains(normalized) &&
+          !userName.toLowerCase().contains(normalized)) {
+        continue;
+      }
+
+      result.add({
+        'userId': profile.authUserId.toString(),
+        'displayName': displayName,
+        'avatarUrl': profile.imageUrl?.toString() ?? '',
+      });
+
+      if (result.length >= limit) break;
+    }
+
+    return result;
+  }
+
+  Future<Map<String, String>?> getExistingUserProfile(
+    Session session,
+    String userId,
+  ) async {
+    final profiles = await auth_core.AuthServices.instance.userProfiles.admin
+        .listUserProfiles(
+          session,
+          limit: 1000,
+        );
+
+    for (final profile in profiles) {
+      if (profile.authUserId.toString() != userId) continue;
+
+      return {
+        'userId': profile.authUserId.toString(),
+        'displayName': (
+          profile.fullName ??
+          profile.userName ??
+          profile.authUserId.toString()
+        ).trim(),
+        'avatarUrl': profile.imageUrl?.toString() ?? '',
+      };
+    }
+
+    return null;
   }
 }

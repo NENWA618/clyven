@@ -2335,6 +2335,50 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['social'] as _i16.SocialEndpoint)
                   .clearWatchHistory(session),
         ),
+        'searchExistingUserProfiles': _i1.MethodConnector(
+          name: 'searchExistingUserProfiles',
+          params: {
+            'query': _i1.ParameterDescription(
+              name: 'query',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['social'] as _i16.SocialEndpoint)
+                  .searchExistingUserProfiles(
+                    session,
+                    params['query'],
+                    limit: params['limit'],
+                  ),
+        ),
+        'getExistingUserProfile': _i1.MethodConnector(
+          name: 'getExistingUserProfile',
+          params: {
+            'userId': _i1.ParameterDescription(
+              name: 'userId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['social'] as _i16.SocialEndpoint)
+                  .getExistingUserProfile(
+                    session,
+                    params['userId'],
+                  ),
+        ),
       },
     );
     connectors['subtitle'] = _i1.EndpointConnector(

@@ -1274,6 +1274,25 @@ class EndpointSocial extends _i2.EndpointRef {
     'clearWatchHistory',
     {},
   );
+
+  _i3.Future<List<Map<String, String>>> searchExistingUserProfiles(
+    String query, {
+    required int limit,
+  }) => caller.callServerEndpoint<List<Map<String, String>>>(
+    'social',
+    'searchExistingUserProfiles',
+    {
+      'query': query,
+      'limit': limit,
+    },
+  );
+
+  _i3.Future<Map<String, String>?> getExistingUserProfile(String userId) =>
+      caller.callServerEndpoint<Map<String, String>?>(
+        'social',
+        'getExistingUserProfile',
+        {'userId': userId},
+      );
 }
 
 /// {@category Endpoint}
