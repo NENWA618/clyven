@@ -51,7 +51,7 @@ class VideoInteractionNotifier extends AsyncNotifier<VideoInteractionState> {
         throw const AppException(AppErrorCode.notLoggedIn);
       }
 
-      final video = await ref.watch(videoDetailProvider(videoId).future);
+      final video = await ref.read(videoDetailProvider(videoId).future);
 
       return await _repository.load(
         videoId: videoId,

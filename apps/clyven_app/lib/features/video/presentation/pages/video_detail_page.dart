@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/utils/require_login.dart';
 import '../../../comments/presentation/pages/comments_page.dart';
 import '../../../creator/presentation/pages/creator_profile_page.dart';
@@ -1263,6 +1264,8 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
     VideoDetail video,
     AppLocalizations l10n,
   ) {
+    final currentUser = ref.watch(authProvider).value;
+    final isOwnVideo = currentUser?.id == video.authorId;
     final creatorAsync = ref.watch(creatorProfileProvider(video.authorId));
     // unwrapPrevious() drops the stale value Riverpod carries over from
     // before a sign-out, so a logged-out/errored fetch reads as no data
@@ -1351,46 +1354,47 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                   ],
                 ),
               ),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () async {
-                  if (isChangingFollow) {
-                    return;
-                  }
+              if (!isOwnVideo)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () async {
+                    if (isChangingFollow) {
+                      return;
+                    }
 
-                  final allowed = await requireLogin(context, ref);
+                    final allowed = await requireLogin(context, ref);
 
-                  if (!allowed || !context.mounted) {
-                    return;
-                  }
+                    if (!allowed || !context.mounted) {
+                      return;
+                    }
 
-                  await ref
-                      .read(creatorProfileProvider(video.authorId).notifier)
-                      .toggleFollow();
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 17,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: scheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    isChangingFollow
-                        ? l10n.processing
-                        : isFollowing
-                        ? l10n.followingButton
-                        : l10n.follow,
-                    style: TextStyle(
-                      color: scheme.onPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                    await ref
+                        .read(creatorProfileProvider(video.authorId).notifier)
+                        .toggleFollow();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 17,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: scheme.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isChangingFollow
+                          ? l10n.processing
+                          : isFollowing
+                          ? l10n.followingButton
+                          : l10n.follow,
+                      style: TextStyle(
+                        color: scheme.onPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
