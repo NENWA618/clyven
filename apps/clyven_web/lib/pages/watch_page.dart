@@ -1,6 +1,7 @@
 import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_router/jaspr_router.dart';
 
 import '../components/watch_subtitle_player.dart';
 import '../components/recommended_videos.dart';
@@ -705,6 +706,14 @@ class _WatchPageState extends State<WatchPage> {
 
     final video = _video!;
 
+    final routeUri = Uri.tryParse(RouteState.of(context).location);
+    final initialSeconds = double.tryParse(
+      routeUri?.queryParameters['t'] ?? '',
+    );
+    final initialMs = initialSeconds == null || initialSeconds < 0
+        ? 0
+        : (initialSeconds * 1000).round();
+
     return div(classes: 'watch-page', [
       div(classes: 'watch-layout', [
         main_(classes: 'watch-main-column', [
@@ -713,6 +722,7 @@ class _WatchPageState extends State<WatchPage> {
           ]),
           WatchSubtitlePlayer(
             videoId: component.videoId,
+            initialMs: initialMs,
             videoUrl: _videoUrl,
             coverUrl: _coverUrl,
             primaryCues: _primaryCues,

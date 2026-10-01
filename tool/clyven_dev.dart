@@ -19,19 +19,20 @@ class _Service {
   bool ready = false;
   bool starting = false;
   int restartCount = 0;
+  IOSink? logSink;
   final List<String> recentLines = <String>[];
 }
 
 final _services = <_Service>[
   _Service(
     name: 'clyven_web',
-    label: 'Web',
+    label: 'WEB',
     directory: 'apps/clyven_web',
     port: 8084,
   ),
   _Service(
     name: 'clyven_studio',
-    label: 'Studio',
+    label: 'STUDIO',
     directory: 'apps/clyven_studio',
     port: 8083,
   ),
@@ -58,12 +59,18 @@ bool _looksImportant(String line) {
 
   final lower = line.toLowerCase();
 
-  return lower.contains('error:') ||
-      lower.contains('exception:') ||
+  return lower.contains('error') ||
+      lower.contains('exception') ||
       lower.contains('failed') ||
+      lower.contains('failure') ||
       lower.contains('could not') ||
+      lower.contains('cannot') ||
       lower.contains('compilation') ||
-      lower.contains('socketexception');
+      lower.contains('socketexception') ||
+      lower.contains('unhandled') ||
+      lower.contains('stack trace') ||
+      lower.contains('critical') ||
+      lower.contains('severe');
 }
 
 void _remember(_Service service, String rawLine) {
@@ -73,7 +80,7 @@ void _remember(_Service service, String rawLine) {
 
   service.recentLines.add(line);
 
-  if (service.recentLines.length > 40) {
+  if (service.recentLines.length > 80) {
     service.recentLines.removeAt(0);
   }
 }
@@ -81,7 +88,7 @@ void _remember(_Service service, String rawLine) {
 void _clearStatusLine() {
   if (!stdout.hasTerminal) return;
 
-  stdout.write('\r${' ' * 100}\r');
+  stdout.write('\r${' ' * 120}\r');
 }
 
 String _statusText() {
@@ -131,6 +138,9 @@ void _printReadyBlock() {
     stdout.writeln('Clyven Web     http://localhost:8084');
     stdout.writeln('Clyven Studio  http://localhost:8083');
     stdout.writeln('');
+    stdout.writeln('Runtime errors will appear below immediately.');
+    stdout.writeln('Logs: .logs/clyven_web.log and .logs/clyven_studio.log');
+    stdout.writeln('');
     stdout.writeln('Ctrl+C to stop.');
     return;
   }
@@ -138,25 +148,75 @@ void _printReadyBlock() {
   stdout.writeln('Ready again.');
 }
 
+void _printRuntimeLine(
+  _Service service,
+  String line, {
+  required bool isErrorStream,
+}) {
+  if (!_printedReadyBlock) return;
+
+  final clean = _stripAnsi(line).trimRight();
+  if (clean.isEmpty || _isKnownNoise(clean)) return;
+
+  // stderr is always useful. stdout is shown when it looks like a runtime issue.
+  if (!isErrorStream && !_looksImportant(clean)) return;
+
+  _stopSpinner();
+
+  final tag = isErrorStream ? '${service.label} ERR' : service.label;
+  stderr.writeln('[$tag] $clean');
+}
+
 void _printCompactFailure(_Service service, int code) {
   _stopSpinner();
 
   stderr.writeln('');
   stderr.writeln(
-    '${service.label} stopped unexpectedly (exit code $code). '
+    '[${service.label}] stopped unexpectedly (exit code $code). '
     'Restarting automatically...',
   );
 
   final useful = service.recentLines.where(_looksImportant).toList();
-  final lines = useful.length <= 8 ? useful : useful.sublist(useful.length - 8);
+  final lines = useful.length <= 10
+      ? useful
+      : useful.sublist(useful.length - 10);
 
   if (lines.isNotEmpty) {
+    stderr.writeln('[${service.label}] Recent important lines:');
     for (final line in lines) {
       stderr.writeln('  $line');
     }
   }
 
   _ensureSpinner();
+}
+
+Future<void> _openLog(_Service service) async {
+  final logDir = Directory('.logs');
+  if (!await logDir.exists()) {
+    await logDir.create(recursive: true);
+  }
+
+  await service.logSink?.flush();
+  await service.logSink?.close();
+
+  final file = File('${logDir.path}/${service.name}.log');
+  service.logSink = file.openWrite(mode: FileMode.writeOnlyAppend);
+
+  service.logSink!.writeln('');
+  service.logSink!.writeln(
+    '===== ${DateTime.now().toIso8601String()} '
+    '${service.label} start =====',
+  );
+}
+
+void _writeLog(_Service service, String line, {required String stream}) {
+  final clean = _stripAnsi(line).trimRight();
+  if (clean.isEmpty) return;
+
+  service.logSink?.writeln(
+    '${DateTime.now().toIso8601String()} [$stream] $clean',
+  );
 }
 
 Future<void> _killProcessTree(Process process) async {
@@ -192,6 +252,14 @@ Future<void> _stopAll() async {
       .toList();
 
   await Future.wait(active.map(_killProcessTree));
+
+  for (final service in _services) {
+    try {
+      await service.logSink?.flush();
+      await service.logSink?.close();
+    } catch (_) {}
+    service.logSink = null;
+  }
 
   stdout.writeln('');
   stdout.writeln('Stopped.');
@@ -243,6 +311,8 @@ Future<int> _runOneService(_Service service) async {
   service.ready = false;
   service.recentLines.clear();
 
+  await _openLog(service);
+
   final process = await Process.start(
     'jaspr',
     ['serve', '--port', '${service.port}'],
@@ -252,8 +322,9 @@ Future<int> _runOneService(_Service service) async {
 
   service.process = process;
 
-  void handleLine(String line) {
+  void handleLine(String line, {required bool isErrorStream}) {
     _remember(service, line);
+    _writeLog(service, line, stream: isErrorStream ? 'STDERR' : 'STDOUT');
 
     if (line.contains('Serving at http://localhost:${service.port}')) {
       service.ready = true;
@@ -262,26 +333,26 @@ Future<int> _runOneService(_Service service) async {
       return;
     }
 
-    if (_printedReadyBlock && _looksImportant(line)) {
-      // Do not flood the terminal. Keep it buffered and only show it if the
-      // service actually exits.
-      return;
-    }
+    _printRuntimeLine(service, line, isErrorStream: isErrorStream);
   }
 
   final outDone = process.stdout
       .transform(utf8.decoder)
       .transform(const LineSplitter())
-      .forEach(handleLine);
+      .forEach((line) => handleLine(line, isErrorStream: false));
 
   final errDone = process.stderr
       .transform(utf8.decoder)
       .transform(const LineSplitter())
-      .forEach(handleLine);
+      .forEach((line) => handleLine(line, isErrorStream: true));
 
   final code = await process.exitCode;
 
   await Future.wait(<Future<void>>[outDone, errDone]);
+
+  try {
+    await service.logSink?.flush();
+  } catch (_) {}
 
   service.process = null;
   service.ready = false;
@@ -300,7 +371,7 @@ Future<void> _supervise(_Service service) async {
 
     _printCompactFailure(service, code);
 
-    // Small backoff prevents a broken source file from creating a tight loop.
+    // Prevent a broken source file from creating a tight restart loop.
     await Future<void>.delayed(const Duration(milliseconds: 900));
   }
 }

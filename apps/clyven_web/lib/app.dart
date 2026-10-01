@@ -7,6 +7,8 @@ import 'l10n/web_l10n.dart';
 import 'pages/explore_page.dart';
 import 'pages/home_page.dart';
 import 'pages/notifications_page.dart';
+import 'pages/public_profile_page.dart';
+import 'pages/search_page.dart';
 import 'pages/settings/about_page.dart';
 import 'pages/settings/account_settings_page.dart';
 import 'pages/settings/notification_settings_page.dart';
@@ -40,6 +42,11 @@ class App extends StatelessComponent {
                   builder: (context, state) => const ExplorePage(),
                 ),
                 Route(
+                  path: '/search',
+                  title: 'Search · Clyven',
+                  builder: (context, state) => const SearchPage(),
+                ),
+                Route(
                   path: '/wordlists/:listId',
                   title: 'Word lists · Clyven',
                   builder: (context, state) {
@@ -63,6 +70,14 @@ class App extends StatelessComponent {
                       ]);
                     }
                     return WatchPage(videoId: id);
+                  },
+                ),
+                Route(
+                  path: '/profile/:userId',
+                  title: 'Profile · Clyven',
+                  builder: (context, state) {
+                    final userId = state.params['userId'] ?? '';
+                    return PublicProfilePage(userId: userId);
                   },
                 ),
                 Route(
