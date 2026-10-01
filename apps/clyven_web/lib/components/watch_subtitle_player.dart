@@ -12,6 +12,7 @@ import '../services/web_client.dart';
 class WatchSubtitlePlayer extends StatefulComponent {
   const WatchSubtitlePlayer({
     required this.videoId,
+    this.initialMs = 0,
     required this.videoUrl,
     required this.coverUrl,
     required this.primaryCues,
@@ -30,6 +31,7 @@ class WatchSubtitlePlayer extends StatefulComponent {
   });
 
   final int videoId;
+  final int initialMs;
   final String videoUrl;
   final String coverUrl;
 
@@ -57,6 +59,7 @@ class WatchSubtitlePlayer extends StatefulComponent {
 
 class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
   bool _playing = false;
+  bool _initialSeekApplied = false;
 
   double _currentTime = 0;
   double _duration = 0;
@@ -235,6 +238,36 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
           _qualityOption(360, '360p'),
         ]),
     ]);
+  }
+
+  void _applyInitialSeek() {
+    final video = _video;
+    if (video == null) return;
+
+    final requestedMs = component.initialMs;
+
+    if (requestedMs <= 0) {
+      _initialSeekApplied = true;
+      _syncVideoState();
+      return;
+    }
+
+    final requestedSeconds = requestedMs / 1000;
+    final duration = video.duration.toDouble();
+
+    if (_initialSeekApplied && video.currentTime.toDouble() > 0.05) {
+      _syncVideoState();
+      return;
+    }
+
+    if (duration.isFinite && duration > 0) {
+      video.currentTime = requestedSeconds.clamp(0.0, duration).toDouble();
+    } else {
+      video.currentTime = requestedSeconds;
+    }
+
+    _initialSeekApplied = true;
+    _syncVideoState();
   }
 
   void _syncVideoState({bool notifyParent = true}) {
@@ -511,7 +544,7 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
           },
           events: {
             'timeupdate': (_) => _syncVideoState(),
-            'loadedmetadata': (_) => _syncVideoState(),
+            'loadedmetadata': (_) => _applyInitialSeek(),
             'durationchange': (_) => _syncVideoState(),
             'play': (_) {
               setState(() {
