@@ -137,6 +137,23 @@ class WebStrings {
       _('Enter a title, creator or category', '输入标题、作者或分类');
   String get searchNoResults => _('No related videos found', '没有找到相关视频');
   String get searchLoadFailed => _('Failed to load', '加载失败');
+  String get searchTitle => _('Search', '搜索');
+  String get searchAction => _('Search', '搜索');
+  String get searchPageHint => _(
+    'Search videos, creators, categories and descriptions.',
+    '搜索视频、作者、分类和简介。',
+  );
+  String searchResultsFor(String query) =>
+      _('Results for "$query"', '“$query”的搜索结果');
+  String searchNoResultsHint(String query) =>
+      _('No videos matched "$query".', '没有视频匹配“$query”。');
+  String get searchVideosSection => _('Videos', '视频');
+  String get searchUsersSection => _('Users', '用户');
+  String get subtitleMatches => _('Subtitle matches', '字幕匹配');
+  String get originalSubtitle => _('Original subtitle', '原文字幕');
+  String get translatedSubtitle => _('Translated subtitle', '翻译字幕');
+  String get searchingVideosAndSubtitles =>
+      _('Searching videos and subtitles...', '正在搜索视频和字幕...');
 
   // Language switcher (same labels as the app)
   String get language => _('Language', '语言');

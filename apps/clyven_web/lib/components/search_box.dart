@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html' as html;
 
 import 'package:clyven_backend_client/clyven_backend_client.dart' as api;
 import 'package:jaspr/dom.dart';
@@ -60,6 +61,30 @@ class _SearchBoxState extends State<SearchBox> {
     }
   }
 
+  void _submitSearch() {
+    final input = html.document.getElementById('clyven-header-search-input');
+
+    final liveValue = input is html.InputElement
+        ? (input.value ?? '').trim()
+        : '';
+
+    final value = liveValue.isNotEmpty ? liveValue : _query.trim();
+
+    _blurTimer?.cancel();
+
+    setState(() {
+      _query = value;
+      _open = false;
+    });
+
+    if (value.isEmpty) {
+      Router.of(context).push('/search');
+      return;
+    }
+
+    Router.of(context).push('/search?q=${Uri.encodeQueryComponent(value)}');
+  }
+
   List<api.Video> _results() {
     final keyword = _query.trim().toLowerCase();
     final l10n = context.l10n;
@@ -82,6 +107,7 @@ class _SearchBoxState extends State<SearchBox> {
 
     return div(classes: 'client-search', [
       input<String>(
+        id: 'clyven-header-search-input',
         type: InputType.search,
         classes: 'client-search-input',
         value: _query,
@@ -100,6 +126,12 @@ class _SearchBoxState extends State<SearchBox> {
               _ensureLoaded();
             },
           ),
+          'keydown': (event) {
+            final dynamic keyboardEvent = event;
+            if (keyboardEvent.key == 'Enter') {
+              _submitSearch();
+            }
+          },
           'focus': (_) {
             _blurTimer?.cancel();
             setState(() => _open = true);
@@ -112,6 +144,16 @@ class _SearchBoxState extends State<SearchBox> {
             });
           },
         },
+      ),
+      button(
+        classes: 'client-search-submit',
+        attributes: {
+          'type': 'button',
+          'aria-label': l10n.searchAction,
+          'title': l10n.searchAction,
+        },
+        onClick: _submitSearch,
+        [.text('⌕')],
       ),
       if (_open) _panel(l10n),
     ]);

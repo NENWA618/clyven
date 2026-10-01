@@ -1,8 +1,0 @@
-class: SubtitlePublishStatus
-
-fields:
-  hasPublishedVersion: bool
-  hasUnpublishedChanges: bool
-  draftRevision: int
-  publishedRevision: int
-  publishedAt: DateTime?

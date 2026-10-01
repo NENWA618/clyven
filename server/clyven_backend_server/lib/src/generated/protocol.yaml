@@ -105,6 +105,8 @@ social:
   - saveWatchProgress:
   - removeWatchHistory:
   - clearWatchHistory:
+  - searchExistingUserProfiles:
+  - getExistingUserProfile:
 subtitle:
   - getCueDetails:
   - getPublishedCueDetails:
