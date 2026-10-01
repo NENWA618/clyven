@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:serverpod/serverpod.dart';
 
@@ -333,7 +333,8 @@ class SubtitleEndpoint extends Endpoint {
       where: (t) =>
           t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
     );
-    if (track == null || track.id == null) throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+    if (track == null || track.id == null)
+      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
 
     final cue = await SubtitleCue.db.findFirstRow(
       session,
@@ -1254,19 +1255,27 @@ class SubtitleEndpoint extends Endpoint {
       }
 
       if (segment.startOffsetMs < 0) {
-        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µå¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0');
+        throw Exception(
+          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µå¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
+        );
       }
 
       if (segment.endOffsetMs <= segment.startOffsetMs) {
-        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´');
+        throw Exception(
+          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
+        );
       }
 
       if (segment.endOffsetMs > cueDurationMs) {
-        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µè¶…å‡ºå½“å‰å­—å¹•æ—¶é•¿');
+        throw Exception(
+          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µè¶…å‡ºå½“å‰å­—å¹•æ—¶é•¿',
+        );
       }
 
       if (segment.startOffsetMs < previousEndMs) {
-        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸Žå‰ä¸€ç‰‡æ®µé‡å ');
+        throw Exception(
+          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸Žå‰ä¸€ç‰‡æ®µé‡å ',
+        );
       }
 
       previousEndMs = segment.endOffsetMs;
@@ -1743,4 +1752,3 @@ class SubtitleEndpoint extends Endpoint {
     return errors;
   }
 }
-
