@@ -298,8 +298,7 @@ class AdminMembershipService {
   }) async {
     final role = await AdminRole.db.findFirstRow(
       session,
-      where: (row) =>
-          row.workspaceId.equals(workspaceId) & row.key.equals(key),
+      where: (row) => row.workspaceId.equals(workspaceId) & row.key.equals(key),
       transaction: transaction,
     );
 

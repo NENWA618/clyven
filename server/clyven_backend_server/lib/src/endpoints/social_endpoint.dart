@@ -332,11 +332,11 @@ class SocialEndpoint extends Endpoint {
     final result = <Map<String, String>>[];
 
     for (final profile in profiles) {
-      final displayName = (
-        profile.fullName ??
-        profile.userName ??
-        profile.authUserId.toString()
-      ).trim();
+      final displayName =
+          (profile.fullName ??
+                  profile.userName ??
+                  profile.authUserId.toString())
+              .trim();
 
       final userName = (profile.userName ?? '').trim();
 
@@ -372,11 +372,11 @@ class SocialEndpoint extends Endpoint {
 
       return {
         'userId': profile.authUserId.toString(),
-        'displayName': (
-          profile.fullName ??
-          profile.userName ??
-          profile.authUserId.toString()
-        ).trim(),
+        'displayName':
+            (profile.fullName ??
+                    profile.userName ??
+                    profile.authUserId.toString())
+                .trim(),
         'avatarUrl': profile.imageUrl?.toString() ?? '',
       };
     }
