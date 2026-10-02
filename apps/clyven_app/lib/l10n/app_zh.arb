@@ -80,6 +80,8 @@
   "followingEyebrow": "ORBIT",
   "followingTitle": "我的关注",
   "noFollowingCreators": "还没有关注创作者",
+  "followersTitle": "我的关注者",
+  "noFollowers": "还没有关注者",
   "followers": "关注者",
   "videos": "个视频",
   "echoesEyebrow": "ECHOES",

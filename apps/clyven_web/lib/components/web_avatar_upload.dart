@@ -250,6 +250,15 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
         classes: 'web-account-menu-item',
         onClick: () {
           setState(() => _accountOpen = false);
+          Router.maybeOf(context)?.push('/wordlists');
+        },
+        [.text(context.l10n.wordLists)],
+      ),
+      button(
+        type: ButtonType.button,
+        classes: 'web-account-menu-item',
+        onClick: () {
+          setState(() => _accountOpen = false);
           Router.maybeOf(context)?.push('/settings');
         },
         [.text(context.l10n.settings)],

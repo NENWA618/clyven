@@ -80,6 +80,8 @@
   "followingEyebrow": "ORBIT",
   "followingTitle": "Following",
   "noFollowingCreators": "You aren't following any creators yet",
+  "followersTitle": "My followers",
+  "noFollowers": "No followers yet",
   "followers": "followers",
   "videos": "videos",
   "echoesEyebrow": "ECHOES",

@@ -8,7 +8,11 @@ import '../providers/following_creators_provider.dart';
 import 'creator_profile_page.dart';
 
 class FollowingCreatorsPage extends ConsumerWidget {
-  const FollowingCreatorsPage({super.key});
+  /// Lists the creators the user follows, or (with [showFollowers]) the
+  /// users who follow the current user.
+  final bool showFollowers;
+
+  const FollowingCreatorsPage({super.key, this.showFollowers = false});
 
   static const Color _background = Color(0xFFF1EFEA);
   static const Color _ink = Color(0xFF171714);
@@ -16,7 +20,10 @@ class FollowingCreatorsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final creatorsAsync = ref.watch(followingCreatorsProvider);
+    final provider = showFollowers
+        ? followerCreatorsProvider
+        : followingCreatorsProvider;
+    final creatorsAsync = ref.watch(provider);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -34,7 +41,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
                   return Center(
                     child: FilledButton(
                       onPressed: () {
-                        ref.invalidate(followingCreatorsProvider);
+                        ref.invalidate(provider);
                       },
                       child: Text(l10n.reload),
                     ),
@@ -53,7 +60,9 @@ class FollowingCreatorsPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 14),
                           Text(
-                            l10n.noFollowingCreators,
+                            showFollowers
+                                ? l10n.noFollowers
+                                : l10n.noFollowingCreators,
                             style: const TextStyle(
                               color: Color(0xFF77736C),
                               fontWeight: FontWeight.w700,
@@ -66,8 +75,8 @@ class FollowingCreatorsPage extends ConsumerWidget {
 
                   return RefreshIndicator(
                     onRefresh: () async {
-                      ref.invalidate(followingCreatorsProvider);
-                      await ref.read(followingCreatorsProvider.future);
+                      ref.invalidate(provider);
+                      await ref.read(provider.future);
                     },
                     child: ListView.separated(
                       physics: const AlwaysScrollableScrollPhysics(
@@ -131,7 +140,7 @@ class FollowingCreatorsPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  l10n.followingTitle,
+                  showFollowers ? l10n.followersTitle : l10n.followingTitle,
                   style: const TextStyle(
                     color: _ink,
                     fontSize: 20,

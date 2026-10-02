@@ -7,6 +7,7 @@ abstract class CreatorRepository {
   Future<CreatorProfile> loadCreatorProfile(String creatorId);
   Future<bool> isFollowing({required String userId, required String creatorId});
   Future<List<String>> loadFollowingCreatorIds({required String userId});
+  Future<List<String>> loadFollowerIds({required String userId});
   Future<bool> toggleFollow({
     required String userId,
     required String creatorId,
@@ -66,6 +67,11 @@ class ServerpodCreatorRepository implements CreatorRepository {
   @override
   Future<List<String>> loadFollowingCreatorIds({required String userId}) {
     return client.social.getFollowingCreatorIds();
+  }
+
+  @override
+  Future<List<String>> loadFollowerIds({required String userId}) {
+    return client.social.getFollowerIds();
   }
 
   @override

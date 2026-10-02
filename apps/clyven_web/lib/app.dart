@@ -3,10 +3,10 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import 'components/client_shell.dart';
+import 'components/word_lists_home_section.dart';
 import 'l10n/web_l10n.dart';
 import 'pages/explore_page.dart';
 import 'pages/home_page.dart';
-import 'pages/notifications_page.dart';
 import 'pages/public_profile_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings/about_page.dart';
@@ -47,6 +47,11 @@ class App extends StatelessComponent {
                   builder: (context, state) => const SearchPage(),
                 ),
                 Route(
+                  path: '/wordlists',
+                  title: 'Word lists · Clyven',
+                  builder: (context, state) => const WordListsHomeSection(),
+                ),
+                Route(
                   path: '/wordlists/:listId',
                   title: 'Word lists · Clyven',
                   builder: (context, state) {
@@ -79,11 +84,6 @@ class App extends StatelessComponent {
                     final userId = state.params['userId'] ?? '';
                     return PublicProfilePage(userId: userId);
                   },
-                ),
-                Route(
-                  path: '/notifications',
-                  title: 'Echoes · Clyven',
-                  builder: (context, state) => const NotificationsPage(),
                 ),
                 Route(
                   path: '/settings',

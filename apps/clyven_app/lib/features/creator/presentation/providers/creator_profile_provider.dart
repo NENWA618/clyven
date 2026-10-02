@@ -26,6 +26,18 @@ final followingCreatorIdsProvider = FutureProvider<List<String>>((ref) async {
   return repository.loadFollowingCreatorIds(userId: user.id);
 });
 
+final followerCreatorIdsProvider = FutureProvider<List<String>>((ref) async {
+  final user = await ref.watch(authProvider.future);
+
+  if (user == null) {
+    return const [];
+  }
+
+  final repository = ref.read(creatorRepositoryProvider);
+
+  return repository.loadFollowerIds(userId: user.id);
+});
+
 class CreatorProfileState {
   final CreatorProfile creator;
 
