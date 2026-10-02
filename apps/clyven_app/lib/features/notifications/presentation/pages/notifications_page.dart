@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/notification_settings_filter.dart';
 import '../providers/notification_provider.dart';
 import '../providers/notification_settings_provider.dart';
+import '../widgets/notification_labels.dart';
 
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
@@ -201,7 +202,7 @@ class NotificationsPage extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
-                _icon(notification.type),
+                notification.icon,
                 color: isDark ? scheme.onSurface : _ink,
               ),
             ),
@@ -211,7 +212,7 @@ class NotificationsPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _title(notification.type, l10n),
+                    notification.title(l10n),
                     style: TextStyle(
                       color: scheme.onSurface,
                       fontSize: 14,
@@ -220,7 +221,7 @@ class NotificationsPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    _message(notification, l10n),
+                    notification.message(l10n),
                     style: TextStyle(
                       color: isDark
                           ? const Color(0xFFBEB9B0)
@@ -231,7 +232,7 @@ class NotificationsPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _formatTime(notification.createdAt, l10n),
+                    notification.timeAgo(l10n),
                     style: TextStyle(
                       color: isDark
                           ? const Color(0xFF8F8A83)
@@ -255,40 +256,6 @@ class NotificationsPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _title(NotificationType type, AppLocalizations l10n) {
-    return switch (type) {
-      NotificationType.comment => l10n.notificationCommentTitle,
-      NotificationType.like => l10n.notificationLikeTitle,
-      NotificationType.follow => l10n.notificationFollowTitle,
-    };
-  }
-
-  String _message(AppNotification notification, AppLocalizations l10n) {
-    return switch (notification.type) {
-      NotificationType.comment => l10n.notificationCommentMessage(
-        notification.actorName,
-        notification.commentPreview ?? '',
-      ),
-      NotificationType.like => l10n.notificationLikeMessage(
-        notification.actorName,
-      ),
-      NotificationType.follow => l10n.notificationFollowMessage(
-        notification.actorName,
-      ),
-    };
-  }
-
-  IconData _icon(NotificationType type) {
-    switch (type) {
-      case NotificationType.like:
-        return Icons.favorite_rounded;
-      case NotificationType.comment:
-        return Icons.mode_comment_rounded;
-      case NotificationType.follow:
-        return Icons.person_add_alt_1_rounded;
-    }
   }
 
   Color _iconColor(BuildContext context, NotificationType type) {
@@ -323,24 +290,5 @@ class NotificationsPage extends ConsumerWidget {
       case NotificationType.follow:
         return const Color(0xFFD7EEE3);
     }
-  }
-
-  String _formatTime(DateTime time, AppLocalizations l10n) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inMinutes < 1) {
-      return l10n.justNow;
-    }
-
-    if (difference.inHours < 1) {
-      return l10n.minutesAgo(difference.inMinutes);
-    }
-
-    if (difference.inDays < 1) {
-      return l10n.hoursAgo(difference.inHours);
-    }
-
-    return l10n.daysAgo(difference.inDays);
   }
 }

@@ -9,6 +9,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../notifications/data/models/notification_settings_filter.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
 import '../../../notifications/presentation/providers/notification_settings_provider.dart';
+import '../../../notifications/presentation/widgets/notification_dropdown.dart';
 import '../../data/models/home_video.dart';
 import '../providers/home_provider.dart';
 import '../providers/main_tab_provider.dart';
@@ -235,11 +236,16 @@ class _HomeHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        _HeaderButton(
-          tooltip: l10n.notifications,
-          icon: Icons.notifications_none_rounded,
-          onTap: onNotificationsTap,
-          showDot: hasUnreadNotifications,
+        Builder(
+          builder: (buttonContext) => _HeaderButton(
+            tooltip: l10n.notifications,
+            icon: Icons.notifications_none_rounded,
+            onTap: () => showNotificationDropdown(
+              buttonContext,
+              onViewAll: onNotificationsTap,
+            ),
+            showDot: hasUnreadNotifications,
+          ),
         ),
       ],
     ),

@@ -2,7 +2,6 @@ import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
 import '../components/language_category_home_section.dart';
-import '../components/word_lists_home_section.dart';
 import '../l10n/web_l10n.dart';
 
 class HomePage extends StatelessComponent {
@@ -26,7 +25,6 @@ class HomePage extends StatelessComponent {
         ]),
       ]),
       LanguageCategoryHomeSection(),
-      WordListsHomeSection(),
     ]);
   }
 }
