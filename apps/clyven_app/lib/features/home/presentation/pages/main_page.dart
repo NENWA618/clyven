@@ -43,8 +43,6 @@ class _MainPageState extends ConsumerState<MainPage> {
 
     final user = ref.watch(authProvider).value;
 
-    // 游客不读取私人通知数据，也不显示未读数。
-    // 但是游客仍然可以进入“回响”页面。
     final notificationsAsync = user == null
         ? null
         : ref.watch(notificationProvider);
@@ -53,7 +51,6 @@ class _MainPageState extends ConsumerState<MainPage> {
         (user == null ? null : ref.watch(notificationSettingsProvider).value) ??
         NotificationSettings(userId: '');
 
-    // 关闭推送后（或某一类型的提醒被关闭），底部导航不再显示对应的未读数。
     final unreadCount = notificationSettings.pushEnabled
         ? notificationsAsync?.value?.where((notification) {
                 return !notification.isRead &&
@@ -65,11 +62,11 @@ class _MainPageState extends ConsumerState<MainPage> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: const [
-          HomePage(),
-          DiscoverPage(),
-          NotificationsPage(),
-          MyProfilePage(),
+        children: [
+          const HomePage(),
+          DiscoverPage(isActive: _selectedIndex == 1),
+          const NotificationsPage(),
+          const MyProfilePage(),
         ],
       ),
 
@@ -77,8 +74,6 @@ class _MainPageState extends ConsumerState<MainPage> {
         selectedIndex: _selectedIndex,
         unreadCount: unreadCount,
 
-        // 导航本身不要求登录。
-        // 游客也可以直接进入“回响”和“我的”。
         onSelected: (index) {
           if (index != _selectedIndex) {
             if (index == 0) ref.invalidate(allPublishedVideosProvider);
@@ -89,8 +84,6 @@ class _MainPageState extends ConsumerState<MainPage> {
           });
         },
 
-        // “发布”属于真正的账号操作，
-        // 所以这里仍然要求登录。
         onCreate: () async {
           final contentType = await showPublishTypeSheet(context);
 
