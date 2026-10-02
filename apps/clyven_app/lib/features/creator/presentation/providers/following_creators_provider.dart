@@ -22,3 +22,23 @@ final followingCreatorsProvider = FutureProvider<List<CreatorProfile>>((
 
   return List.unmodifiable(creators);
 });
+
+final followerCreatorsProvider = FutureProvider<List<CreatorProfile>>((
+  ref,
+) async {
+  final creatorIds = await ref.watch(followerCreatorIdsProvider.future);
+
+  if (creatorIds.isEmpty) {
+    return const [];
+  }
+
+  final repository = ref.read(creatorRepositoryProvider);
+
+  final creators = await Future.wait(
+    creatorIds.map((creatorId) {
+      return repository.loadCreatorProfile(creatorId);
+    }),
+  );
+
+  return List.unmodifiable(creators);
+});
