@@ -154,10 +154,8 @@ class MyProfilePage extends ConsumerWidget {
                 child: _buildLibraryRow(
                   context,
                   l10n,
-                  submissionsTap: login,
                   favoritesTap: login,
                   historyTap: login,
-                  followingTap: login,
                   wordListsTap: login,
                 ),
               ),
@@ -453,18 +451,24 @@ class MyProfilePage extends ConsumerWidget {
               context,
               _count(context, profile.followerCount),
               l10n.followers,
+              onTap: () => _open(
+                context,
+                const FollowingCreatorsPage(showFollowers: true),
+              ),
             ),
             _line(),
             _stat(
               context,
               _count(context, profile.followingCount),
               l10n.followingStat,
+              onTap: () => _open(context, const FollowingCreatorsPage()),
             ),
             _line(),
             _stat(
               context,
               _count(context, profile.videoCount),
               l10n.submissionsStat,
+              onTap: () => _open(context, const MySubmissionsPage()),
             ),
           ],
         ),
@@ -478,16 +482,6 @@ class MyProfilePage extends ConsumerWidget {
       child: _buildLibraryRow(
         context,
         l10n,
-        submissionsTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return const MySubmissionsPage();
-              },
-            ),
-          );
-        },
         favoritesTap: () {
           Navigator.push(
             context,
@@ -504,16 +498,6 @@ class MyProfilePage extends ConsumerWidget {
             MaterialPageRoute(
               builder: (context) {
                 return const WatchHistoryPage();
-              },
-            ),
-          );
-        },
-        followingTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return const FollowingCreatorsPage();
               },
             ),
           );
@@ -535,10 +519,8 @@ class MyProfilePage extends ConsumerWidget {
   Widget _buildLibraryRow(
     BuildContext context,
     AppLocalizations l10n, {
-    required VoidCallback submissionsTap,
     required VoidCallback favoritesTap,
     required VoidCallback historyTap,
-    required VoidCallback followingTap,
     required VoidCallback wordListsTap,
   }) {
     return Column(
@@ -548,27 +530,13 @@ class MyProfilePage extends ConsumerWidget {
             Expanded(
               child: _libraryItem(
                 context: context,
-                icon: Icons.video_library_outlined,
-                title: l10n.submissions,
-                subtitle: l10n.myWorks,
-                onTap: submissionsTap,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _libraryItem(
-                context: context,
                 icon: Icons.bookmark_border_rounded,
                 title: l10n.favorites,
                 subtitle: l10n.savedContent,
                 onTap: favoritesTap,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
+            const SizedBox(width: 10),
             Expanded(
               child: _libraryItem(
                 context: context,
@@ -576,16 +544,6 @@ class MyProfilePage extends ConsumerWidget {
                 title: l10n.history,
                 subtitle: l10n.watchHistory,
                 onTap: historyTap,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _libraryItem(
-                context: context,
-                icon: Icons.people_outline_rounded,
-                title: l10n.followingStat,
-                subtitle: l10n.myChannels,
-                onTap: followingTap,
               ),
             ),
           ],
@@ -782,27 +740,40 @@ class MyProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _stat(BuildContext context, String value, String label) {
+  void _open(BuildContext context, Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  }
+
+  Widget _stat(
+    BuildContext context,
+    String value,
+    String label, {
+    VoidCallback? onTap,
+  }) {
     return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white54, fontSize: 9),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white54, fontSize: 9),
+            ),
+          ],
+        ),
       ),
     );
   }

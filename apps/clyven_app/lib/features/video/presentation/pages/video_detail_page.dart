@@ -21,6 +21,7 @@ import '../../../video_interactions/presentation/providers/video_interaction_pro
 import '../../data/models/video_detail.dart';
 import '../providers/video_detail_provider.dart';
 import '../controllers/global_video_player_controller.dart';
+import '../../../../core/navigation/app_navigator.dart';
 import '../widgets/network_video_player.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
@@ -1281,8 +1282,10 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
+          // The player lives in an overlay above the app Navigator, so push
+          // through the app-level key and shrink the player to reveal it.
+          globalVideoPlayerController.minimize();
+          appNavigatorKey.currentState?.push(
             MaterialPageRoute(
               builder: (context) {
                 return CreatorProfilePage(creatorId: video.authorId);
