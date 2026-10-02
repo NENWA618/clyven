@@ -130,6 +130,17 @@ class SocialEndpoint extends Endpoint {
     return rows.map((row) => row.creatorId).toList(growable: false);
   }
 
+  Future<List<String>> getFollowerIds(Session session) async {
+    final userId = _userId(session);
+    final rows = await CreatorFollow.db.find(
+      session,
+      where: (row) => row.creatorId.equals(userId),
+      orderBy: (row) => row.createdAt,
+      orderDescending: true,
+    );
+    return rows.map((row) => row.followerId).toList(growable: false);
+  }
+
   Future<bool> toggleFavorite(Session session, int videoId) async {
     final userId = _userId(session);
     return session.db.transaction((transaction) async {
