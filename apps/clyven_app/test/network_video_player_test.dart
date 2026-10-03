@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/features/video/presentation/widgets/network_video_player.dart';
+import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,15 +11,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 import 'package:video_player/video_player.dart';
 
+class TestManifestEndpoint implements serverpod.EndpointVideo {
+  @override
+  Future<String?> getPlaybackManifestUrl({required int videoId}) async =>
+      'https://media.example/manifest.m3u8';
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class TestManifestClient implements serverpod.Client {
+  @override
+  final video = TestManifestEndpoint();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class TestVideoPlatform extends VideoPlayerPlatform {
   final events = <int, StreamController<VideoEvent>>{};
   final disposed = <int>[];
+  final played = <int>[];
+  final paused = <int>[];
+  final loopSettings = <bool>[];
+  final sources = <String?>[];
 
   @override
   Future<void> init() async {}
 
   @override
   Future<int?> createWithOptions(VideoCreationOptions options) async {
+    sources.add(options.dataSource.uri);
     final id = events.length + 1;
     events[id] = StreamController<VideoEvent>();
     return id;
@@ -32,13 +56,28 @@ class TestVideoPlatform extends VideoPlayerPlatform {
   }
 
   @override
-  Future<void> setLooping(int playerId, bool looping) async {}
+  Future<void> setLooping(int playerId, bool looping) async {
+    loopSettings.add(looping);
+  }
 
   @override
   Future<void> setVolume(int playerId, double volume) async {}
 
   @override
-  Future<void> pause(int playerId) async {}
+  Future<void> setPlaybackSpeed(int playerId, double speed) async {}
+
+  @override
+  Future<void> pause(int playerId) async {
+    paused.add(playerId);
+  }
+
+  @override
+  Future<void> play(int playerId) async {
+    played.add(playerId);
+  }
+
+  @override
+  Future<Duration> getPosition(int playerId) async => Duration.zero;
 
   @override
   Future<void> seekTo(int playerId, Duration position) async {}
@@ -46,20 +85,26 @@ class TestVideoPlatform extends VideoPlayerPlatform {
   @override
   Widget buildViewWithOptions(VideoViewOptions options) => const SizedBox();
 
-  void ready(int id, {Size size = const Size(640, 360)}) => events[id]!.add(
-    VideoEvent(
-      eventType: VideoEventType.initialized,
-      duration: const Duration(seconds: 60),
-      size: size,
-    ),
-  );
+  void ready(int id, {Size size = const Size(640, 360), int rotation = 0}) =>
+      events[id]!.add(
+        VideoEvent(
+          eventType: VideoEventType.initialized,
+          duration: const Duration(seconds: 60),
+          size: size,
+          rotationCorrection: rotation,
+        ),
+      );
 }
 
 Widget player({
   String url = 'https://media.example/video.mp4',
   bool compact = false,
   double? maxHeight,
+  serverpod.Client? client,
 }) => ProviderScope(
+  overrides: [
+    if (client != null) serverpodClientProvider.overrideWithValue(client),
+  ],
   child: MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
@@ -73,7 +118,7 @@ Widget player({
             ),
             child: NetworkVideoPlayer(
               compact: compact,
-              videoId: null,
+              videoId: client == null ? null : 17,
               videoUrl: url,
               coverUrl: '',
               subtitles: const [],
@@ -104,6 +149,99 @@ void main() {
       await stream.close();
     }
   });
+
+  for (final fallback in [false, true]) {
+    testWidgets(
+      'portrait uses ${fallback ? 'ORIGINAL fallback' : 'HLS'} display ratio',
+      (tester) async {
+        await tester.pumpWidget(
+          player(client: TestManifestClient(), compact: true),
+        );
+        await tester.pump();
+        expect(platform.sources, ['https://media.example/manifest.m3u8']);
+        if (fallback) {
+          platform.events[1]!.addError(
+            PlatformException(code: 'VideoError', message: 'HLS source failed'),
+          );
+          await tester.pump();
+          await tester.pump();
+          expect(platform.sources.last, 'https://media.example/video.mp4');
+        }
+        platform.ready(fallback ? 2 : 1, size: const Size(1080, 1920));
+        await tester.pumpAndSettle();
+        expect(
+          tester.getSize(find.byType(VideoPlayer)).aspectRatio,
+          closeTo(9 / 16, 0.001),
+        );
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      },
+    );
+  }
+
+  for (final source in [const Size(1080, 1920), const Size(1920, 1080)]) {
+    for (final rotation in [0, 90, 180, 270]) {
+      testWidgets(
+        'Shorts contains native display size $source rotation $rotation',
+        (tester) async {
+          const viewport = Size(360, 640);
+          tester.view.devicePixelRatio = 1;
+          tester.view.physicalSize = viewport;
+          addTearDown(tester.view.resetDevicePixelRatio);
+          addTearDown(tester.view.resetPhysicalSize);
+          Widget shorts(bool active) => ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    NetworkVideoPlayer(
+                      videoId: null,
+                      videoUrl: 'https://media.example/portrait.mp4',
+                      coverUrl: '',
+                      subtitles: const [],
+                      initialPositionSeconds: 0,
+                      fallbackDurationSeconds: 60,
+                      compact: true,
+                      shortsMode: true,
+                      autoplay: true,
+                      looping: true,
+                      active: active,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          await tester.pumpWidget(shorts(true));
+          await tester.pump();
+          platform.ready(1, size: source, rotation: rotation);
+          await tester.pumpAndSettle();
+          expect(tester.getSize(find.byType(NetworkVideoPlayer)), viewport);
+          final video = tester.getSize(find.byType(VideoPlayer));
+          expect(video.aspectRatio, closeTo(source.aspectRatio, 0.001));
+          expect(video.width, lessThanOrEqualTo(viewport.width));
+          expect(video.height, lessThanOrEqualTo(viewport.height));
+          expect(find.textContaining('SOURCE='), findsNothing);
+          expect(platform.played, [1]);
+          expect(platform.loopSettings, contains(true));
+          await tester.pumpWidget(shorts(false));
+          await tester.pump();
+          expect(platform.paused.last, 1);
+          await tester.pumpWidget(shorts(true));
+          await tester.pump();
+          expect(platform.played, [1, 1]);
+          expect(platform.events.length, 1);
+          expect(tester.takeException(), isNull);
+          await tester.pumpWidget(const SizedBox());
+          await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+        },
+      );
+    }
+  }
 
   for (final viewport in [
     const Size(360, 640),

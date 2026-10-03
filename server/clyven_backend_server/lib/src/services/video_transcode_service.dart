@@ -5,6 +5,7 @@ import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
 import 'transcode_retry_policy.dart';
+import 'video_transcode_config.dart';
 
 class _TranscodeJobStatus {
   const _TranscodeJobStatus({
@@ -148,11 +149,12 @@ class VideoTranscodeService {
       headers: const {
         'content-type': 'application/json; charset=utf-8',
       },
-      body: jsonEncode({
-        'inputUri': 'gs://$_bucket/$videoStorageKey',
-        'outputUri': 'gs://$_bucket/$outputPrefix',
-        'templateId': 'preset/web-hd',
-      }),
+      body: jsonEncode(
+        buildVideoTranscodeJob(
+          inputUri: 'gs://$_bucket/$videoStorageKey',
+          outputUri: 'gs://$_bucket/$outputPrefix',
+        ),
+      ),
     );
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
