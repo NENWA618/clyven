@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -267,7 +268,11 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     }
   }
 
-  Future<bool> _tryInitializeSource(String source, int generation) async {
+  Future<bool> _tryInitializeSource(
+    String source,
+    int generation, {
+    required String sourceKind,
+  }) async {
     if (!_isGenerationActive(generation)) return false;
 
     final controller = _createController(source);
@@ -292,6 +297,15 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
       controller.addListener(_handleProgress);
       if (widget.autoplay && widget.active) {
         await controller.play();
+      }
+      if (kDebugMode) {
+        final value = controller.value;
+        debugPrint(
+          'PLAYBACK_GEOMETRY videoId=${widget.videoId ?? 'unknown'} '
+          'SOURCE=$sourceKind SIZE=${value.size.width}x${value.size.height} '
+          'ASPECT_RATIO=${value.aspectRatio} '
+          'ROTATION=${value.rotationCorrection}',
+        );
       }
       return true;
     } catch (error, stackTrace) {
@@ -318,7 +332,13 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
       if (!_isGenerationActive(generation)) return false;
       if (manifestUrl == null) continue;
 
-      if (await _tryInitializeSource(manifestUrl, generation)) return true;
+      if (await _tryInitializeSource(
+        manifestUrl,
+        generation,
+        sourceKind: 'HLS',
+      )) {
+        return true;
+      }
     }
     return false;
   }
@@ -329,10 +349,18 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
     var initialized = false;
     if (manifestUrl != null) {
-      initialized = await _tryInitializeSource(manifestUrl, generation);
+      initialized = await _tryInitializeSource(
+        manifestUrl,
+        generation,
+        sourceKind: 'HLS',
+      );
     }
     if (!initialized && _isGenerationActive(generation)) {
-      initialized = await _tryInitializeSource(widget.videoUrl, generation);
+      initialized = await _tryInitializeSource(
+        widget.videoUrl,
+        generation,
+        sourceKind: 'ORIGINAL',
+      );
     }
     if (!initialized && _isGenerationActive(generation)) {
       initialized = await _waitForTranscodedPlayback(generation);
