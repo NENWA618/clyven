@@ -59,20 +59,10 @@ class _MainPageState extends ConsumerState<MainPage> {
               0
         : 0;
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          const HomePage(),
-          DiscoverPage(isActive: _selectedIndex == 1),
-          const NotificationsPage(),
-          const MyProfilePage(),
-        ],
-      ),
-
-      bottomNavigationBar: HomeNavigationDock(
-        selectedIndex: _selectedIndex,
-        unreadCount: unreadCount,
+    final navigationDock = HomeNavigationDock(
+      selectedIndex: _selectedIndex,
+      unreadCount: unreadCount,
+      overlayMode: _selectedIndex == 1,
 
         onSelected: (index) {
           if (index != _selectedIndex) {
@@ -106,7 +96,29 @@ class _MainPageState extends ConsumerState<MainPage> {
             ),
           );
         },
+      );
+
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          IndexedStack(
+            index: _selectedIndex,
+            children: [
+              const HomePage(),
+              DiscoverPage(isActive: _selectedIndex == 1),
+              const NotificationsPage(),
+              const MyProfilePage(),
+            ],
+          ),
+          if (_selectedIndex == 1)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: navigationDock,
+            ),
+        ],
       ),
+      bottomNavigationBar: _selectedIndex == 1 ? null : navigationDock,
     );
   }
 }

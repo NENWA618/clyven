@@ -33,6 +33,7 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
   final bool autoplay;
   final bool looping;
   final bool active;
+  final VoidCallback? onDoubleTap;
   final void Function(Duration position, Duration duration)? onProgress;
 
   const NetworkVideoPlayer({
@@ -56,6 +57,7 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
     this.autoplay = false,
     this.looping = false,
     this.active = true,
+    this.onDoubleTap,
     this.onProgress,
   });
 
@@ -84,6 +86,10 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   OverlayEntry? _fullscreenOverlay;
   Timer? _fullscreenControlsTimer;
   bool _fullscreenControlsVisible = true;
+
+  Timer? _doubleTapHeartTimer;
+  bool _showDoubleTapHeart = false;
+  int _doubleTapHeartSeed = 0;
 
   @override
   void initState() {
@@ -874,6 +880,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
   @override
   void dispose() {
+    _doubleTapHeartTimer?.cancel();
     _closeFullscreen();
     _cancelInitialization();
     _positionTicker?.cancel();
@@ -945,9 +952,39 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: _togglePlay,
+                    onDoubleTap: widget.onDoubleTap == null
+                        ? null
+                        : _handleShortsDoubleTap,
                     child: const SizedBox.expand(),
                   ),
                 ),
+                if (widget.shortsMode && widget.onDoubleTap != null)
+                  IgnorePointer(
+                    child: Center(
+                      child: AnimatedOpacity(
+                        opacity: _showDoubleTapHeart ? 1 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOut,
+                        child: TweenAnimationBuilder<double>(
+                          key: ValueKey('shorts-heart-$_doubleTapHeartSeed'),
+                          tween: Tween<double>(begin: .35, end: 1),
+                          duration: const Duration(milliseconds: 420),
+                          curve: Curves.elasticOut,
+                          builder: (context, scale, child) {
+                            return Transform.scale(scale: scale, child: child);
+                          },
+                          child: const Icon(
+                            Icons.favorite_rounded,
+                            color: Colors.red,
+                            size: 112,
+                            shadows: [
+                              Shadow(color: Colors.black45, blurRadius: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (!widget.compact && widget.onSubtitlesPressed != null)
                   Positioned(
                     right: 10,
@@ -1225,6 +1262,30 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
         ),
       ),
     );
+  }
+
+  void _handleShortsDoubleTap() {
+    final callback = widget.onDoubleTap;
+    if (callback == null) {
+      return;
+    }
+
+    callback();
+
+    _doubleTapHeartTimer?.cancel();
+
+    setState(() {
+      _showDoubleTapHeart = true;
+      _doubleTapHeartSeed++;
+    });
+
+    _doubleTapHeartTimer = Timer(const Duration(milliseconds: 520), () {
+      if (!mounted) return;
+
+      setState(() {
+        _showDoubleTapHeart = false;
+      });
+    });
   }
 
   Future<void> _togglePlay() async {

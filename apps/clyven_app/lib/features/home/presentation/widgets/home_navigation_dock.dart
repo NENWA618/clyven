@@ -8,6 +8,7 @@ class HomeNavigationDock extends StatelessWidget {
   final int unreadCount;
   final ValueChanged<int> onSelected;
   final VoidCallback onCreate;
+  final bool overlayMode;
 
   const HomeNavigationDock({
     super.key,
@@ -15,33 +16,21 @@ class HomeNavigationDock extends StatelessWidget {
     required this.unreadCount,
     required this.onSelected,
     required this.onCreate,
+    this.overlayMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final brandBlue = HomeDesignTokens.brandFor(context);
-    const dockBackground = Color(0xFF171715);
-    const dockBorder = Color(0xFF302E2A);
 
     return SafeArea(
       top: false,
       child: Container(
         height: 76,
-        margin: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-        padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
-        decoration: BoxDecoration(
-          color: dockBackground,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: dockBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: .24),
-              blurRadius: 32,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
+        margin: EdgeInsets.zero,
+        padding: EdgeInsets.zero,
+        decoration: const BoxDecoration(color: Colors.transparent),
         child: Row(
           children: [
             _item(
@@ -118,7 +107,9 @@ class HomeNavigationDock extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final brandBlue = HomeDesignTokens.brandFor(context);
     final selected = selectedIndex == index;
-    const inactive = Color(0xFF9C978F);
+    final inactive = overlayMode
+        ? Colors.white
+        : const Color(0xFF9C978F);
 
     return Expanded(
       child: InkWell(
