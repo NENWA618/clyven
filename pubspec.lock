@@ -289,6 +289,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.1"
+  cronet_http:
+    dependency: transitive
+    description:
+      name: cronet_http
+      sha256: d8aa6c72b4a3b6c9b299a53f0c4e10cfc87961b2c7496e6c9a7216157f9c529c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.10.0"
   cross_file:
     dependency: transitive
     description:
@@ -313,6 +321,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  cupertino_http:
+    dependency: transitive
+    description:
+      name: cupertino_http
+      sha256: d57188b07349a373bec9a78997a80c00e1de08dab0fe454b3f86c84661ac457c
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   cupertino_icons:
     dependency: transitive
     description:
@@ -353,6 +369,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "852ec3b48cc431ac04fff978413c541502b67ffc3e26921e74e3d994694192c1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.11.1"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "3a1b2cd7be71086f38504956e3ebcd2837288d231ff454bafa78021244102bfc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
   email_validator:
     dependency: transitive
     description:
@@ -470,6 +502,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_hls_parser:
+    dependency: transitive
+    description:
+      name: flutter_hls_parser
+      sha256: f4b7df4f927623aea5c72006232693e07fdd11438f600c08670d6a23c1aa85c8
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   flutter_lints:
     dependency: transitive
     description:
@@ -560,6 +600,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_video_caching:
+    dependency: transitive
+    description:
+      name: flutter_video_caching
+      sha256: "37f15a6082b8ed5a51c65455300475ce49e6a6bc717f5dad19937cfa071d7f34"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.6"
   flutter_web_auth_2:
     dependency: transitive
     description:
@@ -750,6 +798,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  http_profile:
+    dependency: transitive
+    description:
+      name: http_profile
+      sha256: "7e679e355b09aaee2ab5010915c932cce3f2d1c11c3b2dc177891687014ffa78"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   image:
     dependency: transitive
     description:
@@ -950,6 +1006,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: "2a0dc097e7b01d942475bdd552356db2d0f768b05540bd4b2b53f1840f2239a7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.8.0"
   logging:
     dependency: transitive
     description:
@@ -1014,6 +1078,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
+  native_dio_adapter:
+    dependency: transitive
+    description:
+      name: native_dio_adapter
+      sha256: "7ca3d04c76095a02c3b0d2e6f3c90e7781373671f7aacad34b81f31074a7369b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.8.0"
+  native_toolchain_c:
+    dependency: transitive
+    description:
+      name: native_toolchain_c
+      sha256: f9c168717100ae6d9fee9ffb0be379bf1f8b26b0f6bcbd4fdddcd931993a6a72
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.2"
   nested:
     dependency: transitive
     description:
@@ -1246,6 +1326,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   record_use:
     dependency: transitive
     description:

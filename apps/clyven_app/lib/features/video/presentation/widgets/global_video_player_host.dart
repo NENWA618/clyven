@@ -87,8 +87,15 @@ class _GlobalVideoPlayerHostState extends State<GlobalVideoPlayerHost>
                   : BorderRadius.circular(14),
               clipBehavior: Clip.antiAlias,
               child: VideoDetailPage(
-                key: ValueKey('global-video-${playerState.videoId}'),
+                key: ValueKey(
+                  'global-video-${playerState.videoId}-'
+                  '${playerState.clipStartMs ?? 'full'}-'
+                  '${playerState.clipEndMs ?? 'full'}',
+                ),
                 videoId: playerState.videoId!,
+                clipStartMs: playerState.clipStartMs,
+                clipEndMs: playerState.clipEndMs,
+                loopClip: playerState.loopClip,
                 hosted: true,
                 miniMode: !playerState.expanded,
                 onMinimize: _controller.minimize,

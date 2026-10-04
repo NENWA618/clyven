@@ -1,3 +1,4 @@
+import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:clyven_app/features/auth/presentation/utils/require_login.dart';
 import 'package:clyven_app/features/comments/presentation/pages/comments_page.dart';
@@ -24,6 +25,49 @@ class DiscoverPage extends ConsumerStatefulWidget {
 class _DiscoverPageState extends ConsumerState<DiscoverPage> {
   final PageController _pageController = PageController();
   int _activeIndex = 0;
+  final Map<String, String> _prewarmedManifestUrls = <String, String>{};
+  final Set<String> _prewarmingVideoIds = <String>{};
+
+  Future<void> _prewarmNextManifest(
+    List<VideoDetail> videos,
+    int currentIndex,
+  ) async {
+    final nextIndex = currentIndex + 1;
+
+    if (!widget.isActive || nextIndex < 0 || nextIndex >= videos.length) {
+      return;
+    }
+
+    final nextVideo = videos[nextIndex];
+    final videoId = int.tryParse(nextVideo.id);
+
+    if (videoId == null ||
+        _prewarmedManifestUrls.containsKey(nextVideo.id) ||
+        !_prewarmingVideoIds.add(nextVideo.id)) {
+      return;
+    }
+
+    try {
+      final client = ref.read(serverpodClientProvider);
+      final manifestUrl = await client.video.getPlaybackManifestUrl(
+        videoId: videoId,
+      );
+      final normalized = manifestUrl?.trim();
+
+      if (!mounted || normalized == null || normalized.isEmpty) {
+        return;
+      }
+
+      setState(() {
+        _prewarmedManifestUrls[nextVideo.id] = normalized;
+      });
+    } catch (_) {
+      // Prewarming is opportunistic. Normal playback still resolves the
+      // manifest itself if this lightweight request fails.
+    } finally {
+      _prewarmingVideoIds.remove(nextVideo.id);
+    }
+  }
 
   @override
   void dispose() {
@@ -55,6 +99,12 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
           if (safeIndex != _activeIndex) {
             _activeIndex = safeIndex;
           }
+          // shorts-initial-prewarm
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _prewarmNextManifest(videos, safeIndex);
+            }
+          });
 
           return PageView.builder(
             controller: _pageController,
@@ -63,12 +113,15 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
             itemCount: videos.length,
             onPageChanged: (index) {
               setState(() => _activeIndex = index);
+              _prewarmNextManifest(videos, index);
             },
             itemBuilder: (context, index) {
               return _ShortPage(
                 key: ValueKey('short-${videos[index].id}'),
                 video: videos[index],
                 active: widget.isActive && index == _activeIndex,
+                preResolvedManifestUrl:
+                    _prewarmedManifestUrls[videos[index].id],
                 l10n: l10n,
               );
             },
@@ -82,12 +135,14 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage> {
 class _ShortPage extends ConsumerWidget {
   final VideoDetail video;
   final bool active;
+  final String? preResolvedManifestUrl;
   final AppLocalizations l10n;
 
   const _ShortPage({
     super.key,
     required this.video,
     required this.active,
+    required this.preResolvedManifestUrl,
     required this.l10n,
   });
 
@@ -107,6 +162,7 @@ class _ShortPage extends ConsumerWidget {
         NetworkVideoPlayer(
           videoId: int.tryParse(video.id),
           videoUrl: video.videoUrl,
+          preResolvedManifestUrl: preResolvedManifestUrl,
           coverUrl: video.coverUrl,
           subtitles: const [],
           initialPositionSeconds: 0,
@@ -241,7 +297,7 @@ class _ShortsHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '短视频',
+          'çŸ­è§†é¢‘',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w900,

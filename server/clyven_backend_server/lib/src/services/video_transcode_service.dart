@@ -69,11 +69,11 @@ class VideoTranscodeService {
     }
 
     final parsed = TranscodeRetryPolicy.parseJobName(currentJobName);
-
-    final expectedManifestKey = TranscodeRetryPolicy.manifestKey(
-      videoId,
-      parsed.attempt,
-    );
+    final persistedManifestKey = video.hlsManifestStorageKey?.trim();
+    final expectedManifestKey =
+        persistedManifestKey != null && persistedManifestKey.isNotEmpty
+        ? persistedManifestKey
+        : TranscodeRetryPolicy.manifestKey(videoId, parsed.attempt);
 
     // 已成功的转码不再重复请求 GCP Transcoder API。
     if (video.transcodeState == 'SUCCEEDED' &&

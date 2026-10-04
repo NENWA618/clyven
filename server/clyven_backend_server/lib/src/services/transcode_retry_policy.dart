@@ -13,20 +13,40 @@ class TranscodeRetryPolicy {
 
   static const int maxRetryAttempts = 3;
 
+  /// Initial media version for newly transcoded videos.
+  ///
+  /// Existing videos are not rewritten. Their already persisted
+  /// hlsManifestStorageKey continues to point at the old path.
+  ///
+  /// New video transcodes use:
+  ///   transcoded/{videoId}/v1/manifest.m3u8
+  ///
+  /// Retry attempts stay inside the same media version:
+  ///   transcoded/{videoId}/v1/retry-1/manifest.m3u8
+  static const int initialMediaVersion = 1;
+
+  static String _versionPrefix(int videoId) {
+    return 'transcoded/$videoId/v$initialMediaVersion/';
+  }
+
   static String manifestKey(int videoId, int attempt) {
+    final base = _versionPrefix(videoId);
+
     if (attempt <= 0) {
-      return 'transcoded/$videoId/manifest.m3u8';
+      return '${base}manifest.m3u8';
     }
 
-    return 'transcoded/$videoId/retry-$attempt/manifest.m3u8';
+    return '${base}retry-$attempt/manifest.m3u8';
   }
 
   static String outputPrefix(int videoId, int attempt) {
+    final base = _versionPrefix(videoId);
+
     if (attempt <= 0) {
-      return 'transcoded/$videoId/';
+      return base;
     }
 
-    return 'transcoded/$videoId/retry-$attempt/';
+    return '${base}retry-$attempt/';
   }
 
   static String encodeJobName(int attempt, String rawJobName) {

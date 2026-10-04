@@ -1,4 +1,10 @@
-/// HLS renditions that preserve the input aspect ratio and rotation metadata.
+/// Builds the Google Cloud Transcoder HLS job used by Clyven.
+///
+/// The master playlist exposes four H.264 renditions so the native player can
+/// use HLS adaptive bitrate playback instead of being locked to one quality.
+///
+/// Only height is fixed. Width is derived from the source aspect ratio, which
+/// keeps portrait Shorts and landscape videos correct.
 Map<String, dynamic> buildVideoTranscodeJob({
   required String inputUri,
   required String outputUri,
@@ -8,17 +14,31 @@ Map<String, dynamic> buildVideoTranscodeJob({
   'config': {
     'elementaryStreams': [
       for (final rendition in [
-        (key: 'video-sd', height: 360, bitrate: 1000000),
-        (key: 'video-hd', height: 720, bitrate: 2500000),
+        (
+          key: 'video-360',
+          height: 360,
+          bitrate: 650000,
+        ),
+        (
+          key: 'video-480',
+          height: 480,
+          bitrate: 1100000,
+        ),
+        (
+          key: 'video-720',
+          height: 720,
+          bitrate: 2200000,
+        ),
+        (
+          key: 'video-1080',
+          height: 1080,
+          bitrate: 4200000,
+        ),
       ])
         {
           'key': rendition.key,
           'videoStream': {
             'h264': {
-              // Do not set both dimensions: that forces the source into a
-              // fixed canvas. Google derives width from the input aspect ratio
-              // and swaps output dimensions for rotation metadata when needed.
-              // https://cloud.google.com/transcoder/docs/reference/rest/v1/JobConfig
               'heightPixels': rendition.height,
               'frameRate': 30,
               'bitrateBps': rendition.bitrate,
@@ -27,23 +47,28 @@ Map<String, dynamic> buildVideoTranscodeJob({
         },
       {
         'key': 'audio',
-        'audioStream': {'codec': 'aac', 'bitrateBps': 128000},
+        'audioStream': {
+          'codec': 'aac',
+          'bitrateBps': 128000,
+        },
       },
     ],
     'muxStreams': [
-      for (final quality in ['sd', 'hd'])
+      for (final quality in ['360', '480', '720', '1080'])
         {
           'key': quality,
           'container': 'ts',
           'elementaryStreams': ['video-$quality', 'audio'],
-          'segmentSettings': {'segmentDuration': '6s'},
+          'segmentSettings': {
+            'segmentDuration': '6s',
+          },
         },
     ],
     'manifests': [
       {
         'fileName': 'manifest.m3u8',
         'type': 'HLS',
-        'muxStreams': ['sd', 'hd'],
+        'muxStreams': ['360', '480', '720', '1080'],
       },
     ],
   },

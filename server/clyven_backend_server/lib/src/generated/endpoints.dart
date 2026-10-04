@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
@@ -2396,6 +2395,31 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'subtitle',
       endpoint: endpoints['subtitle']!,
       methodConnectors: {
+        'searchPublishedCues': _i1.MethodConnector(
+          name: 'searchPublishedCues',
+          params: {
+            'query': _i1.ParameterDescription(
+              name: 'query',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'limit': _i1.ParameterDescription(
+              name: 'limit',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['subtitle'] as _i17.SubtitleEndpoint)
+                  .searchPublishedCues(
+                    session,
+                    query: params['query'],
+                    limit: params['limit'],
+                  ),
+        ),
         'getCueDetails': _i1.MethodConnector(
           name: 'getCueDetails',
           params: {

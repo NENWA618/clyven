@@ -27,6 +27,9 @@ import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
 
 class VideoDetailPage extends ConsumerStatefulWidget {
   final String videoId;
+  final int? clipStartMs;
+  final int? clipEndMs;
+  final bool loopClip;
   final bool hosted;
   final bool miniMode;
   final VoidCallback? onMinimize;
@@ -36,6 +39,9 @@ class VideoDetailPage extends ConsumerStatefulWidget {
   const VideoDetailPage({
     super.key,
     required this.videoId,
+    this.clipStartMs,
+    this.clipEndMs,
+    this.loopClip = false,
     this.hosted = false,
     this.miniMode = false,
     this.onMinimize,
@@ -70,7 +76,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       return;
     }
 
-    // position > 0 代表已经真正开始播放。
+    // position > 0 ä»£è¡¨å·²ç»çœŸæ­£å¼€å§‹æ’­æ”¾ã€‚
     if (position > Duration.zero && !_recordedViewVideoIds.contains(video.id)) {
       _recordedViewVideoIds.add(video.id);
 
@@ -93,7 +99,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       }
     }
 
-    // 5 秒才算 engaged view。
+    // 5 ç§’æ‰ç®— engaged viewã€‚
     if (position.inSeconds >= 5 &&
         !_recordedEngagedViewVideoIds.contains(video.id)) {
       _recordedEngagedViewVideoIds.add(video.id);
@@ -616,6 +622,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       subtitlesEnabled: subtitlesEnabled,
       onSubtitlePositionChanged: onSubtitlePositionChanged,
       onSubtitlesPressed: onSubtitlesPressed,
+      clipStartMs: widget.clipStartMs,
+      clipEndMs: widget.clipEndMs,
+      loopClip: widget.loopClip,
       initialPositionSeconds: initialPositionSeconds,
       fallbackDurationSeconds: video.durationSeconds,
       compact: compact,
@@ -806,7 +815,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '所属系列',
+                        'æ‰€å±žç³»åˆ—',
                         style: TextStyle(
                           color: scheme.onSurfaceVariant,
                           fontSize: 10,
@@ -942,7 +951,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '系列',
+                        'ç³»åˆ—',
                         style: TextStyle(
                           color: scheme.onSurfaceVariant,
                           fontSize: 10,
@@ -974,10 +983,13 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
           Expanded(
             child: videosAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => const Center(child: Text('系列内容加载失败')),
+              error: (_, _) =>
+                  const Center(child: Text('ç³»åˆ—å†…å®¹åŠ è½½å¤±è´¥')),
               data: (videos) {
                 if (videos.isEmpty) {
-                  return const Center(child: Text('这个系列暂时没有视频'));
+                  return const Center(
+                    child: Text('è¿™ä¸ªç³»åˆ—æš‚æ—¶æ²¡æœ‰è§†é¢‘'),
+                  );
                 }
 
                 return ListView.separated(
@@ -1136,7 +1148,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                                     BorderRadius.circular(8),
                                               ),
                                               child: Text(
-                                                '正在播放',
+                                                'æ­£åœ¨æ’­æ”¾',
                                                 style: TextStyle(
                                                   color: scheme.onPrimary,
                                                   fontSize: 9,

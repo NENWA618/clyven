@@ -1,4 +1,5 @@
 import 'package:clyven_app/core/localization/app_locale_provider.dart';
+import 'package:clyven_app/core/media/playback_data_saver_provider.dart';
 import 'package:clyven_app/core/theme/app_theme.dart';
 import 'package:clyven_app/core/theme/app_theme_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
@@ -21,6 +22,7 @@ class SettingsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final selectedLocale = ref.watch(appLocaleProvider);
     final themeSettings = ref.watch(appThemeProvider);
+    final dataSaverEnabled = ref.watch(playbackDataSaverProvider);
     final authAsync = ref.watch(authProvider);
     final isAuthenticated = authAsync.value != null;
     final colors = Theme.of(context).colorScheme;
@@ -76,16 +78,20 @@ class SettingsPage extends ConsumerWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const PrivacyPage()),
+                          MaterialPageRoute(
+                            builder: (_) => const PrivacyPage(),
+                          ),
                         );
                       },
                     ),
                   ] else
                     _SettingsItem(
                       icon: Icons.login_rounded,
-                      title: isZh ? '登录 / 注册' : 'Sign in / Register',
+                      title: isZh
+                          ? '\u767b\u5f55 / \u6ce8\u518c'
+                          : 'Sign in / Register',
                       subtitle: isZh
-                          ? '登录后管理账号与个人资料'
+                          ? '\u767b\u5f55\u540e\u7ba1\u7406\u8d26\u53f7\u4e0e\u4e2a\u4eba\u8d44\u6599'
                           : 'Sign in to manage your account and profile',
                       onTap: () async {
                         await requireLogin(context, ref);
@@ -111,14 +117,14 @@ class SettingsPage extends ConsumerWidget {
                     icon: isNight
                         ? Icons.dark_mode_rounded
                         : Icons.light_mode_rounded,
-                    title: isZh ? '深夜模式' : 'Night mode',
+                    title: isZh ? '\u6df1\u591c\u6a21\u5f0f' : 'Night mode',
                     subtitle: isNight
                         ? (isZh
-                              ? '已开启 · 使用 Clyven 深色背景'
-                              : 'On 路 Clyven dark background')
+                              ? '\u5df2\u5f00\u542f \u00b7 \u4f7f\u7528 Clyven \u6df1\u8272\u80cc\u666f'
+                              : 'On - Clyven dark background')
                         : (isZh
-                              ? '白天模式 · 保持 F4F1EA 背景'
-                              : 'Day mode 路 Keep the F4F1EA background'),
+                              ? '\u767d\u5929\u6a21\u5f0f \u00b7 \u4fdd\u6301 F4F1EA \u80cc\u666f'
+                              : 'Day mode - Keep the F4F1EA background'),
                     onTap: () {
                       ref
                           .read(appThemeProvider.notifier)
@@ -138,6 +144,33 @@ class SettingsPage extends ConsumerWidget {
                                   ? ClyvenDisplayMode.night
                                   : ClyvenDisplayMode.day,
                             );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _SettingsItem(
+                    icon: Icons.data_saver_on_rounded,
+                    title: isZh
+                        ? '\u7701\u6d41\u91cf\u6a21\u5f0f'
+                        : 'Data Saver',
+                    subtitle: dataSaverEnabled
+                        ? (isZh
+                              ? '\u5df2\u5f00\u542f \u00b7 \u65b0\u89c6\u9891\u4f18\u5148\u4f7f\u7528 360p'
+                              : 'On - New playback prefers 360p')
+                        : (isZh
+                              ? '\u5df2\u5173\u95ed \u00b7 \u4f7f\u7528\u81ea\u52a8\u753b\u8d28'
+                              : 'Off - Adaptive quality'),
+                    onTap: () {
+                      ref
+                          .read(playbackDataSaverProvider.notifier)
+                          .setEnabled(!dataSaverEnabled);
+                    },
+                    trailing: Switch(
+                      value: dataSaverEnabled,
+                      onChanged: (enabled) {
+                        ref
+                            .read(playbackDataSaverProvider.notifier)
+                            .setEnabled(enabled);
                       },
                     ),
                   ),
@@ -183,11 +216,11 @@ class SettingsPage extends ConsumerWidget {
                       child: OutlinedButton(
                         onPressed: () async {
                           await ref.read(authProvider.notifier).logout();
-  
+
                           if (!context.mounted) {
                             return;
                           }
-  
+
                           Navigator.pop(context);
                         },
                         style: OutlinedButton.styleFrom(
@@ -518,4 +551,3 @@ class _SettingsItem extends StatelessWidget {
     );
   }
 }
-

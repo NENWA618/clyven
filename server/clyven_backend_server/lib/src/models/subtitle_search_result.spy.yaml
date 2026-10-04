@@ -1,0 +1,11 @@
+﻿class: SubtitleSearchResult
+
+fields:
+  videoId: int
+  videoTitle: String
+  authorName: String
+  languageCode: String
+  cueId: int?
+  startMs: int
+  endMs: int
+  text: String

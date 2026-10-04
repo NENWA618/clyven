@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clyven_app/core/media/video_cache_adapter.dart';
+import '../../../../core/media/media_delivery_url.dart';
+import 'package:clyven_app/core/media/playback_data_saver_provider.dart';
 import 'package:clyven_app/core/serverpod/serverpod_client_provider.dart';
 import 'package:clyven_app/l10n/app_localizations.dart';
 import 'package:clyven_backend_client/clyven_backend_client.dart' as serverpod;
@@ -8,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_video_caching/flutter_video_caching.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/serverpod/feed_diagnostics.dart';
@@ -16,6 +20,7 @@ import 'interactive_subtitle_overlay.dart';
 class NetworkVideoPlayer extends ConsumerStatefulWidget {
   final int? videoId;
   final String videoUrl;
+  final String? preResolvedManifestUrl;
   final String coverUrl;
   final List<serverpod.SubtitleCueDetail> subtitles;
   final List<serverpod.SubtitleCueDetail> secondarySubtitles;
@@ -26,6 +31,9 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
   final bool subtitlesEnabled;
   final ValueChanged<int>? onSubtitlePositionChanged;
   final VoidCallback? onSubtitlesPressed;
+  final int? clipStartMs;
+  final int? clipEndMs;
+  final bool loopClip;
   final int initialPositionSeconds;
   final int fallbackDurationSeconds;
   final bool compact;
@@ -40,6 +48,7 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
     super.key,
     required this.videoId,
     required this.videoUrl,
+    this.preResolvedManifestUrl,
     required this.coverUrl,
     required this.subtitles,
     this.secondarySubtitles = const <serverpod.SubtitleCueDetail>[],
@@ -50,6 +59,9 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
     this.subtitlesEnabled = true,
     this.onSubtitlePositionChanged,
     this.onSubtitlesPressed,
+    this.clipStartMs,
+    this.clipEndMs,
+    this.loopClip = false,
     required this.initialPositionSeconds,
     required this.fallbackDurationSeconds,
     this.compact = false,
@@ -67,7 +79,8 @@ class NetworkVideoPlayer extends ConsumerStatefulWidget {
   }
 }
 
-class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
+class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
+    with WidgetsBindingObserver {
   late VideoPlayerController _controller;
   late Future<void> _initializeFuture;
   bool _controllerCreated = false;
@@ -83,6 +96,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   Timer? _positionTicker;
   Duration _fallbackBasePosition = Duration.zero;
   int _lastSavedSecond = -1;
+  bool _clipSeekInProgress = false;
   OverlayEntry? _fullscreenOverlay;
   Timer? _fullscreenControlsTimer;
   bool _fullscreenControlsVisible = true;
@@ -94,7 +108,12 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    _startPlayer();
+    WidgetsBinding.instance.addObserver(this);
+    if (!widget.shortsMode || widget.active) {
+      _startPlayer();
+    } else {
+      _initializeFuture = Future<void>.value();
+    }
   }
 
   void _startPlayer() {
@@ -193,15 +212,59 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     _startPlayer();
   }
 
+  void _deactivateShortsPlayer() {
+    _closeFullscreen();
+    _cancelInitialization();
+    ++_generation;
+    _releaseCurrentController();
+
+    _positionTicker?.cancel();
+    _positionTicker = null;
+
+    _fallbackClock
+      ..stop()
+      ..reset();
+
+    _fallbackBasePosition = Duration.zero;
+    _lastSavedSecond = -1;
+
+    _initializeFuture = Future<void>.value();
+
+    feedDiagnostic(
+      'PLAYBACK_SHORTS_RELEASED postId=${widget.videoId ?? 'unknown'}',
+    );
+  }
+
   @override
   void didUpdateWidget(covariant NetworkVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.shortsMode && widget.active != oldWidget.active) {
+      if (widget.active) {
+        if (!_controllerCreated) {
+          _startPlayer();
+        }
+      } else {
+        _deactivateShortsPlayer();
+      }
+      return;
+    }
     if (widget.videoUrl != oldWidget.videoUrl ||
         widget.videoId != oldWidget.videoId) {
-      _resetPlayer();
+      if (widget.shortsMode && !widget.active) {
+        _deactivateShortsPlayer();
+      } else {
+        _resetPlayer();
+      }
       return;
     }
 
+    if (widget.clipStartMs != oldWidget.clipStartMs ||
+        widget.clipEndMs != oldWidget.clipEndMs ||
+        widget.loopClip != oldWidget.loopClip) {
+      if (_controllerCreated && _controller.value.isInitialized) {
+        unawaited(_applyClipStartIfNeeded());
+      }
+    }
     if (widget.looping != oldWidget.looping &&
         _controllerCreated &&
         _controller.value.isInitialized) {
@@ -242,13 +305,86 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
         source.startsWith('http://') || source.startsWith('https://');
 
     if (isNetworkVideo) {
-      return VideoPlayerController.networkUrl(Uri.parse(source));
+      return VideoPlayerController.networkUrl(resolveCachedVideoUri(source));
     }
 
     return VideoPlayerController.file(File(source));
   }
 
+  String _variantManifestUrl(String masterUrl, String fileName) {
+    final uri = Uri.tryParse(masterUrl);
+    if (uri == null || uri.pathSegments.isEmpty) return masterUrl;
+
+    final segments = List<String>.of(uri.pathSegments);
+    segments[segments.length - 1] = fileName;
+    return uri.replace(pathSegments: segments).toString();
+  }
+
+  Future<bool> _remoteMediaExists(String source) async {
+    final uri = Uri.tryParse(source);
+    if (uri == null || (uri.scheme != 'http' && uri.scheme != 'https')) {
+      return false;
+    }
+
+    HttpClient? client;
+
+    try {
+      client = HttpClient()..connectionTimeout = const Duration(seconds: 3);
+
+      final request = await client
+          .headUrl(uri)
+          .timeout(const Duration(seconds: 3));
+
+      final response = await request.close().timeout(
+        const Duration(seconds: 3),
+      );
+
+      await response.drain<void>();
+
+      return response.statusCode >= 200 && response.statusCode < 400;
+    } catch (_) {
+      return false;
+    } finally {
+      client?.close(force: true);
+    }
+  }
+
+  Future<String?> _resolveDataSaverManifest(String masterUrl) async {
+    final deliveryMasterUrl = resolveMediaDeliveryUrl(masterUrl);
+    final candidates = <String>[
+      _variantManifestUrl(deliveryMasterUrl, '360.m3u8'),
+      _variantManifestUrl(deliveryMasterUrl, 'sd.m3u8'),
+    ];
+
+    for (final candidate in candidates) {
+      if (candidate == deliveryMasterUrl) continue;
+
+      final exists = await _remoteMediaExists(candidate);
+      final candidateName =
+          Uri.tryParse(candidate)?.pathSegments.last ?? candidate;
+
+      feedDiagnostic(
+        'PLAYBACK_DATA_SAVER_PROBE '
+        'postId=${widget.videoId ?? 'unknown'} '
+        'candidate=$candidateName '
+        'exists=$exists',
+      );
+
+      if (exists) return candidate;
+    }
+
+    return null;
+  }
+
   Future<String?> _fetchPlaybackManifestUrl() async {
+    final preResolved = widget.preResolvedManifestUrl?.trim();
+
+    if (preResolved != null && preResolved.isNotEmpty) {
+      feedDiagnostic(
+        'PREWARMED_MANIFEST postId=${widget.videoId ?? 'unknown'}',
+      );
+      return preResolved;
+    }
     final videoId = widget.videoId;
 
     if (videoId == null) {
@@ -280,11 +416,49 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     required String sourceKind,
   }) async {
     if (!_isGenerationActive(generation)) return false;
+    final deliverySource = resolveMediaDeliveryUrl(source);
 
-    final controller = _createController(source);
+    feedDiagnostic(
+      'PLAYBACK_MEDIA_DELIVERY '
+      'postId=${widget.videoId ?? 'unknown'} '
+      'host=${Uri.tryParse(deliverySource)?.host ?? 'invalid'} '
+      'rewritten=${deliverySource != source}',
+    );
+
+    if (kDebugMode || const bool.fromEnvironment('CLYVEN_FEED_DIAGNOSTICS')) {
+      if (sourceKind == 'HLS') {
+        final cached1 = await VideoCaching.isCached(
+          deliverySource,
+          cacheSegments: 1,
+        );
+        final cached2 = await VideoCaching.isCached(
+          deliverySource,
+          cacheSegments: 2,
+        );
+        final cached4 = await VideoCaching.isCached(
+          deliverySource,
+          cacheSegments: 4,
+        );
+        final storageBytes = await videoCacheStorageBytes();
+
+        feedDiagnostic(
+          'PLAYBACK_CACHE_STATE '
+          'postId=${widget.videoId ?? 'unknown'} '
+          'seg1=$cached1 seg2=$cached2 seg4=$cached4 '
+          'storageBytes=$storageBytes',
+        );
+      }
+    }
+    final controller = _createController(deliverySource);
     _controller = controller;
     _controllerCreated = true;
     _initializationStage = 'native_initialize';
+    feedDiagnostic(
+      'PLAYBACK_CACHE_POLICY '
+      'postId=${widget.videoId ?? 'unknown'} '
+      'sourceKind=$sourceKind '
+      'cache=${sourceKind.startsWith('HLS') ? 'enabled' : 'bypass'}',
+    );
 
     try {
       await controller.initialize();
@@ -300,6 +474,10 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
         return false;
       }
 
+      feedDiagnostic(
+        'PLAYBACK_SOURCE_READY postId=${widget.videoId ?? 'unknown'} '
+        'sourceKind=$sourceKind',
+      );
       controller.addListener(_handleProgress);
       if (widget.autoplay && widget.active) {
         await controller.play();
@@ -338,6 +516,35 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
       if (!_isGenerationActive(generation)) return false;
       if (manifestUrl == null) continue;
 
+      final dataSaverEnabled = ref.read(playbackDataSaverProvider);
+
+      if (dataSaverEnabled) {
+        final saverUrl = await _resolveDataSaverManifest(manifestUrl);
+
+        if (!_isGenerationActive(generation)) return false;
+
+        if (saverUrl != null) {
+          final variant =
+              Uri.tryParse(saverUrl)?.pathSegments.last ?? 'unknown';
+
+          feedDiagnostic(
+            'PLAYBACK_DATA_SAVER_RETRY '
+            'postId=${widget.videoId ?? 'unknown'} '
+            'variant=$variant',
+          );
+
+          if (await _tryInitializeSource(
+            saverUrl,
+            generation,
+            sourceKind: variant == '360.m3u8' ? 'HLS_360' : 'HLS_SD',
+          )) {
+            return true;
+          }
+
+          if (!_isGenerationActive(generation)) return false;
+        }
+      }
+
       if (await _tryInitializeSource(
         manifestUrl,
         generation,
@@ -355,11 +562,44 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
     var initialized = false;
     if (manifestUrl != null) {
-      initialized = await _tryInitializeSource(
-        manifestUrl,
-        generation,
-        sourceKind: 'HLS',
-      );
+      final dataSaverEnabled = ref.read(playbackDataSaverProvider);
+
+      if (dataSaverEnabled) {
+        final saverUrl = await _resolveDataSaverManifest(manifestUrl);
+
+        if (!_isGenerationActive(generation)) return;
+
+        if (saverUrl != null) {
+          final variant =
+              Uri.tryParse(saverUrl)?.pathSegments.last ?? 'unknown';
+
+          feedDiagnostic(
+            'PLAYBACK_DATA_SAVER '
+            'postId=${widget.videoId ?? 'unknown'} '
+            'variant=$variant',
+          );
+
+          initialized = await _tryInitializeSource(
+            saverUrl,
+            generation,
+            sourceKind: variant == '360.m3u8' ? 'HLS_360' : 'HLS_SD',
+          );
+        } else {
+          feedDiagnostic(
+            'PLAYBACK_DATA_SAVER_FALLBACK '
+            'postId=${widget.videoId ?? 'unknown'} '
+            'reason=no_variant',
+          );
+        }
+      }
+
+      if (!initialized && _isGenerationActive(generation)) {
+        initialized = await _tryInitializeSource(
+          manifestUrl,
+          generation,
+          sourceKind: 'HLS',
+        );
+      }
     }
     if (!initialized && _isGenerationActive(generation)) {
       initialized = await _tryInitializeSource(
@@ -380,6 +620,16 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     }
 
     final duration = _effectiveDuration();
+
+    if (_hasClipRange) {
+      await _applyClipStartIfNeeded();
+      feedDiagnostic(
+        'PLAYBACK_CLIP_START postId=${widget.videoId ?? 'unknown'} '
+        'startMs=${widget.clipStartMs} endMs=${widget.clipEndMs}',
+      );
+      return;
+    }
+
     final savedPosition = widget.initialPositionSeconds;
     if (savedPosition <= 0) {
       _fallbackBasePosition = Duration.zero;
@@ -394,6 +644,99 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     _fallbackBasePosition = position;
     _initializationStage = 'restore_position';
     await _controller.seekTo(position);
+  }
+
+  Duration? get _clipStart {
+    final value = widget.clipStartMs;
+    if (value == null || value < 0) {
+      return null;
+    }
+    return Duration(milliseconds: value);
+  }
+
+  Duration? get _clipEnd {
+    final value = widget.clipEndMs;
+    final start = widget.clipStartMs;
+
+    if (value == null || value <= 0) {
+      return null;
+    }
+
+    if (start != null && value <= start) {
+      return null;
+    }
+
+    return Duration(milliseconds: value);
+  }
+
+  bool get _hasClipRange => _clipStart != null && _clipEnd != null;
+
+  Future<void> _applyClipStartIfNeeded() async {
+    final start = _clipStart;
+
+    if (start == null ||
+        !_controllerCreated ||
+        !_controller.value.isInitialized) {
+      return;
+    }
+
+    _fallbackBasePosition = start;
+    await _controller.seekTo(start);
+  }
+
+  Future<void> _handleClipBoundary(Duration position) async {
+    if (!_hasClipRange || _clipSeekInProgress) {
+      return;
+    }
+
+    final start = _clipStart!;
+    final end = _clipEnd!;
+
+    if (position < end) {
+      return;
+    }
+
+    _clipSeekInProgress = true;
+
+    try {
+      if (widget.loopClip) {
+        _fallbackBasePosition = start;
+        _fallbackClock
+          ..stop()
+          ..reset();
+
+        await _controller.seekTo(start);
+
+        if (widget.active && widget.autoplay) {
+          await _controller.play();
+
+          if (_needsFallbackPosition) {
+            _fallbackClock.start();
+            _startPositionTicker();
+          }
+        }
+
+        feedDiagnostic(
+          'PLAYBACK_CLIP_LOOP postId=${widget.videoId ?? 'unknown'} '
+          'startMs=${widget.clipStartMs} endMs=${widget.clipEndMs}',
+        );
+      } else {
+        await _controller.pause();
+        await _controller.seekTo(end);
+
+        _fallbackBasePosition = end;
+        _fallbackClock
+          ..stop()
+          ..reset();
+
+        feedDiagnostic(
+          'PLAYBACK_CLIP_END postId=${widget.videoId ?? 'unknown'} '
+          'endMs=${widget.clipEndMs}',
+        );
+      }
+    } finally {
+      _clipSeekInProgress = false;
+    }
   }
 
   Duration _effectiveDuration() {
@@ -469,6 +812,9 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
     }
 
     final position = _effectivePosition();
+    if (_hasClipRange) {
+      unawaited(_handleClipBoundary(position));
+    }
 
     widget.onSubtitlePositionChanged?.call(position.inMilliseconds);
     final duration = _effectiveDuration();
@@ -879,7 +1225,40 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (!_controllerCreated || !_controller.value.isInitialized) {
+      return;
+    }
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (widget.active && widget.autoplay) {
+          unawaited(_controller.play());
+          feedDiagnostic(
+            'PLAYBACK_APP_RESUMED postId=${widget.videoId ?? 'unknown'}',
+          );
+        }
+        break;
+
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        if (_controller.value.isPlaying) {
+          unawaited(_controller.pause());
+        }
+        feedDiagnostic(
+          'PLAYBACK_APP_PAUSED postId=${widget.videoId ?? 'unknown'} state=${state.name}',
+        );
+        break;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _doubleTapHeartTimer?.cancel();
     _closeFullscreen();
     _cancelInitialization();
@@ -892,6 +1271,9 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.shortsMode && !widget.active && !_controllerCreated) {
+      return _buildLoadingCover();
+    }
     final accent = Theme.of(context).colorScheme.primary;
     final isPhoneSubtitleLayout = MediaQuery.sizeOf(context).width < 600;
 

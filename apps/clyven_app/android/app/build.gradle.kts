@@ -43,3 +43,15 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// CLYVEN_CRONET_NAMESPACE_FIX
+// Cronet 141.7340.3 ships cronet-api / cronet-shared with the same Android
+// namespace, which AGP 9 rejects. Force the fixed 143.7445.0 artifacts.
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.chromium.net") {
+            useVersion("143.7445.0")
+            because("Cronet 141 has duplicate Android namespaces under AGP 9")
+        }
+    }
+}

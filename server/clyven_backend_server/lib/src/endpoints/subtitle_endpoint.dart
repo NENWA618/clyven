@@ -14,7 +14,7 @@ class SubtitleEndpoint extends Endpoint {
     final auth = session.authenticated;
 
     if (auth == null) {
-      throw Exception('éœ€è¦ç™»å½• Clyven Studio');
+      throw Exception('Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢ Clyven Studio');
     }
 
     return auth.userIdentifier.toString();
@@ -32,7 +32,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¨Â§â€ Ã©Â¢â€˜');
     }
 
     final auth = session.authenticated!;
@@ -42,7 +42,9 @@ class SubtitleEndpoint extends Endpoint {
     }
 
     if (video.authorId != userId) {
-      throw Exception('åªèƒ½ç¼–è¾‘è‡ªå·±è´¦å·åä¸‹çš„è§†é¢‘');
+      throw Exception(
+        'Ã¥ÂÂªÃ¨Æ’Â½Ã§Â¼â€“Ã¨Â¾â€˜Ã¨â€¡ÂªÃ¥Â·Â±Ã¨Â´Â¦Ã¥ÂÂ·Ã¥ÂÂÃ¤Â¸â€¹Ã§Å¡â€žÃ¨Â§â€ Ã©Â¢â€˜',
+      );
     }
 
     return video;
@@ -58,7 +60,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -67,13 +69,148 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
     }
 
     return _requireOwnedVideo(
       session,
       track.videoId,
     );
+  }
+
+  /// Searches subtitle cues that are safe for public discovery.
+  ///
+  /// Rules:
+  /// - only public + published videos are searchable;
+  /// - when a subtitle track has a published snapshot, search that snapshot;
+  /// - tracks without a publish-state row follow the existing legacy behavior
+  ///   and use their current live cues;
+  /// - draft edits are never substituted for an existing published snapshot.
+  ///
+  /// This first implementation intentionally reuses the existing subtitle
+  /// publication model. It does not create independent clip media files.
+  Future<List<SubtitleSearchResult>> searchPublishedCues(
+    Session session, {
+    required String query,
+    int limit = 30,
+  }) async {
+    final normalizedQuery = query.trim().toLowerCase();
+
+    if (normalizedQuery.isEmpty || limit <= 0) {
+      return [];
+    }
+
+    final safeLimit = limit.clamp(1, 100);
+
+    final videos = await Video.db.find(
+      session,
+      where: (video) =>
+          video.isPublic.equals(true) &
+          video.status.equals(VideoStatus.published),
+    );
+
+    if (videos.isEmpty) {
+      return [];
+    }
+
+    final videosById = <int, Video>{
+      for (final video in videos)
+        if (video.id != null) video.id!: video,
+    };
+
+    if (videosById.isEmpty) {
+      return [];
+    }
+
+    final tracks = await SubtitleTrack.db.find(
+      session,
+      where: (track) => track.videoId.inSet(videosById.keys.toSet()),
+    );
+
+    if (tracks.isEmpty) {
+      return [];
+    }
+
+    final trackIds = tracks.map((track) => track.id).whereType<int>().toSet();
+
+    final publishStates = trackIds.isEmpty
+        ? <SubtitlePublishState>[]
+        : await SubtitlePublishState.db.find(
+            session,
+            where: (state) => state.trackId.inSet(trackIds),
+          );
+
+    final publishStateByTrackId = <int, SubtitlePublishState>{
+      for (final state in publishStates) state.trackId: state,
+    };
+
+    final results = <SubtitleSearchResult>[];
+
+    for (final track in tracks) {
+      if (results.length >= safeLimit) {
+        break;
+      }
+
+      final trackId = track.id;
+      final video = videosById[track.videoId];
+
+      if (trackId == null || video == null) {
+        continue;
+      }
+
+      final publishState = publishStateByTrackId[trackId];
+      late final List<SubtitleCueDetail> details;
+
+      if (publishState != null) {
+        final payload = publishState.publishedPayload;
+
+        if (payload == null || payload.trim().isEmpty) {
+          continue;
+        }
+
+        details = await _publishedDetailsFromPayload(
+          session,
+          track: track,
+          payload: payload,
+          requestedScriptCode: null,
+        );
+      } else {
+        // Legacy tracks created before explicit publish snapshots existed.
+        details = await getCueDetails(
+          session,
+          videoId: track.videoId,
+          languageCode: track.languageCode,
+        );
+      }
+
+      for (final detail in details) {
+        final cue = detail.cue;
+        final text = cue.text.trim();
+
+        if (text.isEmpty || !text.toLowerCase().contains(normalizedQuery)) {
+          continue;
+        }
+
+        results.add(
+          SubtitleSearchResult(
+            videoId: track.videoId,
+            videoTitle: video.title,
+            authorName: video.authorName,
+            languageCode: track.languageCode,
+            cueId: cue.id,
+            startMs: cue.startMs,
+            endMs: cue.endMs,
+            text: text,
+          ),
+        );
+
+        if (results.length >= safeLimit) {
+          break;
+        }
+      }
+    }
+
+    return results;
   }
 
   Future<List<SubtitleCueDetail>> getCueDetails(
@@ -325,7 +462,9 @@ class SubtitleEndpoint extends Endpoint {
     await _requireOwnedVideo(session, videoId);
 
     if (session.authenticated == null) {
-      throw Exception('éœ€è¦ç™»å½• Studio åŽæ‰èƒ½å‘å¸ƒå­—å¹•');
+      throw Exception(
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢ Studio Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¥Ââ€˜Ã¥Â¸Æ’Ã¥Â­â€”Ã¥Â¹â€¢',
+      );
     }
 
     final track = await SubtitleTrack.db.findFirstRow(
@@ -334,13 +473,16 @@ class SubtitleEndpoint extends Endpoint {
           t.videoId.equals(videoId) & t.languageCode.equals(languageCode),
     );
     if (track == null || track.id == null)
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
 
     final cue = await SubtitleCue.db.findFirstRow(
       session,
       where: (c) => c.trackId.equals(track.id!),
     );
-    if (cue == null) throw Exception('å½“å‰å­—å¹•è½¨æ²¡æœ‰å¯å‘å¸ƒçš„å­—å¹•');
+    if (cue == null)
+      throw Exception(
+        'Ã¥Â½â€œÃ¥â€°ÂÃ¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨Ã¦Â²Â¡Ã¦Å“â€°Ã¥ÂÂ¯Ã¥Ââ€˜Ã¥Â¸Æ’Ã§Å¡â€žÃ¥Â­â€”Ã¥Â¹â€¢',
+      );
 
     final payload = await _buildPublishedPayload(session, track);
     var state = await SubtitlePublishState.db.findFirstRow(
@@ -433,7 +575,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å…¥å­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¥Â¯Â¼Ã¥â€¦Â¥Ã¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -443,7 +585,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¨Â§â€ Ã©Â¢â€˜');
     }
 
     final parser = SubtitleSrtParser();
@@ -480,7 +622,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å…¥å­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¥Â¯Â¼Ã¥â€¦Â¥Ã¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -490,7 +632,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (video == null) {
-      throw Exception('æ‰¾ä¸åˆ°è§†é¢‘');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¨Â§â€ Ã©Â¢â€˜');
     }
 
     final parser = SubtitleSrtParser();
@@ -510,15 +652,15 @@ class SubtitleEndpoint extends Endpoint {
 
     if (!result.canImport) {
       throw Exception(
-        'SRT å­˜åœ¨ '
+        'SRT Ã¥Â­ËœÃ¥Å“Â¨ '
         '${result.errors.length} '
-        'ä¸ªé”™è¯¯ï¼Œæ— æ³•å¯¼å…¥',
+        'Ã¤Â¸ÂªÃ©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å’Ã¦â€”Â Ã¦Â³â€¢Ã¥Â¯Â¼Ã¥â€¦Â¥',
       );
     }
 
     if (result.cues.isEmpty) {
       throw Exception(
-        'SRT ä¸­æ²¡æœ‰å¯å¯¼å…¥çš„å­—å¹•',
+        'SRT Ã¤Â¸Â­Ã¦Â²Â¡Ã¦Å“â€°Ã¥ÂÂ¯Ã¥Â¯Â¼Ã¥â€¦Â¥Ã§Å¡â€žÃ¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -700,7 +842,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½å¯¼å‡ºå­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¥Â¯Â¼Ã¥â€¡ÂºÃ¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -714,7 +856,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null || track.id == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
     }
 
     final cues = await SubtitleCue.db.find(
@@ -725,7 +867,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (cues.isEmpty) {
       throw Exception(
-        'å½“å‰å­—å¹•è½¨æ²¡æœ‰å¯å¯¼å‡ºçš„å­—å¹•',
+        'Ã¥Â½â€œÃ¥â€°ÂÃ¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨Ã¦Â²Â¡Ã¦Å“â€°Ã¥ÂÂ¯Ã¥Â¯Â¼Ã¥â€¡ÂºÃ§Å¡â€žÃ¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -746,7 +888,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹å­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¤Â¿Â®Ã¦â€Â¹Ã¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -754,7 +896,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (normalizedText.isEmpty) {
       throw Exception(
-        'å­—å¹•å†…å®¹ä¸èƒ½ä¸ºç©º',
+        'Ã¥Â­â€”Ã¥Â¹â€¢Ã¥â€ â€¦Ã¥Â®Â¹Ã¤Â¸ÂÃ¨Æ’Â½Ã¤Â¸ÂºÃ§Â©Âº',
       );
     }
 
@@ -764,7 +906,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -957,19 +1099,19 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹å­—å¹•æ—¶é—´',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¤Â¿Â®Ã¦â€Â¹Ã¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€”Â´',
       );
     }
 
     if (startMs < 0) {
       throw Exception(
-        'å¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
+        'Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½ 0',
       );
     }
 
     if (endMs <= startMs) {
       throw Exception(
-        'ç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
+        'Ã§Â»â€œÃ¦ÂÅ¸Ã¦â€”Â¶Ã©â€”Â´Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Â¤Â§Ã¤ÂºÅ½Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´',
       );
     }
 
@@ -979,7 +1121,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
     }
 
     await _ensurePublishBaseline(session, cue.trackId);
@@ -1002,7 +1144,7 @@ class SubtitleEndpoint extends Endpoint {
     for (final segment in karaokeSegments) {
       if (segment.endOffsetMs > newDurationMs) {
         throw Exception(
-          'Karaoke ç‰‡æ®µè¶…å‡ºæ–°çš„å­—å¹•æ—¶é•¿ï¼Œè¯·å…ˆè°ƒæ•´ Karaoke æ—¶é—´ã€‚',
+          'Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¨Â¶â€¦Ã¥â€¡ÂºÃ¦â€“Â°Ã§Å¡â€žÃ¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€¢Â¿Ã¯Â¼Å’Ã¨Â¯Â·Ã¥â€¦Ë†Ã¨Â°Æ’Ã¦â€¢Â´ Karaoke Ã¦â€”Â¶Ã©â€”Â´Ã£â‚¬â€š',
         );
       }
     }
@@ -1042,7 +1184,7 @@ class SubtitleEndpoint extends Endpoint {
 
       if (overlaps) {
         throw Exception(
-          'å­—å¹•æ—¶é—´ä¸ŽçŽ°æœ‰å­—å¹•é‡å ï¼š'
+          'Ã¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€”Â´Ã¤Â¸Å½Ã§Å½Â°Ã¦Å“â€°Ã¥Â­â€”Ã¥Â¹â€¢Ã©â€¡ÂÃ¥ÂÂ Ã¯Â¼Å¡'
           '${existing.startMs}ms - '
           '${existing.endMs}ms',
         );
@@ -1063,25 +1205,25 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½æ–°å¢žå­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¦â€“Â°Ã¥Â¢Å¾Ã¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
     if (text.trim().isEmpty) {
       throw Exception(
-        'å­—å¹•å†…å®¹ä¸èƒ½ä¸ºç©º',
+        'Ã¥Â­â€”Ã¥Â¹â€¢Ã¥â€ â€¦Ã¥Â®Â¹Ã¤Â¸ÂÃ¨Æ’Â½Ã¤Â¸ÂºÃ§Â©Âº',
       );
     }
 
     if (startMs < 0) {
       throw Exception(
-        'å¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
+        'Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½ 0',
       );
     }
 
     if (endMs <= startMs) {
       throw Exception(
-        'ç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
+        'Ã§Â»â€œÃ¦ÂÅ¸Ã¦â€”Â¶Ã©â€”Â´Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Â¤Â§Ã¤ÂºÅ½Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´',
       );
     }
 
@@ -1095,7 +1237,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null || track.id == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
     }
 
     await _ensurePublishBaseline(session, track.id!);
@@ -1160,7 +1302,7 @@ class SubtitleEndpoint extends Endpoint {
 
     if (session.authenticated == null) {
       throw Exception(
-        'éœ€è¦ç™»å½•åŽæ‰èƒ½åˆ é™¤å­—å¹•',
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¥Ë†Â Ã©â„¢Â¤Ã¥Â­â€”Ã¥Â¹â€¢',
       );
     }
 
@@ -1170,7 +1312,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
     }
 
     await _ensurePublishBaseline(session, cue.trackId);
@@ -1212,7 +1354,9 @@ class SubtitleEndpoint extends Endpoint {
     await _requireOwnedCueVideo(session, cueId);
 
     if (session.authenticated == null) {
-      throw Exception('éœ€è¦ç™»å½•åŽæ‰èƒ½ä¿®æ”¹ Karaoke å­—å¹•');
+      throw Exception(
+        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¤Â¿Â®Ã¦â€Â¹ Karaoke Ã¥Â­â€”Ã¥Â¹â€¢',
+      );
     }
 
     final cue = await SubtitleCue.db.findById(
@@ -1221,7 +1365,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (cue == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
     }
 
     final track = await SubtitleTrack.db.findById(
@@ -1230,7 +1374,7 @@ class SubtitleEndpoint extends Endpoint {
     );
 
     if (track == null) {
-      throw Exception('æ‰¾ä¸åˆ°å­—å¹•è½¨');
+      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
     }
 
     await _ensurePublishBaseline(session, track.id!);
@@ -1251,30 +1395,32 @@ class SubtitleEndpoint extends Endpoint {
       final cleanText = segment.text.trim();
 
       if (cleanText.isEmpty) {
-        throw Exception('ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸èƒ½ä¸ºç©º');
+        throw Exception(
+          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¤Â¸ÂÃ¨Æ’Â½Ã¤Â¸ÂºÃ§Â©Âº',
+        );
       }
 
       if (segment.startOffsetMs < 0) {
         throw Exception(
-          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µå¼€å§‹æ—¶é—´ä¸èƒ½å°äºŽ 0',
+          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½ 0',
         );
       }
 
       if (segment.endOffsetMs <= segment.startOffsetMs) {
         throw Exception(
-          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µç»“æŸæ—¶é—´å¿…é¡»å¤§äºŽå¼€å§‹æ—¶é—´',
+          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ§Â»â€œÃ¦ÂÅ¸Ã¦â€”Â¶Ã©â€”Â´Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Â¤Â§Ã¤ÂºÅ½Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´',
         );
       }
 
       if (segment.endOffsetMs > cueDurationMs) {
         throw Exception(
-          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µè¶…å‡ºå½“å‰å­—å¹•æ—¶é•¿',
+          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¨Â¶â€¦Ã¥â€¡ÂºÃ¥Â½â€œÃ¥â€°ÂÃ¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€¢Â¿',
         );
       }
 
       if (segment.startOffsetMs < previousEndMs) {
         throw Exception(
-          'ç¬¬ ${index + 1} ä¸ª Karaoke ç‰‡æ®µä¸Žå‰ä¸€ç‰‡æ®µé‡å ',
+          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¤Â¸Å½Ã¥â€°ÂÃ¤Â¸â‚¬Ã§â€°â€¡Ã¦Â®ÂµÃ©â€¡ÂÃ¥ÂÂ ',
         );
       }
 
@@ -1734,8 +1880,8 @@ class SubtitleEndpoint extends Endpoint {
     for (final cue in cues) {
       if (cue.startMs >= videoDurationMs) {
         errors.add(
-          'ç¬¬ ${cue.sourceNumber} '
-          'æ¡å­—å¹•å¼€å§‹æ—¶é—´è¶…å‡ºè§†é¢‘æ—¶é•¿',
+          'Ã§Â¬Â¬ ${cue.sourceNumber} '
+          'Ã¦ÂÂ¡Ã¥Â­â€”Ã¥Â¹â€¢Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´Ã¨Â¶â€¦Ã¥â€¡ÂºÃ¨Â§â€ Ã©Â¢â€˜Ã¦â€”Â¶Ã©â€¢Â¿',
         );
 
         continue;
@@ -1743,8 +1889,8 @@ class SubtitleEndpoint extends Endpoint {
 
       if (cue.endMs > videoDurationMs) {
         errors.add(
-          'ç¬¬ ${cue.sourceNumber} '
-          'æ¡å­—å¹•ç»“æŸæ—¶é—´è¶…å‡ºè§†é¢‘æ—¶é•¿',
+          'Ã§Â¬Â¬ ${cue.sourceNumber} '
+          'Ã¦ÂÂ¡Ã¥Â­â€”Ã¥Â¹â€¢Ã§Â»â€œÃ¦ÂÅ¸Ã¦â€”Â¶Ã©â€”Â´Ã¨Â¶â€¦Ã¥â€¡ÂºÃ¨Â§â€ Ã©Â¢â€˜Ã¦â€”Â¶Ã©â€¢Â¿',
         );
       }
     }

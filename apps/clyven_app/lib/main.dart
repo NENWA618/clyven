@@ -1,3 +1,4 @@
+import 'core/media/video_cache_adapter.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ import 'l10n/app_localizations.dart';
 
 import 'features/video/presentation/widgets/global_video_player_host.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeVideoCache();
+  attachVideoCacheDiagnostics();
   runApp(const ProviderScope(child: ClyvenApp()));
 }
 

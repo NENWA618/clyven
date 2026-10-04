@@ -97,6 +97,7 @@ social:
   - isFollowing:
   - toggleFollow:
   - getFollowingCreatorIds:
+  - getFollowerIds:
   - toggleFavorite:
   - getFavoriteVideoIds:
   - toggleLike:
@@ -108,6 +109,7 @@ social:
   - searchExistingUserProfiles:
   - getExistingUserProfile:
 subtitle:
+  - searchPublishedCues:
   - getCueDetails:
   - getPublishedCueDetails:
   - getPublishedAvailableTracks:
