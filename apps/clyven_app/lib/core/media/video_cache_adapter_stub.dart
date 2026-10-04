@@ -12,4 +12,6 @@ Future<int> videoCacheStorageBytes() async {
   return -1;
 }
 
+void cancelVideoCacheTasks(String source) {}
+
 void attachVideoCacheDiagnostics() {}

@@ -31,6 +31,16 @@ Future<int> videoCacheStorageBytes() async {
   }
 }
 
+void cancelVideoCacheTasks(String source) {
+  if (source.isEmpty) return;
+
+  try {
+    VideoProxy.downloadManager.cancelTaskAboutUrl(source);
+  } catch (_) {
+    // Cache cancellation is best-effort and must never break playback teardown.
+  }
+}
+
 void attachVideoCacheDiagnostics() {
   const enabled = bool.fromEnvironment('CLYVEN_FEED_DIAGNOSTICS');
   if (!enabled) return;

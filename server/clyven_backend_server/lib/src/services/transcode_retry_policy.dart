@@ -13,24 +13,34 @@ class TranscodeRetryPolicy {
 
   static const int maxRetryAttempts = 3;
 
-  /// Initial media version for newly transcoded videos.
+  /// Media version used for brand-new transcodes.
   ///
-  /// Existing videos are not rewritten. Their already persisted
-  /// hlsManifestStorageKey continues to point at the old path.
+  /// v2 introduces content-type-aware segment duration:
+  /// - Shorts: 3 seconds
+  /// - Normal videos: 6 seconds
   ///
-  /// New video transcodes use:
-  ///   transcoded/{videoId}/v1/manifest.m3u8
-  ///
-  /// Retry attempts stay inside the same media version:
-  ///   transcoded/{videoId}/v1/retry-1/manifest.m3u8
-  static const int initialMediaVersion = 1;
+  /// Existing persisted v1 manifests are not migrated.
+  static const int currentMediaVersion = 2;
 
-  static String _versionPrefix(int videoId) {
-    return 'transcoded/$videoId/v$initialMediaVersion/';
+  static int mediaVersionFromManifestKey(String? manifestKey) {
+    if (manifestKey == null || manifestKey.trim().isEmpty) {
+      return currentMediaVersion;
+    }
+
+    final match = RegExp(r'/v(\d+)/').firstMatch(manifestKey);
+    return int.tryParse(match?.group(1) ?? '') ?? currentMediaVersion;
   }
 
-  static String manifestKey(int videoId, int attempt) {
-    final base = _versionPrefix(videoId);
+  static String _versionPrefix(int videoId, int mediaVersion) {
+    return 'transcoded/$videoId/v$mediaVersion/';
+  }
+
+  static String manifestKey(
+    int videoId,
+    int attempt, {
+    int mediaVersion = currentMediaVersion,
+  }) {
+    final base = _versionPrefix(videoId, mediaVersion);
 
     if (attempt <= 0) {
       return '${base}manifest.m3u8';
@@ -39,8 +49,12 @@ class TranscodeRetryPolicy {
     return '${base}retry-$attempt/manifest.m3u8';
   }
 
-  static String outputPrefix(int videoId, int attempt) {
-    final base = _versionPrefix(videoId);
+  static String outputPrefix(
+    int videoId,
+    int attempt, {
+    int mediaVersion = currentMediaVersion,
+  }) {
+    final base = _versionPrefix(videoId, mediaVersion);
 
     if (attempt <= 0) {
       return base;
