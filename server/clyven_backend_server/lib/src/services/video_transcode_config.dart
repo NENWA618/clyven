@@ -8,6 +8,7 @@
 Map<String, dynamic> buildVideoTranscodeJob({
   required String inputUri,
   required String outputUri,
+  required Duration segmentDuration,
 }) => {
   'inputUri': inputUri,
   'outputUri': outputUri,
@@ -60,7 +61,7 @@ Map<String, dynamic> buildVideoTranscodeJob({
           'container': 'ts',
           'elementaryStreams': ['video-$quality', 'audio'],
           'segmentSettings': {
-            'segmentDuration': '6s',
+            'segmentDuration': '${segmentDuration.inSeconds}s',
           },
         },
     ],

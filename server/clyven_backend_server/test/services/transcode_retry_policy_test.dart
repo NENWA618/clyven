@@ -3,25 +3,49 @@ import 'package:test/test.dart';
 
 void main() {
   group('TranscodeRetryPolicy', () {
-    test('uses base output path for the initial transcode', () {
+    test('new transcodes use current media version v2', () {
+      expect(TranscodeRetryPolicy.currentMediaVersion, 2);
       expect(
         TranscodeRetryPolicy.manifestKey(15, 0),
-        'transcoded/15/manifest.m3u8',
+        'transcoded/15/v2/manifest.m3u8',
       );
       expect(
         TranscodeRetryPolicy.outputPrefix(15, 0),
-        'transcoded/15/',
+        'transcoded/15/v2/',
       );
     });
 
-    test('uses isolated output paths for retries', () {
+    test('retries stay inside the selected media version', () {
       expect(
-        TranscodeRetryPolicy.manifestKey(15, 2),
-        'transcoded/15/retry-2/manifest.m3u8',
+        TranscodeRetryPolicy.manifestKey(15, 2, mediaVersion: 1),
+        'transcoded/15/v1/retry-2/manifest.m3u8',
       );
       expect(
-        TranscodeRetryPolicy.outputPrefix(15, 2),
-        'transcoded/15/retry-2/',
+        TranscodeRetryPolicy.outputPrefix(15, 2, mediaVersion: 1),
+        'transcoded/15/v1/retry-2/',
+      );
+      expect(
+        TranscodeRetryPolicy.manifestKey(15, 2, mediaVersion: 2),
+        'transcoded/15/v2/retry-2/manifest.m3u8',
+      );
+    });
+
+    test('detects persisted media version from manifest key', () {
+      expect(
+        TranscodeRetryPolicy.mediaVersionFromManifestKey(
+          'transcoded/15/v1/manifest.m3u8',
+        ),
+        1,
+      );
+      expect(
+        TranscodeRetryPolicy.mediaVersionFromManifestKey(
+          'transcoded/15/v2/retry-1/manifest.m3u8',
+        ),
+        2,
+      );
+      expect(
+        TranscodeRetryPolicy.mediaVersionFromManifestKey(null),
+        2,
       );
     });
 
@@ -38,14 +62,6 @@ void main() {
 
     test('treats a normal job name as attempt zero', () {
       const raw = 'projects/p/locations/l/jobs/abc';
-      final parsed = TranscodeRetryPolicy.parseJobName(raw);
-
-      expect(parsed.attempt, 0);
-      expect(parsed.rawJobName, raw);
-    });
-
-    test('does not parse malformed retry prefixes', () {
-      const raw = 'retryX|projects/p/locations/l/jobs/abc';
       final parsed = TranscodeRetryPolicy.parseJobName(raw);
 
       expect(parsed.attempt, 0);

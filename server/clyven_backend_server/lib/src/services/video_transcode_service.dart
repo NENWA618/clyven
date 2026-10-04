@@ -25,14 +25,21 @@ class VideoTranscodeService {
   static const _bucket = 'glyphora-video-storage-11129163384';
   static const _scope = 'https://www.googleapis.com/auth/cloud-platform';
 
+  static const _shortSegmentDuration = Duration(seconds: 3);
+  static const _videoSegmentDuration = Duration(seconds: 6);
+
   static AutoRefreshingAuthClient? _cachedClient;
 
-  // The client auto-refreshes its own token, so it's safe to reuse across
-  // calls/instances instead of re-authenticating with GCP on every request.
   static Future<AutoRefreshingAuthClient> _client() async {
     return _cachedClient ??= await clientViaApplicationDefaultCredentials(
       scopes: const [_scope],
     );
+  }
+
+  static Duration _segmentDurationFor(Video video) {
+    return video.contentType == VideoContentType.short
+        ? _shortSegmentDuration
+        : _videoSegmentDuration;
   }
 
   Future<Video> ensure(
@@ -48,21 +55,32 @@ class VideoTranscodeService {
     final currentJobName = video.transcoderJobName?.trim();
 
     if (currentJobName == null || currentJobName.isEmpty) {
+      final mediaVersion = TranscodeRetryPolicy.currentMediaVersion;
       final jobName = await _createJob(
         videoStorageKey: video.videoStorageKey,
-        outputPrefix: TranscodeRetryPolicy.outputPrefix(videoId, 0),
+        outputPrefix: TranscodeRetryPolicy.outputPrefix(
+          videoId,
+          0,
+          mediaVersion: mediaVersion,
+        ),
+        segmentDuration: _segmentDurationFor(video),
       );
 
       video.hlsManifestStorageKey = TranscodeRetryPolicy.manifestKey(
         videoId,
         0,
+        mediaVersion: mediaVersion,
       );
       video.transcoderJobName = jobName;
       video.transcodeState = 'PENDING';
       video.updatedAt = DateTime.now().toUtc();
 
       session.log(
-        'TRANSCODE_CREATED videoId=$videoId attempt=0 job=$jobName',
+        'TRANSCODE_CREATED videoId=$videoId '
+        'mediaVersion=$mediaVersion '
+        'contentType=${video.contentType.name} '
+        'segmentSeconds=${_segmentDurationFor(video).inSeconds} '
+        'attempt=0 job=$jobName',
       );
 
       return Video.db.updateRow(session, video);
@@ -70,12 +88,18 @@ class VideoTranscodeService {
 
     final parsed = TranscodeRetryPolicy.parseJobName(currentJobName);
     final persistedManifestKey = video.hlsManifestStorageKey?.trim();
+    final mediaVersion = TranscodeRetryPolicy.mediaVersionFromManifestKey(
+      persistedManifestKey,
+    );
     final expectedManifestKey =
         persistedManifestKey != null && persistedManifestKey.isNotEmpty
         ? persistedManifestKey
-        : TranscodeRetryPolicy.manifestKey(videoId, parsed.attempt);
+        : TranscodeRetryPolicy.manifestKey(
+            videoId,
+            parsed.attempt,
+            mediaVersion: mediaVersion,
+          );
 
-    // 已成功的转码不再重复请求 GCP Transcoder API。
     if (video.transcodeState == 'SUCCEEDED' &&
         video.hlsManifestStorageKey == expectedManifestKey) {
       return video;
@@ -86,6 +110,7 @@ class VideoTranscodeService {
     if (status.state == 'FAILED') {
       session.log(
         'TRANSCODE_FAILED videoId=$videoId '
+        'mediaVersion=$mediaVersion '
         'attempt=${parsed.attempt} '
         'error=${status.error ?? 'unknown error'}',
         level: LogLevel.warning,
@@ -96,12 +121,18 @@ class VideoTranscodeService {
 
         final retryJobName = await _createJob(
           videoStorageKey: video.videoStorageKey,
-          outputPrefix: TranscodeRetryPolicy.outputPrefix(videoId, nextAttempt),
+          outputPrefix: TranscodeRetryPolicy.outputPrefix(
+            videoId,
+            nextAttempt,
+            mediaVersion: mediaVersion,
+          ),
+          segmentDuration: _segmentDurationFor(video),
         );
 
         video.hlsManifestStorageKey = TranscodeRetryPolicy.manifestKey(
           videoId,
           nextAttempt,
+          mediaVersion: mediaVersion,
         );
         video.transcoderJobName = TranscodeRetryPolicy.encodeJobName(
           nextAttempt,
@@ -112,6 +143,9 @@ class VideoTranscodeService {
 
         session.log(
           'TRANSCODE_RETRY videoId=$videoId '
+          'mediaVersion=$mediaVersion '
+          'contentType=${video.contentType.name} '
+          'segmentSeconds=${_segmentDurationFor(video).inSeconds} '
           'attempt=$nextAttempt job=$retryJobName',
           level: LogLevel.warning,
         );
@@ -135,6 +169,7 @@ class VideoTranscodeService {
   Future<String> _createJob({
     required String videoStorageKey,
     required String outputPrefix,
+    required Duration segmentDuration,
   }) async {
     final client = await _client();
 
@@ -153,6 +188,7 @@ class VideoTranscodeService {
         buildVideoTranscodeJob(
           inputUri: 'gs://$_bucket/$videoStorageKey',
           outputUri: 'gs://$_bucket/$outputPrefix',
+          segmentDuration: segmentDuration,
         ),
       ),
     );
