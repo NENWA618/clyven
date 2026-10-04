@@ -57,3 +57,8 @@ secrets/
 apps/clyven_web/build/jaspr/
 
 .clyven-patch-backup/
+
+# Generated build output
+**/build/
+/*.patch
+/*.bak
