@@ -8,9 +8,9 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: no_leading_underscores_for_library_prefixes
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-// ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
@@ -234,6 +234,8 @@ class TestEndpoints {
 
   late final _PrivacySettingsEndpoint privacySettings;
 
+  late final _PushDeviceEndpoint pushDevice;
+
   late final _ReviewEndpoint review;
 
   late final _ScriptConversionEndpoint scriptConversion;
@@ -301,6 +303,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     privacySettings = _PrivacySettingsEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    pushDevice = _PushDeviceEndpoint(
       endpoints,
       serializationManager,
     );
@@ -2446,6 +2452,85 @@ class _PrivacySettingsEndpoint {
                   _localCallContext.arguments,
                 )
                 as _i3.Future<_i28.PrivacySettings>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _PushDeviceEndpoint {
+  _PushDeviceEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<void> register(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String token,
+    required String platform,
+    required String languageCode,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'pushDevice',
+            method: 'register',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'pushDevice',
+          methodName: 'register',
+          parameters: _i1.testObjectToJson({
+            'token': token,
+            'platform': platform,
+            'languageCode': languageCode,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> unregister(
+    _i1.TestSessionBuilder sessionBuilder, {
+    required String token,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'pushDevice',
+            method: 'unregister',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'pushDevice',
+          methodName: 'unregister',
+          parameters: _i1.testObjectToJson({'token': token}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

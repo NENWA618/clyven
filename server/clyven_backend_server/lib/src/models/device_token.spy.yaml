@@ -1,0 +1,16 @@
+class: DeviceToken
+table: device_token
+
+fields:
+  userId: String
+  token: String
+  platform: String
+  languageCode: String, default='en'
+  updatedAt: DateTime, default=now
+
+indexes:
+  device_token_token_unique_idx:
+    fields: token
+    unique: true
+  device_token_user_idx:
+    fields: userId

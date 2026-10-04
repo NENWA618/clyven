@@ -44,6 +44,12 @@ flutter {
     source = "../.."
 }
 
+// Push notifications: only wire up Firebase once google-services.json exists,
+// so builds without Firebase config keep working.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // CLYVEN_CRONET_NAMESPACE_FIX
 // Cronet 141.7340.3 ships cronet-api / cronet-shared with the same Android
 // namespace, which AGP 9 rejects. Force the fixed 143.7445.0 artifacts.
