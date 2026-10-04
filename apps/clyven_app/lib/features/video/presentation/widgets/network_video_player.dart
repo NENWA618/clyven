@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:clyven_app/core/media/pip_service.dart';
 import 'package:clyven_app/core/media/video_cache_adapter.dart';
 import '../../../../core/media/media_delivery_url.dart';
 import 'package:clyven_app/core/media/playback_data_saver_provider.dart';
@@ -99,6 +100,9 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
   int _lastSavedSecond = -1;
   bool _clipSeekInProgress = false;
   OverlayEntry? _fullscreenOverlay;
+  OverlayEntry? _pipOverlay;
+  Timer? _pipPauseTimer;
+  bool _pipEligibilityReported = false;
   Timer? _fullscreenControlsTimer;
   bool _fullscreenControlsVisible = true;
 
@@ -110,6 +114,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    PipService.instance.inPip.addListener(_handlePipChanged);
     if (!widget.shortsMode || widget.active) {
       _startPlayer();
     } else {
@@ -322,7 +327,14 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
         source.startsWith('http://') || source.startsWith('https://');
 
     if (isNetworkVideo) {
-      return VideoPlayerController.networkUrl(resolveCachedVideoUri(source));
+      return VideoPlayerController.networkUrl(
+        resolveCachedVideoUri(source),
+        // iOS picture-in-picture needs an AVPlayerLayer, which video_player
+        // only provides in platform-view mode (texture mode has none).
+        viewType: _canUsePip && Platform.isIOS
+            ? VideoViewType.platformView
+            : VideoViewType.textureView,
+      );
     }
 
     return VideoPlayerController.file(File(source));
@@ -831,6 +843,8 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
       return;
     }
 
+    _syncPipEligibility();
+
     final position = _effectivePosition();
     if (_hasClipRange) {
       unawaited(_handleClipBoundary(position));
@@ -1244,6 +1258,69 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     );
   }
 
+  bool get _canUsePip => !widget.shortsMode && !widget.compact && widget.active;
+
+  void _syncPipEligibility() {
+    final value = _controller.value;
+    final eligible = _canUsePip && value.isInitialized && value.isPlaying;
+    if (!eligible && !_pipEligibilityReported) return;
+    if (!eligible && PipService.instance.inPip.value) return;
+    _pipEligibilityReported = eligible;
+    unawaited(
+      PipService.instance.setEligible(
+        eligible,
+        aspectRatio: value.aspectRatio > 0 ? value.aspectRatio : 16 / 9,
+      ),
+    );
+  }
+
+  void _handlePipChanged() {
+    if (!mounted) return;
+    if (PipService.instance.inPip.value) {
+      if (!_pipEligibilityReported) return;
+      _pipPauseTimer?.cancel();
+      // On iOS the system shows the native AVPlayerLayer itself.
+      if (Platform.isAndroid) _showPipOverlay();
+    } else {
+      _removePipOverlay();
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      // PiP window dismissed while the app is in the background.
+      if (lifecycle != null &&
+          lifecycle != AppLifecycleState.resumed &&
+          _controllerCreated &&
+          _controller.value.isPlaying) {
+        unawaited(_controller.pause());
+      }
+    }
+  }
+
+  void _showPipOverlay() {
+    if (_pipOverlay != null || !_controllerCreated) return;
+    final overlay = Overlay.of(context, rootOverlay: true);
+    final entry = OverlayEntry(
+      builder: (overlayContext) {
+        return ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio == 0
+                  ? 16 / 9
+                  : _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
+            ),
+          ),
+        );
+      },
+    );
+    _pipOverlay = entry;
+    overlay.insert(entry);
+  }
+
+  void _removePipOverlay() {
+    _pipOverlay?.remove();
+    _pipOverlay = null;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -1254,6 +1331,8 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
 
     switch (state) {
       case AppLifecycleState.resumed:
+        _pipPauseTimer?.cancel();
+        if (PipService.instance.inPip.value) break;
         if (widget.active && widget.autoplay) {
           unawaited(_controller.play());
           feedDiagnostic(
@@ -1266,6 +1345,19 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
+        if (_pipEligibilityReported && state != AppLifecycleState.detached) {
+          // Entering picture-in-picture also fires these states; give the
+          // native side a moment to report PiP before pausing.
+          _pipPauseTimer?.cancel();
+          _pipPauseTimer = Timer(const Duration(milliseconds: 800), () {
+            if (!PipService.instance.inPip.value &&
+                _controllerCreated &&
+                _controller.value.isPlaying) {
+              unawaited(_controller.pause());
+            }
+          });
+          break;
+        }
         if (_controller.value.isPlaying) {
           unawaited(_controller.pause());
         }
@@ -1279,6 +1371,13 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    PipService.instance.inPip.removeListener(_handlePipChanged);
+    _pipPauseTimer?.cancel();
+    _removePipOverlay();
+    if (_pipEligibilityReported) {
+      _pipEligibilityReported = false;
+      unawaited(PipService.instance.setEligible(false));
+    }
     _doubleTapHeartTimer?.cancel();
     _closeFullscreen();
     _cancelInitialization();

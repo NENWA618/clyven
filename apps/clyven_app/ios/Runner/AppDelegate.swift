@@ -1,5 +1,9 @@
+import AVFoundation
+import AVKit
 import Flutter
 import UIKit
+
+private var pipBridge: PipBridge?
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -12,5 +16,8 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "ClyvenPip") {
+      pipBridge = PipBridge(messenger: registrar.messenger())
+    }
   }
 }
