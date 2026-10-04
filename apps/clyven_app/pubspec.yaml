@@ -32,6 +32,7 @@ dependencies:
   shared_preferences: ^2.5.5
   firebase_core: ^4.15.0
   firebase_messaging: ^16.7.0
+  app_links: ^7.2.1
 
 dev_dependencies:
   flutter_test:

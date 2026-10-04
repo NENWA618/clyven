@@ -1,5 +1,7 @@
 # 跨用户视频可见性排查（2026-09-26）
 
+[English](../en/video-visibility-investigation-2026-09-26.md) | **简体中文**
+
 ## 最终沟通修正
 
 用户随后确认：所看到的转圈是视频本身的内容，并非播放器加载动画。因此该现象不能作为跨账号播放失败的证据，前面的播放器卡住判断已撤回。以下保留排查过程及验证范围；缓存、错误处理和播放器超时修改属于健壮性改进，不应标记为已经证实并修复了真实跨账号播放根因。最终 Flutter analyze 无问题，Flutter 测试 9 个通过；未完成新版 APK 在用户手机上的验证。
@@ -126,13 +128,13 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 - apps/clyven_app/test/serverpod_feed_repository_test.dart
 - server/clyven_backend_server/test/integration/video_visibility_test.dart
 - tool/audit_public_feed.ps1
-- docs/video-visibility-investigation.md
+- docs/zh-CN/video-visibility-investigation-2026-09-26.md
 
 尚需：运行故障 APK/连接手机采集日志以确定 APK 故障根因；对齐线上后端协议及 isPublic 权限实现；完成真实 A/B 手机复验。现有修复适用于本地 Video 和 Short 数据链，但不能解决仍在运行的旧线上后端不支持 contentType 的问题。
 
 ## 用户提供 APK 后的检查
 
-- 文件：`C:/Users/Chai Zhen Hong/Downloads/app-release.apk`，140179895 字节。
+- 文件：`Downloads/app-release.apk`，140179895 字节。
 - SHA256：`0D5587C0E1C5775410FBF87CCBBF9C3D95A1AD8797C29948C9BA1853FB31A8D1`。
 - 包名：`com.example.clyven`；versionName `1.0.0`，versionCode `1`；minSdk 24、targetSdk 36。
 - Manifest 包含 INTERNET、ACCESS_NETWORK_STATE 权限；未发现自定义 networkSecurityConfig；允许 cleartext。没有发现缺少 release 联网权限的证据。

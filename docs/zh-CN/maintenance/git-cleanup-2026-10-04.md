@@ -1,5 +1,7 @@
 # Clyven / Glyphora Git 仓库清理记录
 
+[English](../../en/maintenance/git-cleanup-2026-10-04.md) | **简体中文**
+
 日期：2026-10-04
 
 ## 本次清理目标

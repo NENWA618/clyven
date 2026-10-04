@@ -1,25 +1,39 @@
 # Clyven
 
-> A multilingual video + subtitle language-learning platform, built as a Flutter/Jaspr + Serverpod monorepo.
+**English** | [简体中文](README.zh-CN.md)
 
-**Clyven** 早期是一个视频平台项目，目前已经演进为一个**多语言视频与字幕学习平台**：用户观看视频的同时可以查看双语/精校字幕，点词查词典、收藏生词、管理生词本，并追踪自己对词汇的掌握程度（Knowledge State）。项目还包含越南语 Chữ Nôm ↔ Quốc Ngữ script 转换、AI 字幕生成（ASR）与人工字幕审核（Review）等围绕"字幕生产"的完整工作流。
+> A multilingual video and subtitle language-learning platform, built as a Flutter/Jaspr + Serverpod monorepo.
 
-客户端使用 **Riverpod**（Flutter）管理状态，Web 端使用 **Jaspr**（Dart Web 框架），均通过 **Serverpod** 与统一的后端通信。
+**Clyven** started as a video platform and has grown into a **multilingual video and subtitle learning platform**. While watching a video, users can read bilingual or reviewed subtitles, tap a word to look it up in a dictionary, save words to word lists, and track how well they know each word (Knowledge State). The project also covers the full subtitle-production workflow: Vietnamese Chữ Nôm ↔ Quốc Ngữ script conversion, AI subtitle generation (ASR), and human subtitle review.
+
+The mobile client manages state with **Riverpod** (Flutter). The web front-ends use **Jaspr** (Dart web framework). All of them talk to one shared **Serverpod** backend.
 
 ---
 
-# Apps in this Monorepo
+## Documentation
 
-Clyven 由 5 个前端应用、1 个后端服务和 3 个共享 package 组成，用 Melos 统一管理。
+| Document | Description |
+| --- | --- |
+| [Documentation index](docs/en/README.md) | All documents, in English and Chinese |
+| [Owner checklist](docs/en/owner-checklist.md) | Everything that still needs to be configured by hand (Firebase, Apple, DNS, signing keys) |
+| [Picture-in-picture](docs/en/picture-in-picture.md) | How video continues in a floating window on Android and iOS |
+| [Push notifications](docs/en/push-notifications.md) | System-level push through Firebase Cloud Messaging |
+| [Share links](docs/en/share-links.md) | Shared links that open the video inside the app |
 
-| App | 技术栈 | 定位 | 本地端口 |
+---
+
+## Apps in this Monorepo
+
+Clyven consists of 5 front-end applications, 1 backend service, and 3 shared packages, managed together with Melos.
+
+| App | Stack | Purpose | Local port |
 | --- | --- | --- | --- |
-| `apps/clyven_app` | Flutter (iOS/Android/Desktop) | 面向普通用户的主客户端：视频流、字幕学习、词典、生词本 | - |
-| `apps/clyven_web` | Jaspr (Dart Web) | 面向普通用户的公开 Web 端，功能对齐 `clyven_app` | 8084 |
-| `apps/clyven_studio` | Jaspr (Dart Web) | 创作者后台：视频上传/管理、字幕与词典管理、评论管理 | 8083 |
-| `apps/clyven_admin` | Jaspr (Dart Web) | 内部管理后台：用户管理、越南语 script 转换工具 | 8082 |
-| `apps/clyven_review` | Jaspr (Dart Web) | 字幕审核工作台：审核队列、审核任务详情 | 8081 |
-| `server/clyven_backend_server` | Serverpod | 统一后端服务，所有前端共用 | 8080 |
+| `apps/clyven_app` | Flutter (iOS / Android / desktop) | Main client for end users: video feed, subtitle learning, dictionary, word lists | - |
+| `apps/clyven_web` | Jaspr (Dart web) | Public web client with the same features as `clyven_app` | 8084 |
+| `apps/clyven_studio` | Jaspr (Dart web) | Creator back office: video upload and management, subtitle and dictionary management, comment management | 8083 |
+| `apps/clyven_admin` | Jaspr (Dart web) | Internal admin console: user management, Vietnamese script conversion tools | 8082 |
+| `apps/clyven_review` | Jaspr (Dart web) | Subtitle review workbench: review queue and review task details | 8081 |
+| `server/clyven_backend_server` | Serverpod | Shared backend for every front-end | 8080 |
 
 ---
 
@@ -27,114 +41,128 @@ Clyven 由 5 个前端应用、1 个后端服务和 3 个共享 package 组成�
 
 ### Video
 
-* 视频首页 / 发现页 / 搜索
-* 视频详情与播放（含字幕联动）
-* 视频投稿（本地视频选择、时长读取、FFmpeg 处理、上传）
-* 视频系列（Series）
-* 点赞 / 收藏 / 观看历史
+* Home feed, discover page, and search
+* Video detail and playback, synchronized with subtitles
+* Video upload (local video picker, duration detection, FFmpeg processing, upload)
+* Video series
+* Likes, favorites, and watch history
+* Picture-in-picture playback on Android and iOS
+* HLS adaptive streaming with local segment caching
 
-### Subtitles & Language Learning
+### Subtitles and Language Learning
 
-* 字幕轨道、逐句/逐词（token）级字幕数据结构
-* 卡拉OK式逐字高亮播放（karaoke segments）
-* SRT 字幕导入 / 导出
-* AI 自动生成字幕（基于 Deepgram ASR，`asr_job_processor`）
-* 字幕人工审核工作流：审核队列、审核任务、审核仪表盘（Review Dashboard）
-* 播放页内嵌"字幕学习面板"（点词查词、逐句跟读）
+* Subtitle tracks with sentence-level and word-level (token) data
+* Karaoke-style word-by-word highlighting (karaoke segments)
+* SRT import and export
+* AI subtitle generation (Deepgram ASR, `asr_job_processor`)
+* Human review workflow: review queue, review tasks, and a review dashboard
+* In-player subtitle learning panel (tap a word to look it up, repeat sentence by sentence)
 
-### Dictionary & Vocabulary
+### Dictionary and Vocabulary
 
-* 词典查词（释义 / 例句 / 词形 / 词条关系）
-* 词典批量导入（导入预览、字段映射、提交）
-* 生词本（Word List）管理
-* 用户"已掌握词条"（Known Entry）与掌握程度追踪（Knowledge State）
+* Dictionary lookup (definitions, examples, word forms, entry relations)
+* Bulk dictionary import (import preview, field mapping, commit)
+* Word list management
+* Known entries and mastery tracking (Knowledge State)
 
 ### Script Conversion
 
-* 越南语 Chữ Nôm ↔ Quốc Ngữ 转换（`clyven_nom_converter`）
-* 转换 profile 管理、批量导入预览与提交
+* Vietnamese Chữ Nôm ↔ Quốc Ngữ conversion (`clyven_nom_converter`)
+* Conversion profile management, bulk import preview, and commit
 
 ### Creator (Studio)
 
-* 创作者仪表盘
-* 视频管理、字幕管理、词典管理
-* 评论管理
+* Creator dashboard
+* Video, subtitle, and dictionary management
+* Comment management
 
 ### Interaction
 
-* 点赞、评论（含回复、回复点赞）
-* 关注创作者 / 已关注创作者列表
-* 分享
+* Likes and comments, including replies and reply likes
+* Follow creators and a list of followed creators
+* Sharing: a shared link opens the video directly in the app ([details](docs/en/share-links.md))
 
 ### User
 
-* 用户认证（Serverpod Auth IDP）、Auth Gate
-* 个人主页 / 个人资料统计
-* 观看历史
-* 通知中心 + 通知设置 + 隐私设置
+* Authentication (Serverpod Auth IDP) and an auth gate
+* Profile page and profile statistics
+* Watch history
+* Notification center, notification settings, and privacy settings
+* System push notifications for likes, comments, and follows, localized to the app language ([details](docs/en/push-notifications.md))
 
 ### Admin
 
-* 用户管理
-* 越南语 script 转换后台工具
-* Excel 数据导入（词典 / 转换表）
+* User management
+* Vietnamese script conversion tools
+* Excel data import (dictionary and conversion tables)
 
 ---
 
-# Tech Stack
+## Tech Stack
 
-## Client (Mobile / Desktop)
+### Client (mobile / desktop)
 
 * Flutter, Dart
 * Riverpod (`flutter_riverpod`)
-* `video_player`, `video_duration_native`
-* `ffmpeg_kit_flutter_new_min_gpl`（视频处理）
+* `video_player`, `video_duration_native`, `flutter_video_caching`
+* `ffmpeg_kit_flutter_new_min_gpl` (video processing)
 * `image_picker`, `share_plus`
+* `firebase_core`, `firebase_messaging` (push notifications)
+* `app_links` (opening shared links inside the app)
 
-## Web (public / studio / admin / review)
+### Web (public / studio / admin / review)
 
-* Jaspr（`jaspr`, `jaspr_router`, `jaspr_flutter_embed`）
+* Jaspr (`jaspr`, `jaspr_router`, `jaspr_flutter_embed`)
 
-## Backend Communication
+### Backend communication
 
 * Serverpod
 * `serverpod_client` / `serverpod_flutter`
 * `serverpod_auth_idp_flutter` / `serverpod_auth_core_client`
 
-## Backend (Serverpod Server)
+### Backend (Serverpod server)
 
 * Serverpod (PostgreSQL, migrations)
-* Deepgram ASR（自动语音识别生成字幕）
-* `excel`（词典 / 转换表导入）
-* `serverpod_cloud_storage_gcp`（媒体存储）
+* Deepgram ASR (speech recognition for subtitle generation)
+* `excel` (dictionary and conversion table import)
+* `serverpod_cloud_storage_gcp` (media storage)
 * `mailer`, `googleapis_auth`
+* Firebase Cloud Messaging HTTP v1 (push delivery, authenticated with `googleapis_auth`)
 
-## Shared Packages
+### Hosting
 
-* `clyven_nom_converter` — 越南语 Latin ↔ Chữ Nôm 转换核心库（含 CLI）
-* `clyven_subtitle_editor` — Studio 与 Review 共用的字幕编辑组件（时间轴、卡拉OK分段、SRT 导入导出）
-* `clyven_backend_client` — Serverpod 自动生成的客户端代码，所有前端共用
+* Backend: Google Cloud Run
+* Share landing page and domain-verification files: Firebase Hosting (`deploy/share_site`)
 
-## Monorepo Tooling
+### Shared packages
 
-* Dart Workspace（`pubspec.yaml` workspace）
-* Melos（`melos.yaml` 脚本，统一 dev / build / analyze / test）
+* `clyven_nom_converter`: core library for Vietnamese Latin ↔ Chữ Nôm conversion (includes a CLI)
+* `clyven_subtitle_editor`: subtitle editing components shared by Studio and Review (timeline, karaoke segments, SRT import and export)
+* `clyven_backend_client`: client code generated by Serverpod, shared by all front-ends
+
+### Monorepo tooling
+
+* Dart workspace (`pubspec.yaml`)
+* Melos (scripts in `pubspec.yaml` for dev, build, analyze, and test)
 
 ---
 
-# Architecture
+## Architecture
 
-`clyven_app` 客户端采用以 Feature 为单位的模块化结构（`clyven_web` / `clyven_studio` / `clyven_admin` / `clyven_review` 遵循类似的 pages/components/services 划分）：
+`clyven_app` is organized into feature modules. `clyven_web`, `clyven_studio`, `clyven_admin`, and `clyven_review` follow a similar pages / components / services split.
 
 ```text
 lib/
 │
 ├── core/
-│   ├── serverpod/
-│   ├── navigation/
+│   ├── errors/
 │   ├── localization/
-│   ├── theme/
-│   └── errors/
+│   ├── media/            # video cache, picture-in-picture bridge
+│   ├── navigation/
+│   ├── push/             # Firebase Cloud Messaging integration
+│   ├── serverpod/
+│   ├── sharing/          # share links and deep-link handling
+│   └── theme/
 │
 ├── features/
 │   ├── auth/
@@ -154,7 +182,7 @@ lib/
 └── main.dart
 ```
 
-每个 Feature 根据需要继续拆分：
+Each feature is split further as needed:
 
 ```text
 feature/
@@ -168,103 +196,101 @@ feature/
     └── widgets/
 ```
 
-整体数据流可以理解为：
+The overall data flow:
 
 ```text
 UI
  │
  ▼
-Riverpod Provider
+Riverpod provider
  │
  ▼
 Repository
  │
  ▼
-Serverpod Client
+Serverpod client
  │
  ▼
-Backend (Serverpod Endpoint)
+Backend (Serverpod endpoint)
  │
  ▼
-Database / Cloud Storage
+Database / cloud storage
 ```
 
 ---
 
-# Backend Modules (Serverpod Endpoints)
+## Backend Modules (Serverpod Endpoints)
 
 ```text
-video_endpoint                 视频 CRUD、系列、转码触发
-comment_endpoint               评论 / 回复 / 点赞
-social_endpoint                关注、互动状态
-notification_endpoint          通知
-notification_settings_endpoint 通知设置
-privacy_settings_endpoint      隐私设置
-subtitle_endpoint              字幕轨道 / cue / token / karaoke
-review_endpoint                字幕审核队列与任务
-dictionary_endpoint            词典查询
-dictionary_import_endpoint     词典批量导入
-word_list_endpoint             生词本
-known_entry_endpoint           已掌握词条 / 掌握程度
-script_conversion_endpoint     越南语 script 转换
-admin_endpoint                 管理后台相关
+video_endpoint                 Video CRUD, series, transcoding trigger
+comment_endpoint               Comments, replies, likes
+social_endpoint                Follows and interaction state
+notification_endpoint          Notification feed
+notification_settings_endpoint Notification settings
+push_device_endpoint           Registers and removes device push tokens
+privacy_settings_endpoint      Privacy settings
+subtitle_endpoint              Subtitle tracks, cues, tokens, karaoke
+review_endpoint                Subtitle review queue and tasks
+dictionary_endpoint            Dictionary lookup
+dictionary_import_endpoint     Bulk dictionary import
+word_list_endpoint             Word lists
+known_entry_endpoint           Known entries and mastery
+script_conversion_endpoint     Vietnamese script conversion
+admin_endpoint                 Admin console
 ```
 
-后端服务（`lib/src/services/`）还包括：
+Services (`lib/src/services/`):
 
 ```text
-asr_job_processor              ASR 字幕生成任务处理
-deepgram_asr_service           Deepgram 语音识别集成
-video_transcode_service        视频转码
-subtitle_analysis_service      字幕分析
-subtitle_review_task_service   字幕审核任务流转
-subtitle_srt_parser / exporter SRT 导入导出
-dictionary_import_writer       词典导入写入
-vietnamese_nom_conversion_service  越南语 Nôm 转换
-notification_service           通知下发
+asr_job_processor                  Processes ASR subtitle-generation jobs
+deepgram_asr_service               Deepgram speech recognition integration
+video_transcode_service            Video transcoding
+subtitle_analysis_service          Subtitle analysis
+subtitle_review_task_service       Review task workflow
+subtitle_srt_parser / exporter     SRT import and export
+dictionary_import_writer           Writes imported dictionary data
+vietnamese_nom_conversion_service  Vietnamese Nôm conversion
+notification_service               Creates in-app notifications and triggers push
+push_service                       Sends push messages through Firebase Cloud Messaging
 ```
 
 ---
 
-# Monorepo Layout
+## Monorepo Layout
 
 ```text
 clyven/
 │
 ├── apps/
-│   ├── clyven_app/            # Flutter 主客户端
-│   ├── clyven_web/            # Jaspr 公开 Web 端
-│   ├── clyven_studio/         # Jaspr 创作者后台
-│   ├── clyven_admin/          # Jaspr 内部管理后台
-│   └── clyven_review/         # Jaspr 字幕审核工作台
+│   ├── clyven_app/            # Flutter main client
+│   ├── clyven_web/            # Jaspr public web client
+│   ├── clyven_studio/         # Jaspr creator back office
+│   ├── clyven_admin/          # Jaspr internal admin console
+│   └── clyven_review/         # Jaspr subtitle review workbench
 │
 ├── packages/
-│   ├── clyven_backend_client/    # 生成的 Serverpod 客户端
-│   ├── clyven_subtitle_editor/   # 共享字幕编辑组件
-│   └── clyven_nom_converter/     # 越南语 script 转换核心库
+│   ├── clyven_backend_client/    # Generated Serverpod client
+│   ├── clyven_subtitle_editor/   # Shared subtitle editor components
+│   └── clyven_nom_converter/     # Vietnamese script conversion core
 │
 ├── server/
-│   └── clyven_backend_server/    # Serverpod 后端 + 数据库迁移
+│   └── clyven_backend_server/    # Serverpod backend and database migrations
 │
-├── tool/                      # Melos / dev 辅助脚本
-├── docs/                      # 调查笔记等
-├── pubspec.yaml                # Dart workspace 定义
-└── melos.yaml (embedded)       # Melos 任务脚本
+├── deploy/
+│   └── share_site/            # Firebase Hosting site for share links
+│
+├── tool/                      # Melos and development helper scripts
+├── docs/                      # Documentation (docs/en and docs/zh-CN)
+└── pubspec.yaml               # Dart workspace and Melos scripts
 ```
 
-Flutter App、生成的 Serverpod Client、Serverpod 后端以及各个 Jaspr Web 应用均由同一个 Dart workspace 管理，无需分开克隆多个仓库。
+The Flutter app, the generated Serverpod client, the Serverpod backend, and every Jaspr web app live in the same Dart workspace, so there is no need to clone several repositories.
 
 ---
 
-# State Management
+## State Management
 
-应用入口使用：
-
-```dart
-ProviderScope
-```
-
-包装整个应用：
+The application entry point wraps everything in a `ProviderScope`:
 
 ```text
 ProviderScope
@@ -279,35 +305,35 @@ AuthGate
 Application
 ```
 
-各个 Feature 拥有自己的 Provider，并通过 Riverpod 管理：
+Each feature owns its providers, which model:
 
 ```text
 Loading
 Data
 Error
-User Actions
+User actions
 ```
 
-避免让页面 Widget 直接承担数据请求和业务状态。
+Page widgets do not issue data requests or hold business state themselves.
 
 ---
 
-# Getting Started
+## Getting Started
 
-## 1. Clone
+### 1. Clone
 
 ```bash
 git clone https://github.com/chengyang1017/clyven.git
 cd clyven
 ```
 
-## 2. Install Workspace Dependencies
+### 2. Install workspace dependencies
 
 ```bash
 dart pub get
 ```
 
-## 3. Generate Serverpod Code
+### 3. Generate Serverpod code
 
 ```bash
 cd server/clyven_backend_server
@@ -315,36 +341,37 @@ serverpod generate
 cd ../..
 ```
 
-## 4. Run Backend
+### 4. Run the backend
 
 ```bash
 cd server/clyven_backend_server
 dart run bin/main.dart --apply-migrations
 ```
 
-## 5. Run a Frontend
+### 5. Run a front-end
 
-Flutter 客户端：
+Flutter client (generate the localization files first if `lib/l10n/app_localizations.dart` is missing):
 
 ```bash
 cd apps/clyven_app
+flutter gen-l10n
 flutter run
 ```
 
-Jaspr Web 应用（任选其一，或用 Melos 一次启动多个）：
+Jaspr web apps (run one, or start several with Melos):
 
 ```bash
 melos run dev:web      # clyven_web    -> :8084
 melos run dev:studio   # clyven_studio -> :8083
 melos run dev:admin    # clyven_admin  -> :8082
 melos run dev:review   # clyven_review -> :8081
-melos run dev:all      # 同时启动 web / studio / admin / review
-melos run dev:stop     # 停止残留的本地 dev 服务
+melos run dev:all      # start web, studio, admin, and review together
+melos run dev:stop     # stop leftover local dev servers
 ```
 
-## 6. Validate
+### 6. Validate
 
-Flutter app：
+Flutter app:
 
 ```bash
 cd apps/clyven_app
@@ -352,14 +379,14 @@ flutter test
 flutter analyze
 ```
 
-或在根目录用 Melos 跑全部 workspace 包：
+Or run everything from the repository root with Melos:
 
 ```bash
 melos run analyze
 melos run test
 ```
 
-Backend：
+Backend:
 
 ```bash
 cd server/clyven_backend_server
@@ -369,42 +396,53 @@ dart test
 
 ---
 
-# Roadmap
+## Configuration
 
-* [x] Flutter 客户端基础结构 + Riverpod 状态管理
-* [x] Serverpod Client 集成 + 用户认证入口
-* [x] 首页 / 发现页 / 视频搜索 / 视频详情 / 播放
-* [x] 视频投稿基础流程 + 视频系列
-* [x] 评论、创作者、视频互动、历史、通知、个人资料模块
-* [x] 字幕数据结构（轨道 / cue / token / karaoke）与播放联动
-* [x] SRT 导入导出 + 字幕人工审核工作流（Review）
-* [x] ASR 自动生成字幕（Deepgram 集成）
-* [x] 词典查词 + 词典批量导入
-* [x] 生词本 + 已掌握词条 / 掌握程度追踪
-* [x] 越南语 Chữ Nôm ↔ Quốc Ngữ script 转换
-* [x] 创作者 Studio / 管理后台 / 审核工作台（Jaspr）
-* [ ] 完善大型视频上传与转码流程
-* [ ] 完善推荐系统
-* [ ] 完善字幕学习体验（跟读、复习提醒等）
-* [ ] 完善错误恢复与网络状态处理
-* [ ] 完善生产环境部署
+Push notifications and share links work only after some one-time setup outside the code: a Firebase project, Apple and Google signing information, a DNS record, and a server secret. Without it the app still runs normally; push is skipped and shared links fall back to the landing page.
+
+The complete step-by-step list is in the [owner checklist](docs/en/owner-checklist.md).
 
 ---
 
-# Status
+## Roadmap
 
-This project is currently under active development.
-
-现阶段重点是在"视频 + 字幕 + 词汇学习"这条主线上打通客户端、Web 端、创作者后台、审核后台与 Serverpod 后端之间的完整数据流转。
-
-部分功能仍处于开发和完善阶段，不代表生产环境最终实现。
+* [x] Flutter client foundation with Riverpod state management
+* [x] Serverpod client integration and authentication entry
+* [x] Home, discover, search, video detail, and playback
+* [x] Basic video upload flow and video series
+* [x] Comments, creators, video interactions, history, notifications, and profile modules
+* [x] Subtitle data model (tracks, cues, tokens, karaoke) linked to playback
+* [x] SRT import and export, and the human review workflow
+* [x] ASR subtitle generation (Deepgram)
+* [x] Dictionary lookup and bulk import
+* [x] Word lists, known entries, and mastery tracking
+* [x] Vietnamese Chữ Nôm ↔ Quốc Ngữ conversion
+* [x] Creator Studio, admin console, and review workbench (Jaspr)
+* [x] Picture-in-picture playback (Android and iOS; iOS needs device verification)
+* [x] System push notifications (needs Firebase configuration)
+* [x] Share links that open videos in the app (needs domain setup)
+* [ ] Improve large-video upload and transcoding
+* [ ] Improve the recommendation system
+* [ ] Improve the subtitle learning experience (shadowing, review reminders)
+* [ ] Improve error recovery and network-state handling
+* [ ] Improve production deployment
+* [ ] Manual video quality selection
+* [ ] Per-video link previews for shared links
 
 ---
 
-# Author
+## Status
+
+This project is under active development. The current focus is the "video + subtitles + vocabulary learning" path, connecting the client, web apps, creator back office, review back office, and the Serverpod backend end to end.
+
+Some features are still being built or refined and do not represent the final production implementation.
+
+---
+
+## Author
 
 **Cheng Yang**
 
-A multilingual video and subtitle learning platform exploring modular client architecture, Riverpod/Jaspr front-ends, Serverpod backend integration, ASR-driven subtitle production, dictionary/vocabulary tooling, and Vietnamese script conversion.
+A multilingual video and subtitle learning platform exploring modular client architecture, Riverpod/Jaspr front-ends, Serverpod backend integration, ASR-driven subtitle production, dictionary and vocabulary tooling, and Vietnamese script conversion.
 
 > From video playback to a complete multilingual learning platform.

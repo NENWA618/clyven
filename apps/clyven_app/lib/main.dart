@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/localization/app_locale_provider.dart';
 import 'core/push/push_notifications.dart';
+import 'core/sharing/deep_link_handler.dart';
 import 'core/serverpod/serverpod_client_provider.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'core/navigation/app_navigator.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   await initializeVideoCache();
   attachVideoCacheDiagnostics();
   unawaited(PushNotifications.init());
+  unawaited(DeepLinkHandler.init());
   runApp(const ProviderScope(child: ClyvenApp()));
 }
 

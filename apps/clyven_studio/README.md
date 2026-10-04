@@ -1,15 +1,31 @@
 # clyven_studio
 
-A new Jaspr project
+**English** | [简体中文](README.zh-CN.md)
 
-## Running the project
+The creator back office of Clyven, built with Jaspr (Dart web). Creators use it to upload and manage videos, manage subtitles and dictionaries, and manage comments.
 
-Run your project using `jaspr serve`.
+It talks to the shared Serverpod backend (`server/clyven_backend_server`) through the generated `clyven_backend_client` package, and reuses the subtitle editor from `clyven_subtitle_editor`.
 
-The development server will be available on `http://localhost:8080`.
+## Run
 
-## Building the project
+From the repository root, with the backend already running:
 
-Build your project using `jaspr build`.
+```bash
+melos run dev:studio   # serves on http://localhost:8083
+```
 
-The output will be located inside the `build/jaspr/` directory.
+Or directly:
+
+```bash
+cd apps/clyven_studio
+jaspr serve --port 8083
+```
+
+## Build
+
+```bash
+cd apps/clyven_studio
+jaspr build
+```
+
+The output is written to `build/jaspr/`.
