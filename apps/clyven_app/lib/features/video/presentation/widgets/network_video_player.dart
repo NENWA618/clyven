@@ -92,6 +92,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
   Completer<void>? _initializationCompleter;
   String _initializationStage = 'resolve_source';
 
+  String? _activeCacheSource;
   final Stopwatch _fallbackClock = Stopwatch();
   Timer? _positionTicker;
   Duration _fallbackBasePosition = Duration.zero;
@@ -191,6 +192,20 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     if (_controllerCreated) _release(_controller);
   }
 
+  void _cancelActiveCacheTasks() {
+    final source = _activeCacheSource;
+
+    if (source == null || source.isEmpty) return;
+
+    cancelVideoCacheTasks(source);
+
+    _activeCacheSource = null;
+
+    feedDiagnostic(
+      'PLAYBACK_CACHE_CANCELLED postId=${widget.videoId ?? 'unknown'}',
+    );
+  }
+
   void _cancelInitialization() {
     _initializationTimer?.cancel();
     final completion = _initializationCompleter;
@@ -201,6 +216,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     _closeFullscreen();
     _cancelInitialization();
     ++_generation;
+    _cancelActiveCacheTasks();
     _releaseCurrentController();
     _positionTicker?.cancel();
     _positionTicker = null;
@@ -216,6 +232,7 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     _closeFullscreen();
     _cancelInitialization();
     ++_generation;
+    _cancelActiveCacheTasks();
     _releaseCurrentController();
 
     _positionTicker?.cancel();
@@ -418,6 +435,9 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     if (!_isGenerationActive(generation)) return false;
     final deliverySource = resolveMediaDeliveryUrl(source);
 
+    if (sourceKind.startsWith('HLS')) {
+      _activeCacheSource = deliverySource;
+    }
     feedDiagnostic(
       'PLAYBACK_MEDIA_DELIVERY '
       'postId=${widget.videoId ?? 'unknown'} '
@@ -1265,6 +1285,8 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
     _positionTicker?.cancel();
     _fallbackClock.stop();
     ++_generation;
+
+    _cancelActiveCacheTasks();
     _releaseCurrentController();
     super.dispose();
   }
