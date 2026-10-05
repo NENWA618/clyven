@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clyven</title>
+  <meta property="og:title" content="Clyven">
+  <meta property="og:description" content="Watch this video on Clyven / 在 Clyven 观看这个视频">
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, sans-serif; margin: 0; min-height: 100vh;
+           display: grid; place-items: center; background: #0f1115; color: #fff; }
+    main { width: min(90vw, 360px); text-align: center; padding: 16px; }
+    h1 { margin: 0 0 8px; }
+    p { color: #b8bcc6; margin: 0 0 24px; }
+    a.btn { display: block; padding: 14px; margin-bottom: 12px; border-radius: 12px;
+            text-decoration: none; font-weight: 600; }
+    a.primary { background: #6c8cff; color: #fff; }
+    a.secondary { background: #1d212b; color: #fff; }
+    a[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Clyven</h1>
+    <p id="hint"></p>
+    <a id="open" class="btn primary" href="#"></a>
+    <a id="android" class="btn secondary" href="#" hidden></a>
+    <a id="ios" class="btn secondary" href="#" hidden></a>
+  </main>
+  <script>
+    // Fill these in once the app is published; the buttons stay hidden until then.
+    var ANDROID_STORE_URL = "";
+    var IOS_STORE_URL = "";
+
+    var zh = (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var t = zh
+      ? { hint: "在 Clyven App 中观看这个视频", open: "在 Clyven 中打开",
+          android: "下载 Android 版", ios: "下载 iOS 版" }
+      : { hint: "Watch this video in the Clyven app", open: "Open in Clyven",
+          android: "Get it on Android", ios: "Get it on iOS" };
+
+    // Share links look like /v/<videoId>.
+    var parts = location.pathname.split("/").filter(Boolean);
+    var id = parts[0] === "v" ? parts[1] : null;
+    var appLink = id ? "clyven://video/" + encodeURIComponent(id) : "#";
+
+    document.documentElement.lang = zh ? "zh" : "en";
+    document.getElementById("hint").textContent = t.hint;
+    var open = document.getElementById("open");
+    open.textContent = t.open;
+    open.href = appLink;
+
+    [["android", ANDROID_STORE_URL], ["ios", IOS_STORE_URL]].forEach(function (p) {
+      var el = document.getElementById(p[0]);
+      if (!p[1]) return;
+      el.textContent = t[p[0]];
+      el.href = p[1];
+      el.hidden = false;
+    });
+
+    // Phones without verified app links reach this page; try the app once.
+    if (id && /android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+      setTimeout(function () { location.href = appLink; }, 300);
+    }
+  </script>
+</body>
+</html>

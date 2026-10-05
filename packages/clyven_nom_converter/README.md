@@ -1,5 +1,7 @@
 # Clyven Nôm Converter
 
+**English** | [简体中文](README.zh-CN.md)
+
 Shared conversion core for Vietnamese Quốc Ngữ (Latin) ↔ Chữ Nôm.
 
 The converter does **not** invent dictionary mappings. Mappings come from the
@@ -8,7 +10,7 @@ maintained Excel dictionary and are imported into `data/nom_dictionary.json`.
 ## Data flow
 
 ```text
-Excel maintained by Chengyang
+Excel dictionary maintained by the project owner
         ↓
 tool/import_nom_excel.py
         ↓
@@ -41,7 +43,7 @@ py -m pip install openpyxl
 Then:
 
 ```powershell
-cd C:\Users\USER\Documents\Flutter\flutter_application_3\packages\clyven_nom_converter
+cd packages\clyven_nom_converter
 py tool\import_nom_excel.py "C:\path\to\your_dictionary.xlsx"
 ```
 

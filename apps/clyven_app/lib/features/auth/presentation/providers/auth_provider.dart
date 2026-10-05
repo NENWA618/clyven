@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/push/push_notifications.dart';
 import '../../../../core/serverpod/serverpod_client_provider.dart';
 import '../../data/models/app_user.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -144,6 +145,8 @@ class AuthNotifier extends AsyncNotifier<AppUser?> {
     state = const AsyncLoading();
 
     try {
+      // Needs the live session, so it must run before signing out.
+      await PushNotifications.unregister(ref.read(serverpodClientProvider));
       await _repository.logout();
 
       state = const AsyncData(null);

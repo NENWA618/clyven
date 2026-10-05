@@ -1,4 +1,6 @@
-# Clyven 视频播放流量优化真机验收记录
+# 视频播放流量优化真机验收记录
+
+[English](../en/playback-traffic-validation-2026-10-04.md) | **简体中文**
 
 **日期：2026-10-04**  
 **测试脚本：Clyven Playback Traffic Verification v6**  

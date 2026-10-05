@@ -37,3 +37,5 @@
 20260928104145422-add-privacy-notification-settings
 20260928111955310-add-notifications-and-video-likes
 20260930141519752
+20261004180237533-add-device-token
+20261004181431755-device-token-language

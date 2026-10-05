@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
@@ -920,6 +921,39 @@ class EndpointPrivacySettings extends _i2.EndpointRef {
       'showActivityStatus': showActivityStatus,
     },
   );
+}
+
+/// Registers the caller's FCM device token so the server can push to it.
+/// {@category Endpoint}
+class EndpointPushDevice extends _i2.EndpointRef {
+  EndpointPushDevice(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'pushDevice';
+
+  /// Binds [token] to the current user. A token belongs to exactly one user,
+  /// so it is re-assigned when someone else signs in on the same device.
+  _i3.Future<void> register({
+    required String token,
+    required String platform,
+    required String languageCode,
+  }) => caller.callServerEndpoint<void>(
+    'pushDevice',
+    'register',
+    {
+      'token': token,
+      'platform': platform,
+      'languageCode': languageCode,
+    },
+  );
+
+  /// Removes [token], e.g. on sign-out, so the device stops receiving pushes.
+  _i3.Future<void> unregister({required String token}) =>
+      caller.callServerEndpoint<void>(
+        'pushDevice',
+        'unregister',
+        {'token': token},
+      );
 }
 
 /// {@category Endpoint}
@@ -1860,6 +1894,7 @@ class Client extends _i2.ServerpodClientShared {
     notification = EndpointNotification(this);
     notificationSettings = EndpointNotificationSettings(this);
     privacySettings = EndpointPrivacySettings(this);
+    pushDevice = EndpointPushDevice(this);
     review = EndpointReview(this);
     scriptConversion = EndpointScriptConversion(this);
     social = EndpointSocial(this);
@@ -1894,6 +1929,8 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointPrivacySettings privacySettings;
 
+  late final EndpointPushDevice pushDevice;
+
   late final EndpointReview review;
 
   late final EndpointScriptConversion scriptConversion;
@@ -1924,6 +1961,7 @@ class Client extends _i2.ServerpodClientShared {
     'notification': notification,
     'notificationSettings': notificationSettings,
     'privacySettings': privacySettings,
+    'pushDevice': pushDevice,
     'review': review,
     'scriptConversion': scriptConversion,
     'social': social,

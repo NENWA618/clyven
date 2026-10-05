@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:clyven_app/core/sharing/share_links.dart';
+
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/utils/require_login.dart';
 import '../../../comments/presentation/pages/comments_page.dart';
@@ -1554,7 +1556,9 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       ShareParams(
         title: video.title,
         subject: video.title,
-        text: '${video.title}\n${video.authorName}\n\n${video.videoUrl}',
+        text:
+            '${video.title}\n${video.authorName}\n\n'
+            '${ShareLinks.videoUrl(video.id)}',
       ),
     );
   }
