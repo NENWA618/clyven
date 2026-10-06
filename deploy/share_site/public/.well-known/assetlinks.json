@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.glyphora.app",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_SIGNING_CERT_SHA256"]
+      "sha256_cert_fingerprints": ["F1:AC:CF:45:46:51:21:9E:C9:B4:13:F6:AB:9F:AD:70:17:8B:54:AB:B8:BC:62:72:12:71:D6:05:D0:48:95:25"]
     }
   }
 ]

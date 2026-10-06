@@ -19,7 +19,7 @@
             C4,10 10,4 18,4
             Z" />
 
-    <!-- Main C -->
+    <!-- Main G -->
     <path
         android:fillColor="@android:color/transparent"
         android:strokeColor="#7657FF"
@@ -32,39 +32,50 @@
             C22,70 33,83 47,86
             C59,89 70,85 79,77" />
 
+    <!-- G crossbar -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#7657FF"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M60,58
+            H80
+            V75" />
+
     <!-- Play triangle -->
     <path
         android:fillColor="#7657FF"
-        android:pathData="M45,42
-            C43,41 41,42 41,45
-            V64
-            C41,67 44,68 46,66
-            L62,56
-            C64,55 64,53 62,52
+        android:pathData="M43,41
+            C41,40 39,42 39,44
+            V63
+            C39,66 42,67 44,65
+            L59,55
+            C61,54 61,52 59,51
             Z" />
 
     <!-- Subtitle line 1 -->
     <path
         android:fillColor="#A78BFA"
-        android:pathData="M69,47
+        android:pathData="M69,44
             H82
-            C85,47 87,49 87,52
-            C87,55 85,57 82,57
+            C85,44 87,46 87,49
+            C87,52 85,54 82,54
             H69
-            C66,57 64,55 64,52
-            C64,49 66,47 69,47
+            C66,54 64,52 64,49
+            C64,46 66,44 69,44
             Z" />
 
     <!-- Subtitle line 2 -->
     <path
         android:fillColor="#A78BFA"
-        android:pathData="M69,59
+        android:pathData="M70,61
             H79
-            C82,59 84,61 84,64
-            C84,67 82,69 79,69
-            H69
-            C66,69 64,67 64,64
-            C64,61 66,59 69,59
+            C82,61 84,63 84,66
+            C84,69 82,71 79,71
+            H70
+            C67,71 65,69 65,66
+            C65,63 67,61 70,61
             Z" />
 
     <!-- Orbital ring -->

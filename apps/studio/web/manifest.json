@@ -1,11 +1,11 @@
 {
-    "name": "glyphora_studio",
-    "short_name": "glyphora_studio",
+    "name": "Glyphora Studio",
+    "short_name": "Glyphora Studio",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Jaspr project",
+    "background_color": "#F4F1EA",
+    "theme_color": "#7657FF",
+    "description": "Glyphora Studio - creator workspace for Glyphora.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
