@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clyven</title>
-  <meta property="og:title" content="Clyven">
-  <meta property="og:description" content="Watch this video on Clyven / 在 Clyven 观看这个视频">
+  <title>Glyphora</title>
+  <meta property="og:title" content="Glyphora">
+  <meta property="og:description" content="Watch this video on Glyphora / 在 Glyphora 观看这个视频">
   <style>
     :root { color-scheme: light dark; }
     body { font-family: system-ui, sans-serif; margin: 0; min-height: 100vh;
@@ -22,7 +22,7 @@
 </head>
 <body>
   <main>
-    <h1>Clyven</h1>
+    <h1>Glyphora</h1>
     <p id="hint"></p>
     <a id="open" class="btn primary" href="#"></a>
     <a id="android" class="btn secondary" href="#" hidden></a>
@@ -35,15 +35,15 @@
 
     var zh = (navigator.language || "").toLowerCase().indexOf("zh") === 0;
     var t = zh
-      ? { hint: "在 Clyven App 中观看这个视频", open: "在 Clyven 中打开",
+      ? { hint: "在 Glyphora App 中观看这个视频", open: "在 Glyphora 中打开",
           android: "下载 Android 版", ios: "下载 iOS 版" }
-      : { hint: "Watch this video in the Clyven app", open: "Open in Clyven",
+      : { hint: "Watch this video in the Glyphora app", open: "Open in Glyphora",
           android: "Get it on Android", ios: "Get it on iOS" };
 
     // Share links look like /v/<videoId>.
     var parts = location.pathname.split("/").filter(Boolean);
     var id = parts[0] === "v" ? parts[1] : null;
-    var appLink = id ? "clyven://video/" + encodeURIComponent(id) : "#";
+    var appLink = id ? "glyphora://video/" + encodeURIComponent(id) : "#";
 
     document.documentElement.lang = zh ? "zh" : "en";
     document.getElementById("hint").textContent = t.hint;

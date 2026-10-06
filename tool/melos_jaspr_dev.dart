@@ -43,10 +43,10 @@ Future<void> main() async {
   final packageName = Platform.environment['MELOS_PACKAGE_NAME'];
 
   const ports = <String, int>{
-    'clyven_web': 8084,
-    'clyven_studio': 8083,
-    'clyven_admin': 8082,
-    'clyven_review': 8081,
+    'glyphora_web': 8084,
+    'glyphora_studio': 8083,
+    'glyphora_admin': 8082,
+    'glyphora_review': 8081,
   };
 
   if (packageName == null || !ports.containsKey(packageName)) {

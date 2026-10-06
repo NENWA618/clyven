@@ -3,7 +3,7 @@ steps:
     args:
       - build
       - -f
-      - server/clyven_backend_server/Dockerfile
+      - server/backend_server/Dockerfile
       - -t
       - asia-southeast1-docker.pkg.dev/glyphora-video/glyphora-server/glyphora-server:hls-v1-legacyfix-20261004
       - .

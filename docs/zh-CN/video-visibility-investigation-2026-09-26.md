@@ -89,8 +89,8 @@ Flutter：FEED_CLIENT（API 地址、编译 revision）；FEED_REQUEST；FEED_RE
 不记录 token、密码、原始异常正文或签名 URL。Debug 默认启用；release 需显式开启：
 
 ```powershell
-cd apps/clyven_app
-flutter build apk --release --dart-define=CLYVEN_FEED_DIAGNOSTICS=true --dart-define=CLYVEN_BUILD_REVISION=3d38e08-visibility-diagnostic
+cd apps/app
+flutter build apk --release --dart-define=GLYPHORA_FEED_DIAGNOSTICS=true --dart-define=GLYPHORA_BUILD_REVISION=3d38e08-visibility-diagnostic
 adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 ```
 
@@ -105,8 +105,8 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 ## 验证结果
 
 - dart format：本次 Dart 文件已格式化。
-- flutter analyze --no-pub（apps/clyven_app）：No issues found。
-- flutter test --no-pub（apps/clyven_app）：6 个通过。
+- flutter analyze --no-pub（apps/app）：No issues found。
+- flutter test --no-pub（apps/app）：6 个通过。
 - dart analyze（backend）：0 error、0 warning；52 个既有 info，来自字典脚本、server.dart、subtitle_endpoint.dart，本次修改文件没有诊断。
 - dart test（backend）：4 个通过（现有 greeting + 3 个可见性集成测试）。
 - 数据库测试使用本机隔离 PostgreSQL、真实 Serverpod endpoint 和真实 DB 查询；A/B 是 Serverpod 测试认证 session。测试覆盖 A→B Video、A→B Short、B→A Video/Short、作者隔离、非 published 状态过滤和详情权限。每个测试事务自动回滚。
@@ -117,16 +117,16 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 
 ## 修改文件
 
-- apps/clyven_app/lib/core/serverpod/feed_diagnostics.dart
-- apps/clyven_app/lib/core/serverpod/serverpod_client_provider.dart
-- apps/clyven_app/lib/features/video/data/repositories/serverpod_video_repository.dart
-- apps/clyven_app/lib/features/video/presentation/providers/video_detail_provider.dart
-- apps/clyven_app/lib/features/home/presentation/pages/main_page.dart
-- apps/clyven_app/lib/features/home/presentation/pages/discover_page.dart
-- server/clyven_backend_server/lib/src/endpoints/video_endpoint.dart
-- apps/clyven_app/test/feed_account_switch_test.dart
-- apps/clyven_app/test/serverpod_feed_repository_test.dart
-- server/clyven_backend_server/test/integration/video_visibility_test.dart
+- apps/app/lib/core/serverpod/feed_diagnostics.dart
+- apps/app/lib/core/serverpod/serverpod_client_provider.dart
+- apps/app/lib/features/video/data/repositories/serverpod_video_repository.dart
+- apps/app/lib/features/video/presentation/providers/video_detail_provider.dart
+- apps/app/lib/features/home/presentation/pages/main_page.dart
+- apps/app/lib/features/home/presentation/pages/discover_page.dart
+- server/backend_server/lib/src/endpoints/video_endpoint.dart
+- apps/app/test/feed_account_switch_test.dart
+- apps/app/test/serverpod_feed_repository_test.dart
+- server/backend_server/test/integration/video_visibility_test.dart
 - tool/audit_public_feed.ps1
 - docs/zh-CN/video-visibility-investigation-2026-09-26.md
 
@@ -136,7 +136,7 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 
 - 文件：`Downloads/app-release.apk`，140179895 字节。
 - SHA256：`0D5587C0E1C5775410FBF87CCBBF9C3D95A1AD8797C29948C9BA1853FB31A8D1`。
-- 包名：`com.example.clyven`；versionName `1.0.0`，versionCode `1`；minSdk 24、targetSdk 36。
+- 包名：`com.example.glyphora`；versionName `1.0.0`，versionCode `1`；minSdk 24、targetSdk 36。
 - Manifest 包含 INTERNET、ACCESS_NETWORK_STATE 权限；未发现自定义 networkSecurityConfig；允许 cleartext。没有发现缺少 release 联网权限的证据。
 - 包含 arm64-v8a、armeabi-v7a、x86_64 原生库。ARM64 与 x86_64 的 `libapp.so` 都包含相同线上地址 `https://glyphora-server-11129163384.asia-southeast1.run.app/`，与本次公共 API 核验目标一致。编译常量只能证明地址在包内，不能代替运行时请求抓取。
 - 包内有 ServerpodVideoRepository、loadPublishedVideos、getVideos、getVideoUrl 等相关字符串。Flutter release 是 AOT 编译文件，不能仅凭字符串重建具体过滤条件。
@@ -146,7 +146,7 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 
 本次 APK 检查没有改动用户提供的安装包，也没有发现足以确认手机漏新视频根因的静态证据。
 
-尝试使用 `Small_Phone` AVD 的临时只读、无快照、无窗口实例（emulator-5580）运行该 APK。Android SDK 37 镜像启动期间安装服务尚不可用，随后日志出现 `com.android.systemui ... failed to complete startup` / ANR。因此没有完成 APK 安装和应用启动，此失败属于模拟器系统环境，不能归因于 Clyven。临时实例已关闭，未覆盖原 AVD 的应用或用户数据。
+尝试使用 `Small_Phone` AVD 的临时只读、无快照、无窗口实例（emulator-5580）运行该 APK。Android SDK 37 镜像启动期间安装服务尚不可用，随后日志出现 `com.android.systemui ... failed to complete startup` / ANR。因此没有完成 APK 安装和应用启动，此失败属于模拟器系统环境，不能归因于 Glyphora。临时实例已关闭，未覆盖原 AVD 的应用或用户数据。
 
 ## 用户进一步确认：点进视频后画面一直转圈
 
@@ -168,8 +168,8 @@ adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 - 重试使用新 controller；旧 controller 释放一次，旧请求/事件不会恢复或污染新实例；退出时取消计时器。
 - 播放器初始化之后收到 native error 也显示失败状态，原先没有处理该状态。
 - 增加 PLAYBACK_INITIALIZING、PLAYBACK_READY、PLAYBACK_INIT_FAILED、PLAYBACK_NATIVE_ERROR 日志。日志包含 postId、network/file、host、阶段和允许的错误类别，不记录原始异常正文或签名 URL。
-- release 开启日志仍需 `--dart-define=CLYVEN_FEED_DIAGNOSTICS=true`。抓取命令应额外匹配 `PLAYBACK_`。
+- release 开启日志仍需 `--dart-define=GLYPHORA_FEED_DIAGNOSTICS=true`。抓取命令应额外匹配 `PLAYBACK_`。
 
-新增/修改：`network_video_player.dart`、`video_detail_page.dart`、`test/network_video_player_test.dart`、`apps/clyven_app/pubspec.yaml`（显式引用测试用的已有 video_player_platform_interface 6.9.0，未升级运行时播放器）、`tool/audit_media_headers.py`。媒体头部证据保存为 `build/media-header-audit.json`。
+新增/修改：`network_video_player.dart`、`video_detail_page.dart`、`test/network_video_player_test.dart`、`apps/app/pubspec.yaml`（显式引用测试用的已有 video_player_platform_interface 6.9.0，未升级运行时播放器）、`tool/audit_media_headers.py`。媒体头部证据保存为 `build/media-header-audit.json`。
 
 追加验证：Flutter 全套 9 个测试通过，包括初始化不返回、超时释放、重试成功、迟到事件、初始化后的原生错误及加载中退出。**这些测试证明不再无限等待，不证明真实其他账号已能播放。** 仍需要非作者手机的播放日志，或同手机浏览器直接读取该新视频的结果，继续区分 App 播放与设备网络/资源读取问题。

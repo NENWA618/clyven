@@ -89,8 +89,8 @@ Flutter: FEED_CLIENT (API address, build revision); FEED_REQUEST; FEED_RESPONSE 
 Tokens, passwords, raw exception text, and signed URLs are not logged. Debug builds enable this by default; release builds must enable it explicitly:
 
 ```powershell
-cd apps/clyven_app
-flutter build apk --release --dart-define=CLYVEN_FEED_DIAGNOSTICS=true --dart-define=CLYVEN_BUILD_REVISION=3d38e08-visibility-diagnostic
+cd apps/app
+flutter build apk --release --dart-define=GLYPHORA_FEED_DIAGNOSTICS=true --dart-define=GLYPHORA_BUILD_REVISION=3d38e08-visibility-diagnostic
 adb logcat -v time | Select-String 'FEED_|THUMBNAIL_UNAVAILABLE'
 ```
 
@@ -105,8 +105,8 @@ If the phone's FEED_RESPONSE does not contain 17, check the address it actually 
 ## Verification results
 
 - dart format: the Dart files touched were formatted.
-- flutter analyze --no-pub (apps/clyven_app): No issues found.
-- flutter test --no-pub (apps/clyven_app): 6 passed.
+- flutter analyze --no-pub (apps/app): No issues found.
+- flutter test --no-pub (apps/app): 6 passed.
 - dart analyze (backend): 0 errors, 0 warnings; 52 existing infos from the dictionary scripts, server.dart, and subtitle_endpoint.dart, none in the files changed here.
 - dart test (backend): 4 passed (the existing greeting test plus 3 visibility integration tests).
 - Database tests use an isolated local PostgreSQL, real Serverpod endpoints, and real database queries; A and B are Serverpod test authentication sessions. They cover A→B Video, A→B Short, B→A Video / Short, author isolation, non-published status filtering, and detail permissions. Each test transaction rolls back automatically.
@@ -117,16 +117,16 @@ If the phone's FEED_RESPONSE does not contain 17, check the address it actually 
 
 ## Files changed
 
-- apps/clyven_app/lib/core/serverpod/feed_diagnostics.dart
-- apps/clyven_app/lib/core/serverpod/serverpod_client_provider.dart
-- apps/clyven_app/lib/features/video/data/repositories/serverpod_video_repository.dart
-- apps/clyven_app/lib/features/video/presentation/providers/video_detail_provider.dart
-- apps/clyven_app/lib/features/home/presentation/pages/main_page.dart
-- apps/clyven_app/lib/features/home/presentation/pages/discover_page.dart
-- server/clyven_backend_server/lib/src/endpoints/video_endpoint.dart
-- apps/clyven_app/test/feed_account_switch_test.dart
-- apps/clyven_app/test/serverpod_feed_repository_test.dart
-- server/clyven_backend_server/test/integration/video_visibility_test.dart
+- apps/app/lib/core/serverpod/feed_diagnostics.dart
+- apps/app/lib/core/serverpod/serverpod_client_provider.dart
+- apps/app/lib/features/video/data/repositories/serverpod_video_repository.dart
+- apps/app/lib/features/video/presentation/providers/video_detail_provider.dart
+- apps/app/lib/features/home/presentation/pages/main_page.dart
+- apps/app/lib/features/home/presentation/pages/discover_page.dart
+- server/backend_server/lib/src/endpoints/video_endpoint.dart
+- apps/app/test/feed_account_switch_test.dart
+- apps/app/test/serverpod_feed_repository_test.dart
+- server/backend_server/test/integration/video_visibility_test.dart
 - tool/audit_public_feed.ps1
 - docs/en/video-visibility-investigation-2026-09-26.md
 
@@ -136,7 +136,7 @@ Still needed: run the failing APK or connect the phone to collect logs and deter
 
 - File: `Downloads/app-release.apk`, 140179895 bytes.
 - SHA256: `0D5587C0E1C5775410FBF87CCBBF9C3D95A1AD8797C29948C9BA1853FB31A8D1`.
-- Package name: `com.example.clyven`; versionName `1.0.0`, versionCode `1`; minSdk 24, targetSdk 36.
+- Package name: `com.example.glyphora`; versionName `1.0.0`, versionCode `1`; minSdk 24, targetSdk 36.
 - The manifest contains the INTERNET and ACCESS_NETWORK_STATE permissions. No custom networkSecurityConfig was found; cleartext is allowed. There is no evidence that the release build lacks a networking permission.
 - It contains native libraries for arm64-v8a, armeabi-v7a, and x86_64. Both the ARM64 and x86_64 `libapp.so` contain the same live address, `https://glyphora-server-11129163384.asia-southeast1.run.app/`, matching the target of this public API check. A compile-time constant only proves the address is in the package; it is no substitute for capturing runtime requests.
 - The package contains strings such as ServerpodVideoRepository, loadPublishedVideos, getVideos, and getVideoUrl. A Flutter release build is an AOT-compiled file, so the specific filter conditions cannot be reconstructed from strings alone.
@@ -146,7 +146,7 @@ Still needed: run the failing APK or connect the phone to collect logs and deter
 
 This APK inspection did not modify the user's installation package, and found no static evidence sufficient to confirm the root cause of the phone missing new videos.
 
-An attempt was made to run the APK in a temporary read-only, snapshot-free, windowless instance (emulator-5580) of the `Small_Phone` AVD. During start-up of the Android SDK 37 image the package installer service was not yet available, and the log then showed `com.android.systemui ... failed to complete startup` and an ANR. The APK was therefore not installed or started. This failure belongs to the emulator's system environment and cannot be attributed to Clyven. The temporary instance was shut down and the original AVD's apps and user data were not overwritten.
+An attempt was made to run the APK in a temporary read-only, snapshot-free, windowless instance (emulator-5580) of the `Small_Phone` AVD. During start-up of the Android SDK 37 image the package installer service was not yet available, and the log then showed `com.android.systemui ... failed to complete startup` and an ANR. The APK was therefore not installed or started. This failure belongs to the emulator's system environment and cannot be attributed to Glyphora. The temporary instance was shut down and the original AVD's apps and user data were not overwritten.
 
 ## User's further confirmation: the video screen keeps spinning after opening
 
@@ -168,8 +168,8 @@ Player lifecycle defect found and fixed:
 - A retry uses a new controller; the old controller is released once, and old requests / events cannot resume or pollute the new instance; leaving the page cancels the timer.
 - A native error received after player initialization also shows the failure state; this state was not handled before.
 - Logs added: PLAYBACK_INITIALIZING, PLAYBACK_READY, PLAYBACK_INIT_FAILED, and PLAYBACK_NATIVE_ERROR. They include postId, network / file, host, stage, and an allowed error category, and never raw exception text or signed URLs.
-- Enabling logs in a release build still needs `--dart-define=CLYVEN_FEED_DIAGNOSTICS=true`. The capture command should also match `PLAYBACK_`.
+- Enabling logs in a release build still needs `--dart-define=GLYPHORA_FEED_DIAGNOSTICS=true`. The capture command should also match `PLAYBACK_`.
 
-Added or changed: `network_video_player.dart`, `video_detail_page.dart`, `test/network_video_player_test.dart`, `apps/clyven_app/pubspec.yaml` (explicitly references the existing video_player_platform_interface 6.9.0 used by tests; the runtime player was not upgraded), and `tool/audit_media_headers.py`. The media header evidence is saved as `build/media-header-audit.json`.
+Added or changed: `network_video_player.dart`, `video_detail_page.dart`, `test/network_video_player_test.dart`, `apps/app/pubspec.yaml` (explicitly references the existing video_player_platform_interface 6.9.0 used by tests; the runtime player was not upgraded), and `tool/audit_media_headers.py`. The media header evidence is saved as `build/media-header-audit.json`.
 
 Additional verification: all 9 Flutter tests pass, including initialization that never returns, timeout release, a successful retry, late events, a native error after initialization, and leaving during loading. **These tests prove playback no longer waits forever; they do not prove another real account can now play.** Playback logs from a non-author phone, or the result of reading the new video directly in the same phone's browser, are still needed to separate app playback problems from device network or resource-read problems.

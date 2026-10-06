@@ -1,2 +1,2 @@
 @echo off
-dart run tool/clyven_dev.dart
+dart run tool/dev.dart

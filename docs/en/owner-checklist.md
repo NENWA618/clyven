@@ -10,7 +10,7 @@ Related documents: [Picture-in-picture](picture-in-picture.md), [Push notificati
 
 ## 0. Decisions to make first
 
-- [ ] **Application ID / bundle ID.** The app still uses the example `com.example.clyven` on both platforms. Google Play does not accept IDs starting with `com.example`. If you plan to publish, change it now: the Android `applicationId` and `namespace`, the iOS bundle identifier, the Firebase apps, `google-services.json`, `GoogleService-Info.plist`, and both verification files in section 3 all depend on it. Changing it later means redoing those steps.
+- [ ] **Application ID / bundle ID.** The app still uses the example `com.example.glyphora` on both platforms. Google Play does not accept IDs starting with `com.example`. If you plan to publish, change it now: the Android `applicationId` and `namespace`, the iOS bundle identifier, the Firebase apps, `google-services.json`, `GoogleService-Info.plist`, and both verification files in section 3 all depend on it. Changing it later means redoing those steps.
 - [ ] **Share domain.** The code uses `share.glyphora.net`. Keep it, or pick another subdomain and update the three places listed in [Share links](share-links.md#why-a-dedicated-subdomain).
 
 Push notifications and share links do **not** require a Google Play listing; they work with sideloaded builds. Costs: FCM and Firebase Hosting are free at this scale. The only paid items are the Apple Developer Program (about 99 USD per year, needed for iOS push) and, only if you publish on Android, a Google Play developer account (one-time 25 USD). Check the Firebase console's usage and billing page for current terms.
@@ -18,7 +18,7 @@ Push notifications and share links do **not** require a Google Play listing; the
 ## 1. Firebase console
 
 - [ ] Open the [Firebase console](https://console.firebase.google.com), choose "Add project", and select your existing Google Cloud project `glyphora-video`. Using the same project keeps Firebase next to the backend.
-- [ ] Add an **Android app** with the package name from section 0 (currently `com.example.clyven`). Download `google-services.json` and place it at `apps/clyven_app/android/app/google-services.json`.
+- [ ] Add an **Android app** with the package name from section 0 (currently `com.example.glyphora`). Download `google-services.json` and place it at `apps/app/android/app/google-services.json`.
 - [ ] Add an **iOS app** with the same bundle ID. Download `GoogleService-Info.plist` and keep it for section 2.
 - [ ] Open Project settings → Service accounts → "Generate new private key" and download the JSON. This is the key the server uses to send pushes. Keep it private; it is used in section 4.
 
@@ -29,7 +29,7 @@ Requires a paid Apple Developer account and a Mac.
 - [ ] In Certificates, Identifiers & Profiles → Identifiers, open the app's identifier and enable **Push Notifications** and **Associated Domains**, then save.
 - [ ] Under Keys, create a key with **Apple Push Notifications service (APNs)** enabled and download the `.p8` file. It can only be downloaded once. Note the Key ID and your Team ID.
 - [ ] In the Firebase console, open Project settings → Cloud Messaging → iOS app configuration and upload the `.p8`, entering the Key ID and Team ID.
-- [ ] Open `apps/clyven_app/ios/Runner.xcworkspace` in Xcode. Drag `GoogleService-Info.plist` into the Runner group, tick "Copy items if needed" and the Runner target.
+- [ ] Open `apps/app/ios/Runner.xcworkspace` in Xcode. Drag `GoogleService-Info.plist` into the Runner group, tick "Copy items if needed" and the Runner target.
 - [ ] In Runner → Signing & Capabilities, confirm Push Notifications, Associated Domains, and Background Modes (Audio, and Remote notifications) are present. Add any that are missing.
 
 ## 3. Share site and domain
@@ -49,7 +49,7 @@ The share landing page and verification files live in `deploy/share_site`, hoste
 ## 4. Server
 
 - [ ] Add the service-account JSON from section 1 as the Serverpod password `fcmServiceAccountJson`.
-  * Local development: in `server/clyven_backend_server/config/passwords.yaml`, under `shared:`, as a single-line JSON string.
+  * Local development: in `server/backend_server/config/passwords.yaml`, under `shared:`, as a single-line JSON string.
   * Cloud Run: store the JSON in Secret Manager and expose it to the service as the environment variable `SERVERPOD_PASSWORD_fcmServiceAccountJson`.
 - [ ] Grant the Cloud Run runtime service account the **Secret Manager Secret Accessor** role on that secret.
 - [ ] Deploy the server and start it with `--apply-migrations` so the `device_token` table and its `languageCode` column are created (two migrations).
@@ -71,7 +71,7 @@ Push notifications:
 Share links:
 
 - [ ] Sharing a video produces a `https://share.glyphora.net/v/<id>` link.
-- [ ] Tapping the link on a phone with the app opens the video in the app. Without the verification files filled in, it opens the landing page first and the "Open in Clyven" button opens the app.
+- [ ] Tapping the link on a phone with the app opens the video in the app. Without the verification files filled in, it opens the landing page first and the "Open in Glyphora" button opens the app.
 - [ ] On a phone without the app, the landing page shows.
 
 Picture-in-picture:
@@ -83,7 +83,7 @@ Picture-in-picture:
 
 ## 6. Before a store release
 
-- [ ] Change `aps-environment` in `apps/clyven_app/ios/Runner/Runner.entitlements` from `development` to `production`.
+- [ ] Change `aps-environment` in `apps/app/ios/Runner/Runner.entitlements` from `development` to `production`.
 - [ ] Replace the example application ID if you have not already (section 0).
 - [ ] Put the production signing fingerprint into `assetlinks.json` and redeploy the share site.
 

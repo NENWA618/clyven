@@ -20,12 +20,13 @@
 | [播放流量验收（2026-10-04）](playback-traffic-validation-2026-10-04.md) | HLS、缓存、字幕循环与 Shorts 流量的真机验证 |
 | [视频可见性排查（2026-09-26）](video-visibility-investigation-2026-09-26.md) | 跨账号可见性与播放问题排查 |
 | [Git 仓库清理（2026-10-04）](maintenance/git-cleanup-2026-10-04.md) | 历史重写与构建产物清理 |
+| [Glyphora 更名部署清单（2026-10-06）](maintenance/glyphora-rename-deploy-checklist.md) | 品牌更名后，部署前必须处理的数据库、环境变量、路径和包名事项 |
 
 ## 其他 README
 
 * [项目 README](../../README.zh-CN.md)
-* [后端服务](../../server/clyven_backend_server/README.zh-CN.md)
-* [创作者 Studio](../../apps/clyven_studio/README.zh-CN.md)
-* [后端客户端包](../../packages/clyven_backend_client/README.zh-CN.md)
-* [Nôm 转换包](../../packages/clyven_nom_converter/README.zh-CN.md)
+* [后端服务](../../server/backend_server/README.zh-CN.md)
+* [创作者 Studio](../../apps/studio/README.zh-CN.md)
+* [后端客户端包](../../packages/backend_client/README.zh-CN.md)
+* [Nôm 转换包](../../packages/nom_converter/README.zh-CN.md)
 * [分享站点](../../deploy/share_site/README.zh-CN.md)

@@ -19,7 +19,7 @@
 ## Android
 
 * `AndroidManifest.xml` 为 `MainActivity` 声明了 `supportsPictureInPicture` 和 `resizeableActivity`。
-* `MainActivity.kt` 提供名为 `clyven/pip` 的 method channel：
+* `MainActivity.kt` 提供名为 `glyphora/pip` 的 method channel：
   * Android 12 及以上：用户离开 App 时自动进入画中画（`setAutoEnterEnabled`）。
   * Android 8 到 11：在 `onUserLeaveHint` 里手动进入画中画。
   * 小窗宽高比跟随视频，并限制在 Android 允许的范围内（1:2.39 到 2.39:1）。
@@ -33,7 +33,7 @@
 * iOS 只能为 `AVPlayerLayer` 显示画中画。`video_player` 插件默认用纹理渲染，没有这个图层，所以符合条件的播放器在 iOS 上改用 `VideoViewType.platformView`，由原生 `AVPlayerLayer` 渲染。
 * `ios/Runner/PipBridge.swift` 会找到屏幕上最大且带有播放器的 `AVPlayerLayer`，把 `AVPictureInPictureController` 绑定上去，并开启 `canStartPictureInPictureAutomaticallyFromInline`（iOS 14.2 及以上），让系统在 App 进入后台时自动启动画中画。插件没有公开它内部的 `AVPlayer`，所以只能通过遍历视图树来定位图层。
 * `Info.plist` 开启了 `audio` 后台模式，这是画中画的必要条件，音频会话类别设为 playback。
-* 与 Android 共用同一个 `clyven/pip` 通道和 `pipChanged` 事件。iOS 上小窗由系统根据原生图层绘制，因此不显示 Flutter 覆盖层。
+* 与 Android 共用同一个 `glyphora/pip` 通道和 `pipChanged` 事件。iOS 上小窗由系统根据原生图层绘制，因此不显示 Flutter 覆盖层。
 
 ## 需要留意
 
@@ -43,10 +43,10 @@
 
 ## 关键文件
 
-* `apps/clyven_app/lib/core/media/pip_service.dart`
-* `apps/clyven_app/lib/features/video/presentation/widgets/network_video_player.dart`
-* `apps/clyven_app/android/app/src/main/kotlin/com/example/clyven/MainActivity.kt`
-* `apps/clyven_app/android/app/src/main/AndroidManifest.xml`
-* `apps/clyven_app/ios/Runner/PipBridge.swift`
-* `apps/clyven_app/ios/Runner/AppDelegate.swift`
-* `apps/clyven_app/ios/Runner/Info.plist`
+* `apps/app/lib/core/media/pip_service.dart`
+* `apps/app/lib/features/video/presentation/widgets/network_video_player.dart`
+* `apps/app/android/app/src/main/kotlin/com/example/glyphora/MainActivity.kt`
+* `apps/app/android/app/src/main/AndroidManifest.xml`
+* `apps/app/ios/Runner/PipBridge.swift`
+* `apps/app/ios/Runner/AppDelegate.swift`
+* `apps/app/ios/Runner/Info.plist`

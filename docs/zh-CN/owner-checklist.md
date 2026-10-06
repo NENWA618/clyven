@@ -10,7 +10,7 @@
 
 ## 0. 先做的决定
 
-- [ ] **应用包名 / Bundle ID。** 两个平台目前都还是示例的 `com.example.clyven`。Google Play 不接受以 `com.example` 开头的包名。如果打算上架，现在就改：Android 的 `applicationId` 和 `namespace`、iOS 的 Bundle Identifier、Firebase 里的应用、`google-services.json`、`GoogleService-Info.plist`，以及第 3 节的两个校验文件都依赖它。以后再改就要把这些步骤重做一遍。
+- [ ] **应用包名 / Bundle ID。** 两个平台目前都还是示例的 `com.example.glyphora`。Google Play 不接受以 `com.example` 开头的包名。如果打算上架，现在就改：Android 的 `applicationId` 和 `namespace`、iOS 的 Bundle Identifier、Firebase 里的应用、`google-services.json`、`GoogleService-Info.plist`，以及第 3 节的两个校验文件都依赖它。以后再改就要把这些步骤重做一遍。
 - [ ] **分享域名。** 代码里使用 `share.glyphora.net`。可以保留，也可以换成别的子域名，换的话按[分享链接](share-links.md#为什么用独立子域名)里列的三处同步修改。
 
 消息推送和分享链接**不要求**上架 Google Play，侧载安装的包也能用。费用方面：这个规模下 FCM 和 Firebase Hosting 免费；只有 Apple 开发者计划需要付费（约每年 99 美元，iOS 推送必须有），以及只在上架 Android 时才需要的 Google Play 开发者账号（一次性 25 美元）。最新条款请在 Firebase 控制台的“用量和结算”页面确认。
@@ -18,7 +18,7 @@
 ## 1. Firebase 控制台
 
 - [ ] 打开 [Firebase 控制台](https://console.firebase.google.com)，点“添加项目”，选择已有的 Google Cloud 项目 `glyphora-video`。用同一个项目可以让 Firebase 和后端放在一起。
-- [ ] 添加 **Android 应用**，包名填第 0 节确定的包名（目前是 `com.example.clyven`）。下载 `google-services.json`，放到 `apps/clyven_app/android/app/google-services.json`。
+- [ ] 添加 **Android 应用**，包名填第 0 节确定的包名（目前是 `com.example.glyphora`）。下载 `google-services.json`，放到 `apps/app/android/app/google-services.json`。
 - [ ] 添加 **iOS 应用**，Bundle ID 相同。下载 `GoogleService-Info.plist`，留到第 2 节使用。
 - [ ] 打开“项目设置 → 服务账号 → 生成新的私钥”，下载 JSON。这是服务端发送推送用的密钥，请妥善保管，第 4 节会用到。
 
@@ -29,7 +29,7 @@
 - [ ] 在 Certificates, Identifiers & Profiles → Identifiers 里打开这个 App 的标识符，勾选 **Push Notifications** 和 **Associated Domains**，保存。
 - [ ] 在 Keys 里新建一个密钥，勾选 **Apple Push Notifications service (APNs)**，下载 `.p8` 文件。这个文件只能下载一次。记下 Key ID 和 Team ID。
 - [ ] 在 Firebase 控制台打开“项目设置 → 云消息传递 → iOS 应用配置”，上传 `.p8`，填入 Key ID 和 Team ID。
-- [ ] 用 Xcode 打开 `apps/clyven_app/ios/Runner.xcworkspace`，把 `GoogleService-Info.plist` 拖进 Runner 分组，勾选“Copy items if needed”和 Runner target。
+- [ ] 用 Xcode 打开 `apps/app/ios/Runner.xcworkspace`，把 `GoogleService-Info.plist` 拖进 Runner 分组，勾选“Copy items if needed”和 Runner target。
 - [ ] 在 Runner → Signing & Capabilities 里确认已有 Push Notifications、Associated Domains 和 Background Modes（Audio 与 Remote notifications），缺哪个补哪个。
 
 ## 3. 分享站点与域名
@@ -49,7 +49,7 @@
 ## 4. 服务端
 
 - [ ] 把第 1 节下载的服务账号 JSON 配置成 Serverpod 密码 `fcmServiceAccountJson`。
-  * 本地开发：写入 `server/clyven_backend_server/config/passwords.yaml` 的 `shared:` 下，用单行 JSON 字符串。
+  * 本地开发：写入 `server/backend_server/config/passwords.yaml` 的 `shared:` 下，用单行 JSON 字符串。
   * Cloud Run：把 JSON 存进 Secret Manager，再以环境变量 `SERVERPOD_PASSWORD_fcmServiceAccountJson` 的形式提供给服务。
 - [ ] 给 Cloud Run 的运行服务账号授予这个密钥的 **Secret Manager Secret Accessor** 权限。
 - [ ] 部署服务端，启动时带 `--apply-migrations`，让 `device_token` 表及其 `languageCode` 列被创建（共两个迁移）。
@@ -71,7 +71,7 @@
 分享链接：
 
 - [ ] 分享视频后得到 `https://share.glyphora.net/v/<id>` 形式的链接。
-- [ ] 在装了 App 的手机上点击链接，会在 App 内打开视频。校验文件没填好时，会先打开落地页，再点“在 Clyven 中打开”启动 App。
+- [ ] 在装了 App 的手机上点击链接，会在 App 内打开视频。校验文件没填好时，会先打开落地页，再点“在 Glyphora 中打开”启动 App。
 - [ ] 在没装 App 的手机上，显示落地页。
 
 画中画：
@@ -83,7 +83,7 @@
 
 ## 6. 正式上架前
 
-- [ ] 把 `apps/clyven_app/ios/Runner/Runner.entitlements` 中的 `aps-environment` 从 `development` 改成 `production`。
+- [ ] 把 `apps/app/ios/Runner/Runner.entitlements` 中的 `aps-environment` 从 `development` 改成 `production`。
 - [ ] 如果还没改，替换示例包名（见第 0 节）。
 - [ ] 把正式签名的指纹填进 `assetlinks.json`，并重新部署分享站点。
 

@@ -55,9 +55,9 @@ B 的手机弹出通知，点击后打开对应视频
 
 ## 关键文件
 
-* `server/clyven_backend_server/lib/src/models/device_token.spy.yaml`
-* `server/clyven_backend_server/lib/src/endpoints/push_device_endpoint.dart`
-* `server/clyven_backend_server/lib/src/services/push_service.dart`
-* `server/clyven_backend_server/lib/src/services/notification_service.dart`
-* `apps/clyven_app/lib/core/push/push_notifications.dart`
-* `apps/clyven_app/lib/main.dart`
+* `server/backend_server/lib/src/models/device_token.spy.yaml`
+* `server/backend_server/lib/src/endpoints/push_device_endpoint.dart`
+* `server/backend_server/lib/src/services/push_service.dart`
+* `server/backend_server/lib/src/services/notification_service.dart`
+* `apps/app/lib/core/push/push_notifications.dart`
+* `apps/app/lib/main.dart`

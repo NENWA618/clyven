@@ -1,0 +1,42 @@
+name: glyphora_studio
+description: A new Jaspr project
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+     sdk: flutter
+  jaspr: ^0.23.4
+  jaspr_flutter_embed: ^0.4.11
+  jaspr_router: ^0.9.0
+  glyphora_language_core:
+    git:
+      url: https://github.com/chengyang1017/flutter-languages-config.git
+      ref: main
+  glyphora_backend_client:
+    path: ../../packages/backend_client
+  glyphora_subtitle_editor:
+    path: ../../packages/subtitle_editor
+  serverpod_client: 3.4.11
+  serverpod_auth_core_client: 3.4.11
+  web: ^1.1.1
+
+dev_dependencies:
+  build_runner: ^2.10.0
+  build_web_compilers: 4.4.19
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+  jaspr_builder: ^0.23.4
+
+jaspr:
+  mode: client
+  flutter: none
+
+flutter:
+  uses-material-design: true
+
+resolution: workspace
