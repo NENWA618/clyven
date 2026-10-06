@@ -56,6 +56,7 @@ void consumeWebSession() {
   html.window.history.replaceState(
     null,
     '',
-    html.window.location.pathname! + html.window.location.search,
+    html.window.location.pathname! + (html.window.location.search ?? ''),
   );
 }
+
