@@ -78,7 +78,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       return;
     }
 
-    // position > 0 ä»£è¡¨å·²ç»çœŸæ­£å¼€å§‹æ’­æ”¾ã€‚
+    // position > 0 代表已经真正开始播放。
     if (position > Duration.zero && !_recordedViewVideoIds.contains(video.id)) {
       _recordedViewVideoIds.add(video.id);
 
@@ -101,7 +101,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
       }
     }
 
-    // 5 ç§’æ‰ç®— engaged viewã€‚
+    // 5 秒才算 engaged view。
     if (position.inSeconds >= 5 &&
         !_recordedEngagedViewVideoIds.contains(video.id)) {
       _recordedEngagedViewVideoIds.add(video.id);
@@ -817,7 +817,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'æ‰€å±žç³»åˆ—',
+                        '所属系列',
                         style: TextStyle(
                           color: scheme.onSurfaceVariant,
                           fontSize: 10,
@@ -953,7 +953,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ç³»åˆ—',
+                        '系列',
                         style: TextStyle(
                           color: scheme.onSurfaceVariant,
                           fontSize: 10,
@@ -985,13 +985,10 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
           Expanded(
             child: videosAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) =>
-                  const Center(child: Text('ç³»åˆ—å†…å®¹åŠ è½½å¤±è´¥')),
+              error: (_, _) => const Center(child: Text('系列内容加载失败')),
               data: (videos) {
                 if (videos.isEmpty) {
-                  return const Center(
-                    child: Text('è¿™ä¸ªç³»åˆ—æš‚æ—¶æ²¡æœ‰è§†é¢‘'),
-                  );
+                  return const Center(child: Text('这个系列暂时没有视频'));
                 }
 
                 return ListView.separated(
@@ -1150,7 +1147,7 @@ class _VideoDetailPageState extends ConsumerState<VideoDetailPage> {
                                                     BorderRadius.circular(8),
                                               ),
                                               child: Text(
-                                                'æ­£åœ¨æ’­æ”¾',
+                                                '正在播放',
                                                 style: TextStyle(
                                                   color: scheme.onPrimary,
                                                   fontSize: 9,
