@@ -56,7 +56,7 @@ secrets/
 
 apps/web/build/jaspr/
 
-.clyven-patch-backup/
+.glyphora-patch-backup/
 
 # Generated build output
 **/build/

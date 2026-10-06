@@ -1,4 +1,4 @@
-# glyphora_studio
+# Glyphora Studio
 
 **English** | [简体中文](README.zh-CN.md)
 
