@@ -54,7 +54,7 @@ secrets/
 *.key
 *.pem
 
-apps/clyven_web/build/jaspr/
+apps/web/build/jaspr/
 
 .clyven-patch-backup/
 

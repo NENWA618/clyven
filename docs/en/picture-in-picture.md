@@ -19,7 +19,7 @@ Not included:
 ## Android
 
 * `AndroidManifest.xml` declares `supportsPictureInPicture` and `resizeableActivity` on `MainActivity`.
-* `MainActivity.kt` exposes a `clyven/pip` method channel:
+* `MainActivity.kt` exposes a `glyphora/pip` method channel:
   * Android 12 and later: the activity enters picture-in-picture automatically when the user leaves the app (`setAutoEnterEnabled`).
   * Android 8 to 11: the activity enters picture-in-picture in `onUserLeaveHint`.
   * The window aspect ratio follows the video and is clamped to the range Android accepts (1:2.39 to 2.39:1).
@@ -33,7 +33,7 @@ Not included:
 * iOS can only show picture-in-picture for an `AVPlayerLayer`. The `video_player` plugin renders into a texture by default, which has no such layer, so eligible players use `VideoViewType.platformView` on iOS. That mode renders through a native `AVPlayerLayer`.
 * `ios/Runner/PipBridge.swift` finds the largest on-screen `AVPlayerLayer` that has a player, binds an `AVPictureInPictureController` to it, and enables `canStartPictureInPictureAutomaticallyFromInline` (iOS 14.2 and later) so the system starts picture-in-picture when the app goes to the background. The plugin does not expose its `AVPlayer`, which is why the layer is located by walking the view tree.
 * `Info.plist` enables the `audio` background mode, which picture-in-picture requires. The audio session category is set to playback.
-* The same `clyven/pip` channel and `pipChanged` event are used as on Android. On iOS the system draws the floating window from the native layer, so no Flutter overlay is shown.
+* The same `glyphora/pip` channel and `pipChanged` event are used as on Android. On iOS the system draws the floating window from the native layer, so no Flutter overlay is shown.
 
 ## Things to watch
 
@@ -43,10 +43,10 @@ Not included:
 
 ## Key files
 
-* `apps/clyven_app/lib/core/media/pip_service.dart`
-* `apps/clyven_app/lib/features/video/presentation/widgets/network_video_player.dart`
-* `apps/clyven_app/android/app/src/main/kotlin/com/example/clyven/MainActivity.kt`
-* `apps/clyven_app/android/app/src/main/AndroidManifest.xml`
-* `apps/clyven_app/ios/Runner/PipBridge.swift`
-* `apps/clyven_app/ios/Runner/AppDelegate.swift`
-* `apps/clyven_app/ios/Runner/Info.plist`
+* `apps/app/lib/core/media/pip_service.dart`
+* `apps/app/lib/features/video/presentation/widgets/network_video_player.dart`
+* `apps/app/android/app/src/main/kotlin/com/example/glyphora/MainActivity.kt`
+* `apps/app/android/app/src/main/AndroidManifest.xml`
+* `apps/app/ios/Runner/PipBridge.swift`
+* `apps/app/ios/Runner/AppDelegate.swift`
+* `apps/app/ios/Runner/Info.plist`

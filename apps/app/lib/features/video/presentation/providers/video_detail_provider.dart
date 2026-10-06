@@ -1,0 +1,98 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glyphora_backend_client/backend_client.dart' as serverpod;
+
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/serverpod/serverpod_client_provider.dart';
+import '../../../../core/serverpod/feed_diagnostics.dart';
+
+import '../../data/models/video_detail.dart';
+import '../../data/models/video_content_type.dart';
+import '../../data/repositories/video_repository.dart';
+import '../../data/repositories/serverpod_video_repository.dart';
+
+final videoRepositoryProvider = Provider<VideoRepository>((ref) {
+  final client = ref.watch(serverpodClientProvider);
+
+  return ServerpodVideoRepository(client: client);
+});
+
+// ============================================================
+// 单个视频详情
+// ============================================================
+
+final videoDetailProvider = FutureProvider.family<VideoDetail, String>((
+  ref,
+  videoId,
+) async {
+  ref.watch(authProvider.select((state) => state.value?.id));
+  final repository = ref.watch(videoRepositoryProvider);
+
+  return repository.loadVideoDetail(videoId);
+});
+
+// ============================================================
+// 所有用户发布的视频
+//
+// 首页 / 发现使用。
+// 不根据当前登录账号过滤。
+// ============================================================
+
+final allPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
+  ref,
+) async {
+  final viewerId = ref.watch(authProvider.select((state) => state.value?.id));
+  feedDiagnostic(
+    'FEED_REQUEST viewerUserId=${viewerId ?? 'anonymous'} type=video',
+  );
+  final repository = ref.watch(videoRepositoryProvider);
+
+  return repository.loadPublishedVideos();
+});
+
+// Only persisted short-form content. Regular videos never enter this feed.
+final publishedShortsProvider = FutureProvider<List<VideoDetail>>((ref) async {
+  final viewerId = ref.watch(authProvider.select((state) => state.value?.id));
+  feedDiagnostic(
+    'FEED_REQUEST viewerUserId=${viewerId ?? 'anonymous'} type=short',
+  );
+  final repository = ref.watch(videoRepositoryProvider);
+
+  return repository.loadPublishedVideos(contentType: VideoContentType.short);
+});
+
+// ============================================================
+// 当前用户发布的视频
+//
+// “我的投稿”使用。
+// ============================================================
+
+final myPublishedVideosProvider = FutureProvider<List<VideoDetail>>((
+  ref,
+) async {
+  final user = await ref.watch(authProvider.future);
+
+  if (user == null) {
+    return const [];
+  }
+
+  final repository = ref.watch(videoRepositoryProvider);
+
+  return repository.loadUserVideos(userId: user.id);
+});
+
+// ============================================================
+// 系列中的视频
+//
+// seriesPosition 只负责排序，不代表“集数”。
+// ============================================================
+
+final seriesVideosProvider = FutureProvider.family<List<serverpod.Video>, int>((
+  ref,
+  seriesId,
+) async {
+  ref.watch(authProvider.select((state) => state.value?.id));
+
+  final client = ref.watch(serverpodClientProvider);
+
+  return client.video.getSeriesVideos(seriesId: seriesId);
+});

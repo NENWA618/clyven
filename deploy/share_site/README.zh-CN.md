@@ -12,6 +12,6 @@
 
 部署：在本目录下运行 `firebase deploy --only hosting`。
 
-域名必须与以下三处保持一致：`CLYVEN_SHARE_BASE_URL`（默认 `https://share.glyphora.net`）、`AndroidManifest.xml` 里的 intent filter，以及 `ios/Runner/Runner.entitlements` 里的 `applinks:`。
+域名必须与以下三处保持一致：`GLYPHORA_SHARE_BASE_URL`（默认 `https://share.glyphora.net`）、`AndroidManifest.xml` 里的 intent filter，以及 `ios/Runner/Runner.entitlements` 里的 `applinks:`。
 
 完整的配置步骤见[待办清单](../../docs/zh-CN/owner-checklist.md)。

@@ -3,9 +3,9 @@
 **English** | [简体中文](../zh-CN/playback-traffic-validation-2026-10-04.md)
 
 **Date: 2026-10-04**
-**Test script: Clyven Playback Traffic Verification v6**
+**Test script: Glyphora Playback Traffic Verification v6**
 **Platform: physical Android device**
-**Package name: `com.example.clyven`**
+**Package name: `com.example.glyphora`**
 
 ## Conclusion
 
@@ -127,7 +127,7 @@ These belong to the next stage: request-level traffic and cloud-metric validatio
 
 As of 2026-10-04:
 
-**The core behavior of Clyven's P0 playback traffic optimization has passed device testing.**
+**The core behavior of Glyphora's P0 playback traffic optimization has passed device testing.**
 
 There is no need to repeat the checks for player lifecycle, subtitle looping, Shorts release, and basic local caching unless the related code changes significantly.
 
@@ -137,9 +137,9 @@ There is no need to repeat the checks for player lifecycle, subtitle looping, Sh
 ## v10: cold-cache and warm-cache repeated playback
 
 **Test date: 2026-10-04**
-**Test script: Clyven Playback Traffic Verification v10**
+**Test script: Glyphora Playback Traffic Verification v10**
 
-Before the test, Clyven's local data was cleared with `pm clear` to create a true cold-cache environment. The same regular HLS video was then played twice over exactly the same range.
+Before the test, Glyphora's local data was cleared with `pm clear` to create a true cold-cache environment. The same regular HLS video was then played twice over exactly the same range.
 
 ### Phase A: first playback with a cold cache
 
@@ -164,7 +164,7 @@ Distinct media URLs in the log = 4
 - `VIDEO_CACHE_TASK` fell from 69 to 6, a drop of about **91.3%**.
 - The second playback clearly shows a local HLS segment cache hit.
 - The cache directory grew by about 4.1 MB on the second playback, far below the first playback's roughly 30.3 MB.
-- It is therefore confirmed that **when the same video is watched again over the same range, Clyven reuses the local HLS segment cache and does not download the same content in full again.**
+- It is therefore confirmed that **when the same video is watched again over the same range, Glyphora reuses the local HLS segment cache and does not download the same content in full again.**
 - This proves the client's repeated-playback cache works, but cache directory growth cannot be treated as equal to the egress traffic on the Google Cloud bill.
 
 ### Status update
@@ -184,7 +184,7 @@ Distinct media URLs in the log = 4
 ## v12: subtitle clip loop traffic
 
 **Test date: 2026-10-04**
-**Test script: Clyven Subtitle Clip Loop Traffic Verification v12**
+**Test script: Glyphora Subtitle Clip Loop Traffic Verification v12**
 
 ### First clip playback
 

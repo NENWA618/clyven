@@ -1,10 +1,10 @@
-# Clyven
+# Glyphora
 
 [English](README.md) | **简体中文**
 
 > 一个多语言视频与字幕学习平台，采用 Flutter / Jaspr + Serverpod 的 Monorepo 架构。
 
-**Clyven** 最初是一个视频平台项目，现已发展为**多语言视频与字幕学习平台**：用户在观看视频的同时，可以查看双语或精校字幕，点击单词查词典、收藏生词、管理生词本，并追踪自己对词汇的掌握程度（Knowledge State）。项目还覆盖完整的字幕生产工作流：越南语 Chữ Nôm ↔ Quốc Ngữ 文字转换、AI 字幕生成（ASR）以及人工字幕审核。
+**Glyphora** 最初是一个视频平台项目，现已发展为**多语言视频与字幕学习平台**：用户在观看视频的同时，可以查看双语或精校字幕，点击单词查词典、收藏生词、管理生词本，并追踪自己对词汇的掌握程度（Knowledge State）。项目还覆盖完整的字幕生产工作流：越南语 Chữ Nôm ↔ Quốc Ngữ 文字转换、AI 字幕生成（ASR）以及人工字幕审核。
 
 移动客户端使用 **Riverpod**（Flutter）管理状态，Web 前端使用 **Jaspr**（Dart Web 框架），它们都通过统一的 **Serverpod** 后端通信。
 
@@ -24,16 +24,16 @@
 
 ## 项目组成
 
-Clyven 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使用 Melos 统一管理。
+Glyphora 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使用 Melos 统一管理。
 
 | 应用 | 技术栈 | 定位 | 本地端口 |
 | --- | --- | --- | --- |
-| `apps/clyven_app` | Flutter（iOS / Android / 桌面） | 面向普通用户的主客户端：视频流、字幕学习、词典、生词本 | - |
-| `apps/clyven_web` | Jaspr（Dart Web） | 面向普通用户的公开 Web 端，功能与 `clyven_app` 对齐 | 8084 |
-| `apps/clyven_studio` | Jaspr（Dart Web） | 创作者后台：视频上传与管理、字幕与词典管理、评论管理 | 8083 |
-| `apps/clyven_admin` | Jaspr（Dart Web） | 内部管理后台：用户管理、越南语文字转换工具 | 8082 |
-| `apps/clyven_review` | Jaspr（Dart Web） | 字幕审核工作台：审核队列、审核任务详情 | 8081 |
-| `server/clyven_backend_server` | Serverpod | 所有前端共用的统一后端 | 8080 |
+| `apps/app` | Flutter（iOS / Android / 桌面） | 面向普通用户的主客户端：视频流、字幕学习、词典、生词本 | - |
+| `apps/web` | Jaspr（Dart Web） | 面向普通用户的公开 Web 端，功能与 `glyphora_app` 对齐 | 8084 |
+| `apps/studio` | Jaspr（Dart Web） | 创作者后台：视频上传与管理、字幕与词典管理、评论管理 | 8083 |
+| `apps/admin` | Jaspr（Dart Web） | 内部管理后台：用户管理、越南语文字转换工具 | 8082 |
+| `apps/review` | Jaspr（Dart Web） | 字幕审核工作台：审核队列、审核任务详情 | 8081 |
+| `server/backend_server` | Serverpod | 所有前端共用的统一后端 | 8080 |
 
 ---
 
@@ -67,7 +67,7 @@ Clyven 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使�
 
 ### 文字转换
 
-* 越南语 Chữ Nôm ↔ Quốc Ngữ 转换（`clyven_nom_converter`）
+* 越南语 Chữ Nôm ↔ Quốc Ngữ 转换（`glyphora_nom_converter`）
 * 转换配置管理、批量导入预览与提交
 
 ### 创作者（Studio）
@@ -136,9 +136,9 @@ Clyven 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使�
 
 ### 共享包
 
-* `clyven_nom_converter`：越南语 Latin ↔ Chữ Nôm 转换核心库（含命令行工具）
-* `clyven_subtitle_editor`：Studio 与 Review 共用的字幕编辑组件（时间轴、卡拉 OK 分段、SRT 导入导出）
-* `clyven_backend_client`：Serverpod 自动生成的客户端代码，所有前端共用
+* `glyphora_nom_converter`：越南语 Latin ↔ Chữ Nôm 转换核心库（含命令行工具）
+* `glyphora_subtitle_editor`：Studio 与 Review 共用的字幕编辑组件（时间轴、卡拉 OK 分段、SRT 导入导出）
+* `glyphora_backend_client`：Serverpod 自动生成的客户端代码，所有前端共用
 
 ### Monorepo 工具
 
@@ -149,7 +149,7 @@ Clyven 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使�
 
 ## 架构
 
-`clyven_app` 按功能（Feature）划分模块。`clyven_web`、`clyven_studio`、`clyven_admin`、`clyven_review` 采用类似的 pages / components / services 结构。
+`glyphora_app` 按功能（Feature）划分模块。`glyphora_web`、`glyphora_studio`、`glyphora_admin`、`glyphora_review` 采用类似的 pages / components / services 结构。
 
 ```text
 lib/
@@ -259,22 +259,22 @@ push_service                       通过 Firebase Cloud Messaging 发送推送
 ## 目录结构
 
 ```text
-clyven/
+glyphora/
 │
 ├── apps/
-│   ├── clyven_app/            # Flutter 主客户端
-│   ├── clyven_web/            # Jaspr 公开 Web 端
-│   ├── clyven_studio/         # Jaspr 创作者后台
-│   ├── clyven_admin/          # Jaspr 内部管理后台
-│   └── clyven_review/         # Jaspr 字幕审核工作台
+│   ├── app/            # Flutter 主客户端
+│   ├── web/            # Jaspr 公开 Web 端
+│   ├── studio/         # Jaspr 创作者后台
+│   ├── admin/          # Jaspr 内部管理后台
+│   └── review/         # Jaspr 字幕审核工作台
 │
 ├── packages/
-│   ├── clyven_backend_client/    # 生成的 Serverpod 客户端
-│   ├── clyven_subtitle_editor/   # 共享字幕编辑组件
-│   └── clyven_nom_converter/     # 越南语文字转换核心库
+│   ├── backend_client/    # 生成的 Serverpod 客户端
+│   ├── subtitle_editor/   # 共享字幕编辑组件
+│   └── nom_converter/     # 越南语文字转换核心库
 │
 ├── server/
-│   └── clyven_backend_server/    # Serverpod 后端与数据库迁移
+│   └── backend_server/    # Serverpod 后端与数据库迁移
 │
 ├── deploy/
 │   └── share_site/            # 分享链接使用的 Firebase Hosting 站点
@@ -296,7 +296,7 @@ Flutter 应用、生成的 Serverpod 客户端、Serverpod 后端以及各个 Ja
 ProviderScope
      │
      ▼
-ClyvenApp
+GlyphoraApp
      │
      ▼
 AuthGate
@@ -323,8 +323,8 @@ Application
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/chengyang1017/clyven.git
-cd clyven
+git clone https://github.com/chengyang1017/glyphora.git
+cd glyphora
 ```
 
 ### 2. 安装 workspace 依赖
@@ -336,7 +336,7 @@ dart pub get
 ### 3. 生成 Serverpod 代码
 
 ```bash
-cd server/clyven_backend_server
+cd server/backend_server
 serverpod generate
 cd ../..
 ```
@@ -344,7 +344,7 @@ cd ../..
 ### 4. 启动后端
 
 ```bash
-cd server/clyven_backend_server
+cd server/backend_server
 dart run bin/main.dart --apply-migrations
 ```
 
@@ -353,7 +353,7 @@ dart run bin/main.dart --apply-migrations
 Flutter 客户端（如果缺少 `lib/l10n/app_localizations.dart`，先生成本地化文件）：
 
 ```bash
-cd apps/clyven_app
+cd apps/app
 flutter gen-l10n
 flutter run
 ```
@@ -361,10 +361,10 @@ flutter run
 Jaspr Web 应用（任选其一，或用 Melos 同时启动多个）：
 
 ```bash
-melos run dev:web      # clyven_web    -> :8084
-melos run dev:studio   # clyven_studio -> :8083
-melos run dev:admin    # clyven_admin  -> :8082
-melos run dev:review   # clyven_review -> :8081
+melos run dev:web      # glyphora_web    -> :8084
+melos run dev:studio   # glyphora_studio -> :8083
+melos run dev:admin    # glyphora_admin  -> :8082
+melos run dev:review   # glyphora_review -> :8081
 melos run dev:all      # 同时启动 web、studio、admin、review
 melos run dev:stop     # 停止残留的本地开发服务
 ```
@@ -374,7 +374,7 @@ melos run dev:stop     # 停止残留的本地开发服务
 Flutter 应用：
 
 ```bash
-cd apps/clyven_app
+cd apps/app
 flutter test
 flutter analyze
 ```
@@ -389,7 +389,7 @@ melos run test
 后端：
 
 ```bash
-cd server/clyven_backend_server
+cd server/backend_server
 dart analyze
 dart test
 ```

@@ -11,11 +11,11 @@
 apps/**
 packages/**
 !packages/
-!packages/clyven_nom_converter/
-!packages/clyven_nom_converter/**
+!packages/nom_converter/
+!packages/nom_converter/**
 
 *.log
 
 !pubspec.lock
 !cloudbuild.server.yaml
-!server/clyven_backend_server/**
+!server/backend_server/**
