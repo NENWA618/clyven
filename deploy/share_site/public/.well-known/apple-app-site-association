@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["REPLACE_WITH_TEAM_ID.com.example.glyphora"],
+        "appIDs": ["REPLACE_WITH_TEAM_ID.com.glyphora.app"],
         "components": [{ "/": "/v/*" }]
       }
     ]

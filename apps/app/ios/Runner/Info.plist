@@ -60,7 +60,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.example.glyphora</string>
+			<string>com.glyphora.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>glyphora</string>

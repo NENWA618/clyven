@@ -1,4 +1,4 @@
-package com.example.glyphora
+package com.glyphora.app
 
 import android.app.PictureInPictureParams
 import android.content.res.Configuration

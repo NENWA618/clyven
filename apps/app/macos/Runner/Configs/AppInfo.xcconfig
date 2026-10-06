@@ -8,7 +8,7 @@
 PRODUCT_NAME = Glyphora
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.glyphora
+PRODUCT_BUNDLE_IDENTIFIER = com.glyphora.app
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Glyphora. All rights reserved.
