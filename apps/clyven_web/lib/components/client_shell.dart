@@ -1,8 +1,11 @@
-﻿import 'package:jaspr/dom.dart';
+﻿import 'dart:html' as html;
+
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 
 import '../l10n/web_l10n.dart';
+import '../services/studio_handoff.dart';
 import 'notification_bell.dart';
 import 'search_box.dart';
 import 'web_avatar_upload.dart';
@@ -52,7 +55,13 @@ class ClientShell extends StatelessComponent {
             ),
           ]),
           div(classes: 'client-header-actions', [
-            a(href: studioUrl, [
+            a(href: studioUrl, events: {
+              'click': (event) {
+                final dynamic e = event;
+                e.preventDefault();
+                html.window.location.href = studioUrlWithSession(studioUrl);
+              },
+            }, [
               span(classes: 'studio-entry-button', [.text(l10n.studio)]),
             ]),
             const SearchBox(),

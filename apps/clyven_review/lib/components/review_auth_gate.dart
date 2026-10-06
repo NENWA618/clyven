@@ -31,6 +31,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
 
   Future<void> _restore() async {
     try {
+      consumeWebSession();
       await reviewClient.auth.initialize();
 
       if (!mounted) return;

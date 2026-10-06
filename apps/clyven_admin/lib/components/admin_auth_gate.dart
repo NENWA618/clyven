@@ -31,6 +31,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
 
   Future<void> _restore() async {
     try {
+      consumeWebSession();
       await adminClient.auth.initialize();
 
       if (!mounted) return;

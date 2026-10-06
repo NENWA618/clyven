@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:html' as html;
 
 import 'package:clyven_backend_client/clyven_backend_client.dart';
@@ -30,3 +31,25 @@ final reviewClient =
           keyValueStorage: BrowserKeyValueStorage(),
         ),
       );
+
+/// Imports a session handed over from Clyven Web (`#sso=<base64url>`), then
+/// strips the fragment. Must run before `reviewClient.auth.initialize()`.
+/// An invalid or expired session is simply rejected by initialize/refresh and
+/// falls back to the normal login form.
+void consumeWebSession() {
+  final match = RegExp(r'(?:^#|&)sso=([^&]+)').firstMatch(html.window.location.hash);
+  if (match == null) return;
+
+  try {
+    final session = utf8.decode(base64Url.decode(match.group(1)!));
+    html.window.localStorage['serverpod_auth_success_key'] = session;
+  } catch (_) {
+    // Malformed payload: ignore and use the regular login.
+  }
+
+  html.window.history.replaceState(
+    null,
+    '',
+    html.window.location.pathname! + html.window.location.search,
+  );
+}
