@@ -27,3 +27,18 @@ String locationHash() => html.window.location.hash;
 void setDocumentLang(String lang) {
   html.document.documentElement?.lang = lang;
 }
+
+bool prefersDark() {
+  try {
+    return html.window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch (_) {
+    return false;
+  }
+}
+
+void setDocumentTheme(String theme) {
+  html.document.documentElement?.setAttribute('data-theme', theme);
+}
+
+String? documentTheme() =>
+    html.document.documentElement?.getAttribute('data-theme');

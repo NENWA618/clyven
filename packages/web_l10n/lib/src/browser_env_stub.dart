@@ -5,3 +5,6 @@ void writeStored(String key, String? value) {}
 String browserLanguage() => 'en';
 String locationHash() => '';
 void setDocumentLang(String lang) {}
+bool prefersDark() => false;
+void setDocumentTheme(String theme) {}
+String? documentTheme() => null;

@@ -12,28 +12,41 @@ enum WebLang { en, zh }
 
 const _storageKey = 'glyphora.web_locale';
 
-/// Fragment key used to carry the language across origins (Web -> Studio).
-const languageHandoffKey = 'lang';
+/// Shared by every frontend (and by the inline boot script in each
+/// `index.html`, which applies it before first paint).
+const themeStorageKey = 'glyphora-theme';
 
-/// Reads a language handed over in the URL fragment (`#lang=en|zh`) into
-/// localStorage. Call before the first build; it does not touch other
-/// fragment parameters.
-void consumeLanguageHandoff() {
-  final match = RegExp(
-    '(?:^#|&)$languageHandoffKey=(en|zh)(?:&|\$)',
-  ).firstMatch(locationHash());
-  if (match == null) return;
-  writeStored(_storageKey, match.group(1));
+/// Fragment keys used to carry preferences across origins (Web -> Studio).
+const languageHandoffKey = 'lang';
+const themeHandoffKey = 'theme';
+
+/// Reads preferences handed over in the URL fragment (`#lang=en|zh`,
+/// `#theme=light|dark`) into localStorage. Call before the first build; it
+/// does not touch other fragment parameters.
+void consumePreferenceHandoff() {
+  final hash = locationHash();
+  final lang = RegExp('(?:^#|&)$languageHandoffKey=(en|zh)(?:&|\$)').firstMatch(hash);
+  if (lang != null) writeStored(_storageKey, lang.group(1));
+  final theme =
+      RegExp('(?:^#|&)$themeHandoffKey=(light|dark)(?:&|\$)').firstMatch(hash);
+  if (theme != null) writeStored(themeStorageKey, theme.group(1));
 }
 
-/// Adds the current language to [url]'s fragment so another origin can pick it
-/// up with [consumeLanguageHandoff].
-String withLanguageHandoff(String url, WebLocalePreference preference) {
-  if (preference == WebLocalePreference.system) return url;
+/// Adds the current language and theme to [url]'s fragment so another origin
+/// can pick them up with [consumePreferenceHandoff].
+String withPreferenceHandoff(String url, WebLocalePreference preference) {
+  final parts = <String>[
+    if (preference != WebLocalePreference.system)
+      '$languageHandoffKey=${preference.name}',
+    if (readStored(themeStorageKey) case final theme?
+        when theme == 'light' || theme == 'dark')
+      '$themeHandoffKey=$theme',
+  ];
+  if (parts.isEmpty) return url;
   final uri = Uri.parse(url);
   final fragment = uri.fragment.isEmpty
-      ? '$languageHandoffKey=${preference.name}'
-      : '${uri.fragment}&$languageHandoffKey=${preference.name}';
+      ? parts.join('&')
+      : '${uri.fragment}&${parts.join('&')}';
   return uri.replace(fragment: fragment).toString();
 }
 
@@ -101,7 +114,7 @@ class _WebLocaleRootState extends State<WebLocaleRoot> {
   @override
   void initState() {
     super.initState();
-    consumeLanguageHandoff();
+    consumePreferenceHandoff();
     _preference = _readPreference();
     _applyLang(_preference);
   }
@@ -192,6 +205,56 @@ class LanguageSwitcher extends StatelessComponent {
           [.text(context.tr('Simplified Chinese', '简体中文'))],
         ),
       ],
+    );
+  }
+}
+
+/// Light/dark theme toggle shared by every frontend. The theme lives on
+/// `<html data-theme="light|dark">`; each app's CSS keys off that attribute.
+/// Without a stored choice it follows the system preference.
+class ThemeToggle extends StatefulComponent {
+  const ThemeToggle({super.key});
+
+  @override
+  State<ThemeToggle> createState() => _ThemeToggleState();
+}
+
+class _ThemeToggleState extends State<ThemeToggle> {
+  late bool _dark;
+
+  static bool _resolveDark() {
+    final stored = readStored(themeStorageKey);
+    if (stored == 'dark') return true;
+    if (stored == 'light') return false;
+    return prefersDark();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dark = _resolveDark();
+    setDocumentTheme(_dark ? 'dark' : 'light');
+  }
+
+  void _toggle() {
+    setState(() => _dark = !_dark);
+    final theme = _dark ? 'dark' : 'light';
+    writeStored(themeStorageKey, theme);
+    setDocumentTheme(theme);
+  }
+
+  @override
+  Component build(BuildContext context) {
+    final label = _dark
+        ? context.tr('Switch to light mode', '切换到日间模式')
+        : context.tr('Switch to dark mode', '切换到深夜模式');
+
+    return button(
+      type: ButtonType.button,
+      classes: 'theme-toggle',
+      attributes: {'aria-label': label, 'title': label},
+      onClick: _toggle,
+      [.text(_dark ? '☀' : '☾')],
     );
   }
 }

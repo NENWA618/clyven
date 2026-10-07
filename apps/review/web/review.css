@@ -252,7 +252,7 @@
 /* -------------------------------------------------------------------------- */
 
 :root,
-html[data-review-theme='light'] {
+html[data-theme='light'] {
   --review-bg: #f4f6f9;
   --review-surface: #ffffff;
   --review-surface-2: #f8fafc;
@@ -270,7 +270,7 @@ html[data-review-theme='light'] {
   --review-shadow: 0 8px 24px rgba(15, 23, 42, .07);
 }
 
-html[data-review-theme='dark'] {
+html[data-theme='dark'] {
   --review-bg: #090d13;
   --review-surface: #111720;
   --review-surface-2: #171e29;
@@ -534,4 +534,25 @@ body {
 .language-switcher option {
   color: #111827;
   background: #ffffff;
+}
+
+/* Theme toggle (shared via glyphora_web_l10n) */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(128, 128, 128, 0.15);
 }

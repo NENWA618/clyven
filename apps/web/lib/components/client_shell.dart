@@ -60,7 +60,7 @@ class ClientShell extends StatelessComponent {
               'click': (event) {
                 final dynamic e = event;
                 e.preventDefault();
-                html.window.location.href = withLanguageHandoff(
+                html.window.location.href = withPreferenceHandoff(
                   studioUrlWithSession(studioUrl),
                   preference,
                 );
@@ -70,6 +70,7 @@ class ClientShell extends StatelessComponent {
             ]),
             const SearchBox(),
             const LanguageSwitcher(),
+            const ThemeToggle(),
             const NotificationBell(),
             WebAvatarUpload(),
           ]),

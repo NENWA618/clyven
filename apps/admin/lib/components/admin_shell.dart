@@ -70,6 +70,7 @@ class AdminShell extends StatelessComponent {
           ]),
           div(classes: 'review-topbar-actions', [
             const LanguageSwitcher(),
+            const ThemeToggle(),
             span(classes: 'glyphora-admin-scope-badge', [.text('ADMIN')]),
           ]),
         ]),

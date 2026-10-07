@@ -2328,45 +2328,6 @@ button, input {
   color-scheme: dark;
 }
 
-.glyphora-night-mode-toggle {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid rgba(15, 23, 42, .12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .92);
-  color: #111827;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, .16);
-  backdrop-filter: blur(14px);
-  font: inherit;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    transform .15s ease,
-    background .15s ease,
-    color .15s ease,
-    border-color .15s ease,
-    box-shadow .15s ease;
-}
-
-.glyphora-night-mode-toggle:hover {
-  transform: translateY(-2px);
-}
-
-:root[data-theme="dark"] .glyphora-night-mode-toggle {
-  border-color: rgba(255, 255, 255, .12);
-  background: rgba(17, 24, 39, .92);
-  color: #f8fafc;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, .34);
-}
-
 :root[data-theme="dark"] body {
   background: #090d14;
   color: #e5e7eb;
@@ -2479,31 +2440,11 @@ button, input {
 }
 
 @media (max-width: 600px) {
-  .glyphora-night-mode-toggle {
-    right: 12px;
-    bottom: 12px;
-    width: 40px;
-    height: 40px;
   }
-}
 
 /* GLYPHORA WEB NIGHT MODE V2 APPBAR */
 
 /* The theme control belongs in the AppBar, not as a floating action button. */
-.glyphora-night-mode-toggle {
-  position: static !important;
-  right: auto !important;
-  bottom: auto !important;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  margin-left: 10px;
-  border-radius: 10px;
-  box-shadow: none;
-  backdrop-filter: none;
-  font-size: 18px;
-}
-
 /* AppBar / top navigation */
 :root[data-theme="dark"] header,
 :root[data-theme="dark"] nav,
@@ -2546,17 +2487,7 @@ button, input {
   color: #e5e7eb;
 }
 
-:root[data-theme="dark"] .glyphora-night-mode-toggle {
-  border-color: #334155 !important;
-  background: #151d2a !important;
-  color: #f8fafc !important;
-}
-
-:root[data-theme="dark"] .glyphora-night-mode-toggle:hover {
-  background: #1e293b !important;
-}
-
-/* Keep page surfaces consistent with the dark AppBar. */
+:root[data-theme="dark"] :root[data-theme="dark"] /* Keep page surfaces consistent with the dark AppBar. */
 :root[data-theme="dark"] main {
   background: #090d14;
 }
@@ -2568,12 +2499,7 @@ button, input {
 }
 
 @media (max-width: 600px) {
-  .glyphora-night-mode-toggle {
-    width: 34px;
-    height: 34px;
-    margin-left: 6px;
   }
-}
 
 /* GLYPHORA WEB AVATAR UPLOAD V1 */
 
@@ -5024,3 +4950,24 @@ button, input {
   }
 }
 /* === End public profile v2 === */
+
+/* Theme toggle (shared via glyphora_web_l10n) */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(128, 128, 128, 0.15);
+}

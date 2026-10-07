@@ -7889,3 +7889,24 @@ button:disabled { opacity: .55; cursor: default; }
   color: #111827;
   background: #ffffff;
 }
+
+/* Theme toggle (shared via glyphora_web_l10n) */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(128, 128, 128, 0.15);
+}

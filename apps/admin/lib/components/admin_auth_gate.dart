@@ -207,6 +207,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
             ),
           if (_error != null) div(classes: 'admin-error', [.text(_error!)]),
           const LanguageSwitcher(),
+          const ThemeToggle(),
         ]),
       ]);
     }

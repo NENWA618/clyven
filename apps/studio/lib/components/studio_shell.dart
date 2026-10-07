@@ -123,6 +123,7 @@ class StudioShell extends StatelessComponent {
                   classes: 'studio-topbar-actions',
                   [
                     const LanguageSwitcher(),
+                    const ThemeToggle(),
                     span(
                       classes: 'studio-environment',
                       [.text(context.tr('Production', '生产环境'))],

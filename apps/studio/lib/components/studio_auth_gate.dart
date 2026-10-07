@@ -186,6 +186,7 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
                   [.text(_error!)],
                 ),
               const LanguageSwitcher(),
+              const ThemeToggle(),
             ],
           ),
         ],

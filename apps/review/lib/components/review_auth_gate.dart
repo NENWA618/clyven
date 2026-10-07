@@ -207,6 +207,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
             ),
           if (_error != null) div(classes: 'admin-error', [.text(_error!)]),
           const LanguageSwitcher(),
+          const ThemeToggle(),
         ]),
       ]);
     }
