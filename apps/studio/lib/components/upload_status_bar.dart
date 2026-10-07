@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
@@ -43,15 +44,15 @@ class _UploadStatusBarState extends State<UploadStatusBar> {
 
     switch (task.stage) {
       case StudioUploadStage.uploading:
-        statusText = 'Uploading · $percent%';
+        statusText = context.tr('Uploading · $percent%', '上传中 · $percent%');
       case StudioUploadStage.verifying:
-        statusText = 'Upload complete · Verifying';
+        statusText = context.tr('Upload complete · Verifying', '上传完成 · 校验中');
       case StudioUploadStage.processing:
-        statusText = 'Uploaded · Processing video';
+        statusText = context.tr('Uploaded · Processing video', '已上传 · 视频处理中');
       case StudioUploadStage.completed:
-        statusText = 'Upload complete';
+        statusText = context.tr('Upload complete', '上传完成');
       case StudioUploadStage.failed:
-        statusText = 'Upload failed';
+        statusText = context.tr('Upload failed', '上传失败');
     }
 
     return div(

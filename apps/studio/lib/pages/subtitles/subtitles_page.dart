@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:glyphora_language_core/glyphora_language_core.dart';
 import 'package:jaspr/dom.dart';
@@ -276,27 +277,27 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
         div(classes: 'subtitle-manager-header', [
           div([
             p(classes: 'subtitle-manager-kicker', [.text('GLYPHORA STUDIO')]),
-            h1([.text('字幕管理')]),
-            p([.text('管理当前视频的原文、翻译与文字系统。')]),
+            h1([.text(context.tr('Subtitle management', '字幕管理'))]),
+            p([.text(context.tr('Manage the source text, translations and scripts of the current video.', '管理当前视频的原文、翻译与文字系统。'))]),
           ]),
         ]),
 
         if (loading)
-          div(classes: 'subtitle-manager-state', [.text('正在读取视频…')])
+          div(classes: 'subtitle-manager-state', [.text(context.tr('Loading videos…', '正在读取视频…'))])
         else if (error != null)
           div(classes: 'subtitle-manager-state is-error', [.text(error!)])
         else if (videos.isEmpty)
-          div(classes: 'subtitle-manager-state', [.text('目前没有视频')])
+          div(classes: 'subtitle-manager-state', [.text(context.tr('No videos yet', '目前没有视频'))])
         else ...[
-          _currentVideoBar(),
-          if (showVideoPicker) _videoPicker(),
+          _currentVideoBar(context),
+          if (showVideoPicker) _videoPicker(context),
           _trackManager(context),
         ],
       ],
     );
   }
 
-  Component _currentVideoBar() {
+  Component _currentVideoBar(BuildContext context) {
     final video = selectedVideo;
     if (video == null) {
       return const Component.fragment([]);
@@ -320,12 +321,12 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
       ),
       div(classes: 'subtitle-manager-current-copy', [
         span(classes: 'subtitle-manager-current-label', [
-          .text('CURRENT VIDEO'),
+          .text(context.tr('CURRENT VIDEO', '当前视频')),
         ]),
         h2([.text(video.title)]),
         div(classes: 'subtitle-manager-current-meta', [
           span([.text(video.authorName)]),
-          if (source != null) span([.text('${source.flag} ${source.nameOf('zh')}')]),
+          if (source != null) span([.text('${source.flag} ${source.nameOf(context.lang.name)}')]),
           span([.text('${video.durationSeconds}s')]),
         ]),
       ]),
@@ -338,14 +339,14 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
           });
         },
         [
-          span([.text(showVideoPicker ? '收起' : '切换视频')]),
+          span([.text(showVideoPicker ? context.tr('Collapse', '收起') : context.tr('Switch video', '切换视频'))]),
           b([.text(showVideoPicker ? '↑' : '↓')]),
         ],
       ),
     ]);
   }
 
-  Component _videoPicker() {
+  Component _videoPicker(BuildContext context) {
     return div(classes: 'subtitle-manager-video-picker', [
       div(classes: 'subtitle-manager-video-grid', [
         for (final video in videos) _videoPickerItem(video),
@@ -389,8 +390,8 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
     return section(classes: 'subtitle-manager-tracks', [
       div(classes: 'subtitle-manager-section-head', [
         div([
-          h2([.text('字幕轨')]),
-          p([.text('原文与翻译分开管理，直接进入对应轨道编辑。')]),
+          h2([.text(context.tr('Subtitle tracks', '字幕轨'))]),
+          p([.text(context.tr('Source and translations are managed separately; jump straight into a track to edit it.', '原文与翻译分开管理，直接进入对应轨道编辑。'))]),
         ]),
         button(
           type: ButtonType.button,
@@ -402,24 +403,24 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
           },
           [
             span([.text('+')]),
-            strong([.text('添加翻译语言')]),
+            strong([.text(context.tr('Add translation language', '添加翻译语言'))]),
           ],
         ),
       ]),
 
       if (source != null) ...[
-        _trackGroupTitle('原文', 'Original'),
+        _trackGroupTitle(context.tr('Source', '原文'), context.tr('Original', 'Original')),
         _trackRow(context, source, isSource: true),
       ],
 
       if (translations.isNotEmpty) ...[
-        _trackGroupTitle('翻译', 'Translations'),
+        _trackGroupTitle(context.tr('Translations', '翻译'), 'Translations'),
         for (final language in translations) _trackRow(context, language),
       ],
 
       if (loadingPriorityLanguages)
         div(classes: 'subtitle-manager-state compact', [
-          .text('正在读取字幕轨…'),
+          .text(context.tr('Loading subtitle tracks…', '正在读取字幕轨…')),
         ]),
 
       if (showAllLanguages) _languagePicker(context),
@@ -443,8 +444,8 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
     final selectedScript = selectedLanguage?.code == language.code ? selectedScriptCode : null;
 
     final scriptLabel = selectedScript == null
-        ? (scripts.isEmpty ? 'Legacy / unspecified' : language.scriptNameOf(scripts.first.code, 'zh'))
-        : language.scriptNameOf(selectedScript, 'zh');
+        ? (scripts.isEmpty ? context.tr('Legacy / unspecified', '旧版 / 未指定') : language.scriptNameOf(scripts.first.code, context.lang.name))
+        : language.scriptNameOf(selectedScript, context.lang.name);
 
     final scriptCode = selectedScript ?? (scripts.isEmpty ? null : scripts.first.code);
 
@@ -452,18 +453,18 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
       span(classes: 'subtitle-manager-track-flag', [.text(language.flag)]),
       div(classes: 'subtitle-manager-track-language', [
         div([
-          strong([.text(language.nameOf('zh'))]),
-          span([.text(language.nameOf('en'))]),
+          strong([.text(language.nameOf(context.lang.name))]),
+          span([.text(language.nameOf(context.isZh ? 'en' : 'zh'))]),
         ]),
         span(
           classes: 'subtitle-manager-track-badge ${isSource ? 'is-source' : 'is-translation'}',
           [
             .text(
               isSource
-                  ? '原文'
+                  ? context.tr('Source', '原文')
                   : hasTrack
-                  ? '翻译'
-                  : '待创建',
+                  ? context.tr('Translation', '翻译')
+                  : context.tr('To create', '待创建'),
             ),
           ],
         ),
@@ -482,7 +483,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
         classes: 'subtitle-manager-edit-track',
         onClick: () => _openEditor(context, language, scriptCode: scriptCode),
         [
-          span([.text('进入编辑')]),
+          span([.text(context.tr('Edit', '进入编辑'))]),
           b([.text('→')]),
         ],
       ),
@@ -524,7 +525,7 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
         input<String>(
           type: InputType.text,
           attributes: {
-            'placeholder': '搜索中文名 / English / code',
+            'placeholder': context.tr('Search by Chinese name / English / code', '搜索中文名 / English / code'),
             'value': languageSearch,
           },
           events: events<String>(
@@ -550,8 +551,8 @@ class _SubtitlesPageState extends State<SubtitlesPage> {
             [
               span([.text(item.flag)]),
               div([
-                strong([.text(item.nameOf('zh'))]),
-                small([.text(item.nameOf('en'))]),
+                strong([.text(item.nameOf(context.lang.name))]),
+                small([.text(item.nameOf(context.isZh ? 'en' : 'zh'))]),
               ]),
               code([.text(item.code)]),
             ],

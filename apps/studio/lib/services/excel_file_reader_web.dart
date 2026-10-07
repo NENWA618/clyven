@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 import 'dart:html' as html;
 import 'dart:typed_data';
@@ -35,7 +36,7 @@ Future<Uint8List?> readSelectedExcelFile(
     } else {
       completer.completeError(
         StateError(
-          '无法读取 Excel 文件内容：${result.runtimeType}',
+          trNow('Could not read the Excel file contents: ${result.runtimeType}', '无法读取 Excel 文件内容：${result.runtimeType}'),
         ),
       );
     }
@@ -45,7 +46,7 @@ Future<Uint8List?> readSelectedExcelFile(
     if (!completer.isCompleted) {
       completer.completeError(
         StateError(
-          '读取 Excel 文件失败',
+          trNow('Failed to read the Excel file', '读取 Excel 文件失败'),
         ),
       );
     }

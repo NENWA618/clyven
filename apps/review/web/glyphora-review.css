@@ -1,0 +1,52 @@
+/* Glyphora "Vivid" review skin: review-only touches on top of
+   glyphora-console.css. */
+
+.review-task-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.review-task-toolbar-copy {
+  display: grid;
+  justify-items: end;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.review-task-toolbar-copy strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.review-credit-lines,
+.review-workflow-credits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.review-credit-lines span,
+.review-workflow-credits span {
+  display: block;
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.review-history-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.review-history-time {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}

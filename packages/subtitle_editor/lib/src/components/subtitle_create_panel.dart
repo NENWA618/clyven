@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 
@@ -36,34 +37,34 @@ class SubtitleCreatePanel extends StatelessComponent {
   Component build(BuildContext context) {
     return div(classes: 'subtitle-create-panel', [
       div(classes: 'subtitle-create-header', [
-        h3([.text('Add subtitle')]),
-        p([.text('新增一条字幕 Cue')]),
+        h3([.text(context.tr('Add subtitle', '添加字幕'))]),
+        p([.text(context.tr('Add a new subtitle cue', '新增一条字幕 Cue'))]),
       ]),
       div(classes: 'subtitle-create-fields', [
         label([
-          span([.text('Start')]),
+          span([.text(context.tr('Start', '开始'))]),
           input<String>(
             attributes: {'value': startTime, 'placeholder': '00:00.000'},
             events: events<String>(onInput: onStartChanged),
           ),
           button(type: ButtonType.button, onClick: onUseCurrentStart, [
-            .text('Use current'),
+            .text(context.tr('Use current', '使用当前时间')),
           ]),
         ]),
         label([
-          span([.text('End')]),
+          span([.text(context.tr('End', '结束'))]),
           input<String>(
             attributes: {'value': endTime, 'placeholder': '00:03.000'},
             events: events<String>(onInput: onEndChanged),
           ),
           button(type: ButtonType.button, onClick: onUseCurrentEnd, [
-            .text('Use current'),
+            .text(context.tr('Use current', '使用当前时间')),
           ]),
         ]),
         label(classes: 'subtitle-create-text-field', [
-          span([.text('Subtitle')]),
+          span([.text(context.tr('Subtitle', '字幕'))]),
           input<String>(
-            attributes: {'value': subtitleText, 'placeholder': '输入字幕内容...'},
+            attributes: {'value': subtitleText, 'placeholder': context.tr('Enter subtitle text...', '输入字幕内容...')},
             events: events<String>(onInput: onTextChanged),
           ),
         ]),
@@ -75,7 +76,7 @@ class SubtitleCreatePanel extends StatelessComponent {
               : () {
                   onCreate();
                 },
-          [.text(creating ? 'Adding...' : '+ Add subtitle')],
+          [.text(creating ? context.tr('Adding...', '添加中...') : context.tr('+ Add subtitle', '+ 添加字幕'))],
         ),
       ]),
       if (error != null) div(classes: 'subtitle-save-error', [.text(error!)]),

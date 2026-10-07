@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -150,7 +151,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
         fileSelectionError = null;
         uploadMessage = file == null
             ? null
-            : '${file.name} · ${_formatBytes(file.size)} · ${_formatDuration(file.durationSeconds)} · 已生成封面';
+            : '${file.name} · ${_formatBytes(file.size)} · ${_formatDuration(file.durationSeconds)} · ' + trNow('cover generated', '已生成封面');
       });
     } catch (e) {
       setState(() {
@@ -173,14 +174,14 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
 
     if (title.trim().isEmpty) {
       setState(() {
-        uploadMessage = '请输入视频标题';
+        uploadMessage = trNow('Enter a video title', '请输入视频标题');
       });
       return;
     }
 
     if (studioUploadManager.busy) {
       setState(() {
-        uploadMessage = '已有视频正在上传，请等待当前任务完成';
+        uploadMessage = trNow('A video is already uploading; wait for it to finish', '已有视频正在上传，请等待当前任务完成');
       });
       return;
     }
@@ -202,7 +203,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     );
 
     setState(() {
-      uploadMessage = '已开始上传。Creator 将使用当前登录账号，封面已自动生成。';
+      uploadMessage = trNow('Upload started. Studio uses the signed-in account and the cover was generated automatically.', '已开始上传。Creator 将使用当前登录账号，封面已自动生成。');
       selectedFile = null;
       fileSelectionError = null;
       uploadModalOpen = false;
@@ -284,7 +285,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
 
     if (editTitle.trim().isEmpty) {
       setState(() {
-        editMessage = '请输入视频标题';
+        editMessage = trNow('Enter a video title', '请输入视频标题');
       });
       return;
     }
@@ -411,8 +412,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
           classes: 'studio-page-heading sv-video-page-heading',
           [
             div([
-              h1([.text('Videos')]),
-              p([.text('上传视频，并管理公开状态与已有投稿。')]),
+              h1([.text(context.tr('Videos', '视频'))]),
+              p([.text(context.tr('Upload videos and manage visibility and existing submissions.', '上传视频，并管理公开状态与已有投稿。'))]),
             ]),
             div(
               classes: 'sv-page-actions',
@@ -420,12 +421,12 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 button(
                   classes: 'sv-secondary-button',
                   onClick: loading ? null : _loadVideos,
-                  [.text(loading ? 'Loading...' : 'Refresh')],
+                  [.text(loading ? context.tr('Loading...', '加载中...') : context.tr('Refresh', '刷新'))],
                 ),
                 button(
                   classes: 'sv-primary-button sv-upload-open-button',
                   onClick: studioUploadManager.busy ? null : _openUploadModal,
-                  [.text('+ Upload video')],
+                  [.text(context.tr('+ Upload video', '+ 上传视频'))],
                 ),
               ],
             ),
@@ -439,44 +440,44 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               classes: 'sv-video-library-header',
               [
                 div([
-                  h2([.text('My videos')]),
+                  h2([.text(context.tr('My videos', '我的视频'))]),
                   p([
                     .text(
-                      '${videos.length} ${videos.length == 1 ? 'video' : 'videos'}',
+                      context.tr('${videos.length} ${videos.length == 1 ? 'video' : 'videos'}', '${videos.length} 个视频'),
                     ),
                   ]),
                 ]),
               ],
             ),
             if (loading)
-              p(classes: 'sv-video-list-status', [.text('正在读取视频...')])
+              p(classes: 'sv-video-list-status', [.text(context.tr('Loading videos...', '正在读取视频...'))])
             else if (videos.isEmpty)
               div(
                 classes: 'sv-empty sv-video-empty',
                 [
-                  h3([.text('还没有视频')]),
-                  p([.text('上传第一个视频后，它会显示在这里。')]),
+                  h3([.text(context.tr('No videos yet', '还没有视频'))]),
+                  p([.text(context.tr('Your first uploaded video will show up here.', '上传第一个视频后，它会显示在这里。'))]),
                   button(
                     classes: 'sv-primary-button',
                     onClick: _openUploadModal,
-                    [.text('+ Upload video')],
+                    [.text(context.tr('+ Upload video', '+ 上传视频'))],
                   ),
                 ],
               )
             else
               div(
                 classes: 'sv-video-grid',
-                [for (final video in videos) _videoCard(video)],
+                [for (final video in videos) _videoCard(context, video)],
               ),
           ],
         ),
-        if (uploadModalOpen) _uploadModal(),
-        if (editingVideoId != null) _editWorkspace(),
+        if (uploadModalOpen) _uploadModal(context),
+        if (editingVideoId != null) _editWorkspace(context),
       ],
     );
   }
 
-  Component _uploadModal() {
+  Component _uploadModal(BuildContext context) {
     return div(
       classes: 'sv-modal-backdrop',
       [
@@ -487,8 +488,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               classes: 'sv-modal-header',
               [
                 div([
-                  h2([.text('Upload video')]),
-                  p([.text('填写视频资料并选择文件。封面会由浏览器自动生成。')]),
+                  h2([.text(context.tr('Upload video', '上传视频'))]),
+                  p([.text(context.tr('Fill in the video details and pick a file. The cover is generated by the browser.', '填写视频资料并选择文件。封面会由浏览器自动生成。'))]),
                 ]),
                 button(
                   classes: 'sv-modal-close',
@@ -502,28 +503,32 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               classes: 'sv-modal-body',
               [
                 _field(
-                  'Title',
+                  context,
+                  context.tr('Title', '标题'),
                   title,
-                  '视频标题',
+                  context.tr('Video title', '视频标题'),
                   (value) => setState(() => title = value),
                 ),
                 _field(
-                  'Description',
+                  context,
+                  context.tr('Description', '简介'),
                   description,
-                  '视频简介',
+                  context.tr('Video description', '视频简介'),
                   (value) => setState(() => description = value),
                 ),
                 div(
                   classes: 'sv-two-columns',
                   [
                     _field(
-                      'Category',
+                      context,
+                      context.tr('Category', '分类'),
                       category,
                       'general',
                       (value) => setState(() => category = value),
                     ),
 
                     _languagePicker(
+                      context,
                       value: languageCode,
                       open: uploadLanguagePickerOpen,
                       search: uploadLanguageSearch,
@@ -541,7 +546,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                   ],
                 ),
                 _field(
-                  'Tags',
+                  context,
+                  context.tr('Tags', '标签'),
                   tagsText,
                   'language,vlog,podcast',
                   (value) => setState(() => tagsText = value),
@@ -549,19 +555,19 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 div(
                   classes: 'sv-field',
                   [
-                    span(classes: 'sv-label', [.text('Visibility')]),
+                    span(classes: 'sv-label', [.text(context.tr('Visibility', '可见性'))]),
                     div(
                       classes: 'sv-segmented',
                       [
                         button(
                           classes: 'sv-segment ${uploadPublic ? 'active' : ''}',
                           onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = true),
-                          [.text('Public')],
+                          [.text(context.tr('Public', '公开'))],
                         ),
                         button(
                           classes: 'sv-segment ${!uploadPublic ? 'active' : ''}',
                           onClick: studioUploadManager.busy ? null : () => setState(() => uploadPublic = false),
-                          [.text('Private')],
+                          [.text(context.tr('Private', '私密'))],
                         ),
                       ],
                     ),
@@ -583,12 +589,12 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                     if (selectedFile != null)
                       p(classes: 'sv-file-meta', [
                         .text(
-                          '${selectedFile!.name} · ${_formatBytes(selectedFile!.size)} · ${_formatDuration(selectedFile!.durationSeconds)} · 自动封面已就绪',
+                          '${selectedFile!.name} · ${_formatBytes(selectedFile!.size)} · ${_formatDuration(selectedFile!.durationSeconds)} · ${context.tr('cover ready', '自动封面已就绪')}',
                         ),
                       ])
                     else
                       p(classes: 'sv-file-meta', [
-                        .text('选择一个视频文件；浏览器会自动验证并抽取封面。'),
+                        .text(context.tr('Choose a video file; the browser validates it and extracts a cover automatically.', '选择一个视频文件；浏览器会自动验证并抽取封面。')),
                       ]),
                   ],
                 ),
@@ -605,7 +611,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 button(
                   classes: 'sv-secondary-button',
                   onClick: studioUploadManager.busy ? null : _closeUploadModal,
-                  [.text('Cancel')],
+                  [.text(context.tr('Cancel', '取消'))],
                 ),
                 button(
                   classes: 'sv-primary-button',
@@ -613,7 +619,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                   onClick: studioUploadManager.busy ? null : _upload,
                   [
                     .text(
-                      studioUploadManager.busy ? 'Upload in progress...' : 'Upload',
+                      studioUploadManager.busy ? context.tr('Upload in progress...', '上传中...') : context.tr('Upload', '上传'),
                     ),
                   ],
                 ),
@@ -625,7 +631,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     );
   }
 
-  Component _editWorkspace() {
+  Component _editWorkspace(BuildContext context) {
     return div(
       classes: 'sv-edit-workspace',
       [
@@ -633,14 +639,14 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
           classes: 'sv-edit-workspace-header',
           [
             div([
-              span(classes: 'sv-edit-kicker', [.text('VIDEO DETAILS')]),
-              h2([.text('Edit video')]),
-              p([.text('边播放边检查视频资料、语言标记与公开状态。')]),
+              span(classes: 'sv-edit-kicker', [.text(context.tr('VIDEO DETAILS', '视频详情'))]),
+              h2([.text(context.tr('Edit video', '编辑视频'))]),
+              p([.text(context.tr('Check metadata, language and visibility while the video plays.', '边播放边检查视频资料、语言标记与公开状态。'))]),
             ]),
             button(
               classes: 'sv-secondary-button sv-edit-back-button',
               onClick: editSaving ? null : _closeEditModal,
-              [.text('Back to videos')],
+              [.text(context.tr('Back to videos', '返回视频列表'))],
             ),
           ],
         ),
@@ -658,7 +664,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                         classes: 'sv-edit-player-state',
                         [
                           span(classes: 'sv-edit-player-spinner', []),
-                          p([.text('Loading video preview...')]),
+                          p([.text(context.tr('Loading video preview...', '正在加载视频预览...'))]),
                         ],
                       )
                     else if (editVideoUrl != null)
@@ -673,7 +679,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                       div(
                         classes: 'sv-edit-player-state',
                         [
-                          strong([.text('Preview unavailable')]),
+                          strong([.text(context.tr('Preview unavailable', '无法预览'))]),
                           if (editVideoError != null) p([.text(editVideoError!)]),
                         ],
                       ),
@@ -682,8 +688,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 div(
                   classes: 'sv-edit-preview-note',
                   [
-                    strong([.text('Preview')]),
-                    span([.text('这里直接播放当前视频，修改资料时不用离开页面。')]),
+                    strong([.text(context.tr('Preview', '预览'))]),
+                    span([.text(context.tr('The current video plays right here, so you can edit details without leaving the page.', '这里直接播放当前视频，修改资料时不用离开页面。'))]),
                   ],
                 ),
               ],
@@ -692,27 +698,31 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
               classes: 'sv-edit-form-column',
               [
                 _field(
-                  'Title',
+                  context,
+                  context.tr('Title', '标题'),
                   editTitle,
-                  '视频标题',
+                  context.tr('Video title', '视频标题'),
                   (value) => setState(() => editTitle = value),
                 ),
                 _field(
-                  'Description',
+                  context,
+                  context.tr('Description', '简介'),
                   editDescription,
-                  '视频简介',
+                  context.tr('Video description', '视频简介'),
                   (value) => setState(() => editDescription = value),
                 ),
                 div(
                   classes: 'sv-two-columns',
                   [
                     _field(
-                      'Category',
+                      context,
+                      context.tr('Category', '分类'),
                       editCategory,
                       'general',
                       (value) => setState(() => editCategory = value),
                     ),
                     _languagePicker(
+                      context,
                       value: editLanguageCode,
                       open: editLanguagePickerOpen,
                       search: editLanguageSearch,
@@ -731,7 +741,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                   ],
                 ),
                 _field(
-                  'Tags',
+                  context,
+                  context.tr('Tags', '标签'),
                   editTagsText,
                   'language,vlog,podcast',
                   (value) => setState(() => editTagsText = value),
@@ -739,19 +750,19 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 div(
                   classes: 'sv-field',
                   [
-                    span(classes: 'sv-label', [.text('Visibility')]),
+                    span(classes: 'sv-label', [.text(context.tr('Visibility', '可见性'))]),
                     div(
                       classes: 'sv-segmented',
                       [
                         button(
                           classes: 'sv-segment ${editPublic ? 'active' : ''}',
                           onClick: editSaving ? null : () => setState(() => editPublic = true),
-                          [.text('Public')],
+                          [.text(context.tr('Public', '公开'))],
                         ),
                         button(
                           classes: 'sv-segment ${!editPublic ? 'active' : ''}',
                           onClick: editSaving ? null : () => setState(() => editPublic = false),
-                          [.text('Private')],
+                          [.text(context.tr('Private', '私密'))],
                         ),
                       ],
                     ),
@@ -768,13 +779,13 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                     button(
                       classes: 'sv-secondary-button',
                       onClick: editSaving ? null : _closeEditModal,
-                      [.text('Cancel')],
+                      [.text(context.tr('Cancel', '取消'))],
                     ),
                     button(
                       classes: 'sv-primary-button',
                       attributes: editSaving ? {'disabled': 'disabled'} : null,
                       onClick: editSaving ? null : _saveEdit,
-                      [.text(editSaving ? 'Saving...' : 'Save changes')],
+                      [.text(editSaving ? context.tr('Saving...', '保存中...') : context.tr('Save changes', '保存更改'))],
                     ),
                   ],
                 ),
@@ -786,7 +797,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     );
   }
 
-  Component _languagePicker({
+  Component _languagePicker(
+    BuildContext context, {
     required String value,
     required bool open,
     required String search,
@@ -797,7 +809,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
   }) {
     final normalized = value.trim().isEmpty ? 'auto' : value.trim().toLowerCase();
     final selectedLanguage = normalized == 'auto' ? null : LanguageConfig.findByCode(normalized);
-    final selectedEnglishName = normalized == 'auto' ? 'Auto detect' : selectedLanguage?.nameOf('en') ?? normalized;
+    final uiLang = context.lang.name;
+    final selectedEnglishName = normalized == 'auto' ? context.tr('Auto detect', '自动识别') : selectedLanguage?.nameOf(uiLang) ?? normalized;
 
     String? nativeName;
     if (selectedLanguage != null) {
@@ -819,7 +832,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
             (name) => name.toLowerCase().contains(query),
           );
         }).toList()..sort(
-          (a, b) => a.nameOf('en').toLowerCase().compareTo(b.nameOf('en').toLowerCase()),
+          (a, b) => a.nameOf(uiLang).toLowerCase().compareTo(b.nameOf(uiLang).toLowerCase()),
         );
 
     final visible = matches.take(40).toList(growable: false);
@@ -827,7 +840,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     return div(
       classes: 'sv-field sv-language-picker-field',
       [
-        span(classes: 'sv-label', [.text('Language')]),
+        span(classes: 'sv-label', [.text(context.tr('Language', '语言'))]),
         div(
           classes: 'sv-language-picker${open ? ' open' : ''}',
           [
@@ -867,8 +880,8 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                         type: InputType.text,
                         attributes: {
                           'value': search,
-                          'placeholder': 'Search by name, native name or code...',
-                          'aria-label': 'Search video language',
+                          'placeholder': context.tr('Search by name, native name or code...', '按名称、本地名称或代码搜索...'),
+                          'aria-label': context.tr('Search video language', '搜索视频语言'),
                         },
                         events: events<String>(
                           onInput: onSearchChanged,
@@ -888,7 +901,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                               .text('🌐'),
                             ]),
                             span(classes: 'sv-language-option-copy', [
-                              strong([.text('Auto detect')]),
+                              strong([.text(context.tr('Auto detect', '自动识别'))]),
                               span([.text('auto')]),
                             ]),
                           ],
@@ -902,7 +915,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                               .text(language.flag),
                             ]),
                             span(classes: 'sv-language-option-copy', [
-                              strong([.text(language.nameOf('en'))]),
+                              strong([.text(language.nameOf(uiLang))]),
                               span([
                                 .text(language.code),
                               ]),
@@ -913,7 +926,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                           !(query.isEmpty || 'auto detect'.contains(query) || 'auto'.contains(query)))
                         div(
                           classes: 'sv-language-picker-empty',
-                          [.text('No matching language')],
+                          [.text(context.tr('No matching language', '没有匹配的语言'))],
                         ),
                     ],
                   ),
@@ -922,7 +935,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                       classes: 'sv-language-picker-hint',
                       [
                         .text(
-                          'Showing first ${visible.length} of ${matches.length}. Keep typing to narrow results.',
+                          context.tr('Showing first ${visible.length} of ${matches.length}. Keep typing to narrow results.', '显示前 ${visible.length} 项，共 ${matches.length} 项。继续输入以缩小范围。'),
                         ),
                       ],
                     ),
@@ -935,6 +948,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
   }
 
   Component _field(
+    BuildContext context,
     String label,
     String value,
     String placeholder,
@@ -958,7 +972,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
     );
   }
 
-  Component _videoCard(Video video) {
+  Component _videoCard(BuildContext context, Video video) {
     final id = video.id;
     final busy = id != null && busyVideoId == id;
     final confirmDelete = id != null && pendingDeleteId == id;
@@ -989,7 +1003,7 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
                 h3([.text(video.title)]),
                 span(
                   classes: 'sv-visibility ${video.isPublic ? 'public' : 'private'}',
-                  [.text(video.isPublic ? 'Public' : 'Private')],
+                  [.text(video.isPublic ? context.tr('Public', '公开') : context.tr('Private', '私密'))],
                 ),
               ],
             ),
@@ -1011,23 +1025,23 @@ class _VideoManagementPageState extends State<VideoManagementPage> {
             a(
               href: video.id == null ? '#' : '/videos/${video.id}/edit',
               classes: 'sv-secondary-button sv-edit-button',
-              [.text('Edit')],
+              [.text(context.tr('Edit', '编辑'))],
             ),
             button(
               classes: 'sv-secondary-button',
               onClick: busy ? null : () => _toggleVisibility(video),
-              [.text(video.isPublic ? 'Make private' : 'Make public')],
+              [.text(video.isPublic ? context.tr('Make private', '设为私密') : context.tr('Make public', '设为公开'))],
             ),
             button(
               classes: 'sv-danger-button${confirmDelete ? ' confirm' : ''}',
               onClick: busy ? null : () => _delete(video),
-              [.text(confirmDelete ? 'Confirm delete' : 'Delete')],
+              [.text(confirmDelete ? context.tr('Confirm delete', '确认删除') : context.tr('Delete', '删除'))],
             ),
             if (confirmDelete)
               button(
                 classes: 'sv-link-button',
                 onClick: busy ? null : () => setState(() => pendingDeleteId = null),
-                [.text('Cancel')],
+                [.text(context.tr('Cancel', '取消'))],
               ),
           ],
         ),

@@ -5,10 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="scaffolded-by" content="https://github.com/schultek/jaspr">
     <title>Glyphora Review</title>
+    <script>
+      /* Shared theme boot (glyphora_web_l10n ThemeToggle): applies the stored or
+         system theme before first paint. */
+      (function () {
+        try {
+          var key = 'glyphora-theme';
+          var m = /(?:^#|&)theme=(light|dark)(?:&|$)/.exec(location.hash);
+          if (m) localStorage.setItem(key, m[1]);
+          var saved = localStorage.getItem(key);
+          var dark = saved === 'dark' ||
+            (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/glyphora-tokens.css">
     <link rel="stylesheet" href="/studio.css">
     <link rel="stylesheet" href="/admin.css">
     <link rel="stylesheet" href="/review.css">
+    <link rel="stylesheet" href="/glyphora-console.css">
+    <link rel="stylesheet" href="/glyphora-review.css">
     <script defer src="/main.client.dart.js"></script>
   </head>
   <body></body>

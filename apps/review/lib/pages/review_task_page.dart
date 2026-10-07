@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:glyphora_subtitle_editor/subtitle_editor.dart';
 import 'package:jaspr/dom.dart';
@@ -94,7 +95,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
 
       final taskId = task.id;
       if (taskId == null) {
-        throw Exception('喃字任务创建失败');
+        throw Exception(trNow('Failed to create the Nôm task', '喃字任务创建失败'));
       }
 
       Router.of(context).push('/tasks/$taskId');
@@ -122,12 +123,12 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
   @override
   Component build(BuildContext context) {
     if (loading) {
-      return div(classes: 'review-empty', [.text('正在打开审核任务…')]);
+      return div(classes: 'review-empty', [.text(context.tr('Opening the review task…', '正在打开审核任务…'))]);
     }
 
     final current = detail;
     if (current == null) {
-      return div(classes: 'review-error', [.text(error ?? '找不到任务')]);
+      return div(classes: 'review-error', [.text(error ?? context.tr('Task not found', '找不到任务'))]);
     }
 
     final task = current.item.task;
@@ -138,11 +139,11 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
       div(classes: 'review-task-toolbar', [
         Link(
           to: '/',
-          child: span(classes: 'review-back', [.text('← 工作队列')]),
+          child: span(classes: 'review-back', [.text(context.tr('← Work Queue', '← 工作队列'))]),
         ),
         div(classes: 'review-task-toolbar-copy', [
-          span([.text('TASK #${task.id}')]),
-          strong([.text(_statusLabel(task.status))]),
+          span([.text(context.tr('TASK #${task.id}', '任务 #${task.id}'))]),
+          strong([.text(_statusLabel(context, task.status))]),
         ]),
       ]),
       div(classes: 'review-workflow-card', [
@@ -158,10 +159,10 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
             ]),
           ]),
           div(classes: 'review-workflow-credits', [
-            _credit('领取员工', task.assignedDisplayName),
-            _credit('字幕校对', task.editedByDisplayName),
-            _credit('字幕复核', task.reviewedByDisplayName),
-            _credit('审核通过', task.approvedByDisplayName),
+            _credit(context.tr('Claimed by', '领取员工'), task.assignedDisplayName),
+            _credit(context.tr('Proofread by', '字幕校对'), task.editedByDisplayName),
+            _credit(context.tr('Reviewed by', '字幕复核'), task.reviewedByDisplayName),
+            _credit(context.tr('Approved by', '审核通过'), task.approvedByDisplayName),
           ]),
         ]),
         if (error != null) div(classes: 'review-error', [.text(error!)]),
@@ -177,7 +178,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         taskId: component.taskId,
                       ),
                     ),
-              [.text(actionLoading ? '处理中…' : '领取任务')],
+              [.text(actionLoading ? context.tr('Working…', '处理中…') : context.tr('Claim task', '领取任务'))],
             ),
           if ((task.status == SubtitleReviewTaskStatus.assigned ||
                   task.status == SubtitleReviewTaskStatus.returned) &&
@@ -192,7 +193,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         taskId: component.taskId,
                       ),
                     ),
-              [.text(actionLoading ? '处理中…' : '开始校对')],
+              [.text(actionLoading ? context.tr('Working…', '处理中…') : context.tr('Start proofreading', '开始校对'))],
             ),
           if (task.status == SubtitleReviewTaskStatus.inReview &&
               current.item.isMine)
@@ -206,7 +207,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         taskId: component.taskId,
                       ),
                     ),
-              [.text(actionLoading ? '提交中…' : '完成校对 · 提交复核')],
+              [.text(actionLoading ? context.tr('Submitting…', '提交中…') : context.tr('Finish proofreading · Submit for review', '完成校对 · 提交复核'))],
             ),
           if (task.status == SubtitleReviewTaskStatus.readyForSecondReview) ...[
             button(
@@ -219,12 +220,12 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         taskId: component.taskId,
                       ),
                     ),
-              [.text(actionLoading ? '发布中…' : '通过并发布 Glyphora Official')],
+              [.text(actionLoading ? context.tr('Publishing…', '发布中…') : context.tr('Approve and publish as Glyphora Official', '通过并发布 Glyphora Official'))],
             ),
             input<String>(
               type: InputType.text,
               classes: 'review-return-note',
-              attributes: {'placeholder': '退回原因（可选）'},
+              attributes: {'placeholder': context.tr('Reason for returning (optional)', '退回原因（可选）')},
               events: events<String>(
                 onInput: (value) {
                   returnNote = value;
@@ -242,7 +243,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         note: returnNote,
                       ),
                     ),
-              [.text('退回修改')],
+              [.text(context.tr('Return for changes', '退回修改'))],
             ),
           ],
           if (_canGenerateNom(task))
@@ -252,11 +253,11 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
               onClick: actionLoading
                   ? null
                   : () => _generateNomTask(context, task.trackId),
-              [.text(actionLoading ? '生成中…' : '生成喃字草稿 · 建立转换任务')],
+              [.text(actionLoading ? context.tr('Generating…', '生成中…') : context.tr('Generate Nôm draft · Create conversion task', '生成喃字草稿 · 建立转换任务'))],
             ),
           if (published || approved)
             span(classes: 'review-published-message', [
-              .text('任务已完成，已退出员工工作区。贡献者姓名和历史记录永久保留。'),
+              .text(context.tr('Task complete and removed from the staff workspace. Contributor names and history are kept permanently.', '任务已完成，已退出员工工作区。贡献者姓名和历史记录永久保留。')),
             ]),
         ]),
       ]),
@@ -267,13 +268,13 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
           languageCode: task.languageCode,
           scriptCode: task.scriptCode,
           backRoute: '/',
-          backLabel: '← 工作队列',
+          backLabel: context.tr('← Work Queue', '← 工作队列'),
           showPublishControls: false,
         ),
       section(classes: 'review-history', [
-        h2([.text('任务记录')]),
+        h2([.text(context.tr('Task history', '任务记录'))]),
         if (current.events.isEmpty)
-          p([.text('还没有操作记录')])
+          p([.text(context.tr('No activity yet', '还没有操作记录'))])
         else
           div(classes: 'review-history-list', [
             for (final event in current.events)
@@ -288,7 +289,7 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
                         : 'System',
                   ),
                 ]),
-                span([.text(_actionLabel(event.action))]),
+                span([.text(_actionLabel(context, event.action))]),
                 if (event.note != null && event.note!.trim().isNotEmpty)
                   em([.text(event.note!)]),
               ]),
@@ -304,29 +305,29 @@ class _ReviewTaskPageState extends State<ReviewTaskPage> {
     ]);
   }
 
-  String _statusLabel(SubtitleReviewTaskStatus status) {
+  String _statusLabel(BuildContext context, SubtitleReviewTaskStatus status) {
     return switch (status) {
-      SubtitleReviewTaskStatus.readyForReview => '待领取',
-      SubtitleReviewTaskStatus.assigned => '已领取',
-      SubtitleReviewTaskStatus.inReview => '校对中',
-      SubtitleReviewTaskStatus.readyForSecondReview => '待复核',
-      SubtitleReviewTaskStatus.returned => '退回修改',
-      SubtitleReviewTaskStatus.approved => '已通过',
-      SubtitleReviewTaskStatus.published => '已发布',
-      SubtitleReviewTaskStatus.failed => '异常',
+      SubtitleReviewTaskStatus.readyForReview => context.tr('Unclaimed', '待领取'),
+      SubtitleReviewTaskStatus.assigned => context.tr('Claimed', '已领取'),
+      SubtitleReviewTaskStatus.inReview => context.tr('In review', '校对中'),
+      SubtitleReviewTaskStatus.readyForSecondReview => context.tr('Second review', '待复核'),
+      SubtitleReviewTaskStatus.returned => context.tr('Returned', '退回修改'),
+      SubtitleReviewTaskStatus.approved => context.tr('Approved', '已通过'),
+      SubtitleReviewTaskStatus.published => context.tr('Published', '已发布'),
+      SubtitleReviewTaskStatus.failed => context.tr('Failed', '异常'),
     };
   }
 
-  String _actionLabel(String action) {
+  String _actionLabel(BuildContext context, String action) {
     return switch (action) {
-      'claimed' => '领取任务',
-      'started' => '开始校对',
-      'submitted' => '完成校对并提交复核',
-      'returned' => '退回修改',
-      'approved' => '审核通过',
-      'published' => '发布为 Glyphora Official',
-      'nomDraftGenerated' => 'Glyphora 喃字转换器生成草稿',
-      'nomDraftRequested' => '创建喃字转换任务',
+      'claimed' => context.tr('Claimed the task', '领取任务'),
+      'started' => context.tr('Started proofreading', '开始校对'),
+      'submitted' => context.tr('Finished proofreading and submitted for review', '完成校对并提交复核'),
+      'returned' => context.tr('Returned for changes', '退回修改'),
+      'approved' => context.tr('Approved', '审核通过'),
+      'published' => context.tr('Published as Glyphora Official', '发布为 Glyphora Official'),
+      'nomDraftGenerated' => context.tr('Draft generated by the Glyphora Nôm converter', 'Glyphora 喃字转换器生成草稿'),
+      'nomDraftRequested' => context.tr('Created a Nôm conversion task', '创建喃字转换任务'),
       _ => action,
     };
   }

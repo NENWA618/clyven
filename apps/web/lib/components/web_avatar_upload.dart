@@ -56,9 +56,9 @@ class _WebAvatarUploadState extends State<WebAvatarUpload> {
 
   Future<void> _restoreSession() async {
     try {
-      await webClient.auth.initialize();
+      final restored = await restoreStoredSession();
 
-      if (!webClient.auth.isAuthenticated) {
+      if (!restored) {
         if (!mounted) return;
 
         setState(() {

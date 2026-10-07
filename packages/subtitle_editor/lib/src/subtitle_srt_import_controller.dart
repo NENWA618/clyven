@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 import 'dart:html' as html;
 
@@ -65,12 +66,12 @@ class SubtitleSrtImportController {
       if (result is String) {
         completer.complete(result);
       } else {
-        completer.completeError(Exception('无法读取 SRT 文件'));
+        completer.completeError(Exception(trNow('Could not read the SRT file', '无法读取 SRT 文件')));
       }
     });
 
     reader.onError.listen((_) {
-      completer.completeError(Exception('读取 SRT 文件失败'));
+      completer.completeError(Exception(trNow('Failed to read the SRT file', '读取 SRT 文件失败')));
     });
 
     reader.readAsText(file);
@@ -89,7 +90,7 @@ class SubtitleSrtImportController {
     final currentContent = content;
 
     if (currentContent == null || currentContent.isEmpty) {
-      error = '请先选择 SRT 文件';
+      error = trNow('Select an SRT file first', '请先选择 SRT 文件');
       onChanged();
       return;
     }
@@ -121,13 +122,13 @@ class SubtitleSrtImportController {
     final currentContent = content;
 
     if (currentContent == null || currentContent.isEmpty) {
-      error = '请先选择 SRT 文件';
+      error = trNow('Select an SRT file first', '请先选择 SRT 文件');
       onChanged();
       return;
     }
 
     if (preview?.canImport != true) {
-      error = '当前 SRT 无法导入';
+      error = trNow('This SRT cannot be imported', '当前 SRT 无法导入');
       onChanged();
       return;
     }
@@ -135,7 +136,7 @@ class SubtitleSrtImportController {
     final cleanScriptCode = scriptCode.trim();
 
     if (cleanScriptCode.isEmpty) {
-      error = '请输入 script code';
+      error = trNow('Enter a script code', '请输入 script code');
       onChanged();
       return;
     }

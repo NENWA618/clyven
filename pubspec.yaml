@@ -12,6 +12,7 @@ workspace:
   - apps/review
   - packages/backend_client
   - packages/subtitle_editor
+  - packages/web_l10n
   - packages/nom_converter
   - server/backend_server
   

@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 
 import 'subtitle_cue_service.dart';
@@ -43,7 +44,7 @@ class SubtitleCueController {
     }
 
     if (!isLoggedIn()) {
-      saveErrors[cueId] = '请先登录 Studio';
+      saveErrors[cueId] = trNow('Sign in to Studio first', '请先登录 Studio');
       onChanged();
       return;
     }
@@ -79,7 +80,7 @@ class SubtitleCueController {
     }
 
     if (!isLoggedIn()) {
-      timingErrors[cueId] = '请先登录 Studio';
+      timingErrors[cueId] = trNow('Sign in to Studio first', '请先登录 Studio');
       onChanged();
       return;
     }
@@ -95,14 +96,14 @@ class SubtitleCueController {
     final endMs = parseSubtitleTime(endText);
 
     if (startMs == null || endMs == null) {
-      timingErrors[cueId] = '时间格式必须是 mm:ss.mmm';
+      timingErrors[cueId] = trNow('Time format must be mm:ss.mmm', '时间格式必须是 mm:ss.mmm');
 
       onChanged();
       return;
     }
 
     if (endMs <= startMs) {
-      timingErrors[cueId] = '结束时间必须大于开始时间';
+      timingErrors[cueId] = trNow('End time must be after the start time', '结束时间必须大于开始时间');
 
       onChanged();
       return;
@@ -120,7 +121,7 @@ class SubtitleCueController {
     if (overlappingCue != null) {
       final number = cues.indexOf(overlappingCue) + 1;
 
-      timingErrors[cueId] = '与第 $number 条字幕时间重叠';
+      timingErrors[cueId] = trNow('Overlaps with subtitle #$number', '与第 $number 条字幕时间重叠');
 
       onChanged();
       return;
@@ -166,7 +167,7 @@ class SubtitleCueController {
     }
 
     if (!isLoggedIn()) {
-      deleteErrors[cueId] = '请先登录 Studio';
+      deleteErrors[cueId] = trNow('Sign in to Studio first', '请先登录 Studio');
       onChanged();
       return;
     }
@@ -213,7 +214,7 @@ class SubtitleCueController {
     required String languageCode,
   }) async {
     if (!isLoggedIn()) {
-      createCueError = '请先登录 Studio';
+      createCueError = trNow('Sign in to Studio first', '请先登录 Studio');
       onChanged();
       return;
     }
@@ -222,13 +223,13 @@ class SubtitleCueController {
     final endMs = parseSubtitleTime(newCueEnd);
 
     if (startMs == null || endMs == null) {
-      createCueError = '时间格式必须是 mm:ss.mmm';
+      createCueError = trNow('Time format must be mm:ss.mmm', '时间格式必须是 mm:ss.mmm');
       onChanged();
       return;
     }
 
     if (endMs <= startMs) {
-      createCueError = '结束时间必须大于开始时间';
+      createCueError = trNow('End time must be after the start time', '结束时间必须大于开始时间');
       onChanged();
       return;
     }
@@ -244,13 +245,13 @@ class SubtitleCueController {
     if (overlappingCue != null) {
       final number = cues.indexOf(overlappingCue) + 1;
 
-      createCueError = '与第 $number 条字幕时间重叠';
+      createCueError = trNow('Overlaps with subtitle #$number', '与第 $number 条字幕时间重叠');
       onChanged();
       return;
     }
 
     if (newCueText.trim().isEmpty) {
-      createCueError = '字幕内容不能为空';
+      createCueError = trNow('Subtitle text cannot be empty', '字幕内容不能为空');
       onChanged();
       return;
     }
@@ -311,7 +312,7 @@ class SubtitleCueController {
 
       detail.cue.startMs = originalStart;
       detail.cue.endMs = originalEnd;
-      timingErrors[cueId] = '与第 $number 条字幕时间重叠';
+      timingErrors[cueId] = trNow('Overlaps with subtitle #$number', '与第 $number 条字幕时间重叠');
 
       onChanged();
       return;

@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 import 'dart:html' as html;
 import 'package:glyphora_backend_client/backend_client.dart';
@@ -32,7 +33,7 @@ class SubtitleEditorPage extends StatefulComponent {
     required this.languageCode,
     this.scriptCode,
     this.backRoute = '/subtitles',
-    this.backLabel = '← Subtitles',
+    this.backLabel,
     this.showPublishControls = true,
     super.key,
   });
@@ -42,7 +43,7 @@ class SubtitleEditorPage extends StatefulComponent {
   final String languageCode;
   final String? scriptCode;
   final String backRoute;
-  final String backLabel;
+  final String? backLabel;
   final bool showPublishControls;
 
   @override
@@ -353,7 +354,12 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
       return;
     }
 
-    final confirmed = html.window.confirm('确定要删除这条字幕吗？删除后无法恢复。');
+    final confirmed = html.window.confirm(
+      trNow(
+        'Delete this subtitle? This cannot be undone.',
+        '确定要删除这条字幕吗？删除后无法恢复。',
+      ),
+    );
 
     if (!confirmed) {
       return;
@@ -370,7 +376,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     final currentMs = _videoController.currentTimeMs();
 
     if (currentMs == null) {
-      _cueController.createCueError = '无法读取当前视频时间';
+      _cueController.createCueError = trNow('Could not read the current video time', '无法读取当前视频时间');
 
       setState(() {});
       return;
@@ -383,7 +389,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     final currentMs = _videoController.currentTimeMs();
 
     if (currentMs == null) {
-      _cueController.createCueError = '无法读取当前视频时间';
+      _cueController.createCueError = trNow('Could not read the current video time', '无法读取当前视频时间');
 
       setState(() {});
       return;
@@ -482,12 +488,12 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     final status = _publishStatus;
 
     final stateText = status == null
-        ? '发布状态…'
+        ? context.tr('Publish status…', '发布状态…')
         : !status.hasPublishedVersion
-        ? '未发布'
+        ? context.tr('Not published', '未发布')
         : status.hasUnpublishedChanges
-        ? '有未发布更改'
-        : '已发布';
+        ? context.tr('Unpublished changes', '有未发布更改')
+        : context.tr('Published', '已发布');
 
     final stateClass = status == null
         ? ' is-loading'
@@ -508,7 +514,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             : () {
                 _publishSubtitle();
               },
-        [.text(_publishingSubtitle ? '发布中…' : '发布字幕')],
+        [.text(_publishingSubtitle ? context.tr('Publishing…', '发布中…') : context.tr('Publish subtitles', '发布字幕'))],
       ),
       if (_publishError != null)
         span(classes: 'subtitle-publish-error', [.text(_publishError!)]),
@@ -562,11 +568,15 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
 
     if (detail == null || detail.cue.id == null) {
       return div(classes: 'subtitle-quick-editor is-empty', [
-        div(classes: 'subtitle-quick-editor-title', [.text('字幕快速编辑')]),
+        div(classes: 'subtitle-quick-editor-title', [.text(context.tr('Quick subtitle edit', '字幕快速编辑'))]),
         p([
           .text(
+            context.tr(
+            'Click a subtitle block on the timeline, '
+            'then type the subtitle right here.',
             '点击时间轴上的字幕片段后，'
             '可以直接在这里输入字幕。',
+          ),
           ),
         ]),
       ]);
@@ -580,7 +590,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     return div(classes: 'subtitle-quick-editor', [
       div(classes: 'subtitle-quick-editor-header', [
         div([
-          div(classes: 'subtitle-quick-editor-title', [.text('字幕快速编辑')]),
+          div(classes: 'subtitle-quick-editor-title', [.text(context.tr('Quick subtitle edit', '字幕快速编辑'))]),
           span(classes: 'subtitle-quick-editor-time', [
             .text(
               '${detail.cue.startMs}ms → '
@@ -599,10 +609,10 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
           [
             .text(
               isSaving
-                  ? '保存中…'
+                  ? context.tr('Saving…', '保存中…')
                   : hasUnsavedChanges
-                  ? '未保存'
-                  : '草稿已保存',
+                  ? context.tr('Unsaved', '未保存')
+                  : context.tr('Draft saved', '草稿已保存'),
             ),
           ],
         ),
@@ -617,7 +627,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
               : () {
                   _cueController.saveCue(detail);
                 },
-          [.text(isSaving ? '保存中…' : '保存草稿')],
+          [.text(isSaving ? context.tr('Saving…', '保存中…') : context.tr('Save draft', '保存草稿'))],
         ),
       ]),
       textarea(
@@ -651,7 +661,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
         Link(
           to: component.backRoute,
           child: span(classes: 'subtitle-back-link', [
-            .text(component.backLabel),
+            .text(component.backLabel ?? context.tr('← Subtitles', '← 字幕')),
           ]),
         ),
         div(classes: 'subtitle-editor-toolbar-actions', [
@@ -667,22 +677,23 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
       ]),
 
       if (loading)
-        div(classes: 'preview-loading', [.text('正在载入字幕工作台...')])
+        div(classes: 'preview-loading', [.text(context.tr('Loading the subtitle workspace...', '正在载入字幕工作台...'))])
       else if (error != null)
         div(classes: 'preview-error', [.text(error!)])
       else ...[
         div(classes: 'subtitle-editor-heading', [
           div([
-            h1([.text(video?.title ?? 'Video #${component.videoId}')]),
+            h1([.text(video?.title ?? context.tr('Video #${component.videoId}', '视频 #${component.videoId}'))]),
             p([
               .text(
-                'Video #${component.videoId} · '
+                context.tr('Video #${component.videoId}', '视频 #${component.videoId}') +
+                ' · '
                 '${component.languageCode.toUpperCase()}'
                 '${component.scriptCode == null ? '' : ' · ${component.scriptCode}'}',
               ),
             ]),
           ]),
-          div(classes: 'subtitle-cue-count', [.text('${cues.length} cues')]),
+          div(classes: 'subtitle-cue-count', [.text(context.tr('${cues.length} cues', '${cues.length} 条字幕'))]),
         ]),
 
         SubtitleSrtImportPanel(
@@ -892,8 +903,8 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
           [
             .text(
               showCueList
-                  ? '▾ 隐藏字幕列表（${cues.length}）'
-                  : '▸ 字幕列表（${cues.length}）',
+                  ? context.tr('▾ Hide subtitle list (${cues.length})', '▾ 隐藏字幕列表（${cues.length}）')
+                  : context.tr('▸ Subtitle list (${cues.length})', '▸ 字幕列表（${cues.length}）'),
             ),
           ],
         ),

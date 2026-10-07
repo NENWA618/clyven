@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -181,13 +182,13 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
           classes: 'studio-page-heading',
           [
             div([
-              h1([.text('Comments')]),
-              p([.text('查看并管理自己视频下的评论与回复。')]),
+              h1([.text(context.tr('Comments', '评论'))]),
+              p([.text(context.tr('View and manage comments and replies on your own videos.', '查看并管理自己视频下的评论与回复。'))]),
             ]),
             button(
               classes: 'sv-secondary-button',
               onClick: loadingVideos ? null : _loadVideos,
-              [.text('Refresh')],
+              [.text(context.tr('Refresh', '刷新'))],
             ),
           ],
         ),
@@ -198,11 +199,11 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
             aside(
               classes: 'sc-video-list',
               [
-                h2([.text('Videos')]),
+                h2([.text(context.tr('Videos', '视频'))]),
                 if (loadingVideos)
-                  p([.text('Loading...')])
+                  p([.text(context.tr('Loading...', '加载中...'))])
                 else if (videos.isEmpty)
-                  p([.text('没有可管理的视频。')])
+                  p([.text(context.tr('No videos to manage.', '没有可管理的视频。'))])
                 else
                   for (final video in videos)
                     button(
@@ -212,7 +213,10 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
                         strong([.text(video.title)]),
                         span([
                           .text(
-                            '${video.commentCount} comments · ${video.isPublic ? 'Public' : 'Private'}',
+                            context.tr(
+                              '${video.commentCount} comments · ${video.isPublic ? 'Public' : 'Private'}',
+                              '${video.commentCount} 条评论 · ${video.isPublic ? '公开' : '私密'}',
+                            ),
                           ),
                         ]),
                       ],
@@ -224,17 +228,17 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
               [
                 h2([
                   .text(
-                    selectedVideo == null ? 'Comments' : selectedVideo.title,
+                    selectedVideo == null ? context.tr('Comments', '评论') : selectedVideo.title,
                   ),
                 ]),
                 if (loadingComments)
-                  p([.text('正在读取评论...')])
+                  p([.text(context.tr('Loading comments...', '正在读取评论...'))])
                 else if (selectedVideoId == null)
-                  div(classes: 'sv-empty', [.text('请选择视频。')])
+                  div(classes: 'sv-empty', [.text(context.tr('Select a video.', '请选择视频。'))])
                 else if (commentPage == null || commentPage!.comments.isEmpty)
-                  div(classes: 'sv-empty', [.text('这一页没有评论。')])
+                  div(classes: 'sv-empty', [.text(context.tr('No comments on this page.', '这一页没有评论。'))])
                 else ...[
-                  for (final comment in commentPage!.comments) _commentCard(comment),
+                  for (final comment in commentPage!.comments) _commentCard(context, comment),
                   div(
                     classes: 'sc-pagination',
                     [
@@ -246,9 +250,9 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
                                 page -= 1;
                                 await _loadComments();
                               },
-                        [.text('Previous')],
+                        [.text(context.tr('Previous', '上一页'))],
                       ),
-                      span([.text('Page $page')]),
+                      span([.text(context.tr('Page $page', '第 $page 页'))]),
                       button(
                         classes: 'sv-secondary-button',
                         onClick: !(commentPage?.hasMore ?? false) || loadingComments
@@ -257,7 +261,7 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
                                 page += 1;
                                 await _loadComments();
                               },
-                        [.text('Next')],
+                        [.text(context.tr('Next', '下一页'))],
                       ),
                     ],
                   ),
@@ -270,7 +274,7 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
     );
   }
 
-  Component _commentCard(VideoCommentDto comment) {
+  Component _commentCard(BuildContext context, VideoCommentDto comment) {
     return article(
       classes: 'sc-comment-card',
       [
@@ -288,7 +292,7 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
               onClick: busyCommentId == comment.id ? null : () => _deleteComment(comment),
               [
                 .text(
-                  busyCommentId == comment.id ? 'Deleting...' : 'Delete',
+                  busyCommentId == comment.id ? context.tr('Deleting...', '删除中...') : context.tr('Delete', '删除'),
                 ),
               ],
             ),
@@ -296,7 +300,7 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
         ),
         p(classes: 'sc-comment-content', [.text(comment.content)]),
         div(classes: 'sc-comment-meta', [
-          .text('${comment.likeCount} likes · ${comment.replies.length} replies'),
+          .text(context.tr('${comment.likeCount} likes · ${comment.replies.length} replies', '${comment.likeCount} 个赞 · ${comment.replies.length} 条回复')),
         ]),
         if (comment.replies.isNotEmpty)
           div(
@@ -321,7 +325,7 @@ class _CommentsManagementPageState extends State<CommentsManagementPage> {
                       onClick: busyReplyId == reply.id ? null : () => _deleteReply(comment, reply),
                       [
                         .text(
-                          busyReplyId == reply.id ? 'Deleting...' : 'Delete reply',
+                          busyReplyId == reply.id ? context.tr('Deleting...', '删除中...') : context.tr('Delete reply', '删除回复'),
                         ),
                       ],
                     ),

@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
@@ -13,7 +14,8 @@ class App extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div(classes: 'admin-app', [
+    return WebLocaleRoot(
+      child: div(classes: 'admin-app', [
       Router(
         routes: [
           ShellRoute(
@@ -45,6 +47,7 @@ class App extends StatelessComponent {
           ),
         ],
       ),
-    ]);
+    ]),
+    );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 
 import 'subtitle_cue_service.dart';
@@ -68,7 +69,7 @@ class SubtitleKaraokeController {
     final durationMs = detail.cue.endMs - detail.cue.startMs;
 
     if (durationMs <= 0) {
-      errors[cueId] = '当前字幕时长无效';
+      errors[cueId] = trNow('The current cue duration is invalid', '当前字幕时长无效');
       onChanged();
       return;
     }
@@ -76,7 +77,7 @@ class SubtitleKaraokeController {
     final source = sourceText.trim();
 
     if (source.isEmpty) {
-      errors[cueId] = '当前 script 没有字幕文字';
+      errors[cueId] = trNow('The current script has no subtitle text', '当前 script 没有字幕文字');
       draftsByCueId[cueId] = <KaraokeSegmentDraft>[];
       hydratedCueIds.add(cueId);
       onChanged();
@@ -86,7 +87,7 @@ class SubtitleKaraokeController {
     final pieces = _piecesFromSource(detail, source);
 
     if (pieces.isEmpty) {
-      errors[cueId] = '无法从当前字幕生成 Karaoke 片段';
+      errors[cueId] = trNow('Could not generate karaoke segments from the current subtitle', '无法从当前字幕生成 Karaoke 片段');
       onChanged();
       return;
     }
@@ -185,7 +186,7 @@ class SubtitleKaraokeController {
     }
 
     if (startMs >= durationMs) {
-      errors[cueId] = '没有剩余时间，请先缩短上一片段';
+      errors[cueId] = trNow('No time left; shorten the previous segment first', '没有剩余时间，请先缩短上一片段');
       onChanged();
       return;
     }
@@ -311,7 +312,7 @@ class SubtitleKaraokeController {
     }
 
     if (!isLoggedIn()) {
-      errors[cueId] = '请先登录 Studio';
+      errors[cueId] = trNow('Sign in to Studio first', '请先登录 Studio');
       onChanged();
       return;
     }
@@ -329,31 +330,31 @@ class SubtitleKaraokeController {
       final endMs = parseSubtitleTime(draft.endTime);
 
       if (draft.text.trim().isEmpty) {
-        errors[cueId] = '第 ${index + 1} 段文字不能为空';
+        errors[cueId] = trNow('Segment ${index + 1} text cannot be empty', '第 ${index + 1} 段文字不能为空');
         onChanged();
         return;
       }
 
       if (startMs == null || endMs == null) {
-        errors[cueId] = '第 ${index + 1} 段时间格式必须是 mm:ss.mmm';
+        errors[cueId] = trNow('Segment ${index + 1} time format must be mm:ss.mmm', '第 ${index + 1} 段时间格式必须是 mm:ss.mmm');
         onChanged();
         return;
       }
 
       if (startMs < 0 || endMs <= startMs) {
-        errors[cueId] = '第 ${index + 1} 段结束时间必须大于开始时间';
+        errors[cueId] = trNow('Segment ${index + 1} end time must be after its start time', '第 ${index + 1} 段结束时间必须大于开始时间');
         onChanged();
         return;
       }
 
       if (endMs > durationMs) {
-        errors[cueId] = '第 ${index + 1} 段超出字幕时长';
+        errors[cueId] = trNow('Segment ${index + 1} exceeds the cue duration', '第 ${index + 1} 段超出字幕时长');
         onChanged();
         return;
       }
 
       if (startMs < previousEndMs) {
-        errors[cueId] = '第 ${index + 1} 段与前一段重叠';
+        errors[cueId] = trNow('Segment ${index + 1} overlaps the previous one', '第 ${index + 1} 段与前一段重叠');
         onChanged();
         return;
       }

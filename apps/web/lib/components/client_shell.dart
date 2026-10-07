@@ -23,6 +23,7 @@ class ClientShell extends StatelessComponent {
   Component build(BuildContext context) {
     final path = RouteState.of(context).location;
     final l10n = context.l10n;
+    final preference = WebL10n.of(context).preference;
 
     return div(classes: 'client-shell', [
       header(classes: 'client-header', [
@@ -59,13 +60,17 @@ class ClientShell extends StatelessComponent {
               'click': (event) {
                 final dynamic e = event;
                 e.preventDefault();
-                html.window.location.href = studioUrlWithSession(studioUrl);
+                html.window.location.href = withPreferenceHandoff(
+                  studioUrlWithSession(studioUrl),
+                  preference,
+                );
               },
             }, [
               span(classes: 'studio-entry-button', [.text(l10n.studio)]),
             ]),
             const SearchBox(),
             const LanguageSwitcher(),
+            const ThemeToggle(),
             const NotificationBell(),
             WebAvatarUpload(),
           ]),
@@ -73,47 +78,5 @@ class ClientShell extends StatelessComponent {
       ]),
       main_(classes: 'client-main', [child]),
     ]);
-  }
-}
-
-class LanguageSwitcher extends StatelessComponent {
-  const LanguageSwitcher({super.key});
-
-  @override
-  Component build(BuildContext context) {
-    final scope = WebL10n.of(context);
-    final l10n = context.l10n;
-
-    return select(
-      classes: 'language-switcher',
-      value: scope.preference.name,
-      attributes: {'aria-label': l10n.language, 'title': l10n.language},
-      onChange: (values) {
-        if (values.isEmpty) return;
-        scope.setPreference(
-          WebLocalePreference.values.firstWhere(
-            (p) => p.name == values.first,
-            orElse: () => WebLocalePreference.system,
-          ),
-        );
-      },
-      [
-        option(
-          value: 'system',
-          selected: scope.preference == WebLocalePreference.system,
-          [.text(l10n.languageSystem)],
-        ),
-        option(
-          value: 'en',
-          selected: scope.preference == WebLocalePreference.en,
-          [.text(l10n.languageEnglish)],
-        ),
-        option(
-          value: 'zh',
-          selected: scope.preference == WebLocalePreference.zh,
-          [.text(l10n.languageChinese)],
-        ),
-      ],
-    );
   }
 }

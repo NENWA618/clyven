@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -72,7 +73,7 @@ class _SubtitleCueListState extends State<SubtitleCueList> {
   @override
   Component build(BuildContext context) {
     if (component.cues.isEmpty) {
-      return div(classes: 'empty-state', [.text('这个视频目前没有该语言的字幕。')]);
+      return div(classes: 'empty-state', [.text(context.tr('This video has no subtitles in this language yet.', '这个视频目前没有该语言的字幕。'))]);
     }
 
     final visibleCount = _visibleCount > component.cues.length
@@ -83,8 +84,8 @@ class _SubtitleCueListState extends State<SubtitleCueList> {
 
     return div(classes: 'subtitle-editor-main', [
       div(classes: 'subtitle-editor-list-header', [
-        span([.text('Timeline')]),
-        span([.text('Subtitle')]),
+        span([.text(context.tr('Timeline', '时间轴'))]),
+        span([.text(context.tr('Subtitle', '字幕'))]),
       ]),
 
       for (var index = 0; index < visibleCount; index++) _buildRow(index),
@@ -103,7 +104,7 @@ class _SubtitleCueListState extends State<SubtitleCueList> {
                     : nextCount;
               });
             },
-            [.text('加载更多 · 剩余 $remaining 条')],
+            [.text(context.tr('Load more · $remaining remaining', '加载更多 · 剩余 $remaining 条'))],
           ),
         ]),
     ]);

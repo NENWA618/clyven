@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:glyphora_subtitle_editor/subtitle_editor.dart';
 import 'package:glyphora_language_core/glyphora_language_core.dart';
@@ -53,7 +54,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
       final loaded = await studioClient.video.getVideo(component.videoId);
 
       if (loaded == null) {
-        throw Exception('视频不存在，或当前账号无权访问。');
+        throw Exception(trNow('The video does not exist or this account has no access.', '视频不存在，或当前账号无权访问。'));
       }
 
       final url = await studioClient.video.getVideoUrl(
@@ -91,7 +92,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
 
     if (title.trim().isEmpty) {
       setState(() {
-        error = '视频标题不能为空';
+        error = trNow('The video title is required', '视频标题不能为空');
         savedMessage = null;
       });
       return;
@@ -124,7 +125,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
 
       setState(() {
         video = updated;
-        savedMessage = 'Saved';
+        savedMessage = trNow('Saved', '已保存');
       });
     } catch (e) {
       if (!mounted) return;
@@ -142,6 +143,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
   }
 
   Component _field(
+    BuildContext context,
     String label,
     String value,
     String placeholder,
@@ -165,7 +167,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
     );
   }
 
-  Component _languageField() {
+  Component _languageField(BuildContext context) {
     final query = languageSearch.trim().toLowerCase();
 
     final matches = LanguageConfig.allLanguages
@@ -188,7 +190,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
     return div(
       classes: 'sv-field sv-edit-language-field',
       [
-        span(classes: 'sv-label', [.text('Language')]),
+        span(classes: 'sv-label', [.text(context.tr('Language', '语言'))]),
         div(
           classes: 'sv-edit-language-current',
           [
@@ -198,7 +200,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
             div([
               strong([
                 .text(
-                  languageCode == 'auto' ? 'Auto detect' : selected?.nameOf('en') ?? languageCode,
+                  languageCode == 'auto' ? context.tr('Auto detect', '自动识别') : selected?.nameOf(context.lang.name) ?? languageCode,
                 ),
               ]),
               span([
@@ -211,7 +213,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
           type: InputType.text,
           attributes: {
             'value': languageSearch,
-            'placeholder': 'Search language, native name or code...',
+            'placeholder': context.tr('Search language, native name or code...', '搜索语言、本地名称或代码...'),
           },
           events: events<String>(
             onInput: (value) => setState(() => languageSearch = value),
@@ -230,7 +232,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
                   }),
                   [
                     span([.text('🌐')]),
-                    strong([.text('Auto detect')]),
+                    strong([.text(context.tr('Auto detect', '自动识别'))]),
                     small([.text('auto')]),
                   ],
                 ),
@@ -243,14 +245,14 @@ class _VideoEditPageState extends State<VideoEditPage> {
                   }),
                   [
                     span([.text(language.flag)]),
-                    strong([.text(language.nameOf('en'))]),
+                    strong([.text(language.nameOf(context.lang.name))]),
                     small([.text(language.code)]),
                   ],
                 ),
               if (matches.isEmpty && !('auto detect'.contains(query) || 'auto'.contains(query)))
                 div(
                   classes: 'sv-edit-language-empty',
-                  [.text('No matching language')],
+                  [.text(context.tr('No matching language', '没有匹配的语言'))],
                 ),
             ],
           ),
@@ -267,11 +269,11 @@ class _VideoEditPageState extends State<VideoEditPage> {
           a(
             href: '/videos',
             classes: 'sv-edit-page-back',
-            [.text('← Videos')],
+            [.text(context.tr('← Videos', '← 视频'))],
           ),
           div(
             classes: 'sv-edit-page-loading',
-            [.text('Loading video...')],
+            [.text(context.tr('Loading video...', '正在加载视频...'))],
           ),
         ],
       );
@@ -284,12 +286,12 @@ class _VideoEditPageState extends State<VideoEditPage> {
           a(
             href: '/videos',
             classes: 'sv-edit-page-back',
-            [.text('← Videos')],
+            [.text(context.tr('← Videos', '← 视频'))],
           ),
           div(
             classes: 'sv-edit-page-error',
             [
-              h2([.text('Unable to open video')]),
+              h2([.text(context.tr('Unable to open video', '无法打开视频'))]),
               p([.text(error!)]),
             ],
           ),
@@ -309,10 +311,10 @@ class _VideoEditPageState extends State<VideoEditPage> {
               a(
                 href: '/videos',
                 classes: 'sv-edit-page-back',
-                [.text('← Videos')],
+                [.text(context.tr('← Videos', '← 视频'))],
               ),
               h1([.text(currentVideo.title)]),
-              p([.text('Video details')]),
+              p([.text(context.tr('Video details', '视频详情'))]),
             ]),
             div(
               classes: 'sv-video-edit-status',
@@ -323,7 +325,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
                   ]),
                 span(
                   classes: 'sv-visibility ${isPublic ? 'is-public' : 'is-private'}',
-                  [.text(isPublic ? 'Public' : 'Private')],
+                  [.text(isPublic ? context.tr('Public', '公开') : context.tr('Private', '私密'))],
                 ),
               ],
             ),
@@ -346,7 +348,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
                 else
                   div(
                     classes: 'sv-video-edit-player-error',
-                    [.text('Video preview unavailable')],
+                    [.text(context.tr('Video preview unavailable', '无法预览视频'))],
                   ),
               ],
             ),
@@ -354,31 +356,35 @@ class _VideoEditPageState extends State<VideoEditPage> {
               classes: 'sv-video-edit-form',
               [
                 _field(
-                  'Title',
+                  context,
+                  context.tr('Title', '标题'),
                   title,
-                  'Video title',
+                  context.tr('Video title', '视频标题'),
                   (value) => setState(() => title = value),
                 ),
                 _field(
-                  'Description',
+                  context,
+                  context.tr('Description', '简介'),
                   description,
-                  'Video description',
+                  context.tr('Video description', '视频简介'),
                   (value) => setState(() => description = value),
                 ),
                 div(
                   classes: 'sv-two-columns',
                   [
                     _field(
-                      'Category',
+                      context,
+                      context.tr('Category', '分类'),
                       category,
                       'general',
                       (value) => setState(() => category = value),
                     ),
-                    _languageField(),
+                    _languageField(context),
                   ],
                 ),
                 _field(
-                  'Tags',
+                  context,
+                  context.tr('Tags', '标签'),
                   tagsText,
                   'language,vlog,podcast',
                   (value) => setState(() => tagsText = value),
@@ -386,19 +392,19 @@ class _VideoEditPageState extends State<VideoEditPage> {
                 div(
                   classes: 'sv-field',
                   [
-                    span(classes: 'sv-label', [.text('Visibility')]),
+                    span(classes: 'sv-label', [.text(context.tr('Visibility', '可见性'))]),
                     div(
                       classes: 'sv-segmented',
                       [
                         button(
                           classes: 'sv-segment ${isPublic ? 'active' : ''}',
                           onClick: saving ? null : () => setState(() => isPublic = true),
-                          [.text('Public')],
+                          [.text(context.tr('Public', '公开'))],
                         ),
                         button(
                           classes: 'sv-segment ${!isPublic ? 'active' : ''}',
                           onClick: saving ? null : () => setState(() => isPublic = false),
-                          [.text('Private')],
+                          [.text(context.tr('Private', '私密'))],
                         ),
                       ],
                     ),
@@ -415,14 +421,14 @@ class _VideoEditPageState extends State<VideoEditPage> {
                     a(
                       href: '/videos',
                       classes: 'sv-secondary-button',
-                      [.text('Cancel')],
+                      [.text(context.tr('Cancel', '取消'))],
                     ),
                     button(
                       classes: 'sv-primary-button',
                       attributes: saving ? {'disabled': 'disabled'} : null,
                       onClick: saving ? null : _save,
                       [
-                        .text(saving ? 'Saving...' : 'Save changes'),
+                        .text(saving ? context.tr('Saving...', '保存中...') : context.tr('Save changes', '保存更改')),
                       ],
                     ),
                   ],

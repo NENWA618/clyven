@@ -1,7 +1,7 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
 import '../services/studio_client.dart';
 
@@ -45,12 +45,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
     });
 
     try {
-      await studioClient.auth.initialize();
+      final restored = await restoreStoredSession();
 
-      if (!studioClient.auth.isAuthenticated) {
+      if (!restored) {
         setState(() {
           loading = false;
-          error = '请先登录 Glyphora Studio';
+          error = trNow('Sign in to Glyphora Studio first', '请先登录 Glyphora Studio');
         });
 
         return;
@@ -152,11 +152,11 @@ class _DictionaryPageState extends State<DictionaryPage> {
           classes: 'page-heading',
           [
             h1([
-              .text('Dictionary'),
+              .text(context.tr('Dictionary', '词典')),
             ]),
             p([
               .text(
-                '搜索与维护词条、释义、字形和例句。',
+                context.tr('Search and maintain entries, definitions, scripts and example sentences.', '搜索与维护词条、释义、字形和例句。'),
               ),
             ]),
           ],
@@ -171,11 +171,11 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 div(
                   [
                     h2([
-                      .text('Vietnamese Dictionary'),
+                      .text(context.tr('Vietnamese Dictionary', '越南语词典')),
                     ]),
                     p([
                       .text(
-                        '生产数据库中的越南语主词表',
+                        context.tr('Vietnamese headword list in the production database', '生产数据库中的越南语主词表'),
                       ),
                     ]),
                   ],
@@ -183,7 +183,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                 div(
                   classes: 'dictionary-table-count',
                   [
-                    .text('${entries.length} entries'),
+                    .text(context.tr('${entries.length} entries', '${entries.length} 个词条')),
                   ],
                 ),
               ],
@@ -196,7 +196,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   div(
                     classes: 'preview-loading',
                     [
-                      .text('正在读取词库...'),
+                      .text(context.tr('Loading dictionary...', '正在读取词库...')),
                     ],
                   )
                 else if (error != null)
@@ -210,7 +210,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   p(
                     classes: 'empty-state',
                     [
-                      .text('数据库目前没有词条'),
+                      .text(context.tr('The database has no entries yet', '数据库目前没有词条')),
                     ],
                   )
                 else ...[
@@ -224,31 +224,32 @@ class _DictionaryPageState extends State<DictionaryPage> {
                             .text('#'),
                           ]),
                           div([
-                            .text('国语字'),
+                            .text(context.tr('Quốc ngữ', '国语字')),
                           ]),
                           div([
-                            .text('喃字'),
+                            .text(context.tr('Nôm', '喃字')),
                           ]),
                           div([
-                            .text('中文'),
+                            .text(context.tr('Chinese', '中文')),
                           ]),
                           div([
-                            .text('词性'),
+                            .text(context.tr('Part of speech', '词性')),
                           ]),
                           div([
-                            .text('国语字例句'),
+                            .text(context.tr('Quốc ngữ example', '国语字例句')),
                           ]),
                           div([
-                            .text('喃字例句'),
+                            .text(context.tr('Nôm example', '喃字例句')),
                           ]),
                           div([
-                            .text('中文例句'),
+                            .text(context.tr('Chinese example', '中文例句')),
                           ]),
                         ],
                       ),
 
                       for (var index = 0; index < count; index++)
                         _buildRow(
+                          context,
                           index,
                           entries[index],
                         ),
@@ -270,8 +271,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           },
                           [
                             .text(
-                              '加载更多 · '
-                              '剩余 ${entries.length - visibleCount} 条',
+                              context.tr('Load more · ${entries.length - visibleCount} remaining', '加载更多 · 剩余 ${entries.length - visibleCount} 条'),
                             ),
                           ],
                         ),
@@ -352,6 +352,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
   }
 
   Component _buildRow(
+    BuildContext context,
     int index,
     DictionaryEntryDetail detail,
   ) {
@@ -424,10 +425,10 @@ class _DictionaryPageState extends State<DictionaryPage> {
               [
                 .text(
                   savingEntryIds.contains(entryId)
-                      ? '保存中'
+                      ? context.tr('Saving', '保存中')
                       : savedEntryIds.contains(entryId)
                       ? '✓'
-                      : '保存',
+                      : context.tr('Save', '保存'),
                 ),
               ],
             ),

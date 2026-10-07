@@ -54,3 +54,20 @@ void consumeWebSession() {
   );
 }
 
+/// Restores the stored session from localStorage and validates it with the
+/// server. `auth.initialize()` only waits 2s and throws on timeout, which used
+/// to make a slow or cold-starting server look like "signed out". Here a
+/// timeout or network error keeps the stored session; only a server-side
+/// rejection (expired/revoked) signs the user out.
+Future<bool> restoreStoredSession() async {
+  await reviewClient.auth.restore();
+  if (!reviewClient.auth.isAuthenticated) return false;
+  try {
+    await reviewClient.auth.validateAuthentication(
+      timeout: const Duration(seconds: 30),
+    );
+  } catch (_) {
+    // Offline or slow server: keep the session; the next request refreshes it.
+  }
+  return reviewClient.auth.isAuthenticated;
+}

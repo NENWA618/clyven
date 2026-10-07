@@ -18,6 +18,8 @@ dependencies:
       ref: main
   glyphora_backend_client:
     path: ../../packages/backend_client
+  glyphora_web_l10n:
+    path: ../../packages/web_l10n
   glyphora_subtitle_editor:
     path: ../../packages/subtitle_editor
   serverpod_client: 3.4.11

@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -93,7 +94,7 @@ class _MembersPageState extends State<MembersPage> {
   }
 
   String _roleName(int roleId) {
-    return _roleFor(roleId)?.name ?? 'Unknown';
+    return _roleFor(roleId)?.name ?? trNow('Unknown', '未知');
   }
 
   bool _isOwner(AdminMember member) {
@@ -138,7 +139,7 @@ class _MembersPageState extends State<MembersPage> {
 
     if (email.isEmpty || roleId == null) {
       setState(() {
-        _error = '请输入邮箱并选择角色。';
+        _error = trNow('Enter an email and choose a role.', '请输入邮箱并选择角色。');
       });
       return;
     }
@@ -148,7 +149,7 @@ class _MembersPageState extends State<MembersPage> {
         email: email,
         roleId: roleId,
       );
-    }, success: '成员已添加。');
+    }, success: trNow('Member added.', '成员已添加。'));
 
     if (mounted) {
       setState(() {
@@ -166,7 +167,7 @@ class _MembersPageState extends State<MembersPage> {
         memberId: memberId,
         roleId: roleId,
       );
-    }, success: '角色已更新。');
+    }, success: trNow('Role updated.', '角色已更新。'));
   }
 
   Future<void> _removeMember(AdminMember member) async {
@@ -175,7 +176,7 @@ class _MembersPageState extends State<MembersPage> {
 
     await _runMutation(() async {
       await client.adminMembership.removeMember(memberId: memberId);
-    }, success: '成员已移除。');
+    }, success: trNow('Member removed.', '成员已移除。'));
   }
 
   Future<void> _transferOwnership(AdminMember member) async {
@@ -186,7 +187,7 @@ class _MembersPageState extends State<MembersPage> {
       await client.adminMembership.transferOwnership(
         newOwnerMemberId: memberId,
       );
-    }, success: 'Owner 已转移。');
+    }, success: trNow('Ownership transferred.', 'Owner 已转移。'));
   }
 
   void _togglePermission(int roleId, String code) {
@@ -214,26 +215,26 @@ class _MembersPageState extends State<MembersPage> {
         roleId: roleId,
         permissionCodes: codes,
       );
-    }, success: '${role.name} 权限已保存。');
+    }, success: trNow('${role.name} permissions saved.', '${role.name} 权限已保存。'));
   }
 
   @override
   Component build(BuildContext context) {
     if (_loading) {
-      return div(classes: 'admin-members-state', [.text('正在读取成员和权限…')]);
+      return div(classes: 'admin-members-state', [.text(context.tr('Loading members and permissions…', '正在读取成员和权限…'))]);
     }
 
     return div(classes: 'admin-members-page', [
       div(classes: 'admin-members-heading', [
         div([
-          h2([.text('成员与权限')]),
-          p([.text('Owner 永远唯一。管理员、成员与查看者通过 Role + Permission 管理。')]),
+          h2([.text(context.tr('Members & Permissions', '成员与权限'))]),
+          p([.text(context.tr('There is always exactly one Owner. Admins, members and viewers are managed through Role + Permission.', 'Owner 永远唯一。管理员、成员与查看者通过 Role + Permission 管理。'))]),
         ]),
         button(
           type: ButtonType.button,
           classes: 'admin-secondary-button',
           onClick: _saving ? null : _load,
-          [.text('刷新')],
+          [.text(context.tr('Refresh', '刷新'))],
         ),
       ]),
       if (_error != null)
@@ -243,8 +244,8 @@ class _MembersPageState extends State<MembersPage> {
       section(classes: 'admin-members-card admin-members-add-card', [
         div(classes: 'admin-members-card-title', [
           div([
-            strong([.text('添加成员')]),
-            span([.text('成员必须先拥有已注册的 Glyphora 账号。')]),
+            strong([.text(context.tr('Add member', '添加成员'))]),
+            span([.text(context.tr('Members must already have a registered Glyphora account.', '成员必须先拥有已注册的 Glyphora 账号。'))]),
           ]),
         ]),
         div(classes: 'admin-members-add-form', [
@@ -279,15 +280,15 @@ class _MembersPageState extends State<MembersPage> {
             classes: 'admin-primary-button',
             attributes: _saving ? {'disabled': 'disabled'} : null,
             onClick: _saving ? null : _addMember,
-            [.text(_saving ? '处理中…' : '添加成员')],
+            [.text(_saving ? context.tr('Working…', '处理中…') : context.tr('Add member', '添加成员'))],
           ),
         ]),
       ]),
       section(classes: 'admin-members-card', [
         div(classes: 'admin-members-card-title', [
           div([
-            strong([.text('成员')]),
-            span([.text('${_members.length} total')]),
+            strong([.text(context.tr('Members', '成员'))]),
+            span([.text(context.tr('${_members.length} total', '共 ${_members.length} 人'))]),
           ]),
         ]),
         div(classes: 'admin-members-list', [
@@ -338,13 +339,13 @@ class _MembersPageState extends State<MembersPage> {
                         onClick: _saving
                             ? null
                             : () => _transferOwnership(member),
-                        [.text('Transfer Owner')],
+                        [.text(context.tr('Transfer Owner', '转移 Owner'))],
                       ),
                       button(
                         type: ButtonType.button,
                         classes: 'admin-mini-button admin-danger-button',
                         onClick: _saving ? null : () => _removeMember(member),
-                        [.text('Remove')],
+                        [.text(context.tr('Remove', '移除'))],
                       ),
                     ],
                   ]),
@@ -355,8 +356,8 @@ class _MembersPageState extends State<MembersPage> {
       section(classes: 'admin-members-card', [
         div(classes: 'admin-members-card-title', [
           div([
-            strong([.text('角色权限')]),
-            span([.text('Owner 拥有隐式全部权限，不允许通过这里修改。')]),
+            strong([.text(context.tr('Role permissions', '角色权限'))]),
+            span([.text(context.tr('Owner implicitly has every permission and cannot be edited here.', 'Owner 拥有隐式全部权限，不允许通过这里修改。'))]),
           ]),
         ]),
         div(classes: 'admin-role-permission-grid', [
@@ -371,7 +372,7 @@ class _MembersPageState extends State<MembersPage> {
                   type: ButtonType.button,
                   classes: 'admin-primary-button',
                   onClick: _saving ? null : () => _saveRolePermissions(role),
-                  [.text('Save')],
+                  [.text(context.tr('Save', '保存'))],
                 ),
               ]),
               div(classes: 'admin-permission-list', [

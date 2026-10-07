@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0f172a">
   <title>Glyphora</title>
+  <link rel="stylesheet" href="glyphora-tokens.css">
   <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="glyphora-web.css">
   <script defer src="main.client.dart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
     <script>
@@ -116,121 +118,23 @@
       })();
     </script>
     <script>
-      /* GLYPHORA_NIGHT_MODE_BOOT_V1 */
-      (() => {
-        const key = 'glyphora-theme';
-
+      /* Shared theme boot (glyphora_web_l10n ThemeToggle): applies the stored or
+         system theme before first paint. */
+      (function () {
         try {
-          const saved = localStorage.getItem(key);
-          const prefersDark =
-            window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-          const theme =
-            saved === 'dark' || saved === 'light'
-              ? saved
-              : (prefersDark ? 'dark' : 'light');
-
-          document.documentElement.dataset.theme = theme;
-        } catch (_) {
-          document.documentElement.dataset.theme = 'light';
+          var key = 'glyphora-theme';
+          var m = /(?:^#|&)theme=(light|dark)(?:&|$)/.exec(location.hash);
+          if (m) localStorage.setItem(key, m[1]);
+          var saved = localStorage.getItem(key);
+          var dark = saved === 'dark' ||
+            (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
         }
       })();
     </script>
 </head>
 <body>
-        <script>
-      /* GLYPHORA_NIGHT_MODE_TOGGLE_V2_APPBAR */
-      (() => {
-        const key = 'glyphora-theme';
-
-        const getTheme = () =>
-          document.documentElement.dataset.theme === 'dark'
-            ? 'dark'
-            : 'light';
-
-        const setTheme = (theme) => {
-          document.documentElement.dataset.theme = theme;
-
-          try {
-            localStorage.setItem(key, theme);
-          } catch (_) {}
-
-          const button = document.getElementById('glyphora-night-mode-toggle');
-
-          if (button) {
-            const dark = theme === 'dark';
-
-            button.textContent = dark ? '☀' : '☾';
-            button.setAttribute(
-              'aria-label',
-              dark ? '切换到日间模式' : '切换到深夜模式',
-            );
-            button.setAttribute(
-              'title',
-              dark ? '日间模式' : '深夜模式',
-            );
-          }
-        };
-
-        const findAppBar = () => {
-          return (
-            document.querySelector('[class*="appbar"]') ||
-            document.querySelector('[class*="top-bar"]') ||
-            document.querySelector('[class*="topbar"]') ||
-            document.querySelector('header nav') ||
-            document.querySelector('header')
-          );
-        };
-
-        const mount = () => {
-          let button = document.getElementById('glyphora-night-mode-toggle');
-
-          if (!button) {
-            button = document.createElement('button');
-            button.id = 'glyphora-night-mode-toggle';
-            button.type = 'button';
-            button.className = 'glyphora-night-mode-toggle';
-
-            button.addEventListener('click', () => {
-              setTheme(getTheme() === 'dark' ? 'light' : 'dark');
-            });
-          }
-
-          const appBar = findAppBar();
-
-          if (!appBar) {
-            return false;
-          }
-
-          if (button.parentElement !== appBar) {
-            appBar.appendChild(button);
-          }
-
-          setTheme(getTheme());
-          return true;
-        };
-
-        const start = () => {
-          if (mount()) return;
-
-          let attempts = 0;
-
-          const timer = window.setInterval(() => {
-            attempts += 1;
-
-            if (mount() || attempts >= 80) {
-              window.clearInterval(timer);
-            }
-          }, 100);
-        };
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', start, { once: true });
-        } else {
-          start();
-        }
-      })();
-    </script>
 </body>
 </html>

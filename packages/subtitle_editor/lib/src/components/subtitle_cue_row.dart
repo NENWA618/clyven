@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:html' as html;
 
 import 'package:glyphora_backend_client/backend_client.dart';
@@ -97,7 +98,7 @@ class SubtitleCueRow extends StatelessComponent {
           if (cueId != null)
             div(classes: 'subtitle-timing-editor', [
               label([
-                span([.text('Start')]),
+                span([.text(context.tr('Start', '开始'))]),
                 input<String>(
                   attributes: {'value': startText, 'placeholder': '00:00.000'},
                   events: events<String>(onInput: onStartChanged),
@@ -105,7 +106,7 @@ class SubtitleCueRow extends StatelessComponent {
               ]),
               span(classes: 'subtitle-time-arrow', [.text('→')]),
               label([
-                span([.text('End')]),
+                span([.text(context.tr('End', '结束'))]),
                 input<String>(
                   attributes: {'value': endText, 'placeholder': '00:00.000'},
                   events: events<String>(onInput: onEndChanged),
@@ -119,7 +120,7 @@ class SubtitleCueRow extends StatelessComponent {
                     : () {
                         onSaveTiming();
                       },
-                [.text(savingTiming ? 'Saving...' : 'Save time')],
+                [.text(savingTiming ? context.tr('Saving...', '保存中...') : context.tr('Save time', '保存时间'))],
               ),
               if (timingError != null)
                 span(classes: 'subtitle-save-error', [.text(timingError!)]),
@@ -144,7 +145,7 @@ class SubtitleCueRow extends StatelessComponent {
                     : () {
                         onSaveText();
                       },
-                [.text(savingText ? 'Saving...' : 'Save')],
+                [.text(savingText ? context.tr('Saving...', '保存中...') : context.tr('Save', '保存'))],
               ),
               button(
                 classes: 'subtitle-delete-button',
@@ -154,7 +155,7 @@ class SubtitleCueRow extends StatelessComponent {
                     : () {
                         onDelete();
                       },
-                [.text(deleting ? 'Deleting...' : 'Delete')],
+                [.text(deleting ? context.tr('Deleting...', '删除中...') : context.tr('Delete', '删除'))],
               ),
               if (saveError != null)
                 span(classes: 'subtitle-save-error', [.text(saveError!)]),
@@ -163,8 +164,8 @@ class SubtitleCueRow extends StatelessComponent {
             ]),
         ]),
         div(classes: 'subtitle-editor-meta', [
-          span([.text('${detail.tokens.length} tokens')]),
-          span([.text('${detail.phrases.length} phrases')]),
+          span([.text(context.tr('${detail.tokens.length} tokens', '${detail.tokens.length} 个词元'))]),
+          span([.text(context.tr('${detail.phrases.length} phrases', '${detail.phrases.length} 个短语'))]),
         ]),
       ],
     );

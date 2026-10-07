@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 
 const Set<String> allowedVideoExtensions = {
@@ -27,24 +28,28 @@ void validateVideoMetadata({
   required List<int> coverBytes,
 }) {
   if (fileSize <= 0) {
-    throw Exception('视频文件为空');
+    throw Exception(trNow('The video file is empty', '视频文件为空'));
   }
 
   final extension = videoFileExtension(fileName);
 
   if (!allowedVideoExtensions.contains(extension)) {
     throw Exception(
-      '不支持的视频格式 .$extension。'
-      '目前允许：${allowedVideoExtensions.join(', ')}',
+      trNow(
+        'Unsupported video format .$extension. '
+        'Allowed: ${allowedVideoExtensions.join(', ')}',
+        '不支持的视频格式 .$extension。'
+        '目前允许：${allowedVideoExtensions.join(', ')}',
+      ),
     );
   }
 
   if (durationSeconds <= 0) {
-    throw Exception('无法读取视频时长，文件可能损坏或格式异常');
+    throw Exception(trNow('Could not read the video duration; the file may be corrupt or malformed', '无法读取视频时长，文件可能损坏或格式异常'));
   }
 
   if (coverBytes.isEmpty) {
-    throw Exception('无法生成视频封面，文件可能损坏或浏览器无法解码');
+    throw Exception(trNow('Could not generate a cover; the file may be corrupt or the browser cannot decode it', '无法生成视频封面，文件可能损坏或浏览器无法解码'));
   }
 }
 
@@ -81,7 +86,7 @@ Future<T> retryAsync<T>({
   }
 
   Error.throwWithStackTrace(
-    lastError ?? StateError('未知上传错误'),
+    lastError ?? StateError(trNow('Unknown upload error', '未知上传错误')),
     lastStackTrace ?? StackTrace.current,
   );
 }
