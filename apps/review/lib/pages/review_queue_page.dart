@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -94,45 +95,45 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
       div(classes: 'review-hero', [
         div([
           p(classes: 'review-eyebrow', [.text('GLYPHORA REVIEW')]),
-          h1([.text('字幕工作队列')]),
-          p([.text('这里只显示需要处理的字幕任务。完成后自动退出工作区，并永久保留员工贡献记录。')]),
+          h1([.text(context.tr('Subtitle Work Queue', '字幕工作队列'))]),
+          p([.text(context.tr('Only subtitle tasks that need attention are shown here. Finished tasks leave the workspace automatically and staff contribution records are kept permanently.', '这里只显示需要处理的字幕任务。完成后自动退出工作区，并永久保留员工贡献记录。'))]),
         ]),
         if (data != null)
           div(classes: 'review-current-staff', [
-            span([.text('当前员工')]),
+            span([.text(context.tr('Current staff', '当前员工'))]),
             strong([.text(data.currentDisplayName)]),
           ]),
       ]),
       if (data != null)
         div(classes: 'review-stats', [
-          _stat('待领取', data.unclaimedCount),
-          _stat('我的任务', data.myCount),
-          _stat('待复核', data.secondReviewCount),
-          _stat('已完成', data.completedCount),
+          _stat(context.tr('Unclaimed', '待领取'), data.unclaimedCount),
+          _stat(context.tr('My tasks', '我的任务'), data.myCount),
+          _stat(context.tr('Second review', '待复核'), data.secondReviewCount),
+          _stat(context.tr('Completed', '已完成'), data.completedCount),
         ]),
       div(classes: 'review-tabs', [
-        _tabButton('待领取', _ReviewTab.unclaimed, data?.unclaimedCount ?? 0),
-        _tabButton('我的任务', _ReviewTab.mine, data?.myCount ?? 0),
+        _tabButton(context.tr('Unclaimed', '待领取'), _ReviewTab.unclaimed, data?.unclaimedCount ?? 0),
+        _tabButton(context.tr('My tasks', '我的任务'), _ReviewTab.mine, data?.myCount ?? 0),
         _tabButton(
-          '待复核',
+          context.tr('Second review', '待复核'),
           _ReviewTab.secondReview,
           data?.secondReviewCount ?? 0,
         ),
-        _tabButton('已完成', _ReviewTab.completed, data?.completedCount ?? 0),
+        _tabButton(context.tr('Completed', '已完成'), _ReviewTab.completed, data?.completedCount ?? 0),
         button(
           type: ButtonType.button,
           classes: 'review-refresh',
           onClick: loading ? null : _load,
-          [.text(loading ? '刷新中…' : '刷新')],
+          [.text(loading ? context.tr('Refreshing…', '刷新中…') : context.tr('Refresh', '刷新'))],
         ),
       ]),
       if (error != null) div(classes: 'review-error', [.text(error!)]),
       if (loading)
-        div(classes: 'review-empty', [.text('正在读取工作队列…')])
+        div(classes: 'review-empty', [.text(context.tr('Loading the work queue…', '正在读取工作队列…'))])
       else if (_items.isEmpty)
         div(classes: 'review-empty', [
-          strong([.text(_emptyTitle())]),
-          p([.text(_emptyDescription())]),
+          strong([.text(_emptyTitle(context))]),
+          p([.text(_emptyDescription(context))]),
         ])
       else
         div(classes: 'review-task-grid', [
@@ -140,7 +141,7 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
         ]),
       if (data != null)
         p(classes: 'review-page-note', [
-          .text('工作区每组只加载前 40 条；数字显示完整任务总数。大规模后继续加语言筛选、分页和自动派单。'),
+          .text(context.tr('Each group loads only the first 40 items; the numbers show the full task totals. Language filters, pagination and auto-assignment will follow at larger scale.', '工作区每组只加载前 40 条；数字显示完整任务总数。大规模后继续加语言筛选、分页和自动派单。')),
         ]),
     ]);
   }
@@ -185,9 +186,9 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
             span(classes: 'review-script-badge', [.text(task.scriptCode!)]),
           if (task.languageCode.toLowerCase().startsWith('vi') &&
               (task.scriptCode ?? '').toLowerCase() == 'hnom')
-            span(classes: 'review-script-badge', [.text('文字转换')]),
+            span(classes: 'review-script-badge', [.text(context.tr('Script conversion', '文字转换'))]),
           span(classes: 'review-status-badge', [
-            .text(_statusLabel(task.status)),
+            .text(_statusLabel(context, task.status)),
           ]),
         ]),
         span(classes: 'review-task-id', [.text('#${taskId ?? '—'}')]),
@@ -197,10 +198,10 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
         .text('${item.videoAuthorName} · ${_duration(item.durationSeconds)}'),
       ]),
       div(classes: 'review-credit-lines', [
-        _credit('领取', task.assignedDisplayName),
-        _credit('校对', task.editedByDisplayName),
-        _credit('复核', task.reviewedByDisplayName),
-        _credit('通过', task.approvedByDisplayName),
+        _credit(context.tr('Claimed', '领取'), task.assignedDisplayName),
+        _credit(context.tr('Proofread', '校对'), task.editedByDisplayName),
+        _credit(context.tr('Reviewed', '复核'), task.reviewedByDisplayName),
+        _credit(context.tr('Approved', '通过'), task.approvedByDisplayName),
       ]),
       div(classes: 'review-task-actions', [
         if (tab == _ReviewTab.unclaimed && taskId != null)
@@ -210,17 +211,17 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
             onClick: claimingTaskId == null
                 ? () => _claimAndOpen(context, item)
                 : null,
-            [.text(claimingTaskId == taskId ? '领取中…' : '领取并打开')],
+            [.text(claimingTaskId == taskId ? context.tr('Claiming…', '领取中…') : context.tr('Claim and open', '领取并打开'))],
           )
         else if (!completed && taskId != null)
           button(
             type: ButtonType.button,
             classes: 'review-primary-button',
             onClick: () => Router.of(context).push('/tasks/$taskId'),
-            [.text(tab == _ReviewTab.secondReview ? '开始复核' : '继续工作')],
+            [.text(tab == _ReviewTab.secondReview ? context.tr('Start review', '开始复核') : context.tr('Continue', '继续工作'))],
           )
         else
-          span(classes: 'review-completed-note', [.text('已离开工作区 · 贡献记录已保存')]),
+          span(classes: 'review-completed-note', [.text(context.tr('Left the workspace · contribution saved', '已离开工作区 · 贡献记录已保存'))]),
       ]),
     ]);
   }
@@ -233,16 +234,16 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
     ]);
   }
 
-  String _statusLabel(SubtitleReviewTaskStatus status) {
+  String _statusLabel(BuildContext context, SubtitleReviewTaskStatus status) {
     return switch (status) {
-      SubtitleReviewTaskStatus.readyForReview => '待领取',
-      SubtitleReviewTaskStatus.assigned => '已领取',
-      SubtitleReviewTaskStatus.inReview => '校对中',
-      SubtitleReviewTaskStatus.readyForSecondReview => '待复核',
-      SubtitleReviewTaskStatus.returned => '退回修改',
-      SubtitleReviewTaskStatus.approved => '已通过',
-      SubtitleReviewTaskStatus.published => '已发布',
-      SubtitleReviewTaskStatus.failed => '异常',
+      SubtitleReviewTaskStatus.readyForReview => context.tr('Unclaimed', '待领取'),
+      SubtitleReviewTaskStatus.assigned => context.tr('Claimed', '已领取'),
+      SubtitleReviewTaskStatus.inReview => context.tr('In review', '校对中'),
+      SubtitleReviewTaskStatus.readyForSecondReview => context.tr('Second review', '待复核'),
+      SubtitleReviewTaskStatus.returned => context.tr('Returned', '退回修改'),
+      SubtitleReviewTaskStatus.approved => context.tr('Approved', '已通过'),
+      SubtitleReviewTaskStatus.published => context.tr('Published', '已发布'),
+      SubtitleReviewTaskStatus.failed => context.tr('Failed', '异常'),
     };
   }
 
@@ -259,21 +260,21 @@ class _ReviewQueuePageState extends State<ReviewQueuePage> {
         '${s.toString().padLeft(2, '0')}';
   }
 
-  String _emptyTitle() {
+  String _emptyTitle(BuildContext context) {
     return switch (tab) {
-      _ReviewTab.unclaimed => '现在没有待领取任务',
-      _ReviewTab.mine => '你目前没有进行中的任务',
-      _ReviewTab.secondReview => '现在没有待复核任务',
-      _ReviewTab.completed => '还没有完成记录',
+      _ReviewTab.unclaimed => context.tr('No unclaimed tasks right now', '现在没有待领取任务'),
+      _ReviewTab.mine => context.tr('You have no tasks in progress', '你目前没有进行中的任务'),
+      _ReviewTab.secondReview => context.tr('No tasks awaiting second review', '现在没有待复核任务'),
+      _ReviewTab.completed => context.tr('No completed records yet', '还没有完成记录'),
     };
   }
 
-  String _emptyDescription() {
+  String _emptyDescription(BuildContext context) {
     return switch (tab) {
-      _ReviewTab.unclaimed => '新的 AI 字幕、文字转换等生产任务会自动进入这里。',
-      _ReviewTab.mine => '领取任务后会出现在这里。',
-      _ReviewTab.secondReview => '校对员提交后会自动进入这里。',
-      _ReviewTab.completed => '审核发布后的任务只保留在历史记录，不再占用工作区。',
+      _ReviewTab.unclaimed => context.tr('New AI subtitle, script conversion and other production tasks arrive here automatically.', '新的 AI 字幕、文字转换等生产任务会自动进入这里。'),
+      _ReviewTab.mine => context.tr('Tasks you claim will appear here.', '领取任务后会出现在这里。'),
+      _ReviewTab.secondReview => context.tr('Tasks submitted by proofreaders arrive here automatically.', '校对员提交后会自动进入这里。'),
+      _ReviewTab.completed => context.tr('Published tasks stay in history only and no longer take up the workspace.', '审核发布后的任务只保留在历史记录，不再占用工作区。'),
     };
   }
 }

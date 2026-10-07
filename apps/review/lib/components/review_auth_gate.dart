@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
@@ -76,7 +77,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
         _loading = false;
         _signedIn = true;
         _authorized = false;
-        _error = '当前版本的 Review 入口暂时要求管理员权限。';
+        _error = trNow('The Review entry currently requires admin access.', '当前版本的 Review 入口暂时要求管理员权限。');
       });
     }
   }
@@ -86,7 +87,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
 
     if (email.isEmpty || _password.isEmpty) {
       setState(() {
-        _error = '请输入 Glyphora 邮箱和密码';
+        _error = trNow('Enter your Glyphora email and password', '请输入 Glyphora 邮箱和密码');
       });
       return;
     }
@@ -143,7 +144,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
       return div(classes: 'admin-auth-screen', [
         div(classes: 'admin-auth-card', [
           h2([.text('Glyphora Review')]),
-          p([.text('正在恢复字幕审核会话…')]),
+          p([.text(context.tr('Restoring the subtitle review session…', '正在恢复字幕审核会话…'))]),
         ]),
       ]);
     }
@@ -156,15 +157,15 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
           p([
             .text(
               _signedIn
-                  ? '你已经登录 Glyphora，但当前账号还没有 Review 访问权限。'
-                  : '使用内部字幕审核账号登录。',
+                  ? context.tr('You are signed in to Glyphora, but this account has no Review access yet.', '你已经登录 Glyphora，但当前账号还没有 Review 访问权限。')
+                  : context.tr('Sign in with an internal subtitle review account.', '使用内部字幕审核账号登录。'),
             ),
           ]),
           if (!_signedIn) ...[
             input<String>(
               type: InputType.email,
               attributes: {
-                'placeholder': 'Glyphora email',
+                'placeholder': context.tr('Glyphora email', 'Glyphora 邮箱'),
                 'autocomplete': 'email',
               },
               events: events<String>(
@@ -176,7 +177,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
             input<String>(
               type: InputType.password,
               attributes: {
-                'placeholder': 'Password',
+                'placeholder': context.tr('Password', '密码'),
                 'autocomplete': 'current-password',
               },
               events: events<String>(
@@ -190,16 +191,17 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
               classes: 'admin-primary-button',
               attributes: _loginLoading ? {'disabled': 'disabled'} : null,
               onClick: _loginLoading ? null : _login,
-              [.text(_loginLoading ? '登录中…' : '登录 Review')],
+              [.text(_loginLoading ? context.tr('Signing in…', '登录中…') : context.tr('Sign in to Review', '登录 Review'))],
             ),
           ] else
             button(
               type: ButtonType.button,
               classes: 'admin-secondary-button',
               onClick: _signOut,
-              [.text('退出并换一个账号')],
+              [.text(context.tr('Sign out and switch account', '退出并换一个账号'))],
             ),
           if (_error != null) div(classes: 'admin-error', [.text(_error!)]),
+          const LanguageSwitcher(),
         ]),
       ]);
     }

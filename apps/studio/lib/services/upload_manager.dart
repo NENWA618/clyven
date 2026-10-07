@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 
 import 'package:glyphora_backend_client/backend_client.dart';
@@ -111,7 +112,7 @@ class StudioUploadManager {
         _notify();
       },
       onRetry: (attempt, error) {
-        currentTask.error = '第 $attempt 次失败，准备自动重试：$error';
+        currentTask.error = trNow('Attempt $attempt failed, retrying automatically: $error', '第 $attempt 次失败，准备自动重试：$error');
         _notify();
       },
     );
@@ -123,7 +124,7 @@ class StudioUploadManager {
     required StudioUploadTask currentTask,
   }) async {
     if (bytes.isEmpty) {
-      throw Exception('生成的视频封面为空');
+      throw Exception(trNow('The generated cover is empty', '生成的视频封面为空'));
     }
 
     await _retry<void>(
@@ -134,7 +135,7 @@ class StudioUploadManager {
         );
 
         if (uploadDescription == null) {
-          throw Exception('无法创建封面上传任务');
+          throw Exception(trNow('Could not create the cover upload task', '无法创建封面上传任务'));
         }
 
         final uploader = FileUploader(uploadDescription);
@@ -147,13 +148,13 @@ class StudioUploadManager {
             .timeout(_uploadTimeout);
 
         if (!uploaded) {
-          throw Exception('视频封面上传失败');
+          throw Exception(trNow('Cover upload failed', '视频封面上传失败'));
         }
 
         final verified = await client.video.verifyUpload(path: storageKey);
 
         if (!verified) {
-          throw Exception('视频封面上传完成，但服务器校验失败');
+          throw Exception(trNow('Cover uploaded, but server verification failed', '视频封面上传完成，但服务器校验失败'));
         }
       },
       currentTask: currentTask,
@@ -170,7 +171,7 @@ class StudioUploadManager {
     required bool isPublic,
   }) async {
     if (busy) {
-      throw StateError('当前已有视频正在上传');
+      throw StateError(trNow('A video is already uploading', '当前已有视频正在上传'));
     }
 
     _validateVideoFile(file);
@@ -178,7 +179,7 @@ class StudioUploadManager {
     final normalizedTitle = title.trim();
 
     if (normalizedTitle.isEmpty) {
-      throw Exception('视频标题不能为空');
+      throw Exception(trNow('The video title is required', '视频标题不能为空'));
     }
 
     final currentTask = StudioUploadTask(
@@ -214,7 +215,7 @@ class StudioUploadManager {
           );
 
           if (uploadDescription == null) {
-            throw Exception('无法创建上传任务');
+            throw Exception(trNow('Could not create the upload task', '无法创建上传任务'));
           }
 
           final uploader = FileUploader(uploadDescription);
@@ -230,7 +231,7 @@ class StudioUploadManager {
               .timeout(_uploadTimeout);
 
           if (!uploaded) {
-            throw Exception('视频上传失败');
+            throw Exception(trNow('Video upload failed', '视频上传失败'));
           }
 
           currentTask.uploadedBytes = file.size;
@@ -240,7 +241,7 @@ class StudioUploadManager {
           final verified = await client.video.verifyUpload(path: storageKey);
 
           if (!verified) {
-            throw Exception('视频上传完成，但服务器校验失败');
+            throw Exception(trNow('Video uploaded, but server verification failed', '视频上传完成，但服务器校验失败'));
           }
         },
         currentTask: currentTask,

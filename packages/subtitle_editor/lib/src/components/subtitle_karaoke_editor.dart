@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -103,12 +104,17 @@ class SubtitleKaraokeEditor extends StatelessComponent {
     return div(classes: 'subtitle-karaoke-editor', [
       div(classes: 'subtitle-karaoke-header', [
         div([
-          h3(classes: 'subtitle-karaoke-title', [.text('Karaoke timing')]),
+          h3(classes: 'subtitle-karaoke-title', [.text(context.tr('Karaoke timing', 'Karaoke 时间'))]),
           p(classes: 'subtitle-karaoke-description', [
             .text(
+              context.tr(
+              'Each colored block is a karaoke segment. '
+              'See where it sits in the cue, then drag Start / End to adjust; '
+              'exact time inputs are still available for final tweaks.',
               '每一个色块就是一个 Karaoke 片段。'
               '先看它在 cue 的哪一段，再拖 Start / End 调整；'
               '精确时间输入仍可用于最后微调。',
+            ),
             ),
           ]),
         ]),
@@ -117,13 +123,13 @@ class SubtitleKaraokeEditor extends StatelessComponent {
             type: ButtonType.button,
             classes: 'subtitle-karaoke-secondary-button',
             onClick: onGenerateFromSubtitle,
-            [.text('从字幕生成')],
+            [.text(context.tr('Generate from subtitle', '从字幕生成'))],
           ),
           button(
             type: ButtonType.button,
             classes: 'subtitle-karaoke-secondary-button',
             onClick: onClear,
-            [.text('清空')],
+            [.text(context.tr('Clear', '清空'))],
           ),
         ]),
       ]),
@@ -142,8 +148,8 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           [
             .text(
               insideCue
-                  ? '当前 +${formatSubtitleTime(relativeCurrentMs)}'
-                  : '当前播放位置不在这条字幕内',
+                  ? context.tr('Now +${formatSubtitleTime(relativeCurrentMs)}', '当前 +${formatSubtitleTime(relativeCurrentMs)}')
+                  : context.tr('The playhead is outside this cue', '当前播放位置不在这条字幕内'),
             ),
           ],
         ),
@@ -165,7 +171,7 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           ]),
           div(classes: 'subtitle-karaoke-visual-track', [
             for (var index = 0; index < drafts.length; index++)
-              _visualSegment(index),
+              _visualSegment(context, index),
             if (insideCue)
               div(
                 classes: 'subtitle-karaoke-playhead',
@@ -175,36 +181,44 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           ]),
           div(classes: 'subtitle-karaoke-visual-legend', [
             .text(
+              context.tr(
+              'Block position = segment time; '
+              'each #number below matches the blocks here.',
               '色块位置 = 片段时间；'
               '下方每一行的 #编号与这里完全对应。',
+            ),
             ),
           ]),
         ]),
       if (drafts.isEmpty)
         div(classes: 'subtitle-karaoke-empty', [
           .text(
+            context.tr(
+            'No karaoke segments yet. '
+            'Generate initial segments from the current subtitle, or add them manually.',
             '还没有 Karaoke 片段。'
             '可以从当前字幕自动生成初始片段，或者手动添加。',
+          ),
           ),
         ])
       else
         div(classes: 'subtitle-karaoke-segments', [
           for (var index = 0; index < drafts.length; index++)
-            _segmentRow(index, drafts[index], insideCue),
+            _segmentRow(context, index, drafts[index], insideCue),
         ]),
       div(classes: 'subtitle-karaoke-footer', [
         button(
           type: ButtonType.button,
           classes: 'subtitle-karaoke-add-button',
           onClick: onAdd,
-          [.text('+ 添加片段')],
+          [.text(context.tr('+ Add segment', '+ 添加片段'))],
         ),
         button(
           type: ButtonType.button,
           classes: 'subtitle-karaoke-save-button',
           attributes: saving ? {'disabled': 'disabled'} : null,
           onClick: saving ? null : onSave,
-          [.text(saving ? 'Saving...' : '保存 Karaoke')],
+          [.text(saving ? context.tr('Saving...', '保存中...') : context.tr('Save karaoke', '保存 Karaoke'))],
         ),
         if (error != null)
           span(classes: 'subtitle-save-error', [.text(error!)]),
@@ -212,7 +226,7 @@ class SubtitleKaraokeEditor extends StatelessComponent {
     ]);
   }
 
-  Component _visualSegment(int index) {
+  Component _visualSegment(BuildContext context, int index) {
     final startMs = _startMs(index);
     final endMs = _endMs(index);
     final draft = drafts[index];
@@ -249,13 +263,18 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           .text('#${index + 1}'),
         ]),
         span(classes: 'subtitle-karaoke-visual-text', [
-          .text(draft.text.trim().isEmpty ? '空片段' : draft.text),
+          .text(draft.text.trim().isEmpty ? context.tr('Empty segment', '空片段') : draft.text),
         ]),
       ],
     );
   }
 
-  Component _segmentRow(int index, KaraokeSegmentDraft draft, bool insideCue) {
+  Component _segmentRow(
+    BuildContext context,
+    int index,
+    KaraokeSegmentDraft draft,
+    bool insideCue,
+  ) {
     final startMs = _startMs(index);
     final endMs = _endMs(index);
 
@@ -273,9 +292,9 @@ class SubtitleKaraokeEditor extends StatelessComponent {
       div(classes: 'subtitle-karaoke-segment-row', [
         span(classes: 'subtitle-karaoke-index', [.text('${index + 1}')]),
         label(classes: 'subtitle-karaoke-text-field', [
-          span([.text('片段')]),
+          span([.text(context.tr('Segment', '片段'))]),
           input<String>(
-            attributes: {'value': draft.text, 'placeholder': '文字 / 音节 / 字'},
+            attributes: {'value': draft.text, 'placeholder': context.tr('Text / syllable / character', '文字 / 音节 / 字')},
             events: events<String>(
               onInput: (value) {
                 onTextChanged(index, value);
@@ -284,7 +303,7 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           ),
         ]),
         label(classes: 'subtitle-karaoke-time-field', [
-          span([.text('Start')]),
+          span([.text(context.tr('Start', '开始'))]),
           input<String>(
             attributes: {'value': draft.startTime, 'placeholder': '00:00.000'},
             events: events<String>(
@@ -299,10 +318,10 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           classes: 'subtitle-karaoke-now-button',
           attributes: insideCue ? null : {'disabled': 'disabled'},
           onClick: insideCue ? () => onUseCurrentStart(index) : null,
-          [.text('当前→Start')],
+          [.text(context.tr('Now→Start', '当前→开始'))],
         ),
         label(classes: 'subtitle-karaoke-time-field', [
-          span([.text('End')]),
+          span([.text(context.tr('End', '结束'))]),
           input<String>(
             attributes: {'value': draft.endTime, 'placeholder': '00:00.000'},
             events: events<String>(
@@ -317,13 +336,13 @@ class SubtitleKaraokeEditor extends StatelessComponent {
           classes: 'subtitle-karaoke-now-button',
           attributes: insideCue ? null : {'disabled': 'disabled'},
           onClick: insideCue ? () => onUseCurrentEnd(index) : null,
-          [.text('当前→End')],
+          [.text(context.tr('Now→End', '当前→结束'))],
         ),
         button(
           type: ButtonType.button,
           classes: 'subtitle-karaoke-delete-button',
           onClick: () => onDelete(index),
-          [.text('删除')],
+          [.text(context.tr('Delete', '删除'))],
         ),
       ]),
       if (validRange)
@@ -332,7 +351,7 @@ class SubtitleKaraokeEditor extends StatelessComponent {
             span([
               .text(
                 '#${index + 1} · '
-                '${draft.text.trim().isEmpty ? '空片段' : draft.text}',
+                '${draft.text.trim().isEmpty ? context.tr('Empty segment', '空片段') : draft.text}',
               ),
             ]),
             span([
@@ -396,8 +415,12 @@ class SubtitleKaraokeEditor extends StatelessComponent {
       else
         div(classes: 'subtitle-karaoke-range-error', [
           .text(
+            context.tr(
+            'Invalid time format. Fix Start / End first '
+            'and the visual slider will appear.',
             '时间格式无效，先把 Start / End 修成有效时间后'
             '就会出现可视化拖杆。',
+          ),
           ),
         ]),
     ]);

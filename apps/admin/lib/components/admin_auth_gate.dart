@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
@@ -76,7 +77,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
         _loading = false;
         _signedIn = true;
         _authorized = false;
-        _error = '当前 Glyphora 账号不是 Admin Workspace 的有效成员。';
+        _error = trNow('This Glyphora account is not an active member of the Admin Workspace.', '当前 Glyphora 账号不是 Admin Workspace 的有效成员。');
       });
     }
   }
@@ -86,7 +87,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
 
     if (email.isEmpty || _password.isEmpty) {
       setState(() {
-        _error = '请输入 Glyphora 邮箱和密码';
+        _error = trNow('Enter your Glyphora email and password', '请输入 Glyphora 邮箱和密码');
       });
       return;
     }
@@ -143,7 +144,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
       return div(classes: 'admin-auth-screen', [
         div(classes: 'admin-auth-card', [
           h2([.text('Glyphora Admin')]),
-          p([.text('正在恢复管理员会话…')]),
+          p([.text(context.tr('Restoring the admin session…', '正在恢复管理员会话…'))]),
         ]),
       ]);
     }
@@ -156,15 +157,15 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
           p([
             .text(
               _signedIn
-                  ? '你已经登录 Glyphora，但这个账号没有管理员权限。'
-                  : '使用拥有管理员权限的 Glyphora 账号登录。',
+                  ? context.tr('You are signed in to Glyphora, but this account has no admin access.', '你已经登录 Glyphora，但这个账号没有管理员权限。')
+                  : context.tr('Sign in with a Glyphora account that has admin access.', '使用拥有管理员权限的 Glyphora 账号登录。'),
             ),
           ]),
           if (!_signedIn) ...[
             input<String>(
               type: InputType.email,
               attributes: {
-                'placeholder': 'Glyphora email',
+                'placeholder': context.tr('Glyphora email', 'Glyphora 邮箱'),
                 'autocomplete': 'email',
               },
               events: events<String>(
@@ -176,7 +177,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
             input<String>(
               type: InputType.password,
               attributes: {
-                'placeholder': 'Password',
+                'placeholder': context.tr('Password', '密码'),
                 'autocomplete': 'current-password',
               },
               events: events<String>(
@@ -190,16 +191,17 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
               classes: 'admin-primary-button',
               attributes: _loginLoading ? {'disabled': 'disabled'} : null,
               onClick: _loginLoading ? null : _login,
-              [.text(_loginLoading ? '登录中…' : '登录管理员平台')],
+              [.text(_loginLoading ? context.tr('Signing in…', '登录中…') : context.tr('Sign in to Admin', '登录管理员平台'))],
             ),
           ] else
             button(
               type: ButtonType.button,
               classes: 'admin-secondary-button',
               onClick: _signOut,
-              [.text('退出并换一个账号')],
+              [.text(context.tr('Sign out and switch account', '退出并换一个账号'))],
             ),
           if (_error != null) div(classes: 'admin-error', [.text(_error!)]),
+          const LanguageSwitcher(),
         ]),
       ]);
     }

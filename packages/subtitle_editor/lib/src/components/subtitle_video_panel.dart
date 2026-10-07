@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:html' as html;
 
 import 'package:glyphora_backend_client/backend_client.dart' as serverpod;
@@ -379,7 +380,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
                 'max': '1000',
                 'step': '1',
                 'value': '$progress',
-                'aria-label': 'Video progress',
+                'aria-label': context.tr('Video progress', '视频进度'),
               },
               events: events<String>(
                 onInput: (value) {
@@ -445,7 +446,7 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
                     'max': '100',
                     'step': '1',
                     'value': '${(_volume * 100).round()}',
-                    'aria-label': 'Volume',
+                    'aria-label': context.tr('Volume', '音量'),
                   },
                   events: events<String>(
                     onInput: (value) {

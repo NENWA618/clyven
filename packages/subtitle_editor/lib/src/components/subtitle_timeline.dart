@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -160,7 +161,7 @@ class SubtitleTimeline extends StatelessComponent {
 
     return div(classes: 'subtitle-timeline-panel', [
       div(classes: 'subtitle-timeline-header', [
-        span([.text('Timeline')]),
+        span([.text(context.tr('Timeline', '时间轴'))]),
         div(classes: 'subtitle-timeline-controls', [
           button(
             type: ButtonType.button,
@@ -191,14 +192,14 @@ class SubtitleTimeline extends StatelessComponent {
             onClick: () {
               onZoomChanged(_defaultZoom());
             },
-            [.text('30秒窗口')],
+            [.text(context.tr('30s window', '30秒窗口'))],
           ),
           button(
             type: ButtonType.button,
             onClick: () {
               onZoomChanged(1.0);
             },
-            [.text('全览')],
+            [.text(context.tr('Fit all', '全览'))],
           ),
           span(classes: 'subtitle-timeline-time', [
             .text(

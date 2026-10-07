@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
@@ -21,7 +22,8 @@ class App extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return div(
+    return WebLocaleRoot(
+      child: div(
       classes: 'app',
       [
         Router(
@@ -51,9 +53,9 @@ class App extends StatelessComponent {
                     );
 
                     if (videoId == null) {
-                      return const PlaceholderPage(
-                        title: 'Edit video',
-                        description: '无效的视频 ID。',
+                      return PlaceholderPage(
+                        title: context.tr('Edit video', '编辑视频'),
+                        description: context.tr('Invalid video ID.', '无效的视频 ID。'),
                       );
                     }
 
@@ -92,9 +94,9 @@ class App extends StatelessComponent {
                     final scriptCode = state.params['scriptCode'] ?? '';
 
                     if (videoId == null || languageCode.isEmpty || scriptCode.isEmpty) {
-                      return const PlaceholderPage(
-                        title: 'Subtitle Editor',
-                        description: '无效的视频、语言或文字参数。',
+                      return PlaceholderPage(
+                        title: context.tr('Subtitle Editor', '字幕编辑器'),
+                        description: context.tr('Invalid video, language or script parameters.', '无效的视频、语言或文字参数。'),
                       );
                     }
 
@@ -116,9 +118,9 @@ class App extends StatelessComponent {
                     final languageCode = state.params['languageCode'] ?? '';
 
                     if (videoId == null || languageCode.isEmpty) {
-                      return const PlaceholderPage(
-                        title: 'Subtitle Editor',
-                        description: '无效的视频或语言参数。',
+                      return PlaceholderPage(
+                        title: context.tr('Subtitle Editor', '字幕编辑器'),
+                        description: context.tr('Invalid video or language parameters.', '无效的视频或语言参数。'),
                       );
                     }
 
@@ -147,9 +149,9 @@ class App extends StatelessComponent {
                   path: '/nom',
                   title: 'Nôm Tools · Glyphora Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Nôm Tools',
-                      description: '国语字与喃字内容工具。',
+                    return PlaceholderPage(
+                      title: context.tr('Nôm Tools', '喃字工具'),
+                      description: context.tr('Content tools for Quốc ngữ and Nôm.', '国语字与喃字内容工具。'),
                     );
                   },
                 ),
@@ -157,9 +159,9 @@ class App extends StatelessComponent {
                   path: '/review',
                   title: 'Review · Glyphora Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Review',
-                      description: '审核字幕、词典与发布内容。',
+                    return PlaceholderPage(
+                      title: context.tr('Review', '审核'),
+                      description: context.tr('Review subtitles, dictionary entries and published content.', '审核字幕、词典与发布内容。'),
                     );
                   },
                 ),
@@ -167,9 +169,9 @@ class App extends StatelessComponent {
                   path: '/settings',
                   title: 'Settings · Glyphora Studio',
                   builder: (context, state) {
-                    return const PlaceholderPage(
-                      title: 'Settings',
-                      description: 'Studio 与语言资源配置。',
+                    return PlaceholderPage(
+                      title: context.tr('Settings', '设置'),
+                      description: context.tr('Studio and language resource settings.', 'Studio 与语言资源配置。'),
                     );
                   },
                 ),
@@ -185,6 +187,7 @@ class App extends StatelessComponent {
           ],
         ),
       ],
+    ),
     );
   }
 }

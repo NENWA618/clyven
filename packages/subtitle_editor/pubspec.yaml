@@ -11,6 +11,8 @@ dependencies:
   jaspr_router: ^0.9.0
   glyphora_backend_client:
     path: ../backend_client
+  glyphora_web_l10n:
+    path: ../web_l10n
   serverpod_auth_core_client: 3.4.11
 
 resolution: workspace

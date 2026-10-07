@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 
 import 'subtitle_cue_service.dart';
@@ -27,14 +28,14 @@ class SubtitleWorkspaceService {
   }) async {
     final video = await client.video.getVideo(videoId);
     if (video == null) {
-      throw Exception('找不到视频');
+      throw Exception(trNow('Video not found', '找不到视频'));
     }
 
     final videoUrl = await client.video.getVideoUrl(
       path: video.videoStorageKey,
     );
     if (videoUrl == null || videoUrl.isEmpty) {
-      throw Exception('无法取得视频播放地址');
+      throw Exception(trNow('Could not get the video playback URL', '无法取得视频播放地址'));
     }
 
     final cues = await cueService.loadCues(

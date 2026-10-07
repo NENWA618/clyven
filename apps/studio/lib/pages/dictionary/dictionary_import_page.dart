@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:convert';
 
 import 'package:glyphora_backend_client/backend_client.dart';
@@ -74,14 +75,14 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
   Future<void> _login() async {
     if (loginEmail.trim().isEmpty) {
       setState(() {
-        loginError = '请输入邮箱';
+        loginError = trNow('Enter your email', '请输入邮箱');
       });
       return;
     }
 
     if (loginPassword.isEmpty) {
       setState(() {
-        loginError = '请输入密码';
+        loginError = trNow('Enter your password', '请输入密码');
       });
       return;
     }
@@ -145,7 +146,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
   Future<void> _previewExcel() async {
     if (selectedProfileId == null) {
       setState(() {
-        previewError = '请选择 Import Profile';
+        previewError = trNow('Select an Import Profile', '请选择 Import Profile');
       });
       return;
     }
@@ -164,7 +165,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
       final bytes = await readSelectedExcelFile('excel-file');
 
       if (bytes == null) {
-        throw Exception('请选择 Excel 文件');
+        throw Exception(trNow('Select an Excel file', '请选择 Excel 文件'));
       }
 
       final excelBase64 = base64Encode(bytes);
@@ -194,21 +195,21 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
   Future<void> _commitExcel() async {
     if (!loggedIn) {
       setState(() {
-        commitError = '请先登录 Studio';
+        commitError = trNow('Sign in to Studio first', '请先登录 Studio');
       });
       return;
     }
 
     if (selectedProfileId == null) {
       setState(() {
-        commitError = '请选择 Import Profile';
+        commitError = trNow('Select an Import Profile', '请选择 Import Profile');
       });
       return;
     }
 
     if (previewExcelBase64 == null) {
       setState(() {
-        commitError = '没有可导入的 Excel 文件';
+        commitError = trNow('There is no Excel file to import', '没有可导入的 Excel 文件');
       });
       return;
     }
@@ -270,9 +271,9 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
         div(
           classes: 'page-heading',
           [
-            h1([.text('Dictionary Import')]),
+            h1([.text(context.tr('Dictionary Import', '词典导入'))]),
             p([
-              .text('通过 Import Profile 预览并导入词典 Excel 数据。'),
+              .text(context.tr('Preview and import dictionary Excel data through an Import Profile.', '通过 Import Profile 预览并导入词典 Excel 数据。')),
             ]),
           ],
         ),
@@ -287,10 +288,10 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
               div(
                 classes: 'login-header',
                 [
-                  h3([.text('Studio Login')]),
+                  h3([.text(context.tr('Studio Login', 'Studio 登录'))]),
                   p([
                     .text(
-                      '正式修改词典、字幕和视频内容前需要登录。',
+                      context.tr('Sign in before making real changes to dictionary, subtitles and videos.', '正式修改词典、字幕和视频内容前需要登录。'),
                     ),
                   ]),
                 ],
@@ -336,7 +337,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                           },
                     [
                       .text(
-                        loginLoading ? '登录中...' : '登录',
+                        loginLoading ? context.tr('Signing in...', '登录中...') : context.tr('Sign in', '登录'),
                       ),
                     ],
                   ),
@@ -352,7 +353,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
         else
           div(
             classes: 'login-success',
-            [.text('✓ Studio 已登录')],
+            [.text(context.tr('✓ Signed in to Studio', '✓ Studio 已登录'))],
           ),
 
         // =========================
@@ -369,18 +370,18 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                   classes: 'panel-header',
                   [
                     h2([.text('Import Profile')]),
-                    p([.text('选择词典导入规则。')]),
+                    p([.text(context.tr('Choose the dictionary import rules.', '选择词典导入规则。'))]),
                   ],
                 ),
                 div(
                   classes: 'panel-body',
                   [
                     if (loading)
-                      p([.text('正在读取 Profile...')])
+                      p([.text(context.tr('Loading profiles...', '正在读取 Profile...'))])
                     else if (error != null)
-                      p([.text('无法读取 Profile：$error')])
+                      p([.text(context.tr('Could not load profiles: $error', '无法读取 Profile：$error'))])
                     else if (profiles.isEmpty)
-                      p([.text('暂无 Profile')])
+                      p([.text(context.tr('No profiles yet', '暂无 Profile'))])
                     else
                       for (final profile in profiles)
                         button(
@@ -405,7 +406,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                               classes: 'profile-meta',
                               [
                                 .text(
-                                  'Language: ${profile.languageCode} · ID: ${profile.id}',
+                                  context.tr('Language: ${profile.languageCode} · ID: ${profile.id}', '语言：${profile.languageCode} · ID：${profile.id}'),
                                 ),
                               ],
                             ),
@@ -426,7 +427,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                     h2([.text('Dictionary Import')]),
                     p([
                       .text(
-                        '上传 Excel 后先进行 Preview，不会直接写入数据库。',
+                        context.tr('Upload an Excel file to preview first; nothing is written to the database yet.', '上传 Excel 后先进行 Preview，不会直接写入数据库。'),
                       ),
                     ]),
                   ],
@@ -443,11 +444,11 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                         ),
                         p(
                           classes: 'upload-title',
-                          [.text('选择 Excel 文件')],
+                          [.text(context.tr('Choose an Excel file', '选择 Excel 文件'))],
                         ),
                         p(
                           classes: 'upload-description',
-                          [.text('支持 .xlsx / .xls')],
+                          [.text(context.tr('Supports .xlsx / .xls', '支持 .xlsx / .xls'))],
                         ),
                         input<String>(
                           id: 'excel-file',
@@ -467,7 +468,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                     if (previewLoading)
                       div(
                         classes: 'preview-loading',
-                        [.text('正在分析 Excel...')],
+                        [.text(context.tr('Analyzing Excel...', '正在分析 Excel...'))],
                       ),
 
                     if (previewError != null)
@@ -481,21 +482,21 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                         classes: 'stats-grid',
                         [
                           _statCard(
-                            'Total',
+                            context.tr('Total', '总计'),
                             preview!.totalRows,
                           ),
                           _statCard(
-                            'Valid',
+                            context.tr('Valid', '有效'),
                             preview!.validRows,
                             tone: 'valid',
                           ),
                           _statCard(
-                            'Warnings',
+                            context.tr('Warnings', '警告'),
                             preview!.warningRows,
                             tone: 'warning',
                           ),
                           _statCard(
-                            'Errors',
+                            context.tr('Errors', '错误'),
                             preview!.errorRows,
                             tone: 'error',
                           ),
@@ -506,7 +507,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                         div(
                           classes: 'warning-section',
                           [
-                            h3([.text('Warning Rows')]),
+                            h3([.text(context.tr('Warning Rows', '警告行'))]),
                             ul(
                               classes: 'warning-list',
                               [
@@ -517,11 +518,11 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                                       [
                                         strong([
                                           .text(
-                                            'Row ${row.rowNumber}',
+                                            context.tr('Row ${row.rowNumber}', '第 ${row.rowNumber} 行'),
                                           ),
                                         ]),
                                         .text(
-                                          ' · ${row.headword ?? '(无主词)'} · ${row.message ?? 'Warning'}',
+                                          ' · ${row.headword ?? context.tr('(no headword)', '(无主词)')} · ${row.message ?? context.tr('Warning', '警告')}',
                                         ),
                                       ],
                                     ),
@@ -549,7 +550,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                                   },
                             [
                               .text(
-                                preview!.errorRows > 0 ? '存在错误，无法导入' : 'Confirm Import',
+                                preview!.errorRows > 0 ? context.tr('Errors found; cannot import', '存在错误，无法导入') : context.tr('Confirm Import', '确认导入'),
                               ),
                             ],
                           ),
@@ -560,30 +561,30 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                         div(
                           classes: 'confirm-box',
                           [
-                            h3([.text('确认导入')]),
+                            h3([.text(context.tr('Confirm import', '确认导入'))]),
                             p([
                               .text(
-                                'Profile: ${preview!.profile.name}',
+                                context.tr('Profile: ${preview!.profile.name}', 'Profile：${preview!.profile.name}'),
                               ),
                             ]),
                             p([
                               .text(
-                                'Total: ${preview!.totalRows}',
+                                context.tr('Total: ${preview!.totalRows}', '总计：${preview!.totalRows}'),
                               ),
                             ]),
                             p([
                               .text(
-                                'Will import: ${preview!.validRows}',
+                                context.tr('Will import: ${preview!.validRows}', '将导入：${preview!.validRows}'),
                               ),
                             ]),
                             p([
                               .text(
-                                'Will skip: ${preview!.warningRows}',
+                                context.tr('Will skip: ${preview!.warningRows}', '将跳过：${preview!.warningRows}'),
                               ),
                             ]),
                             p([
                               .text(
-                                'Errors: ${preview!.errorRows}',
+                                context.tr('Errors: ${preview!.errorRows}', '错误：${preview!.errorRows}'),
                               ),
                             ]),
                             div(
@@ -598,7 +599,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                                             showImportConfirm = false;
                                           });
                                         },
-                                  [.text('取消')],
+                                  [.text(context.tr('Cancel', '取消'))],
                                 ),
                                 button(
                                   classes: 'commit-button',
@@ -614,7 +615,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                                         },
                                   [
                                     .text(
-                                      commitLoading ? '正在导入...' : '正式导入',
+                                      commitLoading ? context.tr('Importing...', '正在导入...') : context.tr('Import', '正式导入'),
                                     ),
                                   ],
                                 ),
@@ -632,7 +633,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                         classes: 'empty-state',
                         [
                           .text(
-                            selectedProfileId == null ? '请先选择 Import Profile' : 'Preview 结果会显示在这里',
+                            selectedProfileId == null ? context.tr('Select an Import Profile first', '请先选择 Import Profile') : context.tr('Preview results will appear here', 'Preview 结果会显示在这里'),
                           ),
                         ],
                       ),
@@ -641,34 +642,34 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                       div(
                         classes: 'commit-result',
                         [
-                          h3([.text('Import Complete')]),
+                          h3([.text(context.tr('Import Complete', '导入完成'))]),
                           p(
                             classes: 'commit-result-description',
-                            [.text('Excel 已完成正式导入。')],
+                            [.text(context.tr('The Excel file has been imported.', 'Excel 已完成正式导入。'))],
                           ),
                           div(
                             classes: 'stats-grid',
                             [
                               _statCard(
-                                'Total',
+                                context.tr('Total', '总计'),
                                 commitResult!.totalRows,
                               ),
                               _statCard(
-                                'Inserted',
+                                context.tr('Inserted', '新增'),
                                 commitResult!.insertedEntries,
                                 tone: 'valid',
                               ),
                               _statCard(
-                                'Merged',
+                                context.tr('Merged', '合并'),
                                 commitResult!.mergedEntries,
                               ),
                               _statCard(
-                                'Skipped',
+                                context.tr('Skipped', '跳过'),
                                 commitResult!.skippedRows,
                                 tone: 'warning',
                               ),
                               _statCard(
-                                'Failed',
+                                context.tr('Failed', '失败'),
                                 commitResult!.failedRows,
                                 tone: 'error',
                               ),
@@ -678,7 +679,7 @@ class _DictionaryImportPageState extends State<DictionaryImportPage> {
                             div(
                               classes: 'commit-messages',
                               [
-                                h4([.text('Messages')]),
+                                h4([.text(context.tr('Messages', '消息'))]),
                                 ul([
                                   for (final message in commitResult!.messages) li([.text(message)]),
                                 ]),

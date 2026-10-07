@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -74,7 +75,7 @@ class _UsersPageState extends State<UsersPage> {
               authorName: name,
               email: emailsByAuthUserId[entry.key]?.trim().isNotEmpty == true
                   ? emailsByAuthUserId[entry.key]!.trim()
-                  : '未绑定邮箱',
+                  : '',
               videos: list,
             );
           }).toList()..sort(
@@ -181,30 +182,30 @@ class _UsersPageState extends State<UsersPage> {
     return div(classes: 'admin-users-page', [
       div(classes: 'admin-users-toolbar', [
         div([
-          h2([.text('Users')]),
-          p([.text('查看 Glyphora 用户，以及该用户账号名下的全部视频。')]),
+          h2([.text(context.tr('Users', '用户'))]),
+          p([.text(context.tr('Browse Glyphora users and all videos under their accounts.', '查看 Glyphora 用户，以及该用户账号名下的全部视频。'))]),
         ]),
         button(
           type: ButtonType.button,
           classes: 'admin-secondary-button',
           onClick: _load,
-          [.text('刷新')],
+          [.text(context.tr('Refresh', '刷新'))],
         ),
       ]),
       if (_error != null)
         div(classes: 'admin-error admin-page-error', [.text(_error!)]),
       if (_loading)
-        div(classes: 'admin-users-state', [.text('正在读取所有用户视频…')])
+        div(classes: 'admin-users-state', [.text(context.tr('Loading all user videos…', '正在读取所有用户视频…'))])
       else
         div(classes: 'admin-users-grid', [
           section(classes: 'admin-users-column', [
             div(classes: 'admin-users-column-header', [
-              strong([.text('用户')]),
+              strong([.text(context.tr('Users', '用户'))]),
               span([.text('${_users.length}')]),
             ]),
             input<String>(
               type: InputType.text,
-              attributes: {'placeholder': '搜索用户名 / 邮箱', 'value': _search},
+              attributes: {'placeholder': context.tr('Search name / email', '搜索用户名 / 邮箱'), 'value': _search},
               events: events<String>(
                 onInput: (value) {
                   setState(() {
@@ -233,7 +234,7 @@ class _UsersPageState extends State<UsersPage> {
                     ]),
                     div(classes: 'admin-user-copy', [
                       strong([.text(user.authorName)]),
-                      span([.text(user.email)]),
+                      span([.text(user.email.isEmpty ? context.tr('No email linked', '未绑定邮箱') : user.email)]),
                     ]),
                     span(classes: 'admin-user-video-count', [
                       .text('${user.videos.length}'),
@@ -247,17 +248,17 @@ class _UsersPageState extends State<UsersPage> {
               strong([
                 .text(
                   selectedUser == null
-                      ? '视频'
-                      : '${selectedUser.authorName} 的视频',
+                      ? context.tr('Videos', '视频')
+                      : context.tr("${selectedUser.authorName}'s videos", '${selectedUser.authorName} 的视频'),
                 ),
               ]),
               if (selectedUser != null)
                 span([.text('${selectedUser.videos.length}')]),
             ]),
             if (selectedUser == null)
-              div(classes: 'admin-users-state', [.text('请选择用户')])
+              div(classes: 'admin-users-state', [.text(context.tr('Select a user', '请选择用户'))])
             else if (selectedUser.videos.isEmpty)
-              div(classes: 'admin-users-state', [.text('这个用户没有视频')])
+              div(classes: 'admin-users-state', [.text(context.tr('This user has no videos', '这个用户没有视频'))])
             else
               div(classes: 'admin-user-video-list', [
                 for (final video in selectedUser.videos)
@@ -274,7 +275,7 @@ class _UsersPageState extends State<UsersPage> {
                       p([
                         .text(
                           video.description.trim().isEmpty
-                              ? '无描述'
+                              ? context.tr('No description', '无描述')
                               : video.description,
                         ),
                       ]),
@@ -289,16 +290,16 @@ class _UsersPageState extends State<UsersPage> {
           ]),
           section(classes: 'admin-tracks-column', [
             div(classes: 'admin-users-column-header', [
-              strong([.text('字幕轨')]),
+              strong([.text(context.tr('Subtitle tracks', '字幕轨'))]),
               if (_selectedVideo != null)
                 span([.text('#${_selectedVideo!.id}')]),
             ]),
             if (_selectedVideo == null)
-              div(classes: 'admin-users-state', [.text('请选择视频')])
+              div(classes: 'admin-users-state', [.text(context.tr('Select a video', '请选择视频'))])
             else if (_loadingTracks)
-              div(classes: 'admin-users-state', [.text('正在读取字幕轨…')])
+              div(classes: 'admin-users-state', [.text(context.tr('Loading subtitle tracks…', '正在读取字幕轨…'))])
             else if (_tracks.isEmpty)
-              div(classes: 'admin-users-state', [.text('这个视频目前没有字幕轨')])
+              div(classes: 'admin-users-state', [.text(context.tr('This video has no subtitle tracks yet', '这个视频目前没有字幕轨'))])
             else
               div(classes: 'admin-track-admin-list', [
                 for (final track in _tracks)
@@ -317,7 +318,7 @@ class _UsersPageState extends State<UsersPage> {
                       type: ButtonType.button,
                       classes: 'admin-primary-button',
                       onClick: () => _openTrack(context, track),
-                      [.text('进入字幕编辑器')],
+                      [.text(context.tr('Open subtitle editor', '进入字幕编辑器'))],
                     ),
                   ]),
               ]),

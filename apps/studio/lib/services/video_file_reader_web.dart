@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
@@ -25,7 +26,7 @@ Future<SelectedVideoFile?> readSelectedVideoFile(String inputId) async {
   final element = web.document.getElementById(inputId);
 
   if (element is! web.HTMLInputElement) {
-    throw Exception('找不到视频文件输入框');
+    throw Exception(trNow('Video file input not found', '找不到视频文件输入框'));
   }
 
   final files = element.files;
@@ -41,7 +42,7 @@ Future<SelectedVideoFile?> readSelectedVideoFile(String inputId) async {
   }
 
   if (file.size <= 0) {
-    throw Exception('视频文件不能为空');
+    throw Exception(trNow('The video file cannot be empty', '视频文件不能为空'));
   }
 
   final metadata = await _readMetadataAndCover(file);
@@ -72,7 +73,7 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
 
     video.onerror = ((web.Event event) {
       metadataCompleter.completeError(
-        Exception('无法读取该文件作为视频。文件可能已损坏、格式不受浏览器支持，或只是修改了文件扩展名。'),
+        Exception(trNow('Could not read this file as a video. It may be corrupt, in a format the browser does not support, or only have a renamed extension.', '无法读取该文件作为视频。文件可能已损坏、格式不受浏览器支持，或只是修改了文件扩展名。')),
       );
     }).toJS;
 
@@ -85,11 +86,11 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
     final duration = video.duration;
 
     if (!duration.isFinite || duration <= 0) {
-      throw Exception('无法读取视频时长');
+      throw Exception(trNow('Could not read the video duration', '无法读取视频时长'));
     }
 
     if (video.videoWidth <= 0 || video.videoHeight <= 0) {
-      throw Exception('无法读取视频尺寸');
+      throw Exception(trNow('Could not read the video dimensions', '无法读取视频尺寸'));
     }
 
     final seekCompleter = _EventCompleter();
@@ -100,7 +101,7 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
 
     video.onerror = ((web.Event event) {
       seekCompleter.completeError(
-        Exception('无法生成视频封面'),
+        Exception(trNow('Could not generate the video cover', '无法生成视频封面')),
       );
     }).toJS;
 
@@ -125,7 +126,7 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
     final context = canvas.getContext('2d');
 
     if (context is! web.CanvasRenderingContext2D) {
-      throw Exception('浏览器无法创建视频封面画布');
+      throw Exception(trNow('The browser could not create a cover canvas', '浏览器无法创建视频封面画布'));
     }
 
     context.drawImage(
@@ -140,13 +141,13 @@ Future<_VideoMetadata> _readMetadataAndCover(web.File file) async {
     final commaIndex = dataUrl.indexOf(',');
 
     if (commaIndex < 0) {
-      throw Exception('视频封面编码失败');
+      throw Exception(trNow('Failed to encode the video cover', '视频封面编码失败'));
     }
 
     final coverBytes = base64Decode(dataUrl.substring(commaIndex + 1));
 
     if (coverBytes.isEmpty) {
-      throw Exception('生成的视频封面为空');
+      throw Exception(trNow('The generated cover is empty', '生成的视频封面为空'));
     }
 
     return _VideoMetadata(
@@ -174,7 +175,7 @@ Stream<List<int>> _openFile(web.File file) async* {
     final bytes = buffer.asUint8List();
 
     if (bytes.isEmpty && end > offset) {
-      throw Exception('视频文件读取到空数据块');
+      throw Exception(trNow('Read an empty chunk from the video file', '视频文件读取到空数据块'));
     }
 
     yield bytes;

@@ -37,7 +37,7 @@ void main() {
           durationSeconds: 12.5,
           coverBytes: const [1],
         ),
-        throwsA(predicate((e) => e.toString().contains('视频文件为空'))),
+        throwsA(predicate((e) => e.toString().contains('The video file is empty'))),
       );
     });
 
@@ -49,7 +49,7 @@ void main() {
           durationSeconds: 12.5,
           coverBytes: const [1],
         ),
-        throwsA(predicate((e) => e.toString().contains('不支持的视频格式'))),
+        throwsA(predicate((e) => e.toString().contains('Unsupported video format'))),
       );
     });
 
@@ -61,7 +61,7 @@ void main() {
           durationSeconds: 0,
           coverBytes: const [1],
         ),
-        throwsA(predicate((e) => e.toString().contains('无法读取视频时长'))),
+        throwsA(predicate((e) => e.toString().contains('Could not read the video duration'))),
       );
     });
 
@@ -73,7 +73,7 @@ void main() {
           durationSeconds: 12.5,
           coverBytes: const [],
         ),
-        throwsA(predicate((e) => e.toString().contains('无法生成视频封面'))),
+        throwsA(predicate((e) => e.toString().contains('Could not generate a cover'))),
       );
     });
   });

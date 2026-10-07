@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
@@ -25,6 +26,7 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
   bool _loggedIn = false;
 
   String? _error;
+  bool _errorIsMissingFields = false;
 
   @override
   void initState() {
@@ -60,13 +62,15 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
 
     if (email.isEmpty || _password.isEmpty) {
       setState(() {
-        _error = '请输入邮箱和密码';
+        _errorIsMissingFields = true;
+        _error = null;
       });
       return;
     }
 
     setState(() {
       _loginLoading = true;
+      _errorIsMissingFields = false;
       _error = null;
     });
 
@@ -104,7 +108,7 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
         [
           div(
             classes: 'preview-loading',
-            [.text('正在恢复 Glyphora 登录会话...')],
+            [.text(context.tr('Restoring your Glyphora session...', '正在恢复 Glyphora 登录会话...'))],
           ),
         ],
       );
@@ -122,7 +126,7 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
                 [
                   h2([.text('Glyphora Studio')]),
                   p([
-                    .text('登录一次后，视频、字幕、词典与导入工具共用同一会话。'),
+                    .text(context.tr('Sign in once; videos, subtitles, dictionary and import tools share the same session.', '登录一次后，视频、字幕、词典与导入工具共用同一会话。')),
                   ]),
                 ],
               ),
@@ -166,16 +170,22 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
                             _login();
                           },
                     [
-                      .text(_loginLoading ? '登录中...' : '登录 Studio'),
+                      .text(_loginLoading ? context.tr('Signing in...', '登录中...') : context.tr('Sign in to Studio', '登录 Studio')),
                     ],
                   ),
                 ],
               ),
-              if (_error != null)
+              if (_errorIsMissingFields)
+                div(
+                  classes: 'login-error',
+                  [.text(context.tr('Enter your email and password', '请输入邮箱和密码'))],
+                )
+              else if (_error != null)
                 div(
                   classes: 'login-error',
                   [.text(_error!)],
                 ),
+              const LanguageSwitcher(),
             ],
           ),
         ],

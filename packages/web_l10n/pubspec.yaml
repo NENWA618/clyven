@@ -1,0 +1,12 @@
+name: glyphora_web_l10n
+description: Shared language preference and switcher for the Glyphora Jaspr frontends (Web, Studio, Review, Admin).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  jaspr: ^0.23.4
+
+resolution: workspace

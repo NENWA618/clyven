@@ -10,8 +10,8 @@ void main() {
     });
 
     test('falls back when no file was selected', () {
-      expect(selectedVideoMissingMessage(null), '请先选择视频文件');
-      expect(selectedVideoMissingMessage('   '), '请先选择视频文件');
+      expect(selectedVideoMissingMessage(null), 'Select a video file first');
+      expect(selectedVideoMissingMessage('   '), 'Select a video file first');
     });
   });
 }

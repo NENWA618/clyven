@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
@@ -50,59 +51,59 @@ class StudioShell extends StatelessComponent {
                   activePath: activePath,
                   path: '/',
                   icon: '⌂',
-                  label: 'Dashboard',
+                  label: context.tr('Dashboard', '概览'),
                 ),
-                _navSection('Content'),
+                _navSection(context.tr('Content', '内容')),
                 _navItem(
                   activePath: activePath,
                   path: '/videos',
                   icon: '▶',
-                  label: 'Videos',
+                  label: context.tr('Videos', '视频'),
                 ),
                 _navItem(
                   activePath: activePath,
                   path: '/comments',
                   icon: '☰',
-                  label: 'Comments',
+                  label: context.tr('Comments', '评论'),
                 ),
                 _navItem(
                   activePath: activePath,
                   path: '/subtitles',
                   icon: 'CC',
-                  label: 'Subtitles',
+                  label: context.tr('Subtitles', '字幕'),
                 ),
-                _navSection('Language'),
+                _navSection(context.tr('Language', '语言')),
                 _navItem(
                   activePath: activePath,
                   path: '/dictionary',
                   icon: '文',
-                  label: 'Dictionary',
+                  label: context.tr('Dictionary', '词典'),
                 ),
                 _navItem(
                   activePath: activePath,
                   path: '/dictionary/import',
                   icon: '↑',
-                  label: 'Import',
+                  label: context.tr('Import', '导入'),
                 ),
                 _navItem(
                   activePath: activePath,
                   path: '/nom',
                   icon: '喃',
-                  label: 'Nôm Tools',
+                  label: context.tr('Nôm Tools', '喃字工具'),
                 ),
-                _navSection('Workflow'),
+                _navSection(context.tr('Workflow', '工作流')),
                 _navItem(
                   activePath: activePath,
                   path: '/review',
                   icon: '✓',
-                  label: 'Review',
+                  label: context.tr('Review', '审核'),
                 ),
                 div(classes: 'studio-nav-spacer', []),
                 _navItem(
                   activePath: activePath,
                   path: '/settings',
                   icon: '⚙',
-                  label: 'Settings',
+                  label: context.tr('Settings', '设置'),
                 ),
               ],
             ),
@@ -116,14 +117,15 @@ class StudioShell extends StatelessComponent {
               [
                 div(
                   classes: 'studio-topbar-title',
-                  [.text(_titleForPath(activePath))],
+                  [.text(_titleForPath(context, activePath))],
                 ),
                 div(
                   classes: 'studio-topbar-actions',
                   [
+                    const LanguageSwitcher(),
                     span(
                       classes: 'studio-environment',
-                      [.text('Production')],
+                      [.text(context.tr('Production', '生产环境'))],
                     ),
                     div(
                       classes: 'studio-avatar',
@@ -182,38 +184,38 @@ class StudioShell extends StatelessComponent {
     );
   }
 
-  String _titleForPath(String path) {
+  String _titleForPath(BuildContext context, String path) {
     if (path.startsWith('/dictionary/import')) {
-      return 'Dictionary Import';
+      return context.tr('Dictionary Import', '词典导入');
     }
 
     if (path.startsWith('/dictionary')) {
-      return 'Dictionary';
+      return context.tr('Dictionary', '词典');
     }
 
     if (path.startsWith('/subtitles')) {
-      return 'Subtitles';
+      return context.tr('Subtitles', '字幕');
     }
 
     if (path.startsWith('/videos')) {
-      return 'Videos';
+      return context.tr('Videos', '视频');
     }
     if (path.startsWith('/comments')) {
-      return 'Comments';
+      return context.tr('Comments', '评论');
     }
 
     if (path.startsWith('/nom')) {
-      return 'Nôm Tools';
+      return context.tr('Nôm Tools', '喃字工具');
     }
 
     if (path.startsWith('/review')) {
-      return 'Review';
+      return context.tr('Review', '审核');
     }
 
     if (path.startsWith('/settings')) {
-      return 'Settings';
+      return context.tr('Settings', '设置');
     }
 
-    return 'Dashboard';
+    return context.tr('Dashboard', '概览');
   }
 }

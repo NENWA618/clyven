@@ -1566,3 +1566,29 @@ button:disabled {
     flex-direction: column;
   }
 }
+
+/* Language switcher (shared via glyphora_web_l10n) */
+.language-switcher {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.language-switcher option {
+  color: #111827;
+  background: #ffffff;
+}
+
+.review-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

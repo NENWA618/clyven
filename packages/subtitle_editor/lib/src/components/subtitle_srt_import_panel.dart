@@ -1,3 +1,4 @@
+import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_language_core/glyphora_language_core.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
@@ -25,35 +26,35 @@ class SubtitleSrtImportPanel extends StatelessComponent {
     return div(classes: 'subtitle-srt-import-panel subtitle-srt-v2', [
       div(classes: 'subtitle-srt-panel-top', [
         div(classes: 'subtitle-srt-panel-info', [
-          span(classes: 'subtitle-tool-kicker', [.text('FILE TOOLS')]),
+          span(classes: 'subtitle-tool-kicker', [.text(context.tr('FILE TOOLS', '文件工具'))]),
           h3([.text('SRT')]),
-          p([.text('导入当前文字轨，或导出当前主字幕时间轴。')]),
+          p([.text(context.tr('Import into the current script track, or export the current main subtitle timeline.', '导入当前文字轨，或导出当前主字幕时间轴。'))]),
         ]),
         div(classes: 'subtitle-srt-import-actions', [
           if (script != null)
             span(classes: 'subtitle-srt-script-badge', [
-              .text('${script.nameOf('zh')} · ${script.code}'),
+              .text('${script.nameOf(context.lang.name)} · ${script.code}'),
             ]),
           button(
             classes: 'subtitle-srt-button subtitle-srt-import-button',
             onClick: controller.previewing || controller.importing
                 ? null
                 : () => controller.pickFile(),
-            [.text(controller.previewing ? '读取中…' : '↑ 导入 SRT')],
+            [.text(controller.previewing ? context.tr('Reading…', '读取中…') : context.tr('↑ Import SRT', '↑ 导入 SRT'))],
           ),
           button(
             classes: 'subtitle-srt-button subtitle-srt-export-button',
             onClick: exportController.exporting
                 ? null
                 : () => exportController.exportSrt(),
-            [.text(exportController.exporting ? '导出中…' : '↓ 导出 SRT')],
+            [.text(exportController.exporting ? context.tr('Exporting…', '导出中…') : context.tr('↓ Export SRT', '↓ 导出 SRT'))],
           ),
         ]),
       ]),
 
       if (script == null)
         div(classes: 'subtitle-srt-script-warning', [
-          .text('当前轨道没有选择文字系统，因此不能进行新的 SRT 导入。请从字幕入口重新选择文字。'),
+          .text(context.tr('This track has no script selected, so a new SRT cannot be imported. Re-pick the script from the subtitle entry page.', '当前轨道没有选择文字系统，因此不能进行新的 SRT 导入。请从字幕入口重新选择文字。')),
         ]),
 
       if (controller.fileName != null)
@@ -61,28 +62,28 @@ class SubtitleSrtImportPanel extends StatelessComponent {
           span(classes: 'subtitle-srt-file-badge', [.text('SRT')]),
           div([
             strong([.text(controller.fileName!)]),
-            span([.text('已选择字幕文件')]),
+            span([.text(context.tr('Subtitle file selected', '已选择字幕文件'))]),
           ]),
         ]),
 
       if (controller.previewing)
-        div(classes: 'subtitle-srt-status', [.text('正在检查字幕文件…')]),
+        div(classes: 'subtitle-srt-status', [.text(context.tr('Checking the subtitle file…', '正在检查字幕文件…'))]),
 
       if (preview != null)
         div(classes: 'subtitle-srt-preview', [
           div(classes: 'subtitle-srt-preview-stat', [
             strong([.text('${preview.cueCount}')]),
-            span([.text('Cues')]),
+            span([.text(context.tr('Cues', '字幕条数'))]),
           ]),
           div(classes: 'subtitle-srt-preview-stat', [
             strong([.text('${preview.errorCount}')]),
-            span([.text('Errors')]),
+            span([.text(context.tr('Errors', '错误'))]),
           ]),
           div(
             classes: preview.canImport
                 ? 'subtitle-srt-ready'
                 : 'subtitle-srt-invalid',
-            [.text(preview.canImport ? '✓ 可导入' : '✕ 无法导入')],
+            [.text(preview.canImport ? context.tr('✓ Ready to import', '✓ 可导入') : context.tr('✕ Cannot import', '✕ 无法导入'))],
           ),
         ]),
 
@@ -101,14 +102,14 @@ class SubtitleSrtImportPanel extends StatelessComponent {
           button(
             classes: 'subtitle-srt-button subtitle-srt-cancel-button',
             onClick: controller.importing ? null : () => controller.reset(),
-            [.text('取消')],
+            [.text(context.tr('Cancel', '取消'))],
           ),
           button(
             classes: 'subtitle-srt-button subtitle-srt-confirm-button',
             onClick: controller.canImport
                 ? () => controller.confirmReplace()
                 : null,
-            [.text(controller.importing ? '导入中…' : '确认替换')],
+            [.text(controller.importing ? context.tr('Importing…', '导入中…') : context.tr('Confirm replace', '确认替换'))],
           ),
         ]),
     ]);
