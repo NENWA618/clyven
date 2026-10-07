@@ -1,0 +1,220 @@
+/* Glyphora "Vivid" web skin: layout and component polish for the public Web
+   client. Loaded after app.css; relies on glyphora-tokens.css. */
+
+/* ---------- Header ---------- */
+
+.client-header {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.client-header-inner {
+  min-height: 72px;
+  gap: 24px;
+}
+
+.client-brand-mark,
+.client-avatar {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ff7ad9));
+  color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.client-brand-copy strong {
+  font-family: var(--font-display);
+}
+
+.client-nav-link {
+  border-radius: var(--r-pill);
+  padding: 8px 16px;
+  transition: background .15s var(--ease), color .15s var(--ease);
+}
+
+.client-nav-link:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.client-nav-link.active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.client-header-actions {
+  gap: 10px;
+}
+
+.studio-entry-button {
+  min-height: 38px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.studio-entry-button:hover {
+  background: var(--accent-hover);
+}
+
+.client-main {
+  padding: 28px 28px 64px;
+}
+
+/* ---------- Search ---------- */
+
+.client-search-placeholder,
+.client-search input {
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+}
+
+.client-search-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------- Surfaces ---------- */
+
+.settings-card,
+.watch-side-card,
+.watch-state-card,
+.watch-feature-card,
+.watch-learning-panel,
+.watch-dictionary-card,
+.watch-subtitle-settings-card,
+.search-user-card,
+.search-clip-card,
+.subtitle-search-card,
+.home-wordlist-card,
+.public-profile-series-card,
+.public-profile-video-card,
+.public-profile-video-card-v2,
+.recommended-video-card,
+.video-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.video-card,
+.search-clip-card,
+.search-user-card,
+.recommended-video-card,
+.public-profile-video-card,
+.public-profile-video-card-v2,
+.home-wordlist-card {
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+}
+
+.video-card:hover,
+.search-clip-card:hover,
+.search-user-card:hover,
+.recommended-video-card:hover,
+.public-profile-video-card:hover,
+.public-profile-video-card-v2:hover,
+.home-wordlist-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.home-language-video-thumb {
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 75%, var(--solid)), var(--solid));
+}
+
+/* ---------- Chips & buttons ---------- */
+
+.home-filter-chip,
+.subtitle-chip,
+.watch-setting-chip {
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  transition: background .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+}
+
+.home-filter-chip:hover,
+.subtitle-chip:hover,
+.watch-setting-chip:hover {
+  border-color: var(--accent-border);
+  color: var(--text);
+}
+
+.home-filter-chip.active,
+.home-filter-chip.is-active,
+.home-filter-chip[aria-pressed="true"],
+.subtitle-chip.active,
+.watch-setting-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.primary-link-button,
+.settings-primary-button,
+.web-avatar-upload-button {
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.primary-link-button:hover,
+.settings-primary-button:hover {
+  background: var(--accent-hover);
+}
+
+.secondary-button,
+.settings-secondary-button,
+.settings-back-button,
+.notification-bell-button {
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.secondary-button:hover,
+.settings-secondary-button:hover,
+.settings-back-button:hover,
+.notification-bell-button:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.settings-signout-button {
+  border: 1px solid color-mix(in srgb, var(--danger-solid) 45%, transparent);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.settings-signout-button:hover {
+  background: var(--danger-soft);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 960px) {
+  .client-header-inner {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .client-main {
+    padding: 20px 16px 48px;
+  }
+}

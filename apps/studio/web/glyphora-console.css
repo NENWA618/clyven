@@ -1,0 +1,658 @@
+/* Glyphora "Vivid" console skin: layout and component polish for the admin and
+   review frontends (glyphora-admin-* / admin-* / script-* / review-* classes).
+   Loaded after the app's own stylesheets; relies on glyphora-tokens.css. */
+
+/* ---------- Shell ---------- */
+
+.glyphora-admin-shell {
+  grid-template-columns: 252px minmax(0, 1fr);
+  background: var(--bg);
+}
+
+.glyphora-admin-sidebar {
+  padding: 20px 14px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.glyphora-admin-brand {
+  gap: 12px;
+  padding: 4px 8px 20px;
+}
+
+.glyphora-admin-brand strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text);
+}
+
+.glyphora-admin-brand span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.glyphora-admin-brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ff7ad9));
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.glyphora-admin-nav {
+  gap: 4px;
+}
+
+.glyphora-admin-nav-item {
+  gap: 12px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  font-weight: 600;
+  transition: background .15s var(--ease), color .15s var(--ease);
+}
+
+.glyphora-admin-nav-item:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.glyphora-admin-nav-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.glyphora-admin-nav-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.glyphora-admin-nav-item.is-active .glyphora-admin-nav-icon {
+  background: var(--accent);
+  color: #fff;
+}
+
+.glyphora-admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: 68px;
+  padding: 12px 28px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.glyphora-admin-topbar h1 {
+  margin: 2px 0 0;
+  font-size: 19px;
+}
+
+.glyphora-admin-kicker {
+  color: var(--faint);
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+.glyphora-admin-scope-badge {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+
+.review-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.glyphora-admin-content {
+  padding: 26px 28px 48px;
+  max-width: 1480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---------- Surfaces ---------- */
+
+.admin-users-column,
+.admin-videos-column,
+.admin-tracks-column,
+.admin-members-card,
+.admin-role-permission-card,
+.admin-track-admin-card,
+.admin-user-video-card,
+.admin-review-card,
+.admin-cues-card,
+.script-conversion-panel,
+.script-profile-card,
+.script-entry-card,
+.script-stat-card,
+.script-test-box,
+.review-task-card,
+.review-workflow-card,
+.review-history,
+.review-stat,
+.review-hero,
+.review-empty {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-users-column,
+.admin-videos-column,
+.admin-tracks-column,
+.admin-members-card,
+.script-conversion-panel,
+.review-workflow-card,
+.review-history {
+  padding: 18px;
+}
+
+.admin-user-video-card,
+.script-profile-card,
+.script-entry-card,
+.admin-track-admin-card,
+.review-task-card {
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+}
+
+.admin-user-video-card:hover,
+.script-profile-card:hover,
+.review-task-card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow);
+}
+
+.admin-user-video-card.is-active,
+.script-profile-card.is-active,
+.admin-user-row.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+
+/* ---------- Page headings ---------- */
+
+.admin-users-toolbar,
+.admin-members-heading,
+.script-conversion-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-users-toolbar h2,
+.admin-members-heading h2,
+.script-conversion-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-users-toolbar p,
+.admin-members-heading p,
+.script-conversion-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.admin-users-column-header,
+.admin-members-card-title,
+.script-conversion-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+}
+
+.admin-users-column-header span,
+.admin-user-video-count {
+  min-width: 26px;
+  padding: 1px 9px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- Buttons ---------- */
+
+.admin-primary-button,
+.admin-publish-button,
+.admin-save-button,
+.review-primary-button,
+.script-conversion-panel button.admin-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 32%, transparent);
+  transition: background .15s var(--ease), transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+
+.admin-primary-button:hover:not(:disabled),
+.admin-publish-button:hover:not(:disabled),
+.admin-save-button:hover:not(:disabled),
+.review-primary-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.admin-primary-button:disabled,
+.admin-publish-button:disabled,
+.admin-save-button:disabled,
+.review-primary-button:disabled {
+  opacity: .55;
+  box-shadow: none;
+  transform: none;
+}
+
+.admin-secondary-button,
+.review-secondary-button,
+.review-refresh,
+.admin-mini-button,
+.script-reverse-toggle {
+  min-height: 36px;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s var(--ease), border-color .15s var(--ease);
+}
+
+.admin-secondary-button:hover:not(:disabled),
+.review-secondary-button:hover:not(:disabled),
+.review-refresh:hover:not(:disabled),
+.admin-mini-button:hover:not(:disabled),
+.script-reverse-toggle:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+.admin-mini-button {
+  min-height: 30px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.admin-mini-button.is-current {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent-text);
+}
+
+.admin-danger-button,
+.script-danger-button,
+.admin-transfer-button {
+  min-height: 36px;
+  padding: 7px 16px;
+  border: 1px solid color-mix(in srgb, var(--danger-solid) 45%, transparent);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--danger);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-danger-button:hover:not(:disabled),
+.script-danger-button:hover:not(:disabled) {
+  background: var(--danger-soft);
+}
+
+/* ---------- Forms ---------- */
+
+.glyphora-admin-content input,
+.glyphora-admin-content select,
+.glyphora-admin-content textarea,
+.admin-auth-card input,
+.script-conversion-field input {
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+}
+
+.admin-field,
+.script-conversion-field {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-field > span,
+.script-conversion-field > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.script-conversion-form-grid,
+.admin-members-add-form {
+  gap: 14px;
+}
+
+/* ---------- Lists / rows ---------- */
+
+.admin-user-row,
+.admin-video-item,
+.admin-member-row {
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text);
+  transition: background .15s var(--ease);
+}
+
+.admin-user-row:hover,
+.admin-video-item:hover,
+.admin-member-row:hover {
+  background: var(--surface-2);
+}
+
+.admin-user-avatar,
+.admin-member-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-weight: 800;
+}
+
+.admin-user-copy span,
+.admin-user-video-meta,
+.admin-muted {
+  color: var(--muted);
+}
+
+.admin-user-video-meta span,
+.admin-track-chip,
+.admin-owner-badge,
+.review-status-badge,
+.review-language-badge,
+.review-script-badge,
+.admin-role-choice {
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.review-language-badge,
+.admin-owner-badge {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.admin-role-choice.is-selected {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---------- Tables ---------- */
+
+.script-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.script-preview-table th {
+  padding: 10px 14px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.script-preview-table td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.script-preview-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: auto;
+}
+
+/* ---------- Alerts ---------- */
+
+.admin-error,
+.admin-page-error,
+.review-error,
+.admin-cue-error {
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--danger-solid) 35%, transparent);
+  border-radius: var(--r-sm);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.admin-members-success,
+.script-import-result {
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.admin-empty,
+.admin-users-state,
+.admin-members-state {
+  padding: 24px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- Auth screen ---------- */
+
+.admin-auth-screen {
+  background:
+    radial-gradient(900px 500px at 15% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+    radial-gradient(700px 420px at 100% 110%, color-mix(in srgb, #ff7ad9 12%, transparent), transparent 60%),
+    var(--bg);
+}
+
+.admin-auth-card {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-auth-card h1 {
+  font-size: 24px;
+}
+
+.admin-auth-badge {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+/* ---------- Review ---------- */
+
+.review-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--surface)), var(--surface));
+}
+
+.review-eyebrow {
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.review-stat {
+  padding: 16px;
+}
+
+.review-stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+
+.review-stat span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.review-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.review-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.review-tab b {
+  padding: 0 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  font-size: 12px;
+}
+
+.review-tab.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.review-tab.is-active b {
+  background: rgba(255, 255, 255, .22);
+  color: #fff;
+}
+
+.review-task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.review-task-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.review-back {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 960px) {
+  .glyphora-admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .glyphora-admin-sidebar {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 12px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .glyphora-admin-brand {
+    padding: 0;
+  }
+
+  .glyphora-admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .glyphora-admin-topbar,
+  .glyphora-admin-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .review-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-hero {
+    flex-direction: column;
+  }
+}

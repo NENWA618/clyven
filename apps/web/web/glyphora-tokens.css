@@ -1,0 +1,214 @@
+/* Glyphora design tokens ("Vivid") shared by web, studio, admin and review.
+   Source of truth: design/glyphora-tokens.css. Run `dart run tool/sync_design.dart`
+   to copy it into every app's web/ directory. */
+
+:root {
+  --font: "Segoe UI", "Microsoft YaHei", "PingFang SC", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: ui-rounded, "Segoe UI", "Microsoft YaHei", "PingFang SC", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --r-xs: 6px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-pill: 999px;
+
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f5fb;
+  --bg-alt: #f1eef9;
+  --surface: #ffffff;
+  --surface-2: #f2effa;
+  --surface-3: #e8e3f6;
+  --border: #e4dff2;
+  --border-strong: #cfc8e6;
+
+  --solid: #1d1836;
+  --text: #1d1836;
+  --muted: #665f86;
+  --faint: #9a94b6;
+
+  --accent: #6a57f5;
+  --accent-hover: #5946e6;
+  --accent-text: #5441dc;
+  --accent-soft: #ece8ff;
+  --accent-border: #cdc5ff;
+
+  --ok: #12805c;
+  --ok-solid: #16a34a;
+  --ok-soft: #dff6ec;
+  --warn: #a05a00;
+  --warn-solid: #d97706;
+  --warn-soft: #fff0d6;
+  --danger: #c9372c;
+  --danger-solid: #dc2626;
+  --danger-soft: #fdebe9;
+
+  --shadow-rgb: 60, 40, 140;
+  --shadow-sm: 0 1px 2px rgba(var(--shadow-rgb), .06);
+  --shadow: 0 2px 4px rgba(var(--shadow-rgb), .06), 0 10px 28px rgba(var(--shadow-rgb), .08);
+  --shadow-lg: 0 8px 18px rgba(var(--shadow-rgb), .10), 0 26px 60px rgba(var(--shadow-rgb), .16);
+  --overlay: rgba(29, 24, 54, .45);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0d0b17;
+  --bg-alt: #0a0812;
+  --surface: #16132a;
+  --surface-2: #1e1a38;
+  --surface-3: #282347;
+  --border: #2b2650;
+  --border-strong: #3d3770;
+
+  --solid: #3a3370;
+  --text: #efeaff;
+  --muted: #a39cc8;
+  --faint: #756e9c;
+
+  --accent: #7f6df8;
+  --accent-hover: #9183ff;
+  --accent-text: #b0a5ff;
+  --accent-soft: #25205a;
+  --accent-border: #4a3fa8;
+
+  --ok: #58d3a2;
+  --ok-solid: #22a45d;
+  --ok-soft: #10291f;
+  --warn: #f2bb66;
+  --warn-solid: #d98b1c;
+  --warn-soft: #2c2210;
+  --danger: #ff8a80;
+  --danger-solid: #e5483d;
+  --danger-soft: #331617;
+
+  --shadow-rgb: 0, 0, 0;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow: 0 2px 4px rgba(0, 0, 0, .4), 0 10px 28px rgba(0, 0, 0, .3);
+  --shadow-lg: 0 8px 18px rgba(0, 0, 0, .45), 0 26px 60px rgba(0, 0, 0, .5);
+  --overlay: rgba(4, 3, 10, .65);
+}
+
+/* ---------- Base ---------- */
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -.01em;
+}
+
+a { color: inherit; }
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+::placeholder {
+  color: var(--faint);
+  opacity: 1;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+input, textarea, select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color .15s var(--ease), box-shadow .15s var(--ease), background .15s var(--ease);
+}
+
+input:hover, textarea:hover, select:hover {
+  border-color: var(--border-strong);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+input[type="checkbox"], input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+button { font: inherit; }
+
+button:disabled, [disabled] {
+  cursor: not-allowed;
+}
+
+* {
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+/* Shared small controls (language / theme switchers) */
+.language-switcher {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.language-switcher option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s var(--ease), border-color .15s var(--ease);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
