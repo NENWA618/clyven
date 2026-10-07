@@ -2,7 +2,6 @@ import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'package:glyphora_backend_client/backend_client.dart';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart';
 
 import '../services/studio_client.dart';
 
@@ -46,9 +45,9 @@ class _DictionaryPageState extends State<DictionaryPage> {
     });
 
     try {
-      await studioClient.auth.initialize();
+      final restored = await restoreStoredSession();
 
-      if (!studioClient.auth.isAuthenticated) {
+      if (!restored) {
         setState(() {
           loading = false;
           error = trNow('Sign in to Glyphora Studio first', '请先登录 Glyphora Studio');

@@ -37,12 +37,12 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
   Future<void> _restoreSession() async {
     try {
       consumeWebSession();
-      await studioClient.auth.initialize();
+      final restored = await restoreStoredSession();
 
       if (!mounted) return;
 
       setState(() {
-        _loggedIn = studioClient.auth.isAuthenticated;
+        _loggedIn = restored;
         _loading = false;
         _error = null;
       });

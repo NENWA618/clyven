@@ -33,7 +33,7 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
   Future<void> _restore() async {
     try {
       consumeWebSession();
-      await adminClient.auth.initialize();
+      await restoreStoredSession();
 
       if (!mounted) return;
 
@@ -70,14 +70,19 @@ class _AdminAuthGateState extends State<AdminAuthGate> {
         _authorized = true;
         _error = null;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
 
       setState(() {
         _loading = false;
         _signedIn = true;
         _authorized = false;
-        _error = trNow('This Glyphora account is not an active member of the Admin Workspace.', '当前 Glyphora 账号不是 Admin Workspace 的有效成员。');
+        _error = e is ServerpodClientException
+            ? trNow('This Glyphora account is not an active member of the Admin Workspace.', '当前 Glyphora 账号不是 Admin Workspace 的有效成员。')
+            : trNow(
+                'Could not reach the server. Check your connection and reload.',
+                '无法连接服务器，请检查网络后刷新页面。',
+              );
       });
     }
   }

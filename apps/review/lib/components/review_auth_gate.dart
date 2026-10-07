@@ -33,7 +33,7 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
   Future<void> _restore() async {
     try {
       consumeWebSession();
-      await reviewClient.auth.initialize();
+      await restoreStoredSession();
 
       if (!mounted) return;
 
@@ -70,14 +70,19 @@ class _ReviewAuthGateState extends State<ReviewAuthGate> {
         _authorized = true;
         _error = null;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
 
       setState(() {
         _loading = false;
         _signedIn = true;
         _authorized = false;
-        _error = trNow('The Review entry currently requires admin access.', '当前版本的 Review 入口暂时要求管理员权限。');
+        _error = e is ServerpodClientException
+            ? trNow('The Review entry currently requires admin access.', '当前版本的 Review 入口暂时要求管理员权限。')
+            : trNow(
+                'Could not reach the server. Check your connection and reload.',
+                '无法连接服务器，请检查网络后刷新页面。',
+              );
       });
     }
   }
