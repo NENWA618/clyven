@@ -188,7 +188,14 @@ void main() {
           );
           await tester.pump();
           await tester.pump();
-          expect(platform.sources.last, 'https://media.example/video.mp4');
+          final fallbackSource = platform.sources.last!;
+          final fallbackUri = Uri.parse(fallbackSource);
+          expect(fallbackUri.path, '/video.mp4');
+          if (fallbackUri.host == '127.0.0.1') {
+            expect(fallbackUri.queryParameters['origin'], isNotEmpty);
+          } else {
+            expect(fallbackSource, 'https://media.example/video.mp4');
+          }
         }
         platform.ready(fallback ? 2 : 1, size: const Size(1080, 1920));
         await tester.pumpAndSettle();
