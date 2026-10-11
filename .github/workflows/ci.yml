@@ -65,30 +65,37 @@ jobs:
         run: flutter test
 
       - name: Analyze Serverpod client
+        if: always() && !cancelled()
         working-directory: packages/backend_client
         run: dart analyze
 
       - name: Analyze Serverpod backend
+        if: always() && !cancelled()
         working-directory: server/backend_server
         run: dart analyze
 
       - name: Install Serverpod CLI
+        if: always() && !cancelled()
         run: dart pub global activate serverpod_cli 3.4.11
 
       - name: Regenerate Serverpod code
+        if: always() && !cancelled()
         working-directory: server/backend_server
         run: serverpod generate
 
       - name: Verify generated protocol consistency
+        if: always() && !cancelled()
         run: |
           git diff --exit-code --ignore-blank-lines -- \
             packages/backend_client/lib/src/protocol \
             server/backend_server/lib/src/generated
 
       - name: Analyze regenerated Serverpod client
+        if: always() && !cancelled()
         working-directory: packages/backend_client
         run: dart analyze
 
       - name: Analyze regenerated Serverpod backend
+        if: always() && !cancelled()
         working-directory: server/backend_server
         run: dart analyze
