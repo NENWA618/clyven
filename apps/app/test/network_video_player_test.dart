@@ -171,7 +171,17 @@ void main() {
           ),
         );
         await tester.pump();
-        expect(platform.sources, ['https://media.example/manifest.m3u8']);
+        // The cache adapter can serve HLS through a local proxy instead of
+        // passing the remote playlist URL directly to video_player.
+        expect(platform.sources, hasLength(1));
+        final hlsSource = platform.sources.single!;
+        final hlsUri = Uri.parse(hlsSource);
+        expect(hlsUri.path, '/manifest.m3u8');
+        if (hlsUri.host == '127.0.0.1') {
+          expect(hlsUri.queryParameters['origin'], isNotEmpty);
+        } else {
+          expect(hlsSource, 'https://media.example/manifest.m3u8');
+        }
         if (fallback) {
           platform.events[1]!.addError(
             PlatformException(code: 'VideoError', message: 'HLS source failed'),
