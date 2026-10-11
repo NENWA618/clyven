@@ -1,0 +1,78 @@
+name: Validate Cloudflare staging API and Neon (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Staging API and Neon schema checks
+    runs-on: ubuntu-latest
+    environment: cloudflare-staging
+    timeout-minutes: 10
+    steps:
+      - name: Inspect staging API over HTTPS
+        env:
+          STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import urllib.error
+          import urllib.request
+          host = os.environ["STAGING_HOST"].strip()
+          if not host.startswith("glyphora-api-staging.") or not host.endswith(".workers.dev"):
+              raise SystemExit("Refusing to probe non-staging hostname.")
+          req = urllib.request.Request("https://" + host + "/", headers={"User-Agent": "Glyphora-Staging-Smoke/1"})
+          try:
+              with urllib.request.urlopen(req, timeout=75) as res:
+                  body = res.read(512).decode("utf-8", "replace")
+                  print("HTTP status:", res.status)
+                  print("Response begins with OK:", body.startswith("OK "))
+                  if res.status != 200 or not body.startswith("OK "):
+                      raise SystemExit("Unexpected staging HTTP response.")
+          except urllib.error.HTTPError as exc:
+              print("HTTP status:", exc.code)
+              raise SystemExit("Staging API probe failed.")
+      - name: Install PostgreSQL client
+        run: python3 -m pip install --quiet --disable-pip-version-check --break-system-packages 'psycopg[binary]'
+      - name: Check isolated Neon database (SELECT only)
+        env:
+          DB_HOST: ${{ secrets.GLYPHORA_STAGING_DB_HOST }}
+          DB_NAME: ${{ secrets.GLYPHORA_STAGING_DB_NAME }}
+          DB_USER: ${{ secrets.GLYPHORA_STAGING_DB_USER }}
+          DB_PASSWORD: ${{ secrets.STAGING_SERVERPOD_PASSWORD_database }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import psycopg
+
+          host = os.environ["DB_HOST"].strip()
+          name = os.environ["DB_NAME"].strip()
+          user = os.environ["DB_USER"].strip()
+          if (not host.endswith(".neon.tech") or
+              host == "ep-wandering-frog-azudrqv6.c-3.ap-southeast-1.aws.neon.tech" or
+              name == "neondb" or user == "neondb_owner"):
+              raise SystemExit("Refusing to connect to a production database.")
+          try:
+              with psycopg.connect(host=host, dbname=name, user=user,
+                                   password=os.environ["DB_PASSWORD"],
+                                   sslmode="require", connect_timeout=15) as conn:
+                  conn.read_only = True
+                  with conn.cursor() as cur:
+                      cur.execute("SELECT current_database(), current_user")
+                      db, role = cur.fetchone()
+                      print("Connected to staging database:", db, "with role:", role)
+                      cur.execute("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'")
+                      total = cur.fetchone()[0]
+                      print("Public base tables:", total)
+                      cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND (table_name LIKE '%serverpod%' OR table_name ILIKE '%video%') ORDER BY table_name LIMIT 25")
+                      print("Relevant tables:", ", ".join(row[0] for row in cur.fetchall()) or "(none)")
+                      if total == 0:
+                          raise SystemExit("Staging database has no public tables; Serverpod migrations are likely needed. No changes were made.")
+                      print("Neon staging database read-only check passed.")
+          except psycopg.Error as exc:
+              print("Neon connection/query failed:", exc.__class__.__name__)
+              raise SystemExit("Neon staging verification failed. No SQL changes were made.")
+          PY
