@@ -1031,7 +1031,8 @@ class VideoEndpoint extends Endpoint {
       final directManifest = Uri.tryParse(manifestKey);
       if (directManifest != null &&
           directManifest.scheme == 'https' &&
-          directManifest.host.endsWith('.cloudflarestream.com')) {
+          (directManifest.host.endsWith('.cloudflarestream.com') ||
+              directManifest.host == 'videodelivery.net')) {
         return directManifest.toString();
       }
 

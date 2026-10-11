@@ -68,3 +68,7 @@ The Cloudflare Container supplies `GLYPHORA_REQUIRE_CLOUDFLARE=true`, so startup
 Check GitHub Actions before attempting cutover: the 2026-10-11 main workflow failed at `dart format` for `lib/server.dart` and `video_transcode_service.dart`. Dependency installation succeeded, but static analysis and tests were skipped. These have not yet been validated.
 
 Cloudflare Containers explicitly select `GLYPHORA_TRANSCODER=cloudflare_stream` for new videos. New jobs on Cloudflare are refused if this setting is missing instead of silently creating a new Google Transcoder job. Legacy in-progress Google jobs may still require Google credentials until migration completes.
+
+## HLS origin compatibility
+
+The playback endpoint accepts Cloudflare Stream's customer-specific `*.cloudflarestream.com` HLS URLs and the standard `videodelivery.net` host. These URLs are returned directly from the Cloudflare Stream API rather than passed through bucket-relative object URL lookup. The host allowlist is intentional: do not accept arbitrary persisted HTTPS URLs.
