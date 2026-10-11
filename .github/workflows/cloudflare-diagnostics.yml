@@ -50,6 +50,7 @@ jobs:
                   return None
 
           print("Checking staging Worker: glyphora-api-staging")
+          had_error = False
           apps_response = get_json(api + "/containers/applications?per_page=100")
           apps = (apps_response or {}).get("result") or []
           if isinstance(apps, dict):
@@ -82,11 +83,28 @@ jobs:
               request = urllib.request.Request("https://" + host + "/", method="GET")
               with urllib.request.urlopen(request, timeout=75) as response:
                   print("Staging HTTP status:", response.status)
+                  if not 200 <= response.status < 300:
+                      had_error = True
           except urllib.error.HTTPError as exc:
               print("Staging HTTP status:", exc.code)
               print("Response message is omitted to avoid leaking server output.")
+              had_error = True
           except Exception as exc:
               print("Staging probe:", type(exc).__name__)
+              had_error = True
+          print("Checking container instances again after the probe.")
+          for app in matching:
+              if not app.get("id"):
+                  continue
+              result = get_json(api + "/containers/applications/" + str(app["id"]) + "/instances-v2")
+              instances = (result or {}).get("result") or []
+              if isinstance(instances, dict):
+                  instances = instances.get("items") or instances.get("instances") or []
+              for instance in instances[:10]:
+                  status = instance.get("status") or {}
+                  print("After probe:", status.get("state", "unknown"), "exit_code:", status.get("exit_code", "not reported"))
           print("Read-only diagnosis complete. For application stderr consult Cloudflare Container Logs;")
           print("the public Containers management API reports instance states, not stderr.")
+          if had_error:
+              raise SystemExit("Staging HTTP probe failed; check Cloudflare routing/access and Container logs.")
           PY
