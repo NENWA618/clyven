@@ -84,3 +84,7 @@ GitHub Actions builds `Dockerfile.cloudflare` from the repository root in a sepa
 ## Legacy transcoding behavior on Cloudflare
 
 Cloudflare Containers no longer query Google Transcoder for existing legacy jobs. A legacy job already marked `SUCCEEDED` can retain its manifest path, but **the referenced objects must first be copied to R2 with their original keys**. Pending or failed legacy jobs cannot be finished by Cloudflare: complete or reprocess them before cutover. This does not migrate any existing GCS object. Verify covers, uploaded originals, HLS manifests and every referenced HLS segment before changing client endpoints. Retain the Google deployment until this inventory and parity check are finished.
+
+## Non-destructive historical object backfill
+
+Use `cloudflare/migrate_gcs_to_r2.sh` from a machine with `rclone` configured with a read-only Google Cloud Storage source remote and a Cloudflare R2 S3 remote. Provide remote paths through `GLYPHORA_GCS_REMOTE` and `GLYPHORA_R2_REMOTE`. The script defaults to `dry-run`; invoke `copy` explicitly to write R2 objects, then `verify` to compare paths and sizes. It uses `rclone copy`, not `sync`, so it never deletes objects on either side. Do not put credentials in the repository. Validation is size-only; independently test HLS manifest/segment consistency, metadata, CORS and actual media playback. Pause uploads or run a final reconciliation during cutover. No remote data is copied by GitHub CI.
