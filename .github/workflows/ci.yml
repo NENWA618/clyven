@@ -118,6 +118,7 @@ jobs:
           export MOCK_RCLONE_LOG="$RUNNER_TEMP/rclone-commands.log"
           export GLYPHORA_GCS_REMOTE='gcs:source-bucket'
           export GLYPHORA_R2_REMOTE='r2:destination-bucket'
+          bash cloudflare/migrate_gcs_to_r2.sh inventory
           bash cloudflare/migrate_gcs_to_r2.sh
           if bash cloudflare/migrate_gcs_to_r2.sh copy; then
             echo 'Copy without confirmation was accepted' >&2
@@ -127,6 +128,42 @@ jobs:
           bash cloudflare/migrate_gcs_to_r2.sh copy
           bash cloudflare/migrate_gcs_to_r2.sh verify
           bash cloudflare/migrate_gcs_to_r2.sh verify-deep
+          grep -q '^size gcs:source-bucket "$MOCK_RCLONE_LOG"
+          grep -q '^copy gcs:source-bucket r2:destination-bucket --immutable --progress ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --download ' "$MOCK_RCLONE_LOG"
+          if GLYPHORA_R2_REMOTE='r2:' bash cloudflare/migrate_gcs_to_r2.sh copy; then
+            echo 'Unsafe root-only remote accepted' >&2
+            exit 1
+          fi
+
+  cloudflare-container-build:
+    name: Build Cloudflare Serverpod container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Cloudflare container image (no push or deploy)
+        run: docker build --file Dockerfile.cloudflare --tag glyphora-cloudflare-ci:latest .
+ "$MOCK_RCLONE_LOG"
+          grep -q '^size r2:destination-bucket "$MOCK_RCLONE_LOG"
+          grep -q '^copy gcs:source-bucket r2:destination-bucket --immutable --progress ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --download ' "$MOCK_RCLONE_LOG"
+          if GLYPHORA_R2_REMOTE='r2:' bash cloudflare/migrate_gcs_to_r2.sh copy; then
+            echo 'Unsafe root-only remote accepted' >&2
+            exit 1
+          fi
+
+  cloudflare-container-build:
+    name: Build Cloudflare Serverpod container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Cloudflare container image (no push or deploy)
+        run: docker build --file Dockerfile.cloudflare --tag glyphora-cloudflare-ci:latest .
+ "$MOCK_RCLONE_LOG"
           grep -q '^copy gcs:source-bucket r2:destination-bucket --dry-run ' "$MOCK_RCLONE_LOG"
           grep -q '^copy gcs:source-bucket r2:destination-bucket --immutable --progress ' "$MOCK_RCLONE_LOG"
           grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"

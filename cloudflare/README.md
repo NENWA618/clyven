@@ -94,3 +94,5 @@ For stronger integrity checking, invoke `verify-deep` after `copy`. It uses `rcl
 The `copy` mode uses `--immutable`: it refuses to overwrite an existing destination object that differs from the source rather than silently replacing data. Resolve conflicts explicitly after inspection; do not force-overwrite the whole bucket. This is separate from `verify`/`verify-deep`, which are read-only.
 
 Before invoking the mutating `copy` mode, explicitly set `GLYPHORA_CONFIRM_R2_COPY=YES`. Without it the script exits without writing. The default `dry-run`, `verify`, and `verify-deep` modes do not need this confirmation. This is an intentional protection against accidentally running an expensive or production-affecting transfer.
+
+Before a dry-run or copy, use `bash cloudflare/migrate_gcs_to_r2.sh inventory` to query read-only object counts and total bytes from both remotes. This gives an approximate transfer volume baseline and helps flag a wrong or empty bucket, but does not calculate cloud egress charges or compare individual objects. Review the output before authorizing `copy`.

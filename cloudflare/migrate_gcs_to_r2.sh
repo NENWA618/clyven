@@ -24,6 +24,13 @@ if [[ ! "$SOURCE" =~ ^[A-Za-z0-9_-]+:[^/[:space:]][^[:space:]]*$ ||
   exit 2
 fi
 case "$MODE" in
+  inventory)
+    echo "Source bucket object count and bytes (read-only):"
+    rclone size "$SOURCE"
+    echo "Destination bucket object count and bytes (read-only):"
+    rclone size "$DESTINATION"
+    echo "The reported sizes help estimate migration volume, not GCS egress costs."
+    ;;
   dry-run)
     echo "Dry-run copy: $SOURCE -> $DESTINATION (no writes)"
     rclone copy "$SOURCE" "$DESTINATION" --dry-run --progress --transfers 4 --checkers 8
@@ -47,7 +54,7 @@ case "$MODE" in
     echo "Byte-level verification passed. Still test public URLs, CORS and HLS playback."
     ;;
   *)
-    echo "Usage: $0 [dry-run|copy|verify|verify-deep]" >&2
+    echo "Usage: $0 [inventory|dry-run|copy|verify|verify-deep]" >&2
     exit 2
     ;;
 esac
