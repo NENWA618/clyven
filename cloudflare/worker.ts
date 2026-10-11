@@ -63,6 +63,26 @@ export default {
       env.CLOUDFLARE_STREAM_API_TOKEN,
       env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST,
     ];
+    // Staging requests must never spin up a Container with production DB settings.
+    // The container validates them again, but reject at the edge before startup.
+    if (env.GLYPHORA_STAGING === 'true') {
+      const dbHost = env.GLYPHORA_STAGING_DB_HOST?.trim();
+      const dbName = env.GLYPHORA_STAGING_DB_NAME?.trim();
+      const dbUser = env.GLYPHORA_STAGING_DB_USER?.trim();
+      if (
+        !dbHost ||
+        !dbName ||
+        !dbUser ||
+        dbHost === 'ep-wandering-frog-azudrqv6.c-3.ap-southeast-1.aws.neon.tech' ||
+        dbName === 'neondb' ||
+        dbUser === 'neondb_owner'
+      ) {
+        return new Response('Glyphora staging database is not configured.', {
+          status: 503,
+          headers: { 'cache-control': 'no-store' },
+        });
+      }
+    }
     if (required.some((value) => typeof value !== 'string' || !value.trim())) {
       return new Response('Glyphora API is not configured.', {
         status: 503,

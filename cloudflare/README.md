@@ -126,3 +126,7 @@ The staging workflow uploads required Worker runtime secrets **before** deployin
 ## First-time staging Worker bootstrap
 
 The manual workflow provides two explicit confirmations. Use `BOOTSTRAP-STAGING` only when `glyphora-api-staging` does not exist; after validating all staging secrets and isolated database settings, the workflow creates the staging-only Worker, uploads its secrets, then deploys again. **The initial Worker can briefly serve 503 before secrets are attached; do not map any production route or DNS to this Worker.** For later updates, use `DEPLOY-STAGING`, which provisions secrets before publishing the updated Worker. Neither command is run automatically on commits. Provision Cloudflare Containers and isolated Neon/R2/Stream resources before invoking the workflow; source code does not create these resources.
+
+## Worker-side staging database guard
+
+When `GLYPHORA_STAGING=true`, the Worker now rejects requests with HTTP 503 without starting its Container if the staging database host/name/user are missing or match the known production config. The Container independently enforces the same protection. These guards do not verify Cloudflare account setup or rule out DNS aliases; staging credentials and permissions must still be isolated.
