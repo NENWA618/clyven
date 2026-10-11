@@ -1010,6 +1010,20 @@ class VideoEndpoint extends Endpoint {
       return null;
     }
 
+    // This endpoint is callable without authentication. Do not expose
+    // playback manifests for a private video to unrelated callers.
+    if (!video.isPublic) {
+      final viewerId = session.authenticated?.userIdentifier.toString();
+      if (viewerId != video.authorId) {
+        return null;
+      }
+      // Existing Stream imports currently use publicly accessible manifests.
+      // A video made private after import must not keep exposing that URL.
+      if (video.transcoderJobName?.startsWith('cfstream:') == true) {
+        return null;
+      }
+    }
+
     try {
       final updated = await const VideoTranscodeService().ensure(
         session,
