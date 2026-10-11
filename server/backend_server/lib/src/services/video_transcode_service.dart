@@ -214,28 +214,28 @@ class VideoTranscodeService {
     final client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 10);
     try {
-      final request = await client
-          .openUrl(
-            method,
-            Uri.parse(
-              'https://api.cloudflare.com/client/v4/accounts/'
-              '$_streamAccountId/stream$path',
-            ),
-          )
-          .timeout(const Duration(seconds: 20));
+      final uri = Uri.parse(
+        'https://api.cloudflare.com/client/v4/accounts/'
+        '$_streamAccountId/stream$path',
+      );
+      final pendingRequest = client.openUrl(method, uri);
+      final request = await pendingRequest.timeout(
+        const Duration(seconds: 20),
+      );
       request.headers.set(
         HttpHeaders.authorizationHeader,
         'Bearer $_streamToken',
       );
       request.headers.contentType = ContentType.json;
       if (body != null) request.write(jsonEncode(body));
-      final response =
-          await request.close().timeout(const Duration(seconds: 30));
-      final payload = await utf8
-          .decoder
-          .bind(response)
-          .join()
-          .timeout(const Duration(seconds: 30));
+      final pendingResponse = request.close();
+      final response = await pendingResponse.timeout(
+        const Duration(seconds: 30),
+      );
+      final pendingPayload = utf8.decoder.bind(response).join();
+      final payload = await pendingPayload.timeout(
+        const Duration(seconds: 30),
+      );
       final decoded = jsonDecode(payload);
       if (response.statusCode < 200 ||
           response.statusCode >= 300 ||
