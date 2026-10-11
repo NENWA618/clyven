@@ -176,6 +176,16 @@ jobs:
                        'CLOUDFLARE_STREAM_API_TOKEN'):
               assert 'secrets.STAGING_' + name in step, 'Missing staging media secret: ' + name
               assert 'secrets.' + name not in step, 'Production media secret in staging: ' + name
+          # Ensure first-time bootstrap is opt-in, and secrets are configured
+          # before standard updates publish a Worker revision.
+          assert "inputs.confirm_staging == 'BOOTSTRAP-STAGING'" in workflow
+          assert "inputs.confirm_staging == 'DEPLOY-STAGING'" in workflow
+          check = workflow.index('      - name: Verify required Worker runtime secrets before deployment')
+          bootstrap = workflow.index('      - name: Bootstrap new staging Worker without production routes')
+          upload = workflow.index('      - name: Configure staging Worker runtime secrets')
+          deploy = workflow.index('      - name: Deploy pre-configured staging Worker')
+          assert check < bootstrap < upload < deploy, 'Unsafe staging deployment order'
+          assert "if: ${{ inputs.confirm_staging == 'BOOTSTRAP-STAGING' }}" in workflow
           for name in ('database', 'serviceSecret', 'jwtHmacSha512PrivateKey'):
               expected = 'secrets.STAGING_SERVERPOD_PASSWORD_' + name
               assert expected in step, 'Missing staging secret: ' + expected
