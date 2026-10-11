@@ -25,8 +25,8 @@ esac
 status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
   --max-time 20 --connect-timeout 10 --max-redirs 0 "https://$host/")"
 echo "Glyphora staged API HTTP status: $status"
-if [[ "$status" == 000 || "$status" == 503 || "$status" =~ ^5 ]]; then
-  echo 'API is unavailable or returns a server error.' >&2
+if [[ ! "$status" =~ ^[23][0-9][0-9]$ ]]; then
+  echo 'Expected a successful HTTP response (2xx/3xx), not a missing route, authentication error, or server error.' >&2
   exit 1
 fi
 echo 'HTTPS endpoint responded without 5xx. This is reachability ONLY, not auth, WebSocket, R2 or Stream validation.'

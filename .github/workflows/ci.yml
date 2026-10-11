@@ -159,6 +159,40 @@ jobs:
             exit 1
           fi
 
+  cloudflare-api-probe:
+    name: Check staged API probe
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check Bash syntax
+        run: bash -n cloudflare/smoke_api.sh
+      - name: Test HTTP error handling without network access
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mockbin"
+          cat > "$RUNNER_TEMP/mockbin/curl" <<'MOCK'
+          #!/bin/sh
+          printf '%s' "$MOCK_HTTP_STATUS"
+          MOCK
+          chmod +x "$RUNNER_TEMP/mockbin/curl"
+          export PATH="$RUNNER_TEMP/mockbin:$PATH"
+          for code in 200 204 302; do
+            export MOCK_HTTP_STATUS="$code"
+            bash cloudflare/smoke_api.sh https://api.example.com/
+          done
+          for code in 000 401 403 404 500 503; do
+            export MOCK_HTTP_STATUS="$code"
+            if bash cloudflare/smoke_api.sh https://api.example.com/; then
+              echo "Unexpectedly accepted HTTP $code" >&2
+              exit 1
+            fi
+          done
+          if bash cloudflare/smoke_api.sh http://api.example.com/; then
+            echo 'Insecure URL accepted' >&2
+            exit 1
+          fi
+
   cloudflare-container-build:
     name: Build Cloudflare Serverpod container
     runs-on: ubuntu-latest
