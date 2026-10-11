@@ -459,26 +459,36 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
 
     if (kDebugMode || const bool.fromEnvironment('GLYPHORA_FEED_DIAGNOSTICS')) {
       if (sourceKind == 'HLS') {
-        final cached1 = await VideoCaching.isCached(
-          deliverySource,
-          cacheSegments: 1,
-        );
-        final cached2 = await VideoCaching.isCached(
-          deliverySource,
-          cacheSegments: 2,
-        );
-        final cached4 = await VideoCaching.isCached(
-          deliverySource,
-          cacheSegments: 4,
-        );
-        final storageBytes = await videoCacheStorageBytes();
-
-        feedDiagnostic(
-          'PLAYBACK_CACHE_STATE '
-          'postId=${widget.videoId ?? 'unknown'} '
-          'seg1=$cached1 seg2=$cached2 seg4=$cached4 '
-          'storageBytes=$storageBytes',
-        );
+        // Diagnostics are best-effort: cache plugins may be unavailable in
+        // widget tests or before their native initialization completes.
+        try {
+          final cached1 = await VideoCaching.isCached(
+            deliverySource,
+            cacheSegments: 1,
+          );
+          final cached2 = await VideoCaching.isCached(
+            deliverySource,
+            cacheSegments: 2,
+          );
+          final cached4 = await VideoCaching.isCached(
+            deliverySource,
+            cacheSegments: 4,
+          );
+          final storageBytes = await videoCacheStorageBytes();
+  
+          feedDiagnostic(
+            'PLAYBACK_CACHE_STATE '
+            'postId=${widget.videoId ?? 'unknown'} '
+            'seg1=$cached1 seg2=$cached2 seg4=$cached4 '
+            'storageBytes=$storageBytes',
+          );
+        } catch (error) {
+          feedDiagnostic(
+            'PLAYBACK_CACHE_DIAGNOSTICS_UNAVAILABLE '
+            'postId=${widget.videoId ?? 'unknown'} '
+            'reason=${error.runtimeType}',
+          );
+        }
       }
     }
     final controller = _createController(deliverySource);
