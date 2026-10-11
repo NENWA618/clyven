@@ -13,6 +13,7 @@ jobs:
     environment: cloudflare-staging
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
       - name: Inspect staging API over HTTPS
         env:
           STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
