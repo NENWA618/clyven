@@ -23,3 +23,17 @@ GLYPHORA_CLOUDFLARE_PUBLIC_HOST='api.glyphora.net' /bin/sh "$root/cloudflare/con
 grep -q '^  publicHost: api.glyphora.net$' config/production.yaml
 grep -q -- '--mode=production' server-arguments.txt
 echo 'Cloudflare entrypoint overlay and failure checks passed'
+
+# Verify staging refuses to start against the production database.
+cp "$root/server/backend_server/config/production.yaml" config/production.yaml
+if GLYPHORA_CLOUDFLARE_PUBLIC_HOST='api.glyphora.net' GLYPHORA_STAGING=true \
+   /bin/sh "$root/cloudflare/container-entrypoint.sh" > /dev/null 2>&1; then
+  echo 'Staging accepted missing isolated DB settings' >&2
+  exit 1
+fi
+GLYPHORA_CLOUDFLARE_PUBLIC_HOST='api.glyphora.net' GLYPHORA_STAGING=true \
+  GLYPHORA_STAGING_DB_HOST='staging-db.example.org' GLYPHORA_STAGING_DB_NAME='glyphora_test' \
+  GLYPHORA_STAGING_DB_USER='glyphora_test_user' /bin/sh "$root/cloudflare/container-entrypoint.sh"
+grep -q '^  host: staging-db.example.org$' config/production.yaml
+grep -q '^  name: glyphora_test$' config/production.yaml
+grep -q '^  user: glyphora_test_user$' config/production.yaml

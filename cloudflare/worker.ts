@@ -14,6 +14,10 @@ export class GlyphoraServer extends Container {
   envVars = {
     runmode: 'production',
     role: 'monolith',
+    ...(env.GLYPHORA_STAGING ? { GLYPHORA_STAGING: env.GLYPHORA_STAGING } : {}),
+    ...(env.GLYPHORA_STAGING_DB_HOST ? { GLYPHORA_STAGING_DB_HOST: env.GLYPHORA_STAGING_DB_HOST } : {}),
+    ...(env.GLYPHORA_STAGING_DB_NAME ? { GLYPHORA_STAGING_DB_NAME: env.GLYPHORA_STAGING_DB_NAME } : {}),
+    ...(env.GLYPHORA_STAGING_DB_USER ? { GLYPHORA_STAGING_DB_USER: env.GLYPHORA_STAGING_DB_USER } : {}),
     GLYPHORA_REQUIRE_CLOUDFLARE: 'true',
     ...(env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST ? { GLYPHORA_CLOUDFLARE_PUBLIC_HOST: env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST } : {}),
     serverid: 'default',
