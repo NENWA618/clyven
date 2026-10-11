@@ -109,7 +109,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/glyphora-mock-bin
-          printf '#!/bin/sh\\nprintf "%%s\\n" "$*" >> "$MOCK_RCLONE_LOG"\\n' > /tmp/glyphora-mock-bin/rclone
+          cat > /tmp/glyphora-mock-bin/rclone <<'MOCK'
+          #!/bin/sh
+          printf '%s\\n' "$*" >> "$MOCK_RCLONE_LOG"
+          MOCK
           chmod +x /tmp/glyphora-mock-bin/rclone
           export PATH="/tmp/glyphora-mock-bin:$PATH"
           export MOCK_RCLONE_LOG="$RUNNER_TEMP/rclone-commands.log"
