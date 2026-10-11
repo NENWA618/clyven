@@ -25,8 +25,8 @@ esac
 status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
   --max-time 20 --connect-timeout 10 --max-redirs 0 "https://$host/")"
 echo "Glyphora staged API HTTP status: $status"
-if [[ ! "$status" =~ ^[23][0-9][0-9]$ ]]; then
-  echo 'Expected a successful HTTP response (2xx/3xx), not a missing route, authentication error, or server error.' >&2
+if [[ ! "$status" =~ ^2[0-9][0-9]$ ]]; then
+  echo 'Expected HTTP 2xx; redirects may mask routing back to Google Cloud or another endpoint.' >&2
   exit 1
 fi
-echo 'HTTPS endpoint responded without 5xx. This is reachability ONLY, not auth, WebSocket, R2 or Stream validation.'
+echo 'HTTPS endpoint returned 2xx without redirect. This is reachability ONLY, not auth, WebSocket, R2 or Stream validation.'

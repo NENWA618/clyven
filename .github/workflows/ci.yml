@@ -206,11 +206,11 @@ jobs:
           MOCK
           chmod +x "$RUNNER_TEMP/mockbin/curl"
           export PATH="$RUNNER_TEMP/mockbin:$PATH"
-          for code in 200 204 302; do
+          for code in 200 204; do
             export MOCK_HTTP_STATUS="$code"
             bash cloudflare/smoke_api.sh https://api.example.com/
           done
-          for code in 000 401 403 404 500 503; do
+          for code in 000 301 302 307 308 401 403 404 500 503; do
             export MOCK_HTTP_STATUS="$code"
             if bash cloudflare/smoke_api.sh https://api.example.com/; then
               echo "Unexpectedly accepted HTTP $code" >&2
