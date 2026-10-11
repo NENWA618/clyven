@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:serverpod/serverpod.dart';
@@ -24,6 +25,15 @@ class VideoTranscodeService {
   static const _location = 'asia-southeast1';
   static const _bucket = 'glyphora-video-storage-11129163384';
   static const _scope = 'https://www.googleapis.com/auth/cloud-platform';
+
+  static bool get _useStream =>
+      Platform.environment['GLYPHORA_TRANSCODER']?.toLowerCase() == 'cloudflare_stream';
+
+  static String get _streamAccountId =>
+      Platform.environment['CLOUDFLARE_ACCOUNT_ID']?.trim() ?? '';
+
+  static String get _streamToken =>
+      Platform.environment['CLOUDFLARE_STREAM_API_TOKEN']?.trim() ?? '';
 
   static const _shortSegmentDuration = Duration(seconds: 3);
   static const _videoSegmentDuration = Duration(seconds: 6);
@@ -54,7 +64,14 @@ class VideoTranscodeService {
 
     final currentJobName = video.transcoderJobName?.trim();
 
+    if (currentJobName?.startsWith('cfstream:') == true) {
+      return _ensureStream(session, video, currentJobName!);
+    }
+
     if (currentJobName == null || currentJobName.isEmpty) {
+      if (_useStream) {
+        return _startStream(session, video);
+      }
       final mediaVersion = TranscodeRetryPolicy.currentMediaVersion;
       final jobName = await _createJob(
         videoStorageKey: video.videoStorageKey,
@@ -164,6 +181,93 @@ class VideoTranscodeService {
     }
 
     return video;
+  }
+
+  Future<Map<String, dynamic>> _streamRequest(
+    String method,
+    String path, {
+    Object? body,
+  }) async {
+    if (_streamAccountId.isEmpty || _streamToken.isEmpty) {
+      throw StateError('Cloudflare Stream account ID or API token is missing.');
+    }
+
+    final client = HttpClient();
+    try {
+      final request = await client.openUrl(
+        method,
+        Uri.parse('https://api.cloudflare.com/client/v4/accounts/'
+            '$_streamAccountId/stream$path'),
+      );
+      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $_streamToken');
+      request.headers.contentType = ContentType.json;
+      if (body != null) request.write(jsonEncode(body));
+      final response = await request.close();
+      final payload = await utf8.decoder.bind(response).join();
+      final decoded = jsonDecode(payload);
+      if (response.statusCode < 200 || response.statusCode >= 300 ||
+          decoded is! Map<String, dynamic> || decoded['success'] != true ||
+          decoded['result'] is! Map<String, dynamic>) {
+        throw StateError('Cloudflare Stream API error: ${response.statusCode} ${payload.length > 1000 ? payload.substring(0, 1000) : payload}');
+      }
+      return decoded['result'] as Map<String, dynamic>;
+    } finally {
+      client.close(force: true);
+    }
+  }
+
+  Future<Video> _startStream(Session session, Video video) async {
+    if (video.id == null) throw StateError('Video ID required.');
+    final sourceUrl = await session.storage.getPublicUrl(
+      storageId: 'public',
+      path: video.videoStorageKey,
+    );
+    if (sourceUrl == null || sourceUrl.scheme != 'https') {
+      throw StateError('Cloudflare Stream requires an accessible HTTPS source video URL.');
+    }
+    final result = await _streamRequest('POST', '/copy', body: {
+      'url': sourceUrl.toString(),
+      'meta': {'glyphoraVideoId': video.id.toString()},
+      'requireSignedURLs': false,
+    });
+    final uid = result['uid']?.toString();
+    if (uid == null || uid.isEmpty) {
+      throw StateError('Cloudflare Stream response missing uid.');
+    }
+    video.transcoderJobName = 'cfstream:$uid';
+    video.transcodeState = 'PENDING';
+    video.hlsManifestStorageKey = null;
+    video.updatedAt = DateTime.now().toUtc();
+    return Video.db.updateRow(session, video);
+  }
+
+  Future<Video> _ensureStream(
+    Session session,
+    Video video,
+    String jobName,
+  ) async {
+    if (video.transcodeState == 'SUCCEEDED' &&
+        video.hlsManifestStorageKey?.startsWith('https://') == true) {
+      return video;
+    }
+    final uid = jobName.substring('cfstream:'.length);
+    final result = await _streamRequest('GET', '/$uid');
+    final status = result['status'];
+    final state = status is Map ? status['state']?.toString() : null;
+    final ready = result['readyToStream'] == true;
+    final playback = result['playback'];
+    final manifest = playback is Map ? playback['hls']?.toString() : null;
+    if (ready && manifest != null && Uri.tryParse(manifest)?.scheme == 'https') {
+      video.hlsManifestStorageKey = manifest;
+      video.transcodeState = 'SUCCEEDED';
+    } else if (state == 'error') {
+      video.transcodeState = 'FAILED';
+      session.log('Cloudflare Stream processing failed videoId=${video.id}: $status', level: LogLevel.warning);
+    } else {
+      video.transcodeState = 'PENDING';
+    }
+    video.updatedAt = DateTime.now().toUtc();
+    return Video.db.updateRow(session, video);
   }
 
   Future<String> _createJob({

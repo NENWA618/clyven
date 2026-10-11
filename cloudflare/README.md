@@ -41,3 +41,20 @@ GCS objects, and Google Transcoder still requires that bucket.
 Run `dart pub get` at the workspace root and commit the regenerated
 `pubspec.lock` after dependency resolution. The lockfile has not yet been
 regenerated in this commit. Do not deploy a frozen-lockfile build until it is.
+
+## Cloudflare Stream optional transcoding path
+
+Set `GLYPHORA_TRANSCODER=cloudflare_stream` and configure
+`CLOUDFLARE_ACCOUNT_ID` and the secret `CLOUDFLARE_STREAM_API_TOKEN`
+to import **new** public R2 video uploads into Cloudflare Stream. Existing
+Google Transcoder jobs remain readable through the legacy job name format.
+Cloudflare Stream reports its own HLS manifest URL, so no GCS-style HLS
+object is expected. Test uploads, processing, video visibility and playback
+before enabling this switch.
+
+Limitations: Stream's managed HLS segments are not identical to the former
+fixed 3/6-second segment configuration. Stream imports require a fetchable
+public HTTPS source (do not enable this path for private uploads). This
+integration currently does not retry failed Stream jobs automatically, and
+does not implement signed playback tokens. Do not cut over protected video
+content until signed playback and access policy are implemented.

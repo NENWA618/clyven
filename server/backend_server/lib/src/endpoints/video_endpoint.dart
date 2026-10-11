@@ -1026,6 +1026,15 @@ class VideoEndpoint extends Endpoint {
         return null;
       }
 
+      // Cloudflare Stream returns an absolute HLS URL, while legacy jobs
+      // store a bucket-relative manifest path.
+      final directManifest = Uri.tryParse(manifestKey);
+      if (directManifest != null &&
+          directManifest.scheme == 'https' &&
+          directManifest.host.endsWith('.cloudflarestream.com')) {
+        return directManifest.toString();
+      }
+
       final uri = await session.storage.getPublicUrl(
         storageId: 'public',
         path: manifestKey,
