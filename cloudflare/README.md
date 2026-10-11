@@ -104,3 +104,9 @@ The committed `server/backend_server/config/production.yaml` still advertises th
 ## Cloudflare runtime API host overlay
 
 Set `GLYPHORA_CLOUDFLARE_PUBLIC_HOST` (hostname only, no scheme or port) as a Worker secret before deployment. The Cloudflare Container startup script patches **only its container-local copy** of `config/production.yaml` with this hostname; the Google Cloud Run production configuration in Git remains unchanged. Container startup refuses unset/invalid hostnames. Test actual API endpoint and WebSocket behavior before DNS/client cutover. This overlay only changes `apiServer.publicHost` and does not expose the Serverpod web/insights listeners (8081/8082).
+
+## Staged API reachability and Flutter client override
+
+Once Cloudflare credentials, containers, and the hostname are provisioned, perform a non-mutating HTTPS reachability probe: `bash cloudflare/smoke_api.sh https://<verified-cloudflare-api-host>/`. An HTTP response without 5xx only proves reachability; the probe deliberately does not write to the database or test uploads. Use an isolated staging hostname, not the public production DNS, during initial checks.
+
+To point a local Flutter build at that staged API without editing the production default, use `flutter run --dart-define=GLYPHORA_API_URL=https://<verified-cloudflare-api-host>/` from `apps/app`. Validate sign-in, WebSocket, cross-origin settings, uploading, R2 URLs and Stream playback by hand before attempting cutover. Until then the app continues to use Cloud Run by default.
