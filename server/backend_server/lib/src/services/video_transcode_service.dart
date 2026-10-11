@@ -64,6 +64,17 @@ class VideoTranscodeService {
 
     final currentJobName = video.transcoderJobName?.trim();
 
+    // Do not start new Google Transcoder jobs on Cloudflare Containers.
+    // Existing Google jobs may still be polled during a controlled cutover.
+    if ((currentJobName == null || currentJobName.isEmpty) &&
+        Platform.environment['GLYPHORA_REQUIRE_CLOUDFLARE'] == 'true' &&
+        !_useStream) {
+      throw StateError(
+        'Cloudflare deployment requires GLYPHORA_TRANSCODER=cloudflare_stream '
+        'before accepting new video transcoding jobs.',
+      );
+    }
+
     if (currentJobName?.startsWith('cfstream:') == true) {
       return _ensureStream(session, video, currentJobName!);
     }
