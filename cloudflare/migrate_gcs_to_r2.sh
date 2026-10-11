@@ -37,8 +37,13 @@ case "$MODE" in
     rclone check "$SOURCE" "$DESTINATION" --one-way --size-only --progress
     echo "Size-based verification passed. Sample HLS manifests and segments with byte hashes or playback separately."
     ;;
+  verify-deep)
+    echo "Comparing actual source and destination bytes; this downloads both sides and may incur egress costs."
+    rclone check "$SOURCE" "$DESTINATION" --one-way --download --progress
+    echo "Byte-level verification passed. Still test public URLs, CORS and HLS playback."
+    ;;
   *)
-    echo "Usage: $0 [dry-run|copy|verify]" >&2
+    echo "Usage: $0 [dry-run|copy|verify|verify-deep]" >&2
     exit 2
     ;;
 esac

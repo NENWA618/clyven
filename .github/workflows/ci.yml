@@ -121,9 +121,11 @@ jobs:
           bash cloudflare/migrate_gcs_to_r2.sh
           bash cloudflare/migrate_gcs_to_r2.sh copy
           bash cloudflare/migrate_gcs_to_r2.sh verify
+          bash cloudflare/migrate_gcs_to_r2.sh verify-deep
           grep -q '^copy gcs:source-bucket r2:destination-bucket --dry-run ' "$MOCK_RCLONE_LOG"
           grep -q '^copy gcs:source-bucket r2:destination-bucket --progress ' "$MOCK_RCLONE_LOG"
           grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --download ' "$MOCK_RCLONE_LOG"
           if GLYPHORA_R2_REMOTE='r2:' bash cloudflare/migrate_gcs_to_r2.sh copy; then
             echo 'Unsafe root-only remote accepted' >&2
             exit 1
