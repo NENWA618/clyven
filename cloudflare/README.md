@@ -72,3 +72,7 @@ Cloudflare Containers explicitly select `GLYPHORA_TRANSCODER=cloudflare_stream` 
 ## HLS origin compatibility
 
 The playback endpoint accepts Cloudflare Stream's customer-specific `*.cloudflarestream.com` HLS URLs and the standard `videodelivery.net` host. These URLs are returned directly from the Cloudflare Stream API rather than passed through bucket-relative object URL lookup. The host allowlist is intentional: do not accept arbitrary persisted HTTPS URLs.
+
+## Required production secrets
+
+The Worker now returns HTTP 503 (without starting a Container) if any of these settings are missing: `SERVERPOD_PASSWORD_database`, `SERVERPOD_PASSWORD_serviceSecret`, `SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_R2_BUCKET`, `CLOUDFLARE_R2_PUBLIC_HOST`, `SERVERPOD_R2_ACCESS_KEY_ID`, `SERVERPOD_R2_SECRET_KEY`, or `CLOUDFLARE_STREAM_API_TOKEN`. Put credentials in Wrangler secrets, never in source control. A dry-run cannot verify secret presence or real runtime connectivity.

@@ -44,6 +44,25 @@ export class GlyphoraServer extends Container {
 
 export default {
   fetch(request: Request, environment: { GLYPHORA_SERVER: DurableObjectNamespace }) {
+    // Fail closed before Container startup if required Cloudflare credentials
+    // are missing. Do not return secret names or values to public callers.
+    const required = [
+      env.SERVERPOD_PASSWORD_database,
+      env.SERVERPOD_PASSWORD_serviceSecret,
+      env.SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey,
+      env.CLOUDFLARE_ACCOUNT_ID,
+      env.CLOUDFLARE_R2_BUCKET,
+      env.CLOUDFLARE_R2_PUBLIC_HOST,
+      env.SERVERPOD_R2_ACCESS_KEY_ID,
+      env.SERVERPOD_R2_SECRET_KEY,
+      env.CLOUDFLARE_STREAM_API_TOKEN,
+    ];
+    if (required.some((value) => typeof value !== 'string' || !value.trim())) {
+      return new Response('Glyphora API is not configured.', {
+        status: 503,
+        headers: { 'cache-control': 'no-store' },
+      });
+    }
     return getContainer(environment.GLYPHORA_SERVER).fetch(request);
   },
 };
