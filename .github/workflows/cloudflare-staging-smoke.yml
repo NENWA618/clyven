@@ -79,10 +79,11 @@ jobs:
               print("HTTP response prefix:", body[:160].replace("\\n", " "))
               raise SystemExit("Video feed HTTP request failed (Neon checks will still run).")
           PY
-      - name: Install Dart SDK
-        uses: dart-lang/setup-dart@v1
+      - name: Install Flutter SDK (includes Dart)
+        uses: subosito/flutter-action@v2
         with:
-          sdk: '3.12.2'
+          flutter-version: '3.44.2'
+          channel: stable
       - name: Resolve workspace Dart dependencies
         run: dart pub get
       - name: Call video feed with generated Dart Serverpod client
