@@ -51,6 +51,7 @@ jobs:
           SERVERPOD_PASSWORD_database: ${{ secrets.STAGING_SERVERPOD_PASSWORD_database }}
           SERVERPOD_PASSWORD_serviceSecret: ${{ secrets.STAGING_SERVERPOD_PASSWORD_serviceSecret }}
           SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: ${{ secrets.STAGING_SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey }}
+          SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: ${{ secrets.STAGING_SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_R2_BUCKET: ${{ secrets.STAGING_CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_R2_PUBLIC_HOST: ${{ secrets.STAGING_CLOUDFLARE_R2_PUBLIC_HOST }}
@@ -65,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           for name in SERVERPOD_PASSWORD_database SERVERPOD_PASSWORD_serviceSecret \
-            SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey CLOUDFLARE_ACCOUNT_ID \
+            SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper CLOUDFLARE_ACCOUNT_ID \
             CLOUDFLARE_R2_BUCKET CLOUDFLARE_R2_PUBLIC_HOST \
             SERVERPOD_R2_ACCESS_KEY_ID SERVERPOD_R2_SECRET_KEY \
             CLOUDFLARE_STREAM_API_TOKEN GLYPHORA_CLOUDFLARE_PUBLIC_HOST \
@@ -91,6 +92,7 @@ jobs:
           SERVERPOD_PASSWORD_database: ${{ secrets.STAGING_SERVERPOD_PASSWORD_database }}
           SERVERPOD_PASSWORD_serviceSecret: ${{ secrets.STAGING_SERVERPOD_PASSWORD_serviceSecret }}
           SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: ${{ secrets.STAGING_SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey }}
+          SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: ${{ secrets.STAGING_SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper }}
           CLOUDFLARE_R2_BUCKET: ${{ secrets.STAGING_CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_R2_PUBLIC_HOST: ${{ secrets.STAGING_CLOUDFLARE_R2_PUBLIC_HOST }}
           SERVERPOD_R2_ACCESS_KEY_ID: ${{ secrets.STAGING_SERVERPOD_R2_ACCESS_KEY_ID }}
@@ -112,7 +114,7 @@ jobs:
           import sys
           fields = [
               "SERVERPOD_PASSWORD_database", "SERVERPOD_PASSWORD_serviceSecret",
-              "SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey", "CLOUDFLARE_ACCOUNT_ID",
+              "SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey", "SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper", "CLOUDFLARE_ACCOUNT_ID",
               "CLOUDFLARE_R2_BUCKET", "CLOUDFLARE_R2_PUBLIC_HOST",
               "SERVERPOD_R2_ACCESS_KEY_ID", "SERVERPOD_R2_SECRET_KEY",
               "CLOUDFLARE_STREAM_API_TOKEN", "GLYPHORA_CLOUDFLARE_PUBLIC_HOST",

@@ -30,6 +30,9 @@ export class GlyphoraServer extends Container {
     ...(env.SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey
       ? { SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: env.SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey }
       : {}),
+    ...(env.SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper
+      ? { SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: env.SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper }
+      : {}),
     ...(env.GLYPHORA_ADMIN_EMAIL
       ? { GLYPHORA_ADMIN_EMAIL: env.GLYPHORA_ADMIN_EMAIL }
       : {}),
@@ -55,6 +58,7 @@ export default {
       env.SERVERPOD_PASSWORD_database,
       env.SERVERPOD_PASSWORD_serviceSecret,
       env.SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey,
+      env.SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper,
       env.CLOUDFLARE_ACCOUNT_ID,
       env.CLOUDFLARE_R2_BUCKET,
       env.CLOUDFLARE_R2_PUBLIC_HOST,
