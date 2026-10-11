@@ -72,6 +72,9 @@ jobs:
             GLYPHORA_STAGING_DB_HOST GLYPHORA_STAGING_DB_NAME GLYPHORA_STAGING_DB_USER; do
             test -n "${!name:-}" || { echo "Missing required runtime secret: $name" >&2; exit 1; }
           done
+          test "$GLYPHORA_STAGING_DB_HOST" != 'ep-wandering-frog-azudrqv6.c-3.ap-southeast-1.aws.neon.tech' || { echo 'Production database host forbidden for staging' >&2; exit 1; }
+          test "$GLYPHORA_STAGING_DB_NAME" != 'neondb' || { echo 'Production database name forbidden for staging' >&2; exit 1; }
+          test "$GLYPHORA_STAGING_DB_USER" != 'neondb_owner' || { echo 'Production database user forbidden for staging' >&2; exit 1; }
       - name: Deploy staging Worker (no route or DNS changes)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -114,5 +117,4 @@ jobs:
           with open(sys.argv[1], "w", encoding="utf-8") as output:
               json.dump({key: os.environ[key] for key in fields}, output)
           PY
-          test "$GLYPHORA_STAGING_DB_HOST" != 'ep-wandering-frog-azudrqv6.c-3.ap-southeast-1.aws.neon.tech' || { echo 'Production database host forbidden for staging' >&2; exit 1; }
           npx wrangler secret bulk "$secret_file" --name glyphora-api-staging
