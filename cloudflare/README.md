@@ -20,3 +20,24 @@ This directory contains the Cloudflare Containers entrypoint for the Dart / Serv
 - Port 8080 is routed; Serverpod's ports 8081 and 8082 are not exposed through the Worker yet.
 
 Do not shut down GCP resources just because the scaffold has been committed. This is an incremental, non-disruptive first step in a complete migration.
+
+## R2 upload support (implementation present, not validated in production)
+
+The Serverpod `public` storage integration selects R2 when all three
+environment variables are present:
+`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_R2_BUCKET`, and
+`CLOUDFLARE_R2_PUBLIC_HOST` (hostname without scheme, for example
+`media.glyphora.net`). Set `SERVERPOD_R2_ACCESS_KEY_ID` and
+`SERVERPOD_R2_SECRET_KEY` as Cloudflare Worker secrets. R2's bucket
+must be configured with a public custom domain, appropriate CORS for direct
+browser uploads, and upload permissions scoped to that bucket.
+
+When the three R2 settings are absent, the existing GCS backend remains
+active; this is explicitly an interim migration mode, **not** a finished
+Google Cloud removal. Always test presigned PUT, public URLs, cover uploads,
+video upload and playback. Existing database rows still point to historical
+GCS objects, and Google Transcoder still requires that bucket.
+
+Run `dart pub get` at the workspace root and commit the regenerated
+`pubspec.lock` after dependency resolution. The lockfile has not yet been
+regenerated in this commit. Do not deploy a frozen-lockfile build until it is.

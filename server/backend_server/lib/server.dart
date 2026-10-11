@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:serverpod_cloud_storage_r2/serverpod_cloud_storage_r2.dart' as r2;
+
 import 'package:mailer/mailer.dart' as mailer;
 import 'package:mailer/smtp_server.dart';
 import 'package:serverpod/serverpod.dart';
@@ -27,17 +29,41 @@ void run(List<String> args) async {
     (arg) => arg == 'maintenance' || arg == '--role=maintenance',
   );
 
-  // 正常启动服务器时才需要 GCP Storage
+  // R2 is enabled only when all public storage settings are supplied.
+  // Keep GCS as a temporary fallback until existing uploads have been copied.
+  // Never silently select a partially configured R2 bucket.
   if (!isMaintenance) {
-    pod.addCloudStorage(
-      gcp.GoogleCloudStorage(
-        serverpod: pod,
-        storageId: 'public',
-        public: true,
-        region: 'auto',
-        bucket: 'glyphora-video-storage-11129163384',
-      ),
-    );
+    final accountId = Platform.environment['CLOUDFLARE_ACCOUNT_ID']?.trim();
+    final bucket = Platform.environment['CLOUDFLARE_R2_BUCKET']?.trim();
+    final publicHost = Platform.environment['CLOUDFLARE_R2_PUBLIC_HOST']?.trim();
+    final usingR2 = accountId != null && accountId.isNotEmpty &&
+        bucket != null && bucket.isNotEmpty &&
+        publicHost != null && publicHost.isNotEmpty;
+
+    if (usingR2) {
+      pod.addCloudStorage(
+        r2.R2CloudStorage(
+          serverpod: pod,
+          storageId: 'public',
+          public: true,
+          accountId: accountId,
+          bucket: bucket,
+          publicHost: publicHost,
+        ),
+      );
+      print('[Glyphora Storage] Public uploads use Cloudflare R2.');
+    } else {
+      pod.addCloudStorage(
+        gcp.GoogleCloudStorage(
+          serverpod: pod,
+          storageId: 'public',
+          public: true,
+          region: 'auto',
+          bucket: 'glyphora-video-storage-11129163384',
+        ),
+      );
+      print('[Glyphora Storage] Legacy GCS active; R2 not fully configured.');
+    }
   }
 
   // 正常启动服务器时才需要登录认证系统
