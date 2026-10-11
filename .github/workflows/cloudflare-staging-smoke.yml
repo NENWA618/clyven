@@ -35,6 +35,41 @@ jobs:
           except urllib.error.HTTPError as exc:
               print("HTTP status:", exc.code)
               raise SystemExit("Staging API probe failed.")
+      - name: Exercise Serverpod video feed endpoint (read-only)
+        env:
+          STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          host = os.environ["STAGING_HOST"].strip()
+          if not host.startswith("glyphora-api-staging.") or not host.endswith(".workers.dev"):
+              raise SystemExit("Refusing to call non-staging API.")
+          # Matches generated Serverpod client: video.getVideos(contentType: null).
+          data = json.dumps({"contentType": None}).encode("utf-8")
+          request = urllib.request.Request(
+              "https://" + host + "/video/getVideos",
+              data=data,
+              headers={"Content-Type": "application/json", "Accept": "application/json"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=75) as response:
+                  raw = response.read(200000).decode("utf-8", "replace")
+                  print("Video endpoint HTTP status:", response.status)
+                  payload = json.loads(raw)
+                  print("Video endpoint result is a list:", isinstance(payload, list))
+                  if not isinstance(payload, list):
+                      raise SystemExit("Unexpected feed response format.")
+                  print("Published staging video count:", len(payload))
+                  print("Serverpod video feed successfully queried staging Neon.")
+          except urllib.error.HTTPError as exc:
+              print("Video endpoint HTTP status:", exc.code)
+              raise SystemExit("Serverpod feed request failed; inspect new Container logs.")
+          PY
       - name: Install PostgreSQL client
         run: python3 -m pip install --quiet --disable-pip-version-check --break-system-packages 'psycopg[binary]'
       - name: Check isolated Neon database (SELECT only)
