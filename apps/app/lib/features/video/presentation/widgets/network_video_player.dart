@@ -548,7 +548,18 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
       if (!_isGenerationActive(generation)) return false;
       if (manifestUrl == null) continue;
 
-      final dataSaverEnabled = ref.read(playbackDataSaverProvider);
+      // Playback must remain functional even if preferences cannot be loaded.
+      // Data saver is optional; a provider failure must not prevent HLS.
+      var dataSaverEnabled = false;
+      try {
+        dataSaverEnabled = ref.read(playbackDataSaverProvider);
+      } catch (error) {
+        feedDiagnostic(
+          'PLAYBACK_DATA_SAVER_UNAVAILABLE '
+          'postId=${widget.videoId ?? 'unknown'} '
+          'reason=${error.runtimeType}',
+        );
+      }
 
       if (dataSaverEnabled) {
         final saverUrl = await _resolveDataSaverManifest(manifestUrl);
