@@ -306,7 +306,116 @@ class VideoTranscodeService {
       return video;
     }
     final uid = jobName.substring('cfstream:'.length);
-    if (!RegExp(r'^[a-fA-F0-9]{32}    final result = await _streamRequest('GET', '/$uid');
+    if (!RegExp(r'^[a-fA-F0-9]{32}
+    final status = result['status'];
+    final state = status is Map ? status['state']?.toString() : null;
+    final ready = result['readyToStream'] == true;
+    final playback = result['playback'];
+    final manifest = playback is Map ? playback['hls']?.toString() : null;
+    if (ready &&
+        manifest != null &&
+        Uri.tryParse(manifest)?.scheme == 'https') {
+      video.hlsManifestStorageKey = manifest;
+      video.transcodeState = 'SUCCEEDED';
+    } else if (state == 'error') {
+      video.transcodeState = 'FAILED';
+      session.log(
+        'Cloudflare Stream processing failed videoId=${video.id}: $status',
+        level: LogLevel.warning,
+      );
+    } else {
+      video.transcodeState = 'PENDING';
+    }
+    video.updatedAt = DateTime.now().toUtc();
+    return Video.db.updateRow(session, video);
+  }
+
+  Future<String> _createJob({
+    required String videoStorageKey,
+    required String outputPrefix,
+    required Duration segmentDuration,
+  }) async {
+    final client = await _client();
+
+    final uri = Uri.parse(
+      'https://transcoder.googleapis.com/v1/'
+      'projects/$_projectId/locations/$_location/jobs'
+      '?fields=name,state',
+    );
+
+    final response = await client.post(
+      uri,
+      headers: const {
+        'content-type': 'application/json; charset=utf-8',
+      },
+      body: jsonEncode(
+        buildVideoTranscodeJob(
+          inputUri: 'gs://$_bucket/$videoStorageKey',
+          outputUri: 'gs://$_bucket/$outputPrefix',
+          segmentDuration: segmentDuration,
+        ),
+      ),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError(
+        'Transcoder create job failed '
+        '(${response.statusCode}): ${response.body}',
+      );
+    }
+
+    final body = jsonDecode(response.body);
+
+    if (body is! Map<String, dynamic>) {
+      throw StateError('Unexpected Transcoder create response.');
+    }
+
+    final name = body['name']?.toString().trim();
+
+    if (name == null || name.isEmpty) {
+      throw StateError('Transcoder response did not include a job name.');
+    }
+
+    return name;
+  }
+
+  Future<_TranscodeJobStatus> _getJobStatus(String jobName) async {
+    final client = await _client();
+
+    final uri = Uri.parse(
+      'https://transcoder.googleapis.com/v1/$jobName'
+      '?fields=state,error',
+    );
+
+    final response = await client.get(uri);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw StateError(
+        'Transcoder get job failed '
+        '(${response.statusCode}): ${response.body}',
+      );
+    }
+
+    final body = jsonDecode(response.body);
+
+    if (body is! Map<String, dynamic>) {
+      throw StateError('Unexpected Transcoder job response.');
+    }
+
+    final state = body['state']?.toString().trim().toUpperCase() ?? 'UNKNOWN';
+    final rawError = body['error'];
+    final error = rawError == null ? null : jsonEncode(rawError);
+
+    return _TranscodeJobStatus(
+      state: state,
+      error: error,
+    );
+  }
+}
+).hasMatch(uid)) {
+      throw StateError('Invalid Cloudflare Stream job identifier.');
+    }
+    final result = await _streamRequest('GET', '/$uid');
     final status = result['status'];
     final state = status is Map ? status['state']?.toString() : null;
     final ready = result['readyToStream'] == true;
