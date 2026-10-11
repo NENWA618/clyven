@@ -24,6 +24,7 @@ jobs:
           import os
           import urllib.error
           import urllib.request
+          import urllib.parse
 
           token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
           account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
@@ -78,15 +79,27 @@ jobs:
                   print("Instance state:", status.get("state", "unknown"),
                         "exit_code:", status.get("exit_code", "not reported"),
                         "updated_at:", status.get("updated_at", "unknown"))
+          # Distinguish a Cloudflare edge rejection from an application response
+          # using non-sensitive headers; never print body or credentials.
+          def describe_headers(headers):
+              for key in ("server", "cf-ray", "cf-cache-status", "content-type", "location"):
+                  value = headers.get(key)
+                  if value:
+                      if key == "location":
+                          parsed = urllib.parse.urlsplit(value)
+                          value = parsed.scheme + "://" + parsed.hostname if parsed.hostname else "(relative redirect)"
+                      print("Response header", key + ":", value[:150])
           print("Probing HTTPS staging endpoint; this may start the Container.")
           try:
               request = urllib.request.Request("https://" + host + "/", method="GET")
               with urllib.request.urlopen(request, timeout=75) as response:
                   print("Staging HTTP status:", response.status)
+                  describe_headers(response.headers)
                   if not 200 <= response.status < 300:
                       had_error = True
           except urllib.error.HTTPError as exc:
               print("Staging HTTP status:", exc.code)
+              describe_headers(exc.headers)
               print("Response message is omitted to avoid leaking server output.")
               had_error = True
           except Exception as exc:
