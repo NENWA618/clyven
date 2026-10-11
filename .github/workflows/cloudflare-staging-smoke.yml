@@ -78,6 +78,18 @@ jobs:
               print("HTTP response prefix:", body[:160].replace("\\n", " "))
               raise SystemExit("Video feed HTTP request failed (Neon checks will still run).")
           PY
+      - name: Install Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.12.2'
+      - name: Resolve workspace Dart dependencies
+        run: dart pub get
+      - name: Call video feed with generated Dart Serverpod client
+        id: dart_feed
+        continue-on-error: true
+        env:
+          STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+        run: dart run tool/staging_video_smoke.dart
       - name: Install PostgreSQL client
         run: python3 -m pip install --quiet --disable-pip-version-check --break-system-packages 'psycopg[binary]'
       - name: Check isolated Neon database (SELECT only)
@@ -124,9 +136,11 @@ jobs:
         if: always()
         env:
           FEED_OUTCOME: ${{ steps.feed.outcome }}
+          DART_FEED_OUTCOME: ${{ steps.dart_feed.outcome }}
         run: |
-          if [ "$FEED_OUTCOME" != 'success' ]; then
-            echo 'Video API did not pass. Neon verification is independent and may have passed.'
+          echo "Raw HTTP probe: $FEED_OUTCOME; Dart client probe: $DART_FEED_OUTCOME"
+          if [ "$DART_FEED_OUTCOME" != 'success' ]; then
+            echo 'Official Dart client did not pass. Neon verification is independent and may have passed.'
             exit 1
           fi
           echo 'Video API smoke test passed.'
