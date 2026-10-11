@@ -1,0 +1,53 @@
+name: Deploy Cloudflare staging (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_staging:
+        description: 'Type DEPLOY-STAGING to deploy a new test Worker (no DNS cutover)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glyphora-cloudflare-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy staging Worker
+    if: ${{ inputs.confirm_staging == 'DEPLOY-STAGING' }}
+    runs-on: ubuntu-latest
+    environment: cloudflare-staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify Cloudflare credentials and staging hostname
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+        run: |
+          set -euo pipefail
+          test -n "$CF_API_TOKEN" || { echo 'Missing Cloudflare API token' >&2; exit 1; }
+          test -n "$CF_ACCOUNT_ID" || { echo 'Missing Cloudflare account ID' >&2; exit 1; }
+          test -n "$STAGING_HOST" || { echo 'Missing staging API host' >&2; exit 1; }
+          case "$STAGING_HOST" in
+            *.run.app|*.googleapis.com|*.examplepod.com)
+              echo 'Not a staging Cloudflare API hostname' >&2; exit 1 ;;
+          esac
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Worker dependencies
+        run: npm install --no-audit --no-fund
+      - name: Validate Worker bundle
+        run: npx wrangler deploy --dry-run
+      - name: Deploy staging Worker (no route or DNS changes)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy --name glyphora-api-staging
