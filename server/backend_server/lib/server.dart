@@ -40,6 +40,14 @@ void run(List<String> args) async {
         bucket != null && bucket.isNotEmpty &&
         publicHost != null && publicHost.isNotEmpty;
 
+    if (!usingR2 &&
+        Platform.environment['GLYPHORA_REQUIRE_CLOUDFLARE'] == 'true') {
+      throw StateError(
+        'Cloudflare deployment requires all R2 settings. '
+        'Refusing to fall back to Google Cloud Storage.',
+      );
+    }
+
     if (usingR2) {
       pod.addCloudStorage(
         r2.R2CloudStorage(

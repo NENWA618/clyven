@@ -14,6 +14,7 @@ export class GlyphoraServer extends Container {
   envVars = {
     runmode: 'production',
     role: 'monolith',
+    GLYPHORA_REQUIRE_CLOUDFLARE: 'true',
     serverid: 'default',
     ...(env.SERVERPOD_PASSWORD_database
       ? { SERVERPOD_PASSWORD_database: env.SERVERPOD_PASSWORD_database }

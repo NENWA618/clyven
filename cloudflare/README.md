@@ -60,3 +60,9 @@ does not implement signed playback tokens. Do not cut over protected video
 content until signed playback and access policy are implemented.
 
 Private video safety: Cloudflare Stream copy mode deliberately refuses videos with `isPublic=false` until signed playback is implemented.
+
+## Fail-closed behavior
+
+The Cloudflare Container supplies `GLYPHORA_REQUIRE_CLOUDFLARE=true`, so startup fails rather than silently reverting to GCS if R2 account, bucket or public host settings are absent. Existing Google Cloud Run deployments retain their original interim fallback unless this variable is enabled.
+
+Check GitHub Actions before attempting cutover: the 2026-10-11 main workflow failed at `dart format` for `lib/server.dart` and `video_transcode_service.dart`. Dependency installation succeeded, but static analysis and tests were skipped. These have not yet been validated.
