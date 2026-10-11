@@ -80,3 +80,7 @@ The Worker now returns HTTP 503 (without starting a Container) if any of these s
 ## Docker image build gate
 
 GitHub Actions builds `Dockerfile.cloudflare` from the repository root in a separate CI job. This catches Dart AOT compilation failures and missing runtime assets that a Wrangler Worker dry-run cannot detect. Neither the image nor the Worker is published. Do not deploy or cut over until Docker build, Wrangler dry-run and the original test suite all pass.
+
+## Legacy transcoding behavior on Cloudflare
+
+Cloudflare Containers no longer query Google Transcoder for existing legacy jobs. A legacy job already marked `SUCCEEDED` can retain its manifest path, but **the referenced objects must first be copied to R2 with their original keys**. Pending or failed legacy jobs cannot be finished by Cloudflare: complete or reprocess them before cutover. This does not migrate any existing GCS object. Verify covers, uploaded originals, HLS manifests and every referenced HLS segment before changing client endpoints. Retain the Google deployment until this inventory and parity check are finished.

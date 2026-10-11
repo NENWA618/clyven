@@ -115,6 +115,13 @@ class VideoTranscodeService {
       return Video.db.updateRow(session, video);
     }
 
+    // Cloudflare Containers have no Google application-default credentials.
+    // Keep finished legacy manifests readable, but do not poll/retry Google
+    // Transcoder jobs from Cloudflare while the backfill is incomplete.
+    if (Platform.environment['GLYPHORA_REQUIRE_CLOUDFLARE'] == 'true') {
+      return video;
+    }
+
     final parsed = TranscodeRetryPolicy.parseJobName(currentJobName);
     final persistedManifestKey = video.hlsManifestStorageKey?.trim();
     final mediaVersion = TranscodeRetryPolicy.mediaVersionFromManifestKey(
