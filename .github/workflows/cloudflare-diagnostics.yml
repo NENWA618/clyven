@@ -1,0 +1,92 @@
+name: Diagnose Cloudflare staging (read-only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Inspect staging Container startup
+    runs-on: ubuntu-latest
+    environment: cloudflare-staging
+    timeout-minutes: 10
+    steps:
+      - name: Inspect Cloudflare application, instance status and API response
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+          account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+          host = os.environ.get("STAGING_HOST", "").strip()
+          if not token or not account or not host:
+              raise SystemExit("Missing Cloudflare staging credentials or host.")
+          if not host.endswith(".workers.dev") or "glyphora-api-staging." not in host:
+              raise SystemExit("Refusing to probe a non-staging workers.dev host.")
+
+          api = "https://api.cloudflare.com/client/v4/accounts/" + account
+          def get_json(url):
+              request = urllib.request.Request(
+                  url, headers={"Authorization": "Bearer " + token,
+                                "Accept": "application/json"})
+              try:
+                  with urllib.request.urlopen(request, timeout=25) as response:
+                      return json.load(response)
+              except urllib.error.HTTPError as exc:
+                  print("Cloudflare API response: HTTP", exc.code,
+                        "(check token account permissions; no credentials printed)")
+                  return None
+              except Exception as exc:
+                  print("Cloudflare API unreachable:", type(exc).__name__)
+                  return None
+
+          print("Checking staging Worker: glyphora-api-staging")
+          apps_response = get_json(api + "/containers/applications?per_page=100")
+          apps = (apps_response or {}).get("result") or []
+          if isinstance(apps, dict):
+              apps = apps.get("items") or apps.get("applications") or []
+          matching = [app for app in apps if isinstance(app, dict)
+                      and str(app.get("name", "")).startswith("glyphora-api-")]
+          if not matching:
+              print("No matching Container application returned; this does not prove it is absent.")
+          for app in matching:
+              app_id = app.get("id")
+              print("Container:", app.get("name", "unknown"))
+              print("Application ID:", app_id or "unavailable")
+              print("Reported health:", json.dumps(app.get("health", {})))
+              if not app_id:
+                  continue
+              instances_response = get_json(
+                  api + "/containers/applications/" + str(app_id) + "/instances-v2")
+              instances = (instances_response or {}).get("result") or []
+              if isinstance(instances, dict):
+                  instances = instances.get("items") or instances.get("instances") or []
+              if not instances:
+                  print("No instances reported (may be idle or API access limited).")
+              for instance in instances[:10]:
+                  status = instance.get("status") or {}
+                  print("Instance state:", status.get("state", "unknown"),
+                        "exit_code:", status.get("exit_code", "not reported"),
+                        "updated_at:", status.get("updated_at", "unknown"))
+          print("Probing HTTPS staging endpoint; this may start the Container.")
+          try:
+              request = urllib.request.Request("https://" + host + "/", method="GET")
+              with urllib.request.urlopen(request, timeout=75) as response:
+                  print("Staging HTTP status:", response.status)
+          except urllib.error.HTTPError as exc:
+              print("Staging HTTP status:", exc.code)
+              print("Response message is omitted to avoid leaking server output.")
+          except Exception as exc:
+              print("Staging probe:", type(exc).__name__)
+          print("Read-only diagnosis complete. For application stderr consult Cloudflare Container Logs;")
+          print("the public Containers management API reports instance states, not stderr.")
+          PY
