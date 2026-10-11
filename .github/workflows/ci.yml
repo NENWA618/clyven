@@ -165,6 +165,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Assert staging workflow uses isolated secrets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          workflow = Path('.github/workflows/cloudflare-staging.yml').read_text()
+          step = workflow.split('      - name: Configure staging Worker runtime secrets', 1)[1]
+          for name in ('database', 'serviceSecret', 'jwtHmacSha512PrivateKey'):
+              expected = 'secrets.STAGING_SERVERPOD_PASSWORD_' + name
+              assert expected in step, 'Missing staging secret: ' + expected
+              assert 'secrets.SERVERPOD_PASSWORD_' + name not in step, 'Production secret in staging'
+          for name in ('GLYPHORA_STAGING', 'GLYPHORA_STAGING_DB_HOST', 'GLYPHORA_STAGING_DB_NAME', 'GLYPHORA_STAGING_DB_USER'):
+              assert '          ' + name + ':' in step, 'Missing staging environment: ' + name
+          PY
       - name: Check Bash syntax
         run: bash -n cloudflare/smoke_api.sh
       - name: Test HTTP error handling without network access

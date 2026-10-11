@@ -81,15 +81,19 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          SERVERPOD_PASSWORD_database: ${{ secrets.SERVERPOD_PASSWORD_database }}
-          SERVERPOD_PASSWORD_serviceSecret: ${{ secrets.SERVERPOD_PASSWORD_serviceSecret }}
-          SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: ${{ secrets.SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey }}
+          SERVERPOD_PASSWORD_database: ${{ secrets.STAGING_SERVERPOD_PASSWORD_database }}
+          SERVERPOD_PASSWORD_serviceSecret: ${{ secrets.STAGING_SERVERPOD_PASSWORD_serviceSecret }}
+          SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: ${{ secrets.STAGING_SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey }}
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_R2_PUBLIC_HOST: ${{ secrets.CLOUDFLARE_R2_PUBLIC_HOST }}
           SERVERPOD_R2_ACCESS_KEY_ID: ${{ secrets.SERVERPOD_R2_ACCESS_KEY_ID }}
           SERVERPOD_R2_SECRET_KEY: ${{ secrets.SERVERPOD_R2_SECRET_KEY }}
           CLOUDFLARE_STREAM_API_TOKEN: ${{ secrets.CLOUDFLARE_STREAM_API_TOKEN }}
           GLYPHORA_CLOUDFLARE_PUBLIC_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
+          GLYPHORA_STAGING: 'true'
+          GLYPHORA_STAGING_DB_HOST: ${{ secrets.GLYPHORA_STAGING_DB_HOST }}
+          GLYPHORA_STAGING_DB_NAME: ${{ secrets.GLYPHORA_STAGING_DB_NAME }}
+          GLYPHORA_STAGING_DB_USER: ${{ secrets.GLYPHORA_STAGING_DB_USER }}
         run: |
           set -euo pipefail
           umask 077
