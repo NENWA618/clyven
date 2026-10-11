@@ -30,7 +30,8 @@ COPY --from=build /app/server/backend_server/web/ web/
 COPY --from=build /app/server/backend_server/migrations/ migrations/
 COPY --from=build /app/server/backend_server/lib/src/generated/protocol.yaml lib/src/generated/protocol.yaml
 COPY --from=build /app/packages/nom_converter/data/ data/glyphora_nom_converter/
+COPY cloudflare/container-entrypoint.sh /app/cloudflare-container-entrypoint.sh
 EXPOSE 8080
 EXPOSE 8081
 EXPOSE 8082
-ENTRYPOINT ./server --mode=$runmode --server-id=$serverid --logging=$logging --role=$role
+ENTRYPOINT ["/bin/sh", "/app/cloudflare-container-entrypoint.sh"]

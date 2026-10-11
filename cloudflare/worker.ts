@@ -15,6 +15,7 @@ export class GlyphoraServer extends Container {
     runmode: 'production',
     role: 'monolith',
     GLYPHORA_REQUIRE_CLOUDFLARE: 'true',
+    ...(env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST ? { GLYPHORA_CLOUDFLARE_PUBLIC_HOST: env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST } : {}),
     serverid: 'default',
     ...(env.SERVERPOD_PASSWORD_database
       ? { SERVERPOD_PASSWORD_database: env.SERVERPOD_PASSWORD_database }
@@ -56,6 +57,7 @@ export default {
       env.SERVERPOD_R2_ACCESS_KEY_ID,
       env.SERVERPOD_R2_SECRET_KEY,
       env.CLOUDFLARE_STREAM_API_TOKEN,
+      env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST,
     ];
     if (required.some((value) => typeof value !== 'string' || !value.trim())) {
       return new Response('Glyphora API is not configured.', {
