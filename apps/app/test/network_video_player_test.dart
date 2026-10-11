@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:glyphora_app/core/serverpod/serverpod_client_provider.dart';
+import 'package:glyphora_app/core/media/playback_data_saver_provider.dart';
 import 'package:glyphora_app/features/video/presentation/widgets/network_video_player.dart';
 import 'package:glyphora_backend_client/backend_client.dart' as serverpod;
 import 'package:glyphora_app/l10n/app_localizations.dart';
@@ -10,6 +11,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 import 'package:video_player/video_player.dart';
+
+class TestPlaybackDataSaverNotifier extends PlaybackDataSaverNotifier {
+  @override
+  bool build() => false;
+}
 
 class TestManifestEndpoint implements serverpod.EndpointVideo {
   @override
@@ -104,6 +110,7 @@ Widget player({
   String? preResolvedManifestUrl,
 }) => ProviderScope(
   overrides: [
+    playbackDataSaverProvider.overrideWith(TestPlaybackDataSaverNotifier.new),
     if (client != null) serverpodClientProvider.overrideWithValue(client),
   ],
   child: MaterialApp(
