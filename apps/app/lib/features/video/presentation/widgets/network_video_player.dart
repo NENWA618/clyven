@@ -605,7 +605,17 @@ class _NetworkVideoPlayerState extends ConsumerState<NetworkVideoPlayer>
 
     var initialized = false;
     if (manifestUrl != null) {
-      final dataSaverEnabled = ref.read(playbackDataSaverProvider);
+      // Preferences are optional and must not block primary HLS playback.
+      var dataSaverEnabled = false;
+      try {
+        dataSaverEnabled = ref.read(playbackDataSaverProvider);
+      } catch (error) {
+        feedDiagnostic(
+          'PLAYBACK_DATA_SAVER_UNAVAILABLE '
+          'postId=${widget.videoId ?? 'unknown'} '
+          'reason=${error.runtimeType}',
+        );
+      }
 
       if (dataSaverEnabled) {
         final saverUrl = await _resolveDataSaverManifest(manifestUrl);
