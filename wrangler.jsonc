@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "glyphora-api",
+  "main": "cloudflare/worker.ts",
+  "compatibility_date": "2026-10-11",
+  "containers": [
+    {
+      "class_name": "GlyphoraServer",
+      "image": "./Dockerfile.cloudflare",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GLYPHORA_SERVER", "class_name": "GlyphoraServer" }
+    ]
+  },
+  "exports": {
+    "GlyphoraServer": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "observability": { "enabled": true }
+}
