@@ -114,3 +114,7 @@ To point a local Flutter build at that staged API without editing the production
 ## Staging database isolation gate
 
 The manual staging workflow now requires a distinct set of `STAGING_SERVERPOD_PASSWORD_database`, `STAGING_SERVERPOD_PASSWORD_serviceSecret`, `STAGING_SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey` and `GLYPHORA_STAGING_DB_HOST`, `GLYPHORA_STAGING_DB_NAME`, `GLYPHORA_STAGING_DB_USER` GitHub environment secrets. When `GLYPHORA_STAGING=true`, the container refuses to launch without an isolated database host, database name, and user, and patches only its local config. This is a guard against accidental reuse of the known production database, not proof of isolation against aliases: verify the credentials and Neon project really belong to staging before triggering a manual deployment. No production database credentials should be stored under the staging-specific secret names.
+
+## Staging media isolation
+
+The manual staging workflow requires `STAGING_CLOUDFLARE_R2_BUCKET`, `STAGING_CLOUDFLARE_R2_PUBLIC_HOST`, `STAGING_SERVERPOD_R2_ACCESS_KEY_ID`, `STAGING_SERVERPOD_R2_SECRET_KEY`, and `STAGING_CLOUDFLARE_STREAM_API_TOKEN` GitHub environment secrets. These are mapped to the original runtime variable names within the staging Worker, but must represent **dedicated non-production R2 and Stream resources** with appropriately limited credentials. The separate secret names alone cannot prove the accounts/buckets are truly isolated; verify this in Cloudflare before deployment. Never reuse production media credentials for automated staging tests.

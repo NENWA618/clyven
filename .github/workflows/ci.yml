@@ -171,6 +171,11 @@ jobs:
           from pathlib import Path
           workflow = Path('.github/workflows/cloudflare-staging.yml').read_text()
           step = workflow.split('      - name: Configure staging Worker runtime secrets', 1)[1]
+          for name in ('CLOUDFLARE_R2_BUCKET', 'CLOUDFLARE_R2_PUBLIC_HOST',
+                       'SERVERPOD_R2_ACCESS_KEY_ID', 'SERVERPOD_R2_SECRET_KEY',
+                       'CLOUDFLARE_STREAM_API_TOKEN'):
+              assert 'secrets.STAGING_' + name in step, 'Missing staging media secret: ' + name
+              assert 'secrets.' + name not in step, 'Production media secret in staging: ' + name
           for name in ('database', 'serviceSecret', 'jwtHmacSha512PrivateKey'):
               expected = 'secrets.STAGING_SERVERPOD_PASSWORD_' + name
               assert expected in step, 'Missing staging secret: ' + expected
