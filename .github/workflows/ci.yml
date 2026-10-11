@@ -134,6 +134,26 @@ jobs:
           grep -q '^copy gcs:source-bucket r2:destination-bucket --immutable --progress ' "$MOCK_RCLONE_LOG"
           grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"
           grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --download ' "$MOCK_RCLONE_LOG"
+          if GLYPHORA_R2_REMOTE='gcs:source-bucket' bash cloudflare/migrate_gcs_to_r2.sh copy; then
+            echo 'Identical source and destination accepted' >&2
+            exit 1
+          fi
+          cat > /tmp/glyphora-mock-bin/rclone <<'MOCKFAIL'
+          #!/bin/sh
+          if [ "$1" = 'check' ]; then
+            exit 17
+          fi
+          exit 0
+          MOCKFAIL
+          chmod +x /tmp/glyphora-mock-bin/rclone
+          if bash cloudflare/migrate_gcs_to_r2.sh verify; then
+            echo 'Failed destination verification was accepted' >&2
+            exit 1
+          fi
+          if bash cloudflare/migrate_gcs_to_r2.sh verify-deep; then
+            echo 'Failed byte verification was accepted' >&2
+            exit 1
+          fi
           if GLYPHORA_R2_REMOTE='r2:' bash cloudflare/migrate_gcs_to_r2.sh copy; then
             echo 'Unsafe root-only remote accepted' >&2
             exit 1
