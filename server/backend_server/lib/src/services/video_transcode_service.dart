@@ -217,6 +217,14 @@ class VideoTranscodeService {
   }
 
   Future<Video> _startStream(Session session, Video video) async {
+    // This integration uses public playback URLs. Never accidentally publish
+    // private Glyphora videos through Cloudflare Stream.
+    if (!video.isPublic) {
+      throw StateError(
+        'Cloudflare Stream public playback is disabled for private videos. '
+        'Signed playback must be implemented before private uploads migrate.',
+      );
+    }
     if (video.id == null) throw StateError('Video ID required.');
     final sourceUrl = await session.storage.getPublicUrl(
       storageId: 'public',

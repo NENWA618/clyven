@@ -58,3 +58,5 @@ public HTTPS source (do not enable this path for private uploads). This
 integration currently does not retry failed Stream jobs automatically, and
 does not implement signed playback tokens. Do not cut over protected video
 content until signed playback and access policy are implemented.
+
+Private video safety: Cloudflare Stream copy mode deliberately refuses videos with `isPublic=false` until signed playback is implemented.
