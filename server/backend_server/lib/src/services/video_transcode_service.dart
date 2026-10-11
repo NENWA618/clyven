@@ -27,7 +27,8 @@ class VideoTranscodeService {
   static const _scope = 'https://www.googleapis.com/auth/cloud-platform';
 
   static bool get _useStream =>
-      Platform.environment['GLYPHORA_TRANSCODER']?.toLowerCase() == 'cloudflare_stream';
+      Platform.environment['GLYPHORA_TRANSCODER']?.toLowerCase() ==
+      'cloudflare_stream';
 
   static String get _streamAccountId =>
       Platform.environment['CLOUDFLARE_ACCOUNT_ID']?.trim() ?? '';
@@ -207,19 +208,28 @@ class VideoTranscodeService {
     try {
       final request = await client.openUrl(
         method,
-        Uri.parse('https://api.cloudflare.com/client/v4/accounts/'
-            '$_streamAccountId/stream$path'),
+        Uri.parse(
+          'https://api.cloudflare.com/client/v4/accounts/'
+          '$_streamAccountId/stream$path',
+        ),
       );
-      request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $_streamToken');
+      request.headers.set(
+        HttpHeaders.authorizationHeader,
+        'Bearer $_streamToken',
+      );
       request.headers.contentType = ContentType.json;
       if (body != null) request.write(jsonEncode(body));
       final response = await request.close();
       final payload = await utf8.decoder.bind(response).join();
       final decoded = jsonDecode(payload);
-      if (response.statusCode < 200 || response.statusCode >= 300 ||
-          decoded is! Map<String, dynamic> || decoded['success'] != true ||
+      if (response.statusCode < 200 ||
+          response.statusCode >= 300 ||
+          decoded is! Map<String, dynamic> ||
+          decoded['success'] != true ||
           decoded['result'] is! Map<String, dynamic>) {
-        throw StateError('Cloudflare Stream API error: ${response.statusCode} ${payload.length > 1000 ? payload.substring(0, 1000) : payload}');
+        throw StateError(
+          'Cloudflare Stream API error: ${response.statusCode} ${payload.length > 1000 ? payload.substring(0, 1000) : payload}',
+        );
       }
       return decoded['result'] as Map<String, dynamic>;
     } finally {
@@ -242,13 +252,19 @@ class VideoTranscodeService {
       path: video.videoStorageKey,
     );
     if (sourceUrl == null || sourceUrl.scheme != 'https') {
-      throw StateError('Cloudflare Stream requires an accessible HTTPS source video URL.');
+      throw StateError(
+        'Cloudflare Stream requires an accessible HTTPS source video URL.',
+      );
     }
-    final result = await _streamRequest('POST', '/copy', body: {
-      'url': sourceUrl.toString(),
-      'meta': {'glyphoraVideoId': video.id.toString()},
-      'requireSignedURLs': false,
-    });
+    final result = await _streamRequest(
+      'POST',
+      '/copy',
+      body: {
+        'url': sourceUrl.toString(),
+        'meta': {'glyphoraVideoId': video.id.toString()},
+        'requireSignedURLs': false,
+      },
+    );
     final uid = result['uid']?.toString();
     if (uid == null || uid.isEmpty) {
       throw StateError('Cloudflare Stream response missing uid.');
@@ -276,12 +292,17 @@ class VideoTranscodeService {
     final ready = result['readyToStream'] == true;
     final playback = result['playback'];
     final manifest = playback is Map ? playback['hls']?.toString() : null;
-    if (ready && manifest != null && Uri.tryParse(manifest)?.scheme == 'https') {
+    if (ready &&
+        manifest != null &&
+        Uri.tryParse(manifest)?.scheme == 'https') {
       video.hlsManifestStorageKey = manifest;
       video.transcodeState = 'SUCCEEDED';
     } else if (state == 'error') {
       video.transcodeState = 'FAILED';
-      session.log('Cloudflare Stream processing failed videoId=${video.id}: $status', level: LogLevel.warning);
+      session.log(
+        'Cloudflare Stream processing failed videoId=${video.id}: $status',
+        level: LogLevel.warning,
+      );
     } else {
       video.transcodeState = 'PENDING';
     }

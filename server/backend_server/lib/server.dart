@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:serverpod_cloud_storage_r2/serverpod_cloud_storage_r2.dart' as r2;
+import 'package:serverpod_cloud_storage_r2/serverpod_cloud_storage_r2.dart'
+    as r2;
 
 import 'package:mailer/mailer.dart' as mailer;
 import 'package:mailer/smtp_server.dart';
@@ -35,10 +36,15 @@ void run(List<String> args) async {
   if (!isMaintenance) {
     final accountId = Platform.environment['CLOUDFLARE_ACCOUNT_ID']?.trim();
     final bucket = Platform.environment['CLOUDFLARE_R2_BUCKET']?.trim();
-    final publicHost = Platform.environment['CLOUDFLARE_R2_PUBLIC_HOST']?.trim();
-    final usingR2 = accountId != null && accountId.isNotEmpty &&
-        bucket != null && bucket.isNotEmpty &&
-        publicHost != null && publicHost.isNotEmpty;
+    final publicHost = Platform.environment['CLOUDFLARE_R2_PUBLIC_HOST']
+        ?.trim();
+    final usingR2 =
+        accountId != null &&
+        accountId.isNotEmpty &&
+        bucket != null &&
+        bucket.isNotEmpty &&
+        publicHost != null &&
+        publicHost.isNotEmpty;
 
     if (!usingR2 &&
         Platform.environment['GLYPHORA_REQUIRE_CLOUDFLARE'] == 'true') {
