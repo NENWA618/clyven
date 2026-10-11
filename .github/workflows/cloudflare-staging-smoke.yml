@@ -36,6 +36,8 @@ jobs:
               print("HTTP status:", exc.code)
               raise SystemExit("Staging API probe failed.")
       - name: Exercise Serverpod video feed endpoint (read-only)
+        id: feed
+        continue-on-error: true
         env:
           STAGING_HOST: ${{ secrets.GLYPHORA_CLOUDFLARE_PUBLIC_HOST }}
         run: |
@@ -68,7 +70,13 @@ jobs:
                   print("Serverpod video feed successfully queried staging Neon.")
           except urllib.error.HTTPError as exc:
               print("Video endpoint HTTP status:", exc.code)
-              raise SystemExit("Serverpod feed request failed; inspect new Container logs.")
+              for key in ("server", "cf-ray", "content-type", "cf-mitigated", "www-authenticate"):
+                  value = exc.headers.get(key)
+                  if value:
+                      print("HTTP header", key + ":", "(present)" if key == "www-authenticate" else value[:120])
+              body = exc.read(400).decode("utf-8", "replace")
+              print("HTTP response prefix:", body[:160].replace("\\n", " "))
+              raise SystemExit("Video feed HTTP request failed (Neon checks will still run).")
           PY
       - name: Install PostgreSQL client
         run: python3 -m pip install --quiet --disable-pip-version-check --break-system-packages 'psycopg[binary]'
@@ -111,3 +119,14 @@ jobs:
               print("Neon connection/query failed:", exc.__class__.__name__)
               raise SystemExit("Neon staging verification failed. No SQL changes were made.")
           PY
+
+      - name: Summarize API endpoint validation
+        if: always()
+        env:
+          FEED_OUTCOME: ${{ steps.feed.outcome }}
+        run: |
+          if [ "$FEED_OUTCOME" != 'success' ]; then
+            echo 'Video API did not pass. Neon verification is independent and may have passed.'
+            exit 1
+          fi
+          echo 'Video API smoke test passed.'
