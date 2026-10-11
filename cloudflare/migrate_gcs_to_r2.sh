@@ -16,7 +16,10 @@ if [[ -z "$SOURCE" || -z "$DESTINATION" ]]; then
   echo "         GLYPHORA_R2_REMOTE='r2:glyphora-video'" >&2
   exit 2
 fi
-if [[ "$SOURCE" == "$DESTINATION" || "$SOURCE" == "/" || "$DESTINATION" == "/" ]]; then
+# Require explicit bucket-scoped paths, never a bare remote or filesystem root.
+if [[ ! "$SOURCE" =~ ^[A-Za-z0-9_-]+:[^/[:space:]][^[:space:]]*$ ||
+      ! "$DESTINATION" =~ ^[A-Za-z0-9_-]+:[^/[:space:]][^[:space:]]*$ ||
+      "$SOURCE" == "$DESTINATION" ]]; then
   echo "Refusing identical or root-only source/destination." >&2
   exit 2
 fi

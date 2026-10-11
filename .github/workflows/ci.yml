@@ -97,6 +97,35 @@ jobs:
       - name: Validate Worker configuration and bundle (no deploy)
         run: npx wrangler deploy --dry-run --outdir /tmp/glyphora-cloudflare-dry-run
 
+  cloudflare-backfill-safety:
+    name: Check migration script safety
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check Bash syntax
+        run: bash -n cloudflare/migrate_gcs_to_r2.sh
+      - name: Verify non-destructive modes with fake rclone
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/glyphora-mock-bin
+          printf '#!/bin/sh\\nprintf "%%s\\n" "$*" >> "$MOCK_RCLONE_LOG"\\n' > /tmp/glyphora-mock-bin/rclone
+          chmod +x /tmp/glyphora-mock-bin/rclone
+          export PATH="/tmp/glyphora-mock-bin:$PATH"
+          export MOCK_RCLONE_LOG="$RUNNER_TEMP/rclone-commands.log"
+          export GLYPHORA_GCS_REMOTE='gcs:source-bucket'
+          export GLYPHORA_R2_REMOTE='r2:destination-bucket'
+          bash cloudflare/migrate_gcs_to_r2.sh
+          bash cloudflare/migrate_gcs_to_r2.sh copy
+          bash cloudflare/migrate_gcs_to_r2.sh verify
+          grep -q '^copy gcs:source-bucket r2:destination-bucket --dry-run ' "$MOCK_RCLONE_LOG"
+          grep -q '^copy gcs:source-bucket r2:destination-bucket --progress ' "$MOCK_RCLONE_LOG"
+          grep -q '^check gcs:source-bucket r2:destination-bucket --one-way --size-only ' "$MOCK_RCLONE_LOG"
+          if GLYPHORA_R2_REMOTE='r2:' bash cloudflare/migrate_gcs_to_r2.sh copy; then
+            echo 'Unsafe root-only remote accepted' >&2
+            exit 1
+          fi
+
   cloudflare-container-build:
     name: Build Cloudflare Serverpod container
     runs-on: ubuntu-latest
