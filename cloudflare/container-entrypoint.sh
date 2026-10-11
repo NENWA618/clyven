@@ -2,7 +2,7 @@
 set -eu
 host="${GLYPHORA_CLOUDFLARE_PUBLIC_HOST:-}"
 case "$host" in
-  ""|*/*|*:*|*' '*|*.run.app|*.googleapis.com|*.examplepod.com)
+  ""|*[!A-Za-z0-9.-]*|.*|*..*|*.-*|*-.*|*.run.app|*.googleapis.com|*.examplepod.com)
     echo 'Cloudflare API public hostname is missing or invalid.' >&2
     exit 1
     ;;

@@ -165,5 +165,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate Cloudflare API hostname overlay
+        run: bash cloudflare/test_container_entrypoint.sh
       - name: Build Cloudflare container image (no push or deploy)
         run: docker build --file Dockerfile.cloudflare --tag glyphora-cloudflare-ci:latest .
