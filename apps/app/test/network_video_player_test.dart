@@ -101,6 +101,7 @@ Widget player({
   bool compact = false,
   double? maxHeight,
   serverpod.Client? client,
+  String? preResolvedManifestUrl,
 }) => ProviderScope(
   overrides: [
     if (client != null) serverpodClientProvider.overrideWithValue(client),
@@ -119,6 +120,7 @@ Widget player({
             child: NetworkVideoPlayer(
               compact: compact,
               videoId: client == null ? null : 17,
+              preResolvedManifestUrl: preResolvedManifestUrl,
               videoUrl: url,
               coverUrl: '',
               subtitles: const [],
@@ -155,7 +157,11 @@ void main() {
       'portrait uses ${fallback ? 'ORIGINAL fallback' : 'HLS'} display ratio',
       (tester) async {
         await tester.pumpWidget(
-          player(client: TestManifestClient(), compact: true),
+          player(
+            client: TestManifestClient(),
+            compact: true,
+            preResolvedManifestUrl: 'https://media.example/manifest.m3u8',
+          ),
         );
         await tester.pump();
         expect(platform.sources, ['https://media.example/manifest.m3u8']);
@@ -233,8 +239,12 @@ void main() {
           expect(platform.paused.last, 1);
           await tester.pumpWidget(shorts(true));
           await tester.pump();
-          expect(platform.played, [1, 1]);
-          expect(platform.events.length, 1);
+          // Deactivation releases the native player; reactivation creates
+          // a fresh controller rather than reusing the disposed one.
+          expect(platform.events.length, 2);
+          platform.ready(2, size: source, rotation: rotation);
+          await tester.pumpAndSettle();
+          expect(platform.played, [1, 2]);
           expect(tester.takeException(), isNull);
           await tester.pumpWidget(const SizedBox());
           await tester.runAsync(() => Future<void>.delayed(Duration.zero));
