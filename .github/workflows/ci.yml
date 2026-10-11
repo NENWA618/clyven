@@ -119,6 +119,11 @@ jobs:
           export GLYPHORA_GCS_REMOTE='gcs:source-bucket'
           export GLYPHORA_R2_REMOTE='r2:destination-bucket'
           bash cloudflare/migrate_gcs_to_r2.sh
+          if bash cloudflare/migrate_gcs_to_r2.sh copy; then
+            echo 'Copy without confirmation was accepted' >&2
+            exit 1
+          fi
+          export GLYPHORA_CONFIRM_R2_COPY=YES
           bash cloudflare/migrate_gcs_to_r2.sh copy
           bash cloudflare/migrate_gcs_to_r2.sh verify
           bash cloudflare/migrate_gcs_to_r2.sh verify-deep

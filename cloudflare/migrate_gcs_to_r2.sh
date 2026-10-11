@@ -29,6 +29,10 @@ case "$MODE" in
     rclone copy "$SOURCE" "$DESTINATION" --dry-run --progress --transfers 4 --checkers 8
     ;;
   copy)
+    if [[ "${GLYPHORA_CONFIRM_R2_COPY:-}" != 'YES' ]]; then
+      echo "Copy writes to R2. Set GLYPHORA_CONFIRM_R2_COPY=YES to proceed." >&2
+      exit 2
+    fi
     echo "Non-destructive copy: $SOURCE -> $DESTINATION"
     rclone copy "$SOURCE" "$DESTINATION" --immutable --progress --transfers 4 --checkers 8
     ;;
