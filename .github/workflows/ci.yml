@@ -8,9 +8,6 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -36,21 +33,6 @@ jobs:
       - name: Generate Flutter localizations
         working-directory: apps/app
         run: flutter gen-l10n
-
-      - name: Format migrated Serverpod files
-        working-directory: server/backend_server
-        run: dart format --output=write lib/server.dart lib/src/services/video_transcode_service.dart
-
-      - name: Commit formatter changes to main
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          if ! git diff --quiet -- server/backend_server/lib/server.dart server/backend_server/lib/src/services/video_transcode_service.dart; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add server/backend_server/lib/server.dart server/backend_server/lib/src/services/video_transcode_service.dart
-            git commit -m "style: format Cloudflare migration Dart files"
-            git push origin HEAD:main
-          fi
 
       - name: Check Serverpod formatting
         working-directory: server/backend_server
