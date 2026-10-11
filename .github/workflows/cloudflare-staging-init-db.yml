@@ -1,0 +1,74 @@
+name: Initialize isolated Neon staging schema (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type INITIALIZE-STAGING to create Serverpod tables ONLY in the empty isolated staging database'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glyphora-staging-database-migrations
+  cancel-in-progress: false
+
+jobs:
+  initialize:
+    if: ${{ inputs.confirmation == 'INITIALIZE-STAGING' }}
+    runs-on: ubuntu-latest
+    environment: cloudflare-staging
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+      - name: Verify staging identity and initialize empty schema
+        env:
+          PGHOST: ${{ secrets.GLYPHORA_STAGING_DB_HOST }}
+          PGDATABASE: ${{ secrets.GLYPHORA_STAGING_DB_NAME }}
+          PGUSER: ${{ secrets.GLYPHORA_STAGING_DB_USER }}
+          PGPASSWORD: ${{ secrets.STAGING_SERVERPOD_PASSWORD_database }}
+          PGSSLMODE: require
+          PGCONNECT_TIMEOUT: '15'
+        run: |
+          set -euo pipefail
+          # This job is intentionally bound to the originally approved isolated
+          # Neon branch, database and role. No fallback to production is permitted.
+          test "$PGHOST" = 'ep-super-violet-azdka6sy.c-3.ap-southeast-1.aws.neon.tech' || { echo 'Wrong staging host; refusing migration'; exit 1; }
+          test "$PGDATABASE" = 'glyphora_staging' || { echo 'Wrong staging database; refusing migration'; exit 1; }
+          test "$PGUSER" = 'glyphora_staging_user' || { echo 'Wrong staging role; refusing migration'; exit 1; }
+          test -n "$PGPASSWORD" || { echo 'Missing staging DB password'; exit 1; }
+          export PGOPTIONS='-c statement_timeout=60000 -c lock_timeout=10000'
+          actual_database="$(psql -X -At -v ON_ERROR_STOP=1 -c 'SELECT current_database()')"
+          actual_user="$(psql -X -At -v ON_ERROR_STOP=1 -c 'SELECT current_user')"
+          test "$actual_database" = "$PGDATABASE" || exit 1
+          test "$actual_user" = "$PGUSER" || exit 1
+          table_count="$(psql -X -At -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'")"
+          echo "Preflight public tables: $table_count"
+          test "$table_count" = '0' || { echo 'Database is not empty; refusing potentially destructive migration'; exit 1; }
+          registry='server/backend_server/migrations/migration_registry.txt'
+          test -f "$registry"
+          count=0
+          while IFS= read -r version || test -n "$version"; do
+            case "$version" in ''|'#'*) continue ;; esac
+            case "$version" in *[!a-zA-Z0-9_-]*) echo 'Invalid migration ID'; exit 1 ;; esac
+            sql="server/backend_server/migrations/$version/migration.sql"
+            test -f "$sql" || { echo "Missing migration file for $version"; exit 1; }
+            count=$((count + 1))
+          done < "$registry"
+          echo "Validated migration files: $count"
+          # Serverpod's own generated migration.sql files contain BEGIN/COMMIT,
+          # version-table updates and ordered schema changes.
+          while IFS= read -r version || test -n "$version"; do
+            case "$version" in ''|'#'*) continue ;; esac
+            echo "Applying migration: $version"
+            psql -X -q -v ON_ERROR_STOP=1 -f "server/backend_server/migrations/$version/migration.sql" >/dev/null
+          done < "$registry"
+          psql -X -At -v ON_ERROR_STOP=1 -c "SELECT 'Public base tables: ' || count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'"
+          psql -X -At -v ON_ERROR_STOP=1 -c "SELECT module || ': ' || version FROM serverpod_migrations ORDER BY module"
+          echo 'Isolated staging schema initialization finished.'
