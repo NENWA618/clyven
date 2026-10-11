@@ -30,7 +30,7 @@ case "$MODE" in
     ;;
   copy)
     echo "Non-destructive copy: $SOURCE -> $DESTINATION"
-    rclone copy "$SOURCE" "$DESTINATION" --progress --transfers 4 --checkers 8
+    rclone copy "$SOURCE" "$DESTINATION" --immutable --progress --transfers 4 --checkers 8
     ;;
   verify)
     echo "Checking source/destination objects; no deletions or writes."
