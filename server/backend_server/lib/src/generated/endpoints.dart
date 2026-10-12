@@ -37,14 +37,12 @@ import 'package:glyphora_backend_server/src/generated/asr_job_status.dart'
     as _i23;
 import 'package:glyphora_backend_server/src/generated/knowledge_state_query.dart'
     as _i24;
-import 'package:glyphora_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
-    as _i25;
 import 'package:glyphora_backend_server/src/generated/video_content_type.dart'
-    as _i26;
+    as _i25;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i27;
+    as _i26;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i28;
+    as _i27;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -2894,37 +2892,6 @@ class Endpoints extends _i1.EndpointDispatch {
                     cueId: params['cueId'],
                   ),
         ),
-        'replaceKaraokeSegments': _i1.MethodConnector(
-          name: 'replaceKaraokeSegments',
-          params: {
-            'cueId': _i1.ParameterDescription(
-              name: 'cueId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'segments': _i1.ParameterDescription(
-              name: 'segments',
-              type: _i1.getType<List<_i25.SubtitleKaraokeSegmentInput>>(),
-              nullable: false,
-            ),
-            'scriptCode': _i1.ParameterDescription(
-              name: 'scriptCode',
-              type: _i1.getType<String?>(),
-              nullable: true,
-            ),
-          },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['subtitle'] as _i18.SubtitleEndpoint)
-                  .replaceKaraokeSegments(
-                    session,
-                    cueId: params['cueId'],
-                    segments: params['segments'],
-                    scriptCode: params['scriptCode'],
-                  ),
-        ),
       },
     );
     connectors['video'] = _i1.EndpointConnector(
@@ -2976,7 +2943,7 @@ class Endpoints extends _i1.EndpointDispatch {
             ),
             'contentType': _i1.ParameterDescription(
               name: 'contentType',
-              type: _i1.getType<_i26.VideoContentType>(),
+              type: _i1.getType<_i25.VideoContentType>(),
               nullable: false,
             ),
             'languageCode': _i1.ParameterDescription(
@@ -3036,7 +3003,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'contentType': _i1.ParameterDescription(
               name: 'contentType',
-              type: _i1.getType<_i26.VideoContentType?>(),
+              type: _i1.getType<_i25.VideoContentType?>(),
               nullable: true,
             ),
           },
@@ -3534,9 +3501,9 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i27.Endpoints()
+    modules['serverpod_auth_idp'] = _i26.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i28.Endpoints()
+    modules['serverpod_auth_core'] = _i27.Endpoints()
       ..initializeEndpoints(server);
   }
 }

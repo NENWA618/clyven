@@ -342,7 +342,7 @@ class _VideoEditPageState extends State<VideoEditPage> {
                     videoUrl: videoUrl!,
                     captionText: null,
                     captionCueStartMs: null,
-                    karaokeSegments: const [],
+                    captionCueEndMs: null,
                     onTimeUpdate: () {},
                   )
                 else

@@ -1,6 +1,0 @@
-class: SubtitleKaraokeSegmentInput
-
-fields:
-  startOffsetMs: int
-  endOffsetMs: int
-  text: String

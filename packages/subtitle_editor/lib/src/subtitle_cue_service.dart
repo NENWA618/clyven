@@ -70,20 +70,6 @@ class SubtitleCueService {
     onDraftChanged?.call();
   }
 
-  Future<List<SubtitleKaraokeSegment>> replaceKaraokeSegments({
-    required int cueId,
-    required List<SubtitleKaraokeSegmentInput> segments,
-  }) async {
-    final saved = await client.subtitle.replaceKaraokeSegments(
-      cueId: cueId,
-      segments: segments,
-      scriptCode: scriptCode,
-    );
-
-    onDraftChanged?.call();
-    return saved;
-  }
-
   Future<List<SubtitleCueDetail>> loadCues({
     required int videoId,
     required String languageCode,

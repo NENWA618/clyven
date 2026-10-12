@@ -17,8 +17,6 @@ import 'subtitle_cue_drag_controller.dart';
 import 'components/subtitle_cue_list.dart';
 import 'subtitle_cue_service.dart';
 import 'subtitle_cue_controller.dart';
-import 'subtitle_karaoke_controller.dart';
-import 'components/subtitle_karaoke_editor.dart';
 import 'subtitle_workspace_service.dart';
 import 'subtitle_workspace_controller.dart';
 import 'subtitle_navigation_controller.dart';
@@ -77,7 +75,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
   late final SubtitleWorkspaceService _workspaceService;
   late final SubtitleWorkspaceController _workspaceController;
   late final SubtitleCueController _cueController;
-  late final SubtitleKaraokeController _karaokeController;
   late final SubtitleVideoController _videoController;
   late final SubtitleTimelineController _timelineController;
   late final SubtitleCueDragController _cueDragController;
@@ -160,18 +157,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     _cueController = SubtitleCueController(
       service: _cueService,
       getCues: () => _workspaceController.cues,
-      isLoggedIn: () => client.auth.isAuthenticated,
-      onChanged: () {
-        if (!mounted) {
-          return;
-        }
-
-        setState(() {});
-      },
-    );
-
-    _karaokeController = SubtitleKaraokeController(
-      service: _cueService,
       isLoggedIn: () => client.auth.isAuthenticated,
       onChanged: () {
         if (!mounted) {
@@ -396,36 +381,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
     }
 
     _cueController.useCurrentTimeAsEnd(currentMs);
-  }
-
-  SubtitleCueDetail? _selectedCueDetail() {
-    final cueId = selectedCueId;
-
-    if (cueId == null) {
-      return null;
-    }
-
-    for (final detail in cues) {
-      if (detail.cue.id == cueId) {
-        return detail;
-      }
-    }
-
-    return null;
-  }
-
-  String _selectedCueText(SubtitleCueDetail detail) {
-    final cueId = detail.cue.id;
-
-    if (cueId != null) {
-      final edited = _cueController.editedTexts[cueId];
-
-      if (edited != null && edited.trim().isNotEmpty) {
-        return edited;
-      }
-    }
-
-    return detail.cue.text;
   }
 
   SubtitleCueDetail? _activeCueDetail() {
@@ -654,8 +609,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
       _refreshPublishStatus();
     }
 
-    final selectedKaraokeCue = _selectedCueDetail();
-
     return div(classes: 'subtitle-editor-page', [
       div(classes: 'subtitle-editor-toolbar', [
         Link(
@@ -706,9 +659,7 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
             videoUrl: videoUrl!,
             captionText: _activeCueText(),
             captionCueStartMs: _activeCueDetail()?.cue.startMs,
-            karaokeSegments:
-                _activeCueDetail()?.karaokeSegments ??
-                const <SubtitleKaraokeSegment>[],
+            captionCueEndMs: _activeCueDetail()?.cue.endMs,
             onTimeUpdate: () {
               final currentMs = _videoController.currentTimeMs();
 
@@ -797,71 +748,6 @@ class _SubtitleEditorPageState extends State<SubtitleEditorPage> {
           },
         ),
         _buildQuickSubtitleEditor(),
-
-        if (selectedKaraokeCue != null)
-          SubtitleKaraokeEditor(
-            detail: selectedKaraokeCue,
-            drafts: _karaokeController.draftsFor(selectedKaraokeCue),
-            currentVideoTimeMs: currentVideoTimeMs,
-            saving:
-                selectedKaraokeCue.cue.id != null &&
-                _karaokeController.savingCueIds.contains(
-                  selectedKaraokeCue.cue.id,
-                ),
-            error: selectedKaraokeCue.cue.id == null
-                ? null
-                : _karaokeController.errors[selectedKaraokeCue.cue.id],
-            onGenerateFromSubtitle: () {
-              _karaokeController.initializeFromSubtitle(
-                selectedKaraokeCue,
-                _selectedCueText(selectedKaraokeCue),
-              );
-            },
-            onClear: () {
-              _karaokeController.clear(selectedKaraokeCue);
-            },
-            onAdd: () {
-              _karaokeController.addSegment(selectedKaraokeCue);
-            },
-            onDelete: (index) {
-              _karaokeController.removeSegment(selectedKaraokeCue, index);
-            },
-            onTextChanged: (index, value) {
-              _karaokeController.updateText(selectedKaraokeCue, index, value);
-            },
-            onStartChanged: (index, value) {
-              _karaokeController.updateStart(selectedKaraokeCue, index, value);
-            },
-            onEndChanged: (index, value) {
-              _karaokeController.updateEnd(selectedKaraokeCue, index, value);
-            },
-            onUseCurrentStart: (index) {
-              final currentMs =
-                  _videoController.currentTimeMs() ?? currentVideoTimeMs;
-
-              _karaokeController.useCurrentTimeAsStart(
-                selectedKaraokeCue,
-                index,
-                currentMs,
-              );
-            },
-            onUseCurrentEnd: (index) {
-              final currentMs =
-                  _videoController.currentTimeMs() ?? currentVideoTimeMs;
-
-              _karaokeController.useCurrentTimeAsEnd(
-                selectedKaraokeCue,
-                index,
-                currentMs,
-              );
-            },
-            onSeekVideo: (milliseconds) {
-              _videoController.seekTo(milliseconds);
-            },
-            onSave: () {
-              _karaokeController.save(selectedKaraokeCue);
-            },
-          ),
 
         SubtitleCreatePanel(
           startTime: _cueController.newCueStart,

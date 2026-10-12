@@ -52,7 +52,7 @@ Glyphora 由 5 个前端应用、1 个后端服务和 3 个共享包组成，使
 ### 字幕与语言学习
 
 * 字幕轨道，支持逐句和逐词（token）级数据
-* 卡拉 OK 式逐字高亮（karaoke segments）
+* 卡拉 OK 式逐字高亮（按 cue 时长自动均分）
 * SRT 导入与导出
 * AI 自动生成字幕（Deepgram ASR，`asr_job_processor`）
 * 人工审核工作流：审核队列、审核任务、审核仪表盘
@@ -229,7 +229,7 @@ notification_endpoint          通知列表
 notification_settings_endpoint 通知设置
 push_device_endpoint           登记与注销设备推送令牌
 privacy_settings_endpoint      隐私设置
-subtitle_endpoint              字幕轨道、cue、token、karaoke
+subtitle_endpoint              字幕轨道、cue、token
 review_endpoint                字幕审核队列与任务
 dictionary_endpoint            词典查询
 dictionary_import_endpoint     词典批量导入
@@ -411,7 +411,7 @@ dart test
 * [x] 首页、发现页、视频搜索、视频详情与播放
 * [x] 视频投稿基础流程与视频系列
 * [x] 评论、创作者、视频互动、历史、通知、个人资料模块
-* [x] 字幕数据结构（轨道、cue、token、karaoke）与播放联动
+* [x] 字幕数据结构（轨道、cue、token）与播放联动
 * [x] SRT 导入导出与人工审核工作流
 * [x] ASR 自动生成字幕（Deepgram）
 * [x] 词典查词与批量导入

@@ -371,30 +371,20 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     );
   }
 
-  List<serverpod.SubtitleKaraokeSegment> _sortedKaraokeSegments() {
-    final requestedScript = scriptCode?.trim().toLowerCase();
-
-    final segments =
-        (detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[])
-            .where((segment) {
-              if (requestedScript == null || requestedScript.isEmpty) {
-                return true;
-              }
-
-              final segmentScript = segment.scriptCode?.trim().toLowerCase();
-
-              return segmentScript == null ||
-                  segmentScript.isEmpty ||
-                  segmentScript == requestedScript;
-            })
-            .toList()
-          ..sort((a, b) => a.position.compareTo(b.position));
-
-    return segments;
-  }
-
   String _normalizeKaraokeUnit(String value) {
     return value.replaceAll(RegExp(r'\s+'), '');
+  }
+
+  /// How far the cue has played, 0..1. Characters are highlighted left to
+  /// right, spread evenly over the cue's duration.
+  double _cueProgress() {
+    final durationMs = detail.cue.endMs - detail.cue.startMs;
+
+    if (durationMs <= 0) return 1;
+
+    return ((videoPositionMs - detail.cue.startMs) / durationMs)
+        .clamp(0.0, 1.0)
+        .toDouble();
   }
 
   double _karaokeProgressForTokenRange(
@@ -402,9 +392,7 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     int startPosition,
     int endPosition,
   ) {
-    final segments = _sortedKaraokeSegments();
-
-    if (segments.isEmpty || tokens.isEmpty) {
+    if (tokens.isEmpty) {
       return 0;
     }
 
@@ -432,39 +420,15 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       return 0;
     }
 
-    var segmentCursor = 0;
-    final matches = <serverpod.SubtitleKaraokeSegment>[];
+    final span = requestedEnd - requestedStart;
 
-    for (final segment in segments) {
-      final length = _normalizeKaraokeUnit(segment.text).runes.length;
-      final segmentStart = segmentCursor;
-      final segmentEnd = segmentCursor + length;
-
-      final overlaps =
-          segmentEnd > requestedStart && segmentStart < requestedEnd;
-
-      if (overlaps) {
-        matches.add(segment);
-      }
-
-      segmentCursor = segmentEnd;
-    }
-
-    if (matches.isEmpty) {
+    if (span <= 0 || tokenCursor <= 0) {
       return 0;
     }
 
-    final relativeMs = videoPositionMs - detail.cue.startMs;
-    final startMs = matches.first.startOffsetMs;
-    final endMs = matches.last.endOffsetMs;
-
-    if (relativeMs <= startMs) return 0;
-    if (relativeMs >= endMs) return 1;
-
-    final durationMs = endMs - startMs;
-    if (durationMs <= 0) return 1;
-
-    return ((relativeMs - startMs) / durationMs).clamp(0.0, 1.0).toDouble();
+    return ((_cueProgress() * tokenCursor - requestedStart) / span)
+        .clamp(0.0, 1.0)
+        .toDouble();
   }
 
   LinearGradient? _karaokeGradient(BuildContext context, double progress) {
@@ -486,11 +450,9 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlainKaraoke(
-    BuildContext context,
-    List<serverpod.SubtitleKaraokeSegment> segments,
-  ) {
-    final relativeMs = videoPositionMs - detail.cue.startMs;
+  Widget _buildPlainKaraoke(BuildContext context) {
+    final runes = _displayText().replaceAll(RegExp(r'\s+'), ' ').runes.toList();
+    final overall = _cueProgress();
     final accent = Theme.of(context).colorScheme.primary;
 
     return Wrap(
@@ -498,35 +460,23 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       spacing: 0,
       runSpacing: 4,
       children: [
-        for (final segment in segments)
+        for (var index = 0; index < runes.length; index++)
           Builder(
             builder: (context) {
-              final durationMs = segment.endOffsetMs - segment.startOffsetMs;
-
-              double progress;
-
-              if (relativeMs <= segment.startOffsetMs) {
-                progress = 0;
-              } else if (relativeMs >= segment.endOffsetMs) {
-                progress = 1;
-              } else if (durationMs <= 0) {
-                progress = 1;
-              } else {
-                progress = (relativeMs - segment.startOffsetMs) / durationMs;
-              }
-
-              final safeProgress = progress.clamp(0.0, 1.0).toDouble();
+              final progress = (overall * runes.length - index)
+                  .clamp(0.0, 1.0)
+                  .toDouble();
 
               return ShaderMask(
                 blendMode: BlendMode.srcIn,
                 shaderCallback: (bounds) {
-                  if (safeProgress <= 0) {
+                  if (progress <= 0) {
                     return const LinearGradient(
                       colors: [Colors.white, Colors.white],
                     ).createShader(bounds);
                   }
 
-                  if (safeProgress >= 1) {
+                  if (progress >= 1) {
                     return LinearGradient(
                       colors: [accent, accent],
                     ).createShader(bounds);
@@ -534,11 +484,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
                   return LinearGradient(
                     colors: [accent, accent, Colors.white, Colors.white],
-                    stops: [0.0, safeProgress, safeProgress, 1.0],
+                    stops: [0.0, progress, progress, 1.0],
                   ).createShader(bounds);
                 },
                 child: Text(
-                  segment.text,
+                  String.fromCharCode(runes[index]),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: _subtitleFontSize(context),
@@ -560,24 +510,6 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
     return width < 600 ? 12.0 : 17.0;
   }
 
-  String _normalizeSubtitleForComparison(String value) {
-    // Karaoke segments are edited independently and do not have to keep
-    // the exact spaces from the sentence. Compare visible text, not storage
-    // whitespace, so "Xin " + "chao" still matches "Xin chao".
-    return value.replaceAll(RegExp(r'\s+'), '');
-  }
-
-  bool _karaokeMatchesDisplayText(
-    List<serverpod.SubtitleKaraokeSegment> segments,
-  ) {
-    if (segments.isEmpty) return false;
-
-    final karaokeText = segments.map((segment) => segment.text).join();
-
-    return _normalizeSubtitleForComparison(karaokeText) ==
-        _normalizeSubtitleForComparison(_displayText());
-  }
-
   bool _tokensMatchDisplayText(List<serverpod.SubtitleToken> tokens) {
     if (tokens.isEmpty) return false;
 
@@ -595,43 +527,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final karaokeSegments = _sortedKaraokeSegments();
     final tokensMatch =
         detail.tokens.isNotEmpty && _tokensMatchDisplayText(detail.tokens);
 
-    final debugLabel =
-        'tokens=${detail.tokens.length} | karaoke=${karaokeSegments.length} | script=${scriptCode ?? '-'}';
-
     if (!tokensMatch) {
-      if (karaokeSegments.isNotEmpty &&
-          _karaokeMatchesDisplayText(karaokeSegments)) {
-        return _buildPlainKaraoke(context, karaokeSegments);
-      }
-
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            debugLabel,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.redAccent,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            _displayText(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: _subtitleFontSize(context),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      );
+      return _buildPlainKaraoke(context);
     }
 
     final tokens = [...detail.tokens]
@@ -827,26 +727,11 @@ class InteractiveSubtitleOverlay extends ConsumerWidget {
       index++;
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          debugLabel,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.redAccent,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 6,
-          runSpacing: 4,
-          children: children,
-        ),
-      ],
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 6,
+      runSpacing: 4,
+      children: children,
     );
   }
 }

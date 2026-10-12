@@ -828,7 +828,6 @@ button:disabled {
 .glyphora-admin-content .subtitle-side-panel,
 .glyphora-admin-content .subtitle-cue-list,
 .glyphora-admin-content .subtitle-timeline,
-.glyphora-admin-content .subtitle-karaoke-editor,
 .glyphora-admin-content .subtitle-srt-import-panel,
 .glyphora-admin-content .subtitle-create-panel {
   background-color: var(--bg) !important;
