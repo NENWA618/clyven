@@ -1,7 +1,6 @@
 import 'package:glyphora_web_l10n/web_l10n.dart';
 import 'dart:html' as html;
 
-import 'package:glyphora_backend_client/backend_client.dart' as serverpod;
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/dom.dart' as dom;
 import 'package:jaspr/jaspr.dart';
@@ -11,7 +10,7 @@ class SubtitleVideoPanel extends StatefulComponent {
     required this.videoUrl,
     required this.captionText,
     required this.captionCueStartMs,
-    required this.karaokeSegments,
+    required this.captionCueEndMs,
     required this.onTimeUpdate,
     super.key,
   });
@@ -19,7 +18,7 @@ class SubtitleVideoPanel extends StatefulComponent {
   final String videoUrl;
   final String? captionText;
   final int? captionCueStartMs;
-  final List<serverpod.SubtitleKaraokeSegment> karaokeSegments;
+  final int? captionCueEndMs;
   final void Function() onTimeUpdate;
 
   @override
@@ -227,50 +226,20 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
         '${secs.toString().padLeft(2, '0')}';
   }
 
-  String _normalizeCaptionForKaraoke(String value) {
-    return value.replaceAll(RegExp(r'\s+'), '').trim();
-  }
-
-  bool _karaokeMatchesCaption(String caption) {
-    if (component.karaokeSegments.isEmpty) {
-      return false;
-    }
-
-    final karaokeText = component.karaokeSegments
-        .map((segment) => segment.text)
-        .join();
-
-    return _normalizeCaptionForKaraoke(karaokeText) ==
-        _normalizeCaptionForKaraoke(caption);
-  }
-
-  Component _karaokeCaption(
-    List<serverpod.SubtitleKaraokeSegment> rawSegments,
-    int cueStartMs,
-  ) {
-    final segments = [...rawSegments]
-      ..sort((a, b) => a.position.compareTo(b.position));
-
+  // Karaoke-style highlight: characters are coloured left to right, spread
+  // evenly over the active cue's duration.
+  Component _progressCaption(String caption, int cueStartMs, int cueEndMs) {
+    final runes = caption.runes.toList();
+    final durationMs = cueEndMs - cueStartMs;
     final relativeMs = (_currentTime * 1000).round() - cueStartMs;
 
-    String styleFor(serverpod.SubtitleKaraokeSegment segment) {
-      final startMs = segment.startOffsetMs;
-      final endMs = segment.endOffsetMs;
-      final durationMs = endMs - startMs;
+    final overall = durationMs <= 0
+        ? 1.0
+        : (relativeMs / durationMs).clamp(0.0, 1.0);
 
-      double progress;
-
-      if (relativeMs <= startMs) {
-        progress = 0;
-      } else if (relativeMs >= endMs) {
-        progress = 1;
-      } else if (durationMs <= 0) {
-        progress = 1;
-      } else {
-        progress = (relativeMs - startMs) / durationMs;
-      }
-
-      final percent = (progress.clamp(0.0, 1.0) * 100).toStringAsFixed(2);
+    String styleFor(int index) {
+      final progress = (overall * runes.length - index).clamp(0.0, 1.0);
+      final percent = (progress * 100).toStringAsFixed(2);
 
       return 'background: linear-gradient('
           '90deg, #60a5fa 0%, #60a5fa $percent%, '
@@ -281,8 +250,10 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
     }
 
     return span(classes: 'subtitle-video-caption', [
-      for (final segment in segments)
-        span(attributes: {'style': styleFor(segment)}, [.text(segment.text)]),
+      for (var i = 0; i < runes.length; i++)
+        span(attributes: {'style': styleFor(i)}, [
+          .text(String.fromCharCode(runes[i])),
+        ]),
     ]);
   }
 
@@ -359,12 +330,12 @@ class _SubtitleVideoPanelState extends State<SubtitleVideoPanel> {
 
         if (_captionsVisible && caption != null && caption.isNotEmpty)
           div(classes: 'subtitle-video-caption-layer', [
-            if (component.karaokeSegments.isNotEmpty &&
-                component.captionCueStartMs != null &&
-                _karaokeMatchesCaption(caption))
-              _karaokeCaption(
-                component.karaokeSegments,
+            if (component.captionCueStartMs != null &&
+                component.captionCueEndMs != null)
+              _progressCaption(
+                caption,
                 component.captionCueStartMs!,
+                component.captionCueEndMs!,
               )
             else
               span(classes: 'subtitle-video-caption', [.text(caption)]),

@@ -424,81 +424,27 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
     return null;
   }
 
-  List<api.SubtitleKaraokeSegment> _segments(
-    api.SubtitleCueDetail detail,
-    String? scriptCode,
-  ) {
-    final requested = scriptCode?.trim().toLowerCase();
-    final raw = detail.karaokeSegments ?? const <api.SubtitleKaraokeSegment>[];
-
-    final result = raw.where((segment) {
-      if (requested == null || requested.isEmpty) return true;
-
-      final segmentScript = segment.scriptCode?.trim().toLowerCase();
-
-      return segmentScript == null ||
-          segmentScript.isEmpty ||
-          segmentScript == requested;
-    }).toList()..sort((a, b) => a.position.compareTo(b.position));
-
-    return result;
-  }
-
-  String _normalizeCaptionForKaraoke(String value) {
-    return value.replaceAll(RegExp(r'\s+'), '');
-  }
-
-  bool _karaokeMatches(
-    api.SubtitleCueDetail detail,
-    List<api.SubtitleKaraokeSegment> segments,
-  ) {
-    if (segments.isEmpty) return false;
-
-    final karaokeText = segments.map((segment) => segment.text).join();
-
-    return _normalizeCaptionForKaraoke(karaokeText) ==
-        _normalizeCaptionForKaraoke(detail.cue.text);
-  }
-
+  // Karaoke-style highlight: characters are coloured left to right, spread
+  // evenly over the active cue's duration.
   Component _caption(
     api.SubtitleCueDetail detail,
     String? scriptCode, {
     bool secondary = false,
   }) {
-    final segments = _segments(detail, scriptCode);
+    final runes = detail.cue.text.runes.toList();
+    final durationMs = detail.cue.endMs - detail.cue.startMs;
+    final relativeMs = (_currentTime * 1000).round() - detail.cue.startMs;
 
-    if (!_karaokeMatches(detail, segments)) {
-      return span(
-        classes:
-            'watch-caption-text${secondary ? ' watch-caption-secondary' : ''}',
-        [.text(detail.cue.text)],
-      );
-    }
+    final overall = durationMs <= 0
+        ? 1.0
+        : (relativeMs / durationMs).clamp(0.0, 1.0);
 
-    final currentMs = (_currentTime * 1000).round();
-    final relativeMs = currentMs - detail.cue.startMs;
+    final completed = secondary ? '#a7f3d0' : '#60a5fa';
+    final pending = secondary ? '#d1d5db' : '#ffffff';
 
-    String styleFor(api.SubtitleKaraokeSegment segment) {
-      final startMs = segment.startOffsetMs;
-      final endMs = segment.endOffsetMs;
-      final durationMs = endMs - startMs;
-
-      double progress;
-
-      if (relativeMs <= startMs) {
-        progress = 0;
-      } else if (relativeMs >= endMs) {
-        progress = 1;
-      } else if (durationMs <= 0) {
-        progress = 1;
-      } else {
-        progress = (relativeMs - startMs) / durationMs;
-      }
-
-      final percent = (progress.clamp(0.0, 1.0) * 100).toStringAsFixed(2);
-
-      final completed = secondary ? '#a7f3d0' : '#60a5fa';
-      final pending = secondary ? '#d1d5db' : '#ffffff';
+    String styleFor(int index) {
+      final progress = (overall * runes.length - index).clamp(0.0, 1.0);
+      final percent = (progress * 100).toStringAsFixed(2);
 
       return 'background: linear-gradient(90deg, '
           '$completed 0%, $completed $percent%, '
@@ -513,8 +459,10 @@ class _WatchSubtitlePlayerState extends State<WatchSubtitlePlayer> {
           'watch-caption-text watch-caption-karaoke'
           '${secondary ? ' watch-caption-secondary' : ''}',
       [
-        for (final segment in segments)
-          span(attributes: {'style': styleFor(segment)}, [.text(segment.text)]),
+        for (var i = 0; i < runes.length; i++)
+          span(attributes: {'style': styleFor(i)}, [
+            .text(String.fromCharCode(runes[i])),
+          ]),
       ],
     );
   }

@@ -886,10 +886,6 @@ class VideoEndpoint extends Endpoint {
       final cueIds = cues.map((row) => row.id).whereType<int>().toSet();
 
       if (cueIds.isNotEmpty) {
-        await SubtitleKaraokeSegment.db.deleteWhere(
-          session,
-          where: (row) => row.cueId.inSet(cueIds),
-        );
         await SubtitlePhrase.db.deleteWhere(
           session,
           where: (row) => row.cueId.inSet(cueIds),

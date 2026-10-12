@@ -265,12 +265,6 @@ class SubtitleEndpoint extends Endpoint {
       orderBy: (p) => p.startPosition,
     );
 
-    final karaokeSegments = await SubtitleKaraokeSegment.db.find(
-      session,
-      where: (segment) => segment.cueId.inSet(cueIds),
-      orderBy: (segment) => segment.position,
-    );
-
     final textsByCueId = <int, List<SubtitleCueText>>{};
 
     for (final text in texts) {
@@ -316,23 +310,6 @@ class SubtitleEndpoint extends Endpoint {
           .add(phrase);
     }
 
-    final karaokeSegmentsByCueId = <int, List<SubtitleKaraokeSegment>>{};
-
-    for (final segment in karaokeSegments) {
-      // Karaoke text follows the same strict script selection rule as
-      // SubtitleCueText. Never show timings from another script.
-      if (segment.scriptCode != selectedScriptCode) {
-        continue;
-      }
-
-      karaokeSegmentsByCueId
-          .putIfAbsent(
-            segment.cueId,
-            () => [],
-          )
-          .add(segment);
-    }
-
     return [
       for (final cue in cues)
         SubtitleCueDetail(
@@ -340,9 +317,6 @@ class SubtitleEndpoint extends Endpoint {
           texts: cue.id == null ? [] : textsByCueId[cue.id!] ?? [],
           tokens: cue.id == null ? [] : tokensByCueId[cue.id!] ?? [],
           phrases: cue.id == null ? [] : phrasesByCueId[cue.id!] ?? [],
-          karaokeSegments: cue.id == null
-              ? []
-              : karaokeSegmentsByCueId[cue.id!] ?? [],
         ),
     ];
   }
@@ -782,12 +756,6 @@ class SubtitleEndpoint extends Endpoint {
             where: (p) => p.cueId.equals(cueId),
             transaction: transaction,
           );
-
-          await SubtitleKaraokeSegment.db.deleteWhere(
-            session,
-            where: (segment) => segment.cueId.equals(cueId),
-            transaction: transaction,
-          );
         }
 
         await SubtitleCue.db.deleteWhere(
@@ -1134,21 +1102,6 @@ class SubtitleEndpoint extends Endpoint {
       excludeCueId: cueId,
     );
 
-    final newDurationMs = endMs - startMs;
-
-    final karaokeSegments = await SubtitleKaraokeSegment.db.find(
-      session,
-      where: (segment) => segment.cueId.equals(cueId),
-    );
-
-    for (final segment in karaokeSegments) {
-      if (segment.endOffsetMs > newDurationMs) {
-        throw Exception(
-          'Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¨Â¶â€¦Ã¥â€¡ÂºÃ¦â€“Â°Ã§Å¡â€žÃ¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€¢Â¿Ã¯Â¼Å’Ã¨Â¯Â·Ã¥â€¦Ë†Ã¨Â°Æ’Ã¦â€¢Â´ Karaoke Ã¦â€”Â¶Ã©â€”Â´Ã£â‚¬â€š',
-        );
-      }
-    }
-
     cue.startMs = startMs;
     cue.endMs = endMs;
     cue.updatedAt = DateTime.now();
@@ -1332,153 +1285,12 @@ class SubtitleEndpoint extends Endpoint {
       where: (p) => p.cueId.equals(cueId),
     );
 
-    await SubtitleKaraokeSegment.db.deleteWhere(
-      session,
-      where: (segment) => segment.cueId.equals(cueId),
-    );
-
     await SubtitleCue.db.deleteWhere(
       session,
       where: (c) => c.id.equals(cueId),
     );
 
     await _markDraftChanged(session, cue.trackId);
-  }
-
-  Future<List<SubtitleKaraokeSegment>> replaceKaraokeSegments(
-    Session session, {
-    required int cueId,
-    required List<SubtitleKaraokeSegmentInput> segments,
-    String? scriptCode,
-  }) async {
-    await _requireOwnedCueVideo(session, cueId);
-
-    if (session.authenticated == null) {
-      throw Exception(
-        'Ã©Å“â‚¬Ã¨Â¦ÂÃ§â„¢Â»Ã¥Â½â€¢Ã¥ÂÅ½Ã¦â€°ÂÃ¨Æ’Â½Ã¤Â¿Â®Ã¦â€Â¹ Karaoke Ã¥Â­â€”Ã¥Â¹â€¢',
-      );
-    }
-
-    final cue = await SubtitleCue.db.findById(
-      session,
-      cueId,
-    );
-
-    if (cue == null) {
-      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢');
-    }
-
-    final track = await SubtitleTrack.db.findById(
-      session,
-      cue.trackId,
-    );
-
-    if (track == null) {
-      throw Exception('Ã¦â€°Â¾Ã¤Â¸ÂÃ¥Ë†Â°Ã¥Â­â€”Ã¥Â¹â€¢Ã¨Â½Â¨');
-    }
-
-    await _ensurePublishBaseline(session, track.id!);
-
-    final cueDurationMs = cue.endMs - cue.startMs;
-
-    final effectiveScriptCode = await _analysisService.resolveScriptCode(
-      session,
-      languageCode: track.languageCode,
-      requestedScriptCode: scriptCode,
-      trackDefaultScriptCode: track.defaultScriptCode,
-    );
-
-    var previousEndMs = 0;
-
-    for (var index = 0; index < segments.length; index++) {
-      final segment = segments[index];
-      final cleanText = segment.text.trim();
-
-      if (cleanText.isEmpty) {
-        throw Exception(
-          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¤Â¸ÂÃ¨Æ’Â½Ã¤Â¸ÂºÃ§Â©Âº',
-        );
-      }
-
-      if (segment.startOffsetMs < 0) {
-        throw Exception(
-          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½ 0',
-        );
-      }
-
-      if (segment.endOffsetMs <= segment.startOffsetMs) {
-        throw Exception(
-          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ§Â»â€œÃ¦ÂÅ¸Ã¦â€”Â¶Ã©â€”Â´Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Â¤Â§Ã¤ÂºÅ½Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€”Â¶Ã©â€”Â´',
-        );
-      }
-
-      if (segment.endOffsetMs > cueDurationMs) {
-        throw Exception(
-          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¨Â¶â€¦Ã¥â€¡ÂºÃ¥Â½â€œÃ¥â€°ÂÃ¥Â­â€”Ã¥Â¹â€¢Ã¦â€”Â¶Ã©â€¢Â¿',
-        );
-      }
-
-      if (segment.startOffsetMs < previousEndMs) {
-        throw Exception(
-          'Ã§Â¬Â¬ ${index + 1} Ã¤Â¸Âª Karaoke Ã§â€°â€¡Ã¦Â®ÂµÃ¤Â¸Å½Ã¥â€°ÂÃ¤Â¸â‚¬Ã§â€°â€¡Ã¦Â®ÂµÃ©â€¡ÂÃ¥ÂÂ ',
-        );
-      }
-
-      previousEndMs = segment.endOffsetMs;
-    }
-
-    final saved = <SubtitleKaraokeSegment>[];
-
-    await session.db.transaction(
-      (transaction) async {
-        final existing = await SubtitleKaraokeSegment.db.find(
-          session,
-          where: (segment) => segment.cueId.equals(cueId),
-          transaction: transaction,
-        );
-
-        for (final row in existing) {
-          if (row.scriptCode != effectiveScriptCode) {
-            continue;
-          }
-
-          final rowId = row.id;
-
-          if (rowId == null) {
-            continue;
-          }
-
-          await SubtitleKaraokeSegment.db.deleteWhere(
-            session,
-            where: (segment) => segment.id.equals(rowId),
-            transaction: transaction,
-          );
-        }
-
-        for (var index = 0; index < segments.length; index++) {
-          final input = segments[index];
-
-          final inserted = await SubtitleKaraokeSegment.db.insertRow(
-            session,
-            SubtitleKaraokeSegment(
-              cueId: cueId,
-              scriptCode: effectiveScriptCode,
-              position: index,
-              startOffsetMs: input.startOffsetMs,
-              endOffsetMs: input.endOffsetMs,
-              text: input.text,
-            ),
-            transaction: transaction,
-          );
-
-          saved.add(inserted);
-        }
-      },
-    );
-
-    await _markDraftChanged(session, track.id!);
-
-    return saved;
   }
 
   Future<void> _ensurePublishBaseline(Session session, int trackId) async {
@@ -1600,13 +1412,6 @@ class SubtitleEndpoint extends Endpoint {
             where: (r) => r.cueId.inSet(cueIds),
             orderBy: (r) => r.startPosition,
           );
-    final karaoke = cueIds.isEmpty
-        ? <SubtitleKaraokeSegment>[]
-        : await SubtitleKaraokeSegment.db.find(
-            session,
-            where: (r) => r.cueId.inSet(cueIds),
-            orderBy: (r) => r.position,
-          );
 
     return jsonEncode({
       'version': 1,
@@ -1663,20 +1468,6 @@ class SubtitleEndpoint extends Endpoint {
             'entryId': r.entryId,
             'startPosition': r.startPosition,
             'endPosition': r.endPosition,
-            'createdAt': r.createdAt.toIso8601String(),
-            'updatedAt': r.updatedAt.toIso8601String(),
-          },
-      ],
-      'karaoke': [
-        for (final r in karaoke)
-          {
-            'id': r.id,
-            'cueId': r.cueId,
-            'scriptCode': r.scriptCode,
-            'position': r.position,
-            'startOffsetMs': r.startOffsetMs,
-            'endOffsetMs': r.endOffsetMs,
-            'text': r.text,
             'createdAt': r.createdAt.toIso8601String(),
             'updatedAt': r.updatedAt.toIso8601String(),
           },
@@ -1755,20 +1546,6 @@ class SubtitleEndpoint extends Endpoint {
           updatedAt: _snapshotDate(m['updatedAt']),
         ),
     ];
-    final karaoke = [
-      for (final m in _snapshotMaps(root['karaoke']))
-        SubtitleKaraokeSegment(
-          id: _snapshotInt(m['id']),
-          cueId: _snapshotInt(m['cueId'])!,
-          scriptCode: m['scriptCode'] as String?,
-          position: _snapshotInt(m['position'])!,
-          startOffsetMs: _snapshotInt(m['startOffsetMs'])!,
-          endOffsetMs: _snapshotInt(m['endOffsetMs'])!,
-          text: m['text'] as String,
-          createdAt: _snapshotDate(m['createdAt']),
-          updatedAt: _snapshotDate(m['updatedAt']),
-        ),
-    ];
 
     final textsByCue = <int, List<SubtitleCueText>>{};
     for (final row in texts) {
@@ -1789,12 +1566,6 @@ class SubtitleEndpoint extends Endpoint {
           !_sameSubtitleScriptCode(row.scriptCode, selectedScriptCode))
         continue;
       phrasesByCue.putIfAbsent(row.cueId, () => []).add(row);
-    }
-    final karaokeByCue = <int, List<SubtitleKaraokeSegment>>{};
-    for (final row in karaoke) {
-      if (!_sameSubtitleScriptCode(row.scriptCode, selectedScriptCode))
-        continue;
-      karaokeByCue.putIfAbsent(row.cueId, () => []).add(row);
     }
 
     final details = <SubtitleCueDetail>[];
@@ -1843,7 +1614,6 @@ class SubtitleEndpoint extends Endpoint {
           texts: cueTexts,
           tokens: cueId == null ? [] : tokensByCue[cueId] ?? [],
           phrases: cueId == null ? [] : phrasesByCue[cueId] ?? [],
-          karaokeSegments: cueId == null ? [] : karaokeByCue[cueId] ?? [],
         ),
       );
     }

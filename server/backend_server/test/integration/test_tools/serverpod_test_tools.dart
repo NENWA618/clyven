@@ -90,19 +90,15 @@ import 'package:glyphora_backend_server/src/generated/subtitle_cue.dart'
     as _i42;
 import 'package:glyphora_backend_server/src/generated/subtitle_cue_text.dart'
     as _i43;
-import 'package:glyphora_backend_server/src/generated/subtitle_karaoke_segment.dart'
-    as _i44;
-import 'package:glyphora_backend_server/src/generated/subtitle_karaoke_segment_input.dart'
-    as _i45;
 import 'package:glyphora_backend_server/src/generated/video_content_type.dart'
-    as _i46;
+    as _i44;
 import 'package:glyphora_backend_server/src/generated/video_series.dart'
-    as _i47;
-import 'package:glyphora_backend_server/src/generated/word_list.dart' as _i48;
+    as _i45;
+import 'package:glyphora_backend_server/src/generated/word_list.dart' as _i46;
 import 'package:glyphora_backend_server/src/generated/word_list_detail.dart'
-    as _i49;
+    as _i47;
 import 'package:glyphora_backend_server/src/generated/greetings/greeting.dart'
-    as _i50;
+    as _i48;
 import 'package:glyphora_backend_server/src/generated/protocol.dart';
 import 'package:glyphora_backend_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -4303,43 +4299,6 @@ class _SubtitleEndpoint {
       }
     });
   }
-
-  _i3.Future<List<_i44.SubtitleKaraokeSegment>> replaceKaraokeSegments(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required int cueId,
-    required List<_i45.SubtitleKaraokeSegmentInput> segments,
-    String? scriptCode,
-  }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'subtitle',
-            method: 'replaceKaraokeSegments',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'subtitle',
-          methodName: 'replaceKaraokeSegments',
-          parameters: _i1.testObjectToJson({
-            'cueId': cueId,
-            'segments': segments,
-            'scriptCode': scriptCode,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _i3.Future<List<_i44.SubtitleKaraokeSegment>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
 }
 
 class _VideoEndpoint {
@@ -4390,7 +4349,7 @@ class _VideoEndpoint {
     required String description,
     String? seriesTitle,
     required String category,
-    required _i46.VideoContentType contentType,
+    required _i44.VideoContentType contentType,
     required String languageCode,
     required List<String> tags,
     required String videoStorageKey,
@@ -4441,7 +4400,7 @@ class _VideoEndpoint {
 
   _i3.Future<List<_i8.Video>> getVideos(
     _i1.TestSessionBuilder sessionBuilder, {
-    _i46.VideoContentType? contentType,
+    _i44.VideoContentType? contentType,
   }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -4531,7 +4490,7 @@ class _VideoEndpoint {
     });
   }
 
-  _i3.Future<_i47.VideoSeries> createSeries(
+  _i3.Future<_i45.VideoSeries> createSeries(
     _i1.TestSessionBuilder sessionBuilder, {
     required String title,
     required String description,
@@ -4564,7 +4523,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i47.VideoSeries>);
+                as _i3.Future<_i45.VideoSeries>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -4572,7 +4531,7 @@ class _VideoEndpoint {
     });
   }
 
-  _i3.Future<List<_i47.VideoSeries>> getCreatorSeries(
+  _i3.Future<List<_i45.VideoSeries>> getCreatorSeries(
     _i1.TestSessionBuilder sessionBuilder, {
     required String creatorId,
   }) async {
@@ -4595,7 +4554,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i47.VideoSeries>>);
+                as _i3.Future<List<_i45.VideoSeries>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -4603,7 +4562,7 @@ class _VideoEndpoint {
     });
   }
 
-  _i3.Future<_i47.VideoSeries?> getSeries(
+  _i3.Future<_i45.VideoSeries?> getSeries(
     _i1.TestSessionBuilder sessionBuilder, {
     required int seriesId,
   }) async {
@@ -4626,7 +4585,7 @@ class _VideoEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i47.VideoSeries?>);
+                as _i3.Future<_i45.VideoSeries?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -5082,7 +5041,7 @@ class _WordListEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i48.WordList>> getLists(
+  _i3.Future<List<_i46.WordList>> getLists(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -5104,7 +5063,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i48.WordList>>);
+                as _i3.Future<List<_i46.WordList>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -5112,7 +5071,7 @@ class _WordListEndpoint {
     });
   }
 
-  _i3.Future<_i49.WordListDetail?> getListDetail(
+  _i3.Future<_i47.WordListDetail?> getListDetail(
     _i1.TestSessionBuilder sessionBuilder, {
     required int listId,
     required String explanationLanguageCode,
@@ -5139,7 +5098,7 @@ class _WordListEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i49.WordListDetail?>);
+                as _i3.Future<_i47.WordListDetail?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -5158,7 +5117,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i50.Greeting> hello(
+  _i3.Future<_i48.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -5181,7 +5140,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i50.Greeting>);
+                as _i3.Future<_i48.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

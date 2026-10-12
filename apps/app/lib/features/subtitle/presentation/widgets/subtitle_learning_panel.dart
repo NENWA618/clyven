@@ -106,8 +106,7 @@ class _SubtitleLearningPanelState extends ConsumerState<SubtitleLearningPanel> {
       ];
     }
 
-    // Legacy subtitle fallback. These positions still match the current
-    // word-by-word Karaoke fallback generation.
+    // Legacy subtitle fallback for cues without analysed tokens.
     final source = _displayText(detail, widget.primaryScriptCode).trim();
 
     if (source.isEmpty) return const <_LearningWord>[];
@@ -257,46 +256,38 @@ class _SubtitleLearningPanelState extends ConsumerState<SubtitleLearningPanel> {
     return data.definitions.first.gloss.trim();
   }
 
-  double? _karaokeProgress(_LearningWord word) {
+  /// Words are highlighted left to right, spread evenly over the cue's
+  /// duration in proportion to their visible length.
+  double? _karaokeProgress(_LearningWord word, List<_LearningWord> words) {
     final detail = widget.primaryDetail;
     if (detail == null) return null;
 
-    final segments =
-        detail.karaokeSegments ?? const <serverpod.SubtitleKaraokeSegment>[];
+    final durationMs = detail.cue.endMs - detail.cue.startMs;
+    if (durationMs <= 0) return null;
 
-    final requestedScript = widget.primaryScriptCode?.trim().toLowerCase();
+    var cursor = 0;
+    int? wordStart;
+    int? wordEnd;
 
-    serverpod.SubtitleKaraokeSegment? segment;
+    for (final item in words) {
+      final length = item.text.replaceAll(RegExp(r'\s+'), '').runes.length;
 
-    for (final item in segments) {
-      if (item.position != word.position) continue;
-
-      final segmentScript = item.scriptCode?.trim().toLowerCase();
-
-      if (requestedScript != null &&
-          requestedScript.isNotEmpty &&
-          segmentScript != null &&
-          segmentScript.isNotEmpty &&
-          segmentScript != requestedScript) {
-        continue;
+      if (item.position == word.position) {
+        wordStart = cursor;
+        wordEnd = cursor + length;
       }
 
-      segment = item;
-      break;
+      cursor += length;
     }
 
-    if (segment == null) return null;
+    if (wordStart == null || wordEnd == null || wordEnd <= wordStart) {
+      return null;
+    }
 
-    final relativeMs = widget.videoPositionMs - detail.cue.startMs;
+    final overall = ((widget.videoPositionMs - detail.cue.startMs) / durationMs)
+        .clamp(0.0, 1.0);
 
-    if (relativeMs <= segment.startOffsetMs) return 0;
-    if (relativeMs >= segment.endOffsetMs) return 1;
-
-    final duration = segment.endOffsetMs - segment.startOffsetMs;
-
-    if (duration <= 0) return 1;
-
-    return ((relativeMs - segment.startOffsetMs) / duration)
+    return ((overall * cursor - wordStart) / (wordEnd - wordStart))
         .clamp(0.0, 1.0)
         .toDouble();
   }
@@ -304,11 +295,12 @@ class _SubtitleLearningPanelState extends ConsumerState<SubtitleLearningPanel> {
   Widget _karaokeWord({
     required BuildContext context,
     required _LearningWord word,
+    required List<_LearningWord> words,
     required String knowledgeState,
   }) {
     final scheme = Theme.of(context).colorScheme;
     final baseColor = _knowledgeColor(context, knowledgeState);
-    final progress = _karaokeProgress(word);
+    final progress = _karaokeProgress(word, words);
 
     final baseStyle = TextStyle(
       color: baseColor,
@@ -851,6 +843,7 @@ class _SubtitleLearningPanelState extends ConsumerState<SubtitleLearningPanel> {
                                       _karaokeWord(
                                         context: context,
                                         word: word,
+                                        words: words,
                                         knowledgeState: knowledgeStateFor(word),
                                       ),
                                     ],

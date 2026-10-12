@@ -1566,6 +1566,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.11"
+  serverpod_cloud_storage_r2:
+    dependency: transitive
+    description:
+      name: serverpod_cloud_storage_r2
+      sha256: fc85fd791a8b95a80f70b1e24ea6929d5a297c2455c35dd72501fb8546538750
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.11"
   serverpod_cloud_storage_s3_compat:
     dependency: transitive
     description:
