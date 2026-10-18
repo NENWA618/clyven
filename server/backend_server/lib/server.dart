@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:serverpod_cloud_storage_r2/serverpod_cloud_storage_r2.dart'
     as r2;
@@ -12,6 +13,7 @@ import 'package:serverpod_auth_idp_server/providers/email.dart';
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 import 'src/services/admin_membership_service.dart';
+import 'src/services/video_deletion_service.dart';
 import 'src/web/routes/app_config_route.dart';
 import 'src/web/routes/root.dart';
 import 'package:serverpod_cloud_storage_gcp/serverpod_cloud_storage_gcp.dart'
@@ -153,6 +155,14 @@ void run(List<String> args) async {
   }
 
   await pod.start();
+
+  if (!isMaintenance) {
+    // Persistent tombstones allow cleanup to resume after container restarts.
+    unawaited(VideoDeletionService.sweep());
+    Timer.periodic(const Duration(minutes: 2), (_) {
+      unawaited(VideoDeletionService.sweep());
+    });
+  }
 
   if (!isMaintenance) {
     await _ensureConfiguredAdminAccess();
