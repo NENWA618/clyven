@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   deploy:
+    environment: cloudflare-staging
     if: inputs.confirm_staging == 'DEPLOY-STUDIO-STAGING'
     runs-on: ubuntu-latest
     timeout-minutes: 30
