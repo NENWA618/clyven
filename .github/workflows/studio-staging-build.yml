@@ -31,7 +31,7 @@ jobs:
       - name: Build Jaspr static output with staging API
         working-directory: apps/studio
         run: |
-          jaspr build --dart-define=GLYPHORA_API_URL=https://glyphora-api-staging.chengyang1017.workers.dev/
+          jaspr build --dart-define=GLYPHORA_API_URL=https://glyphora-api-staging.chengyang1017.workers.dev/ --dart-define=GLYPHORA_STAGING_REGISTRATION=true
       - name: Verify static output exists
         run: |
           test -f apps/studio/build/jaspr/index.html

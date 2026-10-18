@@ -20,6 +20,11 @@ class StudioAuthGate extends StatefulComponent {
 class _StudioAuthGateState extends State<StudioAuthGate> {
   String _email = '';
   String _password = '';
+  String _verificationCode = '';
+  String _registrationToken = '';
+  dynamic _accountRequestId;
+  int _registrationStep = 0;
+  static const bool _stagingRegistrationEnabled = bool.fromEnvironment('GLYPHORA_STAGING_REGISTRATION', defaultValue: false);
 
   bool _loading = true;
   bool _loginLoading = false;
@@ -100,6 +105,42 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
     }
   }
 
+  Future<void> _registerNext() async {
+    if (_loginLoading) return;
+    setState(() { _loginLoading = true; _error = null; });
+    try {
+      if (_registrationStep == 1) {
+        final email = _email.trim().toLowerCase();
+        if (email.isEmpty || !email.contains('@')) throw StateError('Enter a valid email.');
+        _accountRequestId = await studioClient.emailIdp.startRegistration(email: email);
+        if (!mounted) return;
+        setState(() => _registrationStep = 2);
+      } else if (_registrationStep == 2) {
+        if (_verificationCode.trim().isEmpty) throw StateError('Enter the email verification code.');
+        _registrationToken = await studioClient.emailIdp.verifyRegistrationCode(
+          accountRequestId: _accountRequestId,
+          verificationCode: _verificationCode.trim(),
+        );
+        if (!mounted) return;
+        setState(() => _registrationStep = 3);
+      } else if (_registrationStep == 3) {
+        if (_password.length < 8) throw StateError('Password must contain at least 8 characters.');
+        final authSuccess = await studioClient.emailIdp.finishRegistration(
+          registrationToken: _registrationToken,
+          password: _password,
+        );
+        await studioClient.auth.updateSignedInUser(authSuccess);
+        if (!mounted) return;
+        setState(() { _loggedIn = true; _password = ''; _registrationStep = 0; });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loginLoading = false);
+    }
+  }
+
   @override
   Component build(BuildContext context) {
     if (_loading) {
@@ -145,11 +186,18 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
                       },
                     ),
                   ),
+                  if (_registrationStep == 2)
+                    input<String>(
+                      type: InputType.text,
+                      attributes: {'placeholder': 'Email verification code', 'autocomplete': 'one-time-code'},
+                      events: events<String>(onInput: (value) { _verificationCode = value; }),
+                    ),
+                  if (_registrationStep == 0 || _registrationStep == 3)
                   input<String>(
                     type: InputType.password,
                     attributes: {
                       'placeholder': 'Password',
-                      'autocomplete': 'current-password',
+                      'autocomplete': _registrationStep == 3 ? 'new-password' : 'current-password',
                     },
                     events: events<String>(
                       onInput: (value) {
@@ -167,12 +215,19 @@ class _StudioAuthGateState extends State<StudioAuthGate> {
                     onClick: _loginLoading
                         ? null
                         : () {
-                            _login();
+                            if (_registrationStep == 0) { _login(); } else { _registerNext(); }
                           },
                     [
-                      .text(_loginLoading ? context.tr('Signing in...', '登录中...') : context.tr('Sign in to Studio', '登录 Studio')),
+                      .text(_loginLoading ? context.tr('Please wait...', '请稍候...') : _registrationStep == 0 ? context.tr('Sign in to Studio', '登录 Studio') : _registrationStep == 1 ? context.tr('Send verification code', '发送验证码') : _registrationStep == 2 ? context.tr('Verify code', '验证验证码') : context.tr('Create account', '完成注册')),
                     ],
                   ),
+                  if (_stagingRegistrationEnabled)
+                    button(
+                      classes: 'login-button',
+                      attributes: _loginLoading ? {'disabled': 'disabled'} : null,
+                      onClick: _loginLoading ? null : () { setState(() { _registrationStep = _registrationStep == 0 ? 1 : 0; _error = null; _password = ''; }); },
+                      [.text(_registrationStep == 0 ? context.tr('Create staging account', '注册测试账号') : context.tr('Back to sign in', '返回登录'))],
+                    ),
                 ],
               ),
               if (_errorIsMissingFields)
