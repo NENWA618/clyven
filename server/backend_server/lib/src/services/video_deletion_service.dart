@@ -11,8 +11,9 @@ class VideoDeletionService {
   static final Set<int> _processing = <int>{};
 
   static Future<void> cleanup(Session session, Video video) async {
-    final id = video.id;
-    if (id == null || _processing.contains(id)) return;
+    final videoId = video.id;
+    if (videoId == null || _processing.contains(videoId)) return;
+    final id = videoId;
     _processing.add(id);
     try {
       final job = video.transcoderJobName?.trim() ?? '';
