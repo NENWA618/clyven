@@ -36,10 +36,7 @@ jobs:
 
       - name: Check Serverpod formatting
         working-directory: server/backend_server
-        run: |
-          dart format lib/src/endpoints/video_endpoint.dart lib/src/services/video_deletion_service.dart
-          git diff -- lib/src/endpoints/video_endpoint.dart lib/src/services/video_deletion_service.dart
-          git diff --exit-code -- lib/src/endpoints/video_endpoint.dart lib/src/services/video_deletion_service.dart
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze Flutter
         working-directory: apps/app
