@@ -19,6 +19,18 @@ export class GlyphoraServer extends Container {
     ...(env.GLYPHORA_STAGING_DB_NAME ? { GLYPHORA_STAGING_DB_NAME: env.GLYPHORA_STAGING_DB_NAME } : {}),
     ...(env.GLYPHORA_STAGING_DB_USER ? { GLYPHORA_STAGING_DB_USER: env.GLYPHORA_STAGING_DB_USER } : {}),
     GLYPHORA_REQUIRE_CLOUDFLARE: 'true',
+    // Explicitly forward fault injection only in staging. Never activate in production.
+    ...(env.GLYPHORA_STAGING === 'true' && env.GLYPHORA_DELETE_FAULT_ENABLE === 'true'
+      ? {
+          GLYPHORA_DELETE_FAULT_ENABLE: 'true',
+          ...(env.GLYPHORA_DELETE_FAULT_VIDEO_ID
+            ? { GLYPHORA_DELETE_FAULT_VIDEO_ID: env.GLYPHORA_DELETE_FAULT_VIDEO_ID }
+            : {}),
+          ...(env.GLYPHORA_DELETE_FAULT_STEP
+            ? { GLYPHORA_DELETE_FAULT_STEP: env.GLYPHORA_DELETE_FAULT_STEP }
+            : {}),
+        }
+      : {}),
     ...(env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST ? { GLYPHORA_CLOUDFLARE_PUBLIC_HOST: env.GLYPHORA_CLOUDFLARE_PUBLIC_HOST } : {}),
     serverid: 'default',
     ...(env.SERVERPOD_PASSWORD_database
