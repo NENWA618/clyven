@@ -105,6 +105,8 @@ jobs:
           GLYPHORA_STAGING_DB_HOST: ${{ secrets.GLYPHORA_STAGING_DB_HOST }}
           GLYPHORA_STAGING_DB_NAME: ${{ secrets.GLYPHORA_STAGING_DB_NAME }}
           GLYPHORA_STAGING_DB_USER: ${{ secrets.GLYPHORA_STAGING_DB_USER }}
+          SMTP_EMAIL: ${{ secrets.STAGING_SMTP_EMAIL }}
+          SMTP_APP_PASSWORD: ${{ secrets.STAGING_SMTP_APP_PASSWORD }}
         run: |
           set -euo pipefail
           umask 077
@@ -121,7 +123,10 @@ jobs:
               "SERVERPOD_R2_ACCESS_KEY_ID", "SERVERPOD_R2_SECRET_KEY",
               "CLOUDFLARE_STREAM_API_TOKEN", "GLYPHORA_CLOUDFLARE_PUBLIC_HOST",
               "GLYPHORA_STAGING", "GLYPHORA_STAGING_DB_HOST", "GLYPHORA_STAGING_DB_NAME", "GLYPHORA_STAGING_DB_USER",
+              "SMTP_EMAIL", "SMTP_APP_PASSWORD",
           ]
+          if not os.environ.get("SMTP_EMAIL") or not os.environ.get("SMTP_APP_PASSWORD"):
+              raise SystemExit("Missing dedicated staging SMTP configuration.")
           with open(sys.argv[1], "w", encoding="utf-8") as output:
               json.dump({key: os.environ[key] for key in fields}, output)
           PY
