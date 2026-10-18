@@ -19,6 +19,11 @@ export class GlyphoraServer extends Container {
     ...(env.GLYPHORA_STAGING_DB_NAME ? { GLYPHORA_STAGING_DB_NAME: env.GLYPHORA_STAGING_DB_NAME } : {}),
     ...(env.GLYPHORA_STAGING_DB_USER ? { GLYPHORA_STAGING_DB_USER: env.GLYPHORA_STAGING_DB_USER } : {}),
     GLYPHORA_REQUIRE_CLOUDFLARE: 'true',
+    // Staging-only experiment: test whether startup schema analysis exhausts
+    // the configured 5-connection pool. Production retains its existing limit.
+    ...(env.GLYPHORA_STAGING === 'true'
+      ? { SERVERPOD_DATABASE_MAX_CONNECTION_COUNT: '10' }
+      : {}),
     // Explicitly forward fault injection only in staging. Never activate in production.
     ...(env.GLYPHORA_STAGING === 'true' && env.GLYPHORA_DELETE_FAULT_ENABLE === 'true'
       ? {
