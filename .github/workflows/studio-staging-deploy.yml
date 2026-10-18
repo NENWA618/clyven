@@ -1,0 +1,52 @@
+name: 部署 Studio 测试环境（手动）
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_staging:
+        description: 输入 DEPLOY-STUDIO-STAGING 确认仅更新测试网站
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: inputs.confirm_staging == 'DEPLOY-STUDIO-STAGING'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 获取代码
+        uses: actions/checkout@v4
+      - name: 安装 Flutter 与 Dart
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: stable
+          cache: true
+      - name: 安装 Dart 工作区依赖
+        run: dart pub get
+      - name: 安装 Jaspr
+        run: dart pub global activate jaspr_cli
+      - name: 构建测试版 Studio
+        working-directory: apps/studio
+        run: jaspr build --dart-define=GLYPHORA_API_URL=https://glyphora-api-staging.chengyang1017.workers.dev/ --dart-define=GLYPHORA_STAGING_REGISTRATION=true
+      - name: 检查静态网站与 SPA 路由配置
+        run: |
+          test -f apps/studio/build/jaspr/index.html
+          python3 - <<'PY'
+          import json
+          config = json.load(open('apps/studio/wrangler.staging.jsonc'))
+          assert config['name'] == 'bold-dawn-c6c9'
+          assert config['assets']['not_found_handling'] == 'single-page-application'
+          PY
+      - name: 部署到现有测试 Worker（不修改正式 Studio）
+        working-directory: apps/studio
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          npx --yes wrangler@4 deploy --config wrangler.staging.jsonc
