@@ -213,7 +213,9 @@ class VideoDeletionService {
       session = await Serverpod.instance.createSession();
       final pending = await Video.db.find(
         session,
-        where: (t) => t.transcodeState.equals(deleting) | t.transcodeState.equals('DELETING_ACTIVE'),
+        where: (t) =>
+            t.transcodeState.equals(deleting) |
+            t.transcodeState.equals('DELETING_ACTIVE'),
         limit: 20,
       );
       for (final video in pending) {
