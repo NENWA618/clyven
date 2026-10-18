@@ -1,0 +1,45 @@
+name: Build Studio Cloudflare staging bundle (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build isolated Studio staging static site
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout staging changes
+        uses: actions/checkout@v4
+      - name: Setup Flutter and Dart
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: stable
+          cache: true
+      - name: Install Dart workspace dependencies
+        run: dart pub get
+      - name: Install Jaspr CLI
+        run: dart pub global activate jaspr_cli
+      - name: Verify staging API override exists
+        run: |
+          grep -q "String.fromEnvironment(" apps/studio/lib/services/studio_client.dart
+          grep -q "'GLYPHORA_API_URL'" apps/studio/lib/services/studio_client.dart
+      - name: Build Jaspr static output with staging API
+        working-directory: apps/studio
+        run: |
+          jaspr build --dart-define=GLYPHORA_API_URL=https://glyphora-api-staging.chengyang1017.workers.dev/
+      - name: Verify static output exists
+        run: |
+          test -f apps/studio/build/jaspr/index.html
+          test -n "$(find apps/studio/build/jaspr -type f -print -quit)"
+      - name: Upload Pages-ready bundle (no deployment)
+        uses: actions/upload-artifact@v4
+        with:
+          name: glyphora-studio-staging-pages
+          path: apps/studio/build/jaspr/
+          if-no-files-found: error
+          retention-days: 7
