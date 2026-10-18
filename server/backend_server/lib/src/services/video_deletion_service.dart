@@ -21,7 +21,8 @@ class VideoDeletionService {
         await _deleteStream(job.substring('cfstream:'.length));
       }
       await session.storage.deleteFile(
-        storageId: 'public', path: video.videoStorageKey,
+        storageId: 'public',
+        path: video.videoStorageKey,
       );
       final cover = video.coverStorageKey;
       if (cover != null && cover.isNotEmpty) {
@@ -33,21 +34,21 @@ class VideoDeletionService {
         where: (row) => row.videoId.equals(videoId),
       );
       final commentIds = comments.map((row) => row.id).whereType<int>().toSet();
-  
+
       if (commentIds.isNotEmpty) {
         final replies = await CommentReplyRow.db.find(
           session,
           where: (row) => row.commentId.inSet(commentIds),
         );
         final replyIds = replies.map((row) => row.id).whereType<int>().toSet();
-  
+
         if (replyIds.isNotEmpty) {
           await CommentReplyLike.db.deleteWhere(
             session,
             where: (row) => row.replyId.inSet(replyIds),
           );
         }
-  
+
         await CommentReplyRow.db.deleteWhere(
           session,
           where: (row) => row.commentId.inSet(commentIds),
@@ -57,43 +58,43 @@ class VideoDeletionService {
           where: (row) => row.commentId.inSet(commentIds),
         );
       }
-  
+
       await VideoCommentRow.db.deleteWhere(
         session,
         where: (row) => row.videoId.equals(videoId),
       );
-  
+
       final reviewTasks = await SubtitleReviewTask.db.find(
         session,
         where: (row) => row.videoId.equals(videoId),
       );
       final taskIds = reviewTasks.map((row) => row.id).whereType<int>().toSet();
-  
+
       if (taskIds.isNotEmpty) {
         await SubtitleReviewEvent.db.deleteWhere(
           session,
           where: (row) => row.taskId.inSet(taskIds),
         );
       }
-  
+
       await SubtitleReviewTask.db.deleteWhere(
         session,
         where: (row) => row.videoId.equals(videoId),
       );
-  
+
       final tracks = await SubtitleTrack.db.find(
         session,
         where: (row) => row.videoId.equals(videoId),
       );
       final trackIds = tracks.map((row) => row.id).whereType<int>().toSet();
-  
+
       if (trackIds.isNotEmpty) {
         final cues = await SubtitleCue.db.find(
           session,
           where: (row) => row.trackId.inSet(trackIds),
         );
         final cueIds = cues.map((row) => row.id).whereType<int>().toSet();
-  
+
         if (cueIds.isNotEmpty) {
           await SubtitlePhrase.db.deleteWhere(
             session,
@@ -108,7 +109,7 @@ class VideoDeletionService {
             where: (row) => row.cueId.inSet(cueIds),
           );
         }
-  
+
         await SubtitleCue.db.deleteWhere(
           session,
           where: (row) => row.trackId.inSet(trackIds),
@@ -118,7 +119,7 @@ class VideoDeletionService {
           where: (row) => row.trackId.inSet(trackIds),
         );
       }
-  
+
       await AsrJob.db.deleteWhere(
         session,
         where: (row) => row.videoId.equals(videoId),
@@ -130,8 +131,10 @@ class VideoDeletionService {
       await Video.db.deleteRow(session, video);
       session.log('VIDEO_DELETE_COMPLETED videoId=$id');
     } catch (error, stackTrace) {
-      session.log('VIDEO_DELETE_RETRY videoId=$id error=$error',
-          level: LogLevel.warning);
+      session.log(
+        'VIDEO_DELETE_RETRY videoId=$id error=$error',
+        level: LogLevel.warning,
+      );
       session.log('$stackTrace', level: LogLevel.warning);
       rethrow;
     } finally {
@@ -144,21 +147,36 @@ class VideoDeletionService {
       throw StateError('Invalid Cloudflare Stream UID');
     }
     final account = Platform.environment['CLOUDFLARE_ACCOUNT_ID']?.trim() ?? '';
-    final token = Platform.environment['CLOUDFLARE_STREAM_API_TOKEN']?.trim() ?? '';
+    final token =
+        Platform.environment['CLOUDFLARE_STREAM_API_TOKEN']?.trim() ?? '';
     if (account.isEmpty || token.isEmpty) {
-      throw StateError('Cloudflare Stream credentials unavailable for deletion');
+      throw StateError(
+        'Cloudflare Stream credentials unavailable for deletion',
+      );
     }
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 10);
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 10);
     try {
-      final uri = Uri.https('api.cloudflare.com',
-          '/client/v4/accounts/$account/stream/$uid');
-      final request = await client.deleteUrl(uri).timeout(const Duration(seconds: 20));
+      final uri = Uri.https(
+        'api.cloudflare.com',
+        '/client/v4/accounts/$account/stream/$uid',
+      );
+      final request = await client
+          .deleteUrl(uri)
+          .timeout(const Duration(seconds: 20));
       request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
-      final response = await request.close().timeout(const Duration(seconds: 30));
-      final body = await utf8.decoder.bind(response).join().timeout(const Duration(seconds: 30));
+      final response = await request.close().timeout(
+        const Duration(seconds: 30),
+      );
+      final body = await utf8.decoder
+          .bind(response)
+          .join()
+          .timeout(const Duration(seconds: 30));
       if (response.statusCode == HttpStatus.notFound) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw StateError('Cloudflare Stream delete failed HTTP ${response.statusCode}: ${body.length > 300 ? body.substring(0, 300) : body}');
+        throw StateError(
+          'Cloudflare Stream delete failed HTTP ${response.statusCode}: ${body.length > 300 ? body.substring(0, 300) : body}',
+        );
       }
     } finally {
       client.close(force: true);
@@ -172,7 +190,8 @@ class VideoDeletionService {
     Session? session;
     try {
       session = await Serverpod.instance.createSession();
-      final pending = await Video.db.find(session,
+      final pending = await Video.db.find(
+        session,
         where: (t) => t.transcodeState.equals(deleting),
         limit: 20,
       );
