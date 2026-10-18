@@ -302,12 +302,14 @@ class VideoEndpoint extends Endpoint {
   Future<List<Video>> getMyVideos(Session session) async {
     final userId = _requireUserId(session);
 
-    return Video.db.find(
+    final videos = await Video.db.find(
       session,
-      where: (table) => table.authorId.equals(userId) & table.transcodeState.notEquals('DELETING'),
+      where: (table) => table.authorId.equals(userId),
       orderBy: (table) => table.createdAt,
       orderDescending: true,
     );
+    // Filtering in Dart also retains legacy rows with NULL transcodeState.
+    return videos.where((video) => video.transcodeState != 'DELETING').toList();
   }
 
   Future<Video?> getVideo(
