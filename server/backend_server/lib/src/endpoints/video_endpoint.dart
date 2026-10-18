@@ -3,6 +3,7 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 import '../services/asr_job_processor.dart';
 import '../services/video_transcode_service.dart';
+import '../services/video_deletion_service.dart';
 
 class VideoEndpoint extends Endpoint {
   String _requireUserId(Session session) {
@@ -303,7 +304,7 @@ class VideoEndpoint extends Endpoint {
 
     return Video.db.find(
       session,
-      where: (table) => table.authorId.equals(userId),
+      where: (table) => table.authorId.equals(userId) & table.transcodeState.notEquals('DELETING'),
       orderBy: (table) => table.createdAt,
       orderDescending: true,
     );
@@ -318,6 +319,8 @@ class VideoEndpoint extends Endpoint {
 
     final currentUserId = session.authenticated?.userIdentifier.toString();
     final isOwner = currentUserId == video.authorId;
+
+    if (video.transcodeState == 'DELETING') return null;
 
     if (video.status != VideoStatus.published && !isOwner) {
       return null;
@@ -819,119 +822,16 @@ class VideoEndpoint extends Endpoint {
   }) async {
     final video = await _requireOwnedVideo(session, videoId);
 
-    final comments = await VideoCommentRow.db.find(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-    final commentIds = comments.map((row) => row.id).whereType<int>().toSet();
-
-    if (commentIds.isNotEmpty) {
-      final replies = await CommentReplyRow.db.find(
-        session,
-        where: (row) => row.commentId.inSet(commentIds),
-      );
-      final replyIds = replies.map((row) => row.id).whereType<int>().toSet();
-
-      if (replyIds.isNotEmpty) {
-        await CommentReplyLike.db.deleteWhere(
-          session,
-          where: (row) => row.replyId.inSet(replyIds),
-        );
-      }
-
-      await CommentReplyRow.db.deleteWhere(
-        session,
-        where: (row) => row.commentId.inSet(commentIds),
-      );
-      await CommentLike.db.deleteWhere(
-        session,
-        where: (row) => row.commentId.inSet(commentIds),
-      );
+    if (video.transcodeState == 'DELETING') {
+      await VideoDeletionService.cleanup(session, video);
+      return;
     }
-
-    await VideoCommentRow.db.deleteWhere(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-
-    final reviewTasks = await SubtitleReviewTask.db.find(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-    final taskIds = reviewTasks.map((row) => row.id).whereType<int>().toSet();
-
-    if (taskIds.isNotEmpty) {
-      await SubtitleReviewEvent.db.deleteWhere(
-        session,
-        where: (row) => row.taskId.inSet(taskIds),
-      );
-    }
-
-    await SubtitleReviewTask.db.deleteWhere(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-
-    final tracks = await SubtitleTrack.db.find(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-    final trackIds = tracks.map((row) => row.id).whereType<int>().toSet();
-
-    if (trackIds.isNotEmpty) {
-      final cues = await SubtitleCue.db.find(
-        session,
-        where: (row) => row.trackId.inSet(trackIds),
-      );
-      final cueIds = cues.map((row) => row.id).whereType<int>().toSet();
-
-      if (cueIds.isNotEmpty) {
-        await SubtitlePhrase.db.deleteWhere(
-          session,
-          where: (row) => row.cueId.inSet(cueIds),
-        );
-        await SubtitleToken.db.deleteWhere(
-          session,
-          where: (row) => row.cueId.inSet(cueIds),
-        );
-        await SubtitleCueText.db.deleteWhere(
-          session,
-          where: (row) => row.cueId.inSet(cueIds),
-        );
-      }
-
-      await SubtitleCue.db.deleteWhere(
-        session,
-        where: (row) => row.trackId.inSet(trackIds),
-      );
-      await SubtitlePublishState.db.deleteWhere(
-        session,
-        where: (row) => row.trackId.inSet(trackIds),
-      );
-    }
-
-    await AsrJob.db.deleteWhere(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-    await SubtitleTrack.db.deleteWhere(
-      session,
-      where: (row) => row.videoId.equals(videoId),
-    );
-    await Video.db.deleteRow(session, video);
-
-    await session.storage.deleteFile(
-      storageId: 'public',
-      path: video.videoStorageKey,
-    );
-
-    final coverStorageKey = video.coverStorageKey;
-    if (coverStorageKey != null && coverStorageKey.isNotEmpty) {
-      await session.storage.deleteFile(
-        storageId: 'public',
-        path: coverStorageKey,
-      );
-    }
+    video.isPublic = false;
+    video.status = VideoStatus.failed;
+    video.transcodeState = 'DELETING';
+    video.updatedAt = DateTime.now().toUtc();
+    await Video.db.updateRow(session, video);
+    await VideoDeletionService.cleanup(session, video);
   }
 
   Future<String?> createUploadDescription(
@@ -1002,7 +902,7 @@ class VideoEndpoint extends Endpoint {
       videoId,
     );
 
-    if (video == null) {
+    if (video == null || video.transcodeState == 'DELETING') {
       return null;
     }
 
