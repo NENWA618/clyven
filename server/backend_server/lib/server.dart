@@ -154,7 +154,25 @@ void run(List<String> args) async {
     );
   }
 
-  await pod.start();
+  // Capture startup duration and failure stage without printing credentials.
+  final startupTimer = Stopwatch()..start();
+  print('[Glyphora Startup] Serverpod startup begin.');
+  try {
+    await pod.start();
+    print(
+      '[Glyphora Startup] Serverpod startup completed '
+      'in ${startupTimer.elapsedMilliseconds} ms.',
+    );
+  } catch (error) {
+    print(
+      '[Glyphora Startup] Serverpod startup failed after '
+      '${startupTimer.elapsedMilliseconds} ms '
+      '(error type: ${error.runtimeType}).',
+    );
+    rethrow;
+  } finally {
+    startupTimer.stop();
+  }
 
   if (!isMaintenance) {
     // Persistent tombstones allow cleanup to resume after container restarts.
