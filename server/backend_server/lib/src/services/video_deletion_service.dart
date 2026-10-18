@@ -13,6 +13,19 @@ class VideoDeletionService {
   static Future<void> cleanup(Session session, Video video) async {
     final videoId = video.id;
     if (videoId == null || _processing.contains(videoId)) return;
+    // Atomic database claim: prevents separate Containers from deleting the
+    // same video concurrently. A stale claim can be recovered after 30 min.
+    final claimed = await session.db.unsafeQuery(
+      r"""UPDATE "video"
+         SET "transcodeState" = 'DELETING_ACTIVE', "updatedAt" = NOW()
+         WHERE "id" = @videoId
+           AND ("transcodeState" = 'DELETING'
+             OR ("transcodeState" = 'DELETING_ACTIVE'
+                 AND "updatedAt" < NOW() - INTERVAL '30 minutes'))
+         RETURNING "id" """,
+      parameters: QueryParameters.named({'videoId': videoId}),
+    );
+    if (claimed.isEmpty) return;
     final id = videoId;
     _processing.add(id);
     try {
@@ -136,6 +149,14 @@ class VideoDeletionService {
         level: LogLevel.warning,
       );
       session.log('$stackTrace', level: LogLevel.warning);
+      // If cleanup fails, return the job to the queue. If this write fails,
+      // the stale-claim timeout will eventually recover it.
+      await session.db.unsafeExecute(
+        r"""UPDATE "video"
+           SET "transcodeState" = 'DELETING'
+           WHERE "id" = @videoId AND "transcodeState" = 'DELETING_ACTIVE' """,
+        parameters: QueryParameters.named({'videoId': id}),
+      );
       rethrow;
     } finally {
       _processing.remove(id);
@@ -192,7 +213,7 @@ class VideoDeletionService {
       session = await Serverpod.instance.createSession();
       final pending = await Video.db.find(
         session,
-        where: (t) => t.transcodeState.equals(deleting),
+        where: (t) => t.transcodeState.equals(deleting) | t.transcodeState.equals('DELETING_ACTIVE'),
         limit: 20,
       );
       for (final video in pending) {
