@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
+import 'video_deletion_fault_injection.dart';
 
 /// Persistent deletion tombstones stay on Video until external cleanup succeeds.
 class VideoDeletionService {
@@ -29,10 +30,12 @@ class VideoDeletionService {
     final id = videoId;
     _processing.add(id);
     try {
+      VideoDeletionFaultInjection.check(videoId: id, step: 'before_stream');
       final job = video.transcoderJobName?.trim() ?? '';
       if (job.startsWith('cfstream:')) {
         await _deleteStream(job.substring('cfstream:'.length));
       }
+      VideoDeletionFaultInjection.check(videoId: id, step: 'after_stream');
       await session.storage.deleteFile(
         storageId: 'public',
         path: video.videoStorageKey,
@@ -41,6 +44,7 @@ class VideoDeletionService {
       if (cover != null && cover.isNotEmpty) {
         await session.storage.deleteFile(storageId: 'public', path: cover);
       }
+      VideoDeletionFaultInjection.check(videoId: id, step: 'after_r2');
       // Delete database references only after remote assets are cleaned.
       final comments = await VideoCommentRow.db.find(
         session,
