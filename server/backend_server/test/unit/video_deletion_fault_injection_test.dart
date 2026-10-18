@@ -12,18 +12,33 @@ void main() {
 
   test('one-shot failure triggers only for selected video and step', () {
     final consumed = <String>{};
-    expect(VideoDeletionFaultInjection.shouldFail(
-      videoId: 42, step: 'after_stream', environment: base,
-      consumed: consumed,
-    ), isTrue);
-    expect(VideoDeletionFaultInjection.shouldFail(
-      videoId: 42, step: 'after_stream', environment: base,
-      consumed: consumed,
-    ), isFalse);
-    expect(VideoDeletionFaultInjection.shouldFail(
-      videoId: 43, step: 'after_stream', environment: base,
-      consumed: consumed,
-    ), isFalse);
+    expect(
+      VideoDeletionFaultInjection.shouldFail(
+        videoId: 42,
+        step: 'after_stream',
+        environment: base,
+        consumed: consumed,
+      ),
+      isTrue,
+    );
+    expect(
+      VideoDeletionFaultInjection.shouldFail(
+        videoId: 42,
+        step: 'after_stream',
+        environment: base,
+        consumed: consumed,
+      ),
+      isFalse,
+    );
+    expect(
+      VideoDeletionFaultInjection.shouldFail(
+        videoId: 43,
+        step: 'after_stream',
+        environment: base,
+        consumed: consumed,
+      ),
+      isFalse,
+    );
   });
 
   test('never injects outside explicitly enabled staging', () {
@@ -33,23 +48,36 @@ void main() {
       'GLYPHORA_DELETE_FAULT_ENABLE',
     ]) {
       final environment = Map<String, String>.from(base)..remove(removed);
-      expect(VideoDeletionFaultInjection.shouldFail(
-        videoId: 42, step: 'after_stream', environment: environment,
-        consumed: <String>{},
-      ), isFalse);
+      expect(
+        VideoDeletionFaultInjection.shouldFail(
+          videoId: 42,
+          step: 'after_stream',
+          environment: environment,
+          consumed: <String>{},
+        ),
+        isFalse,
+      );
     }
   });
 
   test('rejects missing target id and unknown phases', () {
-    expect(VideoDeletionFaultInjection.shouldFail(
-      videoId: 42, step: 'after_stream',
-      environment: {...base, 'GLYPHORA_DELETE_FAULT_VIDEO_ID': ''},
-      consumed: <String>{},
-    ), isFalse);
-    expect(VideoDeletionFaultInjection.shouldFail(
-      videoId: 42, step: 'unknown',
-      environment: {...base, 'GLYPHORA_DELETE_FAULT_STEP': 'unknown'},
-      consumed: <String>{},
-    ), isFalse);
+    expect(
+      VideoDeletionFaultInjection.shouldFail(
+        videoId: 42,
+        step: 'after_stream',
+        environment: {...base, 'GLYPHORA_DELETE_FAULT_VIDEO_ID': ''},
+        consumed: <String>{},
+      ),
+      isFalse,
+    );
+    expect(
+      VideoDeletionFaultInjection.shouldFail(
+        videoId: 42,
+        step: 'unknown',
+        environment: {...base, 'GLYPHORA_DELETE_FAULT_STEP': 'unknown'},
+        consumed: <String>{},
+      ),
+      isFalse,
+    );
   });
 }
