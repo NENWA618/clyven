@@ -51,7 +51,7 @@ class VideoEndpoint extends Endpoint {
     }
     if (!allowDeleting &&
         (video.transcodeState == 'DELETING' ||
-         video.transcodeState == 'DELETING_ACTIVE')) {
+            video.transcodeState == 'DELETING_ACTIVE')) {
       throw Exception('视频正在删除，无法修改');
     }
 
@@ -315,9 +315,13 @@ class VideoEndpoint extends Endpoint {
       orderDescending: true,
     );
     // Filtering in Dart also retains legacy rows with NULL transcodeState.
-    return videos.where((video) =>
-        video.transcodeState != 'DELETING' &&
-        video.transcodeState != 'DELETING_ACTIVE').toList();
+    return videos
+        .where(
+          (video) =>
+              video.transcodeState != 'DELETING' &&
+              video.transcodeState != 'DELETING_ACTIVE',
+        )
+        .toList();
   }
 
   Future<Video?> getVideo(
@@ -331,7 +335,8 @@ class VideoEndpoint extends Endpoint {
     final isOwner = currentUserId == video.authorId;
 
     if (video.transcodeState == 'DELETING' ||
-        video.transcodeState == 'DELETING_ACTIVE') return null;
+        video.transcodeState == 'DELETING_ACTIVE')
+      return null;
 
     if (video.status != VideoStatus.published && !isOwner) {
       return null;
@@ -831,7 +836,11 @@ class VideoEndpoint extends Endpoint {
     Session session, {
     required int videoId,
   }) async {
-    final video = await _requireOwnedVideo(session, videoId, allowDeleting: true);
+    final video = await _requireOwnedVideo(
+      session,
+      videoId,
+      allowDeleting: true,
+    );
 
     if (video.transcodeState == 'DELETING' ||
         video.transcodeState == 'DELETING_ACTIVE') {
