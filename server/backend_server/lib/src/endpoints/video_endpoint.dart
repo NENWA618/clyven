@@ -36,8 +36,9 @@ class VideoEndpoint extends Endpoint {
 
   Future<Video> _requireOwnedVideo(
     Session session,
-    int videoId,
-  ) async {
+    int videoId, {
+    bool allowDeleting = false,
+  }) async {
     final userId = _requireUserId(session);
     final video = await Video.db.findById(session, videoId);
 
@@ -47,6 +48,11 @@ class VideoEndpoint extends Endpoint {
 
     if (video.authorId != userId) {
       throw Exception('只能管理自己上传的视频');
+    }
+    if (!allowDeleting &&
+        (video.transcodeState == 'DELETING' ||
+         video.transcodeState == 'DELETING_ACTIVE')) {
+      throw Exception('视频正在删除，无法修改');
     }
 
     return video;
@@ -309,7 +315,9 @@ class VideoEndpoint extends Endpoint {
       orderDescending: true,
     );
     // Filtering in Dart also retains legacy rows with NULL transcodeState.
-    return videos.where((video) => video.transcodeState != 'DELETING').toList();
+    return videos.where((video) =>
+        video.transcodeState != 'DELETING' &&
+        video.transcodeState != 'DELETING_ACTIVE').toList();
   }
 
   Future<Video?> getVideo(
@@ -322,7 +330,8 @@ class VideoEndpoint extends Endpoint {
     final currentUserId = session.authenticated?.userIdentifier.toString();
     final isOwner = currentUserId == video.authorId;
 
-    if (video.transcodeState == 'DELETING') return null;
+    if (video.transcodeState == 'DELETING' ||
+        video.transcodeState == 'DELETING_ACTIVE') return null;
 
     if (video.status != VideoStatus.published && !isOwner) {
       return null;
@@ -822,9 +831,10 @@ class VideoEndpoint extends Endpoint {
     Session session, {
     required int videoId,
   }) async {
-    final video = await _requireOwnedVideo(session, videoId);
+    final video = await _requireOwnedVideo(session, videoId, allowDeleting: true);
 
-    if (video.transcodeState == 'DELETING') {
+    if (video.transcodeState == 'DELETING' ||
+        video.transcodeState == 'DELETING_ACTIVE') {
       await VideoDeletionService.cleanup(session, video);
       return;
     }
