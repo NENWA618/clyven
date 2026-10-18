@@ -20,6 +20,14 @@ class BrowserKeyValueStorage implements KeyValueStorage {
   }
 }
 
+// Build-time API selection. The default stays on Cloud Run so that existing
+// Studio deployments remain unchanged until a separately hosted staging build
+// is explicitly configured. Do not switch the live Studio origin to staging.
+const studioApiUrl = String.fromEnvironment(
+  'GLYPHORA_API_URL',
+  defaultValue: 'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+);
+
 // Shared Glyphora browser auth boundary.
 //
 // Studio uses persistent browser storage instead of page-local memory auth.
@@ -29,7 +37,7 @@ class BrowserKeyValueStorage implements KeyValueStorage {
 // Future Glyphora Web SSO hook: keep auth storage behind this shared client.
 final studioClient =
     Client(
-        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        studioApiUrl,
         connectionTimeout: const Duration(minutes: 2),
       )
       ..authSessionManager = ClientAuthSessionManager(
