@@ -154,6 +154,13 @@ void run(List<String> args) async {
     );
   }
 
+  // Staging-only: report the effective Serverpod pool limit, never credentials.
+  if (Platform.environment['GLYPHORA_STAGING'] == 'true') {
+    print(
+      '[Glyphora Startup] staging DB pool max connections: ${pod.config.database?.maxConnectionCount}',
+    );
+  }
+
   // Capture startup duration and failure stage without printing credentials.
   final startupTimer = Stopwatch()..start();
   print('[Glyphora Startup] Serverpod startup begin.');
