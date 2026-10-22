@@ -14,7 +14,9 @@ RUN printf '%s\n' \
   '  - packages/nom_converter' \
   '  - server/backend_server' \
   > pubspec.yaml
+COPY cloudflare/patch-serverpod-analyzer.dart /app/cloudflare/patch-serverpod-analyzer.dart
 RUN dart pub get
+RUN dart /app/cloudflare/patch-serverpod-analyzer.dart
 WORKDIR /app/server/backend_server
 RUN dart compile exe bin/main.dart -o bin/server
 FROM alpine:latest
