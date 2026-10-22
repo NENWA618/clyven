@@ -10,7 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _i1;
 import 'package:serverpod_client/serverpod_client.dart' as _i2;
@@ -1752,21 +1751,28 @@ class EndpointVideo extends _i2.EndpointRef {
   _i3.Future<String?> createUploadDescription({
     required String path,
     required int fileSize,
+    required bool isPublic,
   }) => caller.callServerEndpoint<String?>(
     'video',
     'createUploadDescription',
     {
       'path': path,
       'fileSize': fileSize,
+      'isPublic': isPublic,
     },
   );
 
-  _i3.Future<bool> verifyUpload({required String path}) =>
-      caller.callServerEndpoint<bool>(
-        'video',
-        'verifyUpload',
-        {'path': path},
-      );
+  _i3.Future<bool> verifyUpload({
+    required String path,
+    required bool isPublic,
+  }) => caller.callServerEndpoint<bool>(
+    'video',
+    'verifyUpload',
+    {
+      'path': path,
+      'isPublic': isPublic,
+    },
+  );
 
   _i3.Future<String?> getVideoUrl({required String path}) =>
       caller.callServerEndpoint<String?>(

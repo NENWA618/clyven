@@ -2,7 +2,11 @@ import 'package:glyphora_backend_client/backend_client.dart';
 
 Future<void> main() async {
   final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    const String.fromEnvironment(
+      'GLYPHORA_API_URL',
+      defaultValue:
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    ),
   );
 
   final detail = await client.dictionaryImport

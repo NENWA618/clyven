@@ -19,5 +19,20 @@
   "exports": {
     "GlyphoraServer": { "type": "durable-object", "storage": "sqlite" }
   },
+  "r2_buckets": [
+    {
+      "binding": "GLYPHORA_PRIVATE_R2",
+      "bucket_name": "glyphora-media-private"
+    }
+  ],
+  "vars": {
+    "CLOUDFLARE_R2_BUCKET": "glyphora-media",
+    "CLOUDFLARE_R2_PUBLIC_HOST": "media.glyphora.net",
+    "SMTP_EMAIL": "chengyang1017@gmail.com",
+    "GLYPHORA_ADMIN_EMAIL": "chengyang905@gmail.com",
+    "CLOUDFLARE_R2_PRIVATE_BUCKET": "glyphora-media-private",
+    "GLYPHORA_CLOUDFLARE_PUBLIC_HOST": "glyphora-api.chengyang1017.workers.dev",
+    "GLYPHORA_PRIVATE_INGEST_BASE_URL": "https://glyphora-api.chengyang1017.workers.dev"
+  },
   "observability": { "enabled": true }
 }

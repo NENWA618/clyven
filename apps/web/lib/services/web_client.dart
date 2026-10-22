@@ -22,7 +22,11 @@ class BrowserKeyValueStorage implements KeyValueStorage {
 
 final webClient =
     Client(
-        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        String.fromEnvironment(
+          'GLYPHORA_API_URL',
+          defaultValue:
+              'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        ),
         connectionTimeout: const Duration(minutes: 2),
       )
       ..authSessionManager = ClientAuthSessionManager(

@@ -29,6 +29,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     _i2.VideoContentType? contentType,
     this.languageCode,
     required this.tags,
+    this.videoStorageId,
+    this.coverStorageId,
     required this.videoStorageKey,
     this.coverStorageKey,
     this.hlsManifestStorageKey,
@@ -66,6 +68,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
+    String? videoStorageId,
+    String? coverStorageId,
     required String videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -102,6 +106,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
             ),
       languageCode: jsonSerialization['languageCode'] as String?,
       tags: _i4.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
+      videoStorageId: jsonSerialization['videoStorageId'] as String?,
+      coverStorageId: jsonSerialization['coverStorageId'] as String?,
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
       hlsManifestStorageKey:
@@ -163,6 +169,10 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
 
   List<String> tags;
 
+  String? videoStorageId;
+
+  String? coverStorageId;
+
   String videoStorageKey;
 
   String? coverStorageKey;
@@ -214,6 +224,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
     _i2.VideoContentType? contentType,
     String? languageCode,
     List<String>? tags,
+    String? videoStorageId,
+    String? coverStorageId,
     String? videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -247,6 +259,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'contentType': contentType.toJson(),
       if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
+      if (videoStorageId != null) 'videoStorageId': videoStorageId,
+      if (coverStorageId != null) 'coverStorageId': coverStorageId,
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
       if (hlsManifestStorageKey != null)
@@ -283,6 +297,8 @@ abstract class Video implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
       'contentType': contentType.toJson(),
       if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
+      if (videoStorageId != null) 'videoStorageId': videoStorageId,
+      if (coverStorageId != null) 'coverStorageId': coverStorageId,
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
       if (hlsManifestStorageKey != null)
@@ -349,6 +365,8 @@ class _VideoImpl extends Video {
     _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
+    String? videoStorageId,
+    String? coverStorageId,
     required String videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -378,6 +396,8 @@ class _VideoImpl extends Video {
          contentType: contentType,
          languageCode: languageCode,
          tags: tags,
+         videoStorageId: videoStorageId,
+         coverStorageId: coverStorageId,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
          hlsManifestStorageKey: hlsManifestStorageKey,
@@ -413,6 +433,8 @@ class _VideoImpl extends Video {
     _i2.VideoContentType? contentType,
     Object? languageCode = _Undefined,
     List<String>? tags,
+    Object? videoStorageId = _Undefined,
+    Object? coverStorageId = _Undefined,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
     Object? hlsManifestStorageKey = _Undefined,
@@ -445,6 +467,12 @@ class _VideoImpl extends Video {
       contentType: contentType ?? this.contentType,
       languageCode: languageCode is String? ? languageCode : this.languageCode,
       tags: tags ?? this.tags.map((e0) => e0).toList(),
+      videoStorageId: videoStorageId is String?
+          ? videoStorageId
+          : this.videoStorageId,
+      coverStorageId: coverStorageId is String?
+          ? coverStorageId
+          : this.coverStorageId,
       videoStorageKey: videoStorageKey ?? this.videoStorageKey,
       coverStorageKey: coverStorageKey is String?
           ? coverStorageKey
@@ -532,6 +560,18 @@ class VideoUpdateTable extends _i1.UpdateTable<VideoTable> {
   _i1.ColumnValue<List<String>, List<String>> tags(List<String> value) =>
       _i1.ColumnValue(
         table.tags,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> videoStorageId(String? value) =>
+      _i1.ColumnValue(
+        table.videoStorageId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> coverStorageId(String? value) =>
+      _i1.ColumnValue(
+        table.coverStorageId,
         value,
       );
 
@@ -675,6 +715,14 @@ class VideoTable extends _i1.Table<int?> {
       'tags',
       this,
     );
+    videoStorageId = _i1.ColumnString(
+      'videoStorageId',
+      this,
+    );
+    coverStorageId = _i1.ColumnString(
+      'coverStorageId',
+      this,
+    );
     videoStorageKey = _i1.ColumnString(
       'videoStorageKey',
       this,
@@ -772,6 +820,10 @@ class VideoTable extends _i1.Table<int?> {
 
   late final _i1.ColumnSerializable<List<String>> tags;
 
+  late final _i1.ColumnString videoStorageId;
+
+  late final _i1.ColumnString coverStorageId;
+
   late final _i1.ColumnString videoStorageKey;
 
   late final _i1.ColumnString coverStorageKey;
@@ -818,6 +870,8 @@ class VideoTable extends _i1.Table<int?> {
     contentType,
     languageCode,
     tags,
+    videoStorageId,
+    coverStorageId,
     videoStorageKey,
     coverStorageKey,
     hlsManifestStorageKey,

@@ -2,10 +2,12 @@ import 'package:glyphora_backend_client/backend_client.dart';
 
 Future<void> main() async {
   final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-    connectionTimeout: const Duration(
-      minutes: 2,
+    const String.fromEnvironment(
+      'GLYPHORA_API_URL',
+      defaultValue:
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
     ),
+    connectionTimeout: const Duration(minutes: 2),
   );
 
   const words = [
@@ -40,12 +42,8 @@ Future<void> main() async {
     print('国语字: ${entry.text}');
     print('Normalized: ${entry.normalizedText}');
     print('类型: ${entry.entryType}');
-    print(
-      '主文字系统: ${entry.primaryScriptCode}',
-    );
-    print(
-      '词性: ${entry.partOfSpeech}',
-    );
+    print('主文字系统: ${entry.primaryScriptCode}');
+    print('词性: ${entry.partOfSpeech}');
 
     if (detail.definitions.isEmpty) {
       print('中文释义: 无');
@@ -56,9 +54,7 @@ Future<void> main() async {
           '${definition.explanationLanguageCode}',
         );
 
-        print(
-          '中文释义: ${definition.gloss}',
-        );
+        print('中文释义: ${definition.gloss}');
 
         if (definition.definition != null) {
           print(
@@ -88,9 +84,7 @@ Future<void> main() async {
       print('无例句');
     } else {
       for (final exampleDetail in detail.examples) {
-        print(
-          '例句 #${exampleDetail.example.position}',
-        );
+        print('例句 #${exampleDetail.example.position}');
 
         for (final text in exampleDetail.texts) {
           print(

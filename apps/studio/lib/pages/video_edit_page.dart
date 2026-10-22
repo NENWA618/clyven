@@ -57,8 +57,8 @@ class _VideoEditPageState extends State<VideoEditPage> {
         throw Exception(trNow('The video does not exist or this account has no access.', '视频不存在，或当前账号无权访问。'));
       }
 
-      final url = await studioClient.video.getVideoUrl(
-        path: loaded.videoStorageKey,
+      final url = await studioClient.video.getPlaybackManifestUrl(
+        videoId: loaded.id!,
       );
 
       if (!mounted) return;

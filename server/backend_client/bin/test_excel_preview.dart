@@ -5,9 +5,7 @@ import 'package:glyphora_backend_client/backend_client.dart';
 
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {
-    print(
-      '用法: dart run bin/test_excel_preview.dart "C:\\路径\\越南语.xlsx"',
-    );
+    print('用法: dart run bin/test_excel_preview.dart "C:\\路径\\越南语.xlsx"');
     return;
   }
 
@@ -25,11 +23,14 @@ Future<void> main(List<String> args) async {
   print('文件大小: ${bytes.length} bytes');
 
   final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    const String.fromEnvironment(
+      'GLYPHORA_API_URL',
+      defaultValue:
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    ),
   );
 
-  final preview =
-      await client.dictionaryImport.previewExcelBase64(
+  final preview = await client.dictionaryImport.previewExcelBase64(
     profileId: 1,
     excelBase64: base64Encode(bytes),
   );
@@ -50,10 +51,7 @@ Future<void> main(List<String> args) async {
   const encoder = JsonEncoder.withIndent('  ');
 
   // 先只显示前 10 行，避免 800 多条全部刷出来。
-  for (final row
-    in preview.rows.where(
-      (row) => row.status == 'error',
-    )) {
+  for (final row in preview.rows.where((row) => row.status == 'error')) {
     print(
       'Row ${row.rowNumber}: '
       '${row.headword ?? '(no headword)'} '
@@ -64,11 +62,7 @@ Future<void> main(List<String> args) async {
       print('Message: ${row.message}');
     }
 
-    print(
-      encoder.convert(
-        jsonDecode(row.normalizedJson),
-      ),
-    );
+    print(encoder.convert(jsonDecode(row.normalizedJson)));
 
     print('--------------------');
   }

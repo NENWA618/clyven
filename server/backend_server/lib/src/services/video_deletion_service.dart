@@ -36,13 +36,20 @@ class VideoDeletionService {
         await _deleteStream(job.substring('cfstream:'.length));
       }
       VideoDeletionFaultInjection.check(videoId: id, step: 'after_stream');
-      await session.storage.deleteFile(
-        storageId: 'public',
+      // Use physical storage provenance, never isPublic (which becomes false
+      // as soon as deletion starts). Unknown legacy rows may span both buckets.
+      await _deleteVideoAssetByProvenance(
+        session,
         path: video.videoStorageKey,
+        storageId: video.videoStorageId,
       );
       final cover = video.coverStorageKey;
       if (cover != null && cover.isNotEmpty) {
-        await session.storage.deleteFile(storageId: 'public', path: cover);
+        await _deleteVideoAssetByProvenance(
+          session,
+          path: cover,
+          storageId: video.coverStorageId,
+        );
       }
       VideoDeletionFaultInjection.check(videoId: id, step: 'after_r2');
       // Delete database references only after remote assets are cleaned.
@@ -164,6 +171,39 @@ class VideoDeletionService {
       rethrow;
     } finally {
       _processing.remove(id);
+    }
+  }
+
+  // Delete by actual R2 storage assignment. Private/legacy files can have
+  // leftover publicly accessible copies from before the bucket separation.
+  // Deleting an absent object is expected to be idempotent in Serverpod.
+  // Errors are not swallowed: the existing tombstone retry mechanism handles
+  // failures and keeps the database row until cleanup completes.
+  static Future<void> _deleteVideoAssetByProvenance(
+    Session session, {
+    required String path,
+    required String? storageId,
+  }) async {
+    final location = storageId?.trim();
+    if (location != null &&
+        location.isNotEmpty &&
+        location != 'public' &&
+        location != 'private') {
+      throw StateError('Unsupported video asset storage ID: $location');
+    }
+
+    final privateBucket =
+        Platform.environment['CLOUDFLARE_R2_PRIVATE_BUCKET']?.trim() ?? '';
+    final hasPrivateStorage = privateBucket.isNotEmpty;
+    if (location == 'private' && !hasPrivateStorage) {
+      throw StateError('Private R2 not configured; refusing incomplete delete');
+    }
+
+    // Public first so leaked historical public URLs are revoked promptly.
+    // New public-only uploads need no speculative private deletion.
+    await session.storage.deleteFile(storageId: 'public', path: path);
+    if (hasPrivateStorage && location != 'public') {
+      await session.storage.deleteFile(storageId: 'private', path: path);
     }
   }
 

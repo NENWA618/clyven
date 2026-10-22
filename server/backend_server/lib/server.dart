@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'dart:async';
 
+import 'package:serverpod_cloud_storage_s3_compat/serverpod_cloud_storage_s3_compat.dart'
+    as s3;
+
 import 'package:serverpod_cloud_storage_r2/serverpod_cloud_storage_r2.dart'
     as r2;
 
@@ -27,7 +30,7 @@ void run(List<String> args) async {
     Endpoints(),
   );
 
-  // 现在是不是数据库维护 / migration 模式
+  // çŽ°åœ¨æ˜¯ä¸æ˜¯æ•°æ®åº“ç»´æŠ¤ / migration æ¨¡å¼
   final isMaintenance = args.any(
     (arg) => arg == 'maintenance' || arg == '--role=maintenance',
   );
@@ -68,6 +71,47 @@ void run(List<String> args) async {
         ),
       );
       print('[Glyphora Storage] Public uploads use Cloudflare R2.');
+      // GLYPHORA_PRIVATE_R2_STORAGE_V1
+      // Register private storage only when every private setting is supplied.
+      // This does NOT enable private uploads or playback yet.
+      final privateBucket = Platform.environment['CLOUDFLARE_R2_PRIVATE_BUCKET']
+          ?.trim();
+      final privateAccessKey = Platform
+          .environment['SERVERPOD_R2_PRIVATE_ACCESS_KEY_ID']
+          ?.trim();
+      final privateSecretKey = Platform
+          .environment['SERVERPOD_R2_PRIVATE_SECRET_KEY']
+          ?.trim();
+      final hasAnyPrivateSetting = [
+        privateBucket,
+        privateAccessKey,
+        privateSecretKey,
+      ].any((value) => value != null && value.isNotEmpty);
+      final hasAllPrivateSettings = [
+        privateBucket,
+        privateAccessKey,
+        privateSecretKey,
+      ].every((value) => value != null && value.isNotEmpty);
+      if (hasAnyPrivateSetting && !hasAllPrivateSettings) {
+        throw StateError('Incomplete private R2 configuration.');
+      }
+      if (hasAllPrivateSettings) {
+        pod.addCloudStorage(
+          s3.S3CompatCloudStorage(
+            storageId: 'private',
+            public: false,
+            bucket: privateBucket!,
+            region: 'auto',
+            accessKey: privateAccessKey!,
+            secretKey: privateSecretKey!,
+            endpoints: _GlyphoraPrivateR2Endpoints(accountId),
+            uploadStrategy: s3.PresignedPutUploadStrategy(),
+          ),
+        );
+        print(
+          '[Glyphora Storage] Private uploads storage registered (not yet active).',
+        );
+      }
     } else {
       pod.addCloudStorage(
         gcp.GoogleCloudStorage(
@@ -82,7 +126,7 @@ void run(List<String> args) async {
     }
   }
 
-  // 正常启动服务器时才需要登录认证系统
+  // æ­£å¸¸å¯åŠ¨æœåŠ¡å™¨æ—¶æ‰éœ€è¦ç™»å½•è®¤è¯ç³»ç»Ÿ
   if (!isMaintenance) {
     pod.initializeAuthServices(
       tokenManagerBuilders: [
@@ -297,8 +341,8 @@ Future<void> _sendRegistrationCode(
 }) async {
   await _sendVerificationEmail(
     email: email,
-    subject: 'Glyphora verification code / Glyphora 注册验证码',
-    title: 'Welcome to Glyphora / 欢迎加入 Glyphora',
+    subject: 'Glyphora verification code / Glyphora æ³¨å†ŒéªŒè¯ç ',
+    title: 'Welcome to Glyphora / æ¬¢è¿ŽåŠ å…¥ Glyphora',
     verificationCode: verificationCode,
   );
 }
@@ -312,8 +356,8 @@ Future<void> _sendPasswordResetCode(
 }) async {
   await _sendVerificationEmail(
     email: email,
-    subject: 'Glyphora password reset code / Glyphora 密码重置验证码',
-    title: 'Reset your Glyphora password / 重置你的 Glyphora 密码',
+    subject: 'Glyphora password reset code / Glyphora å¯†ç é‡ç½®éªŒè¯ç ',
+    title: 'Reset your Glyphora password / é‡ç½®ä½ çš„ Glyphora å¯†ç ',
     verificationCode: verificationCode,
   );
 }
@@ -356,13 +400,13 @@ Future<void> _sendVerificationEmail({
         '''
 $title
 
-Your verification code is / 你的验证码是：
+Your verification code is / ä½ çš„éªŒè¯ç æ˜¯ï¼š
 
 $verificationCode
 
-This code is only for this request. / 验证码仅用于本次操作。
+This code is only for this request. / éªŒè¯ç ä»…ç”¨äºŽæœ¬æ¬¡æ“ä½œã€‚
 
-If this wasn't you, you can ignore this email. / 如果这不是你的操作，请忽略这封邮件。
+If this wasn't you, you can ignore this email. / å¦‚æžœè¿™ä¸æ˜¯ä½ çš„æ“ä½œï¼Œè¯·å¿½ç•¥è¿™å°é‚®ä»¶ã€‚
 
 Glyphora
 ''';
@@ -371,4 +415,29 @@ Glyphora
     message,
     smtpServer,
   );
+}
+
+// Private-only Cloudflare R2 endpoint configuration.
+// No anonymous public URL may be produced for private objects.
+class _GlyphoraPrivateR2Endpoints extends s3.S3EndpointConfig {
+  const _GlyphoraPrivateR2Endpoints(this.accountId);
+  final String accountId;
+
+  @override
+  Uri buildBucketUri(String bucket, String region) =>
+      Uri.https('$accountId.r2.cloudflarestorage.com', '/$bucket');
+
+  @override
+  Uri buildPublicUri(
+    String bucket,
+    String region,
+    String path, {
+    Uri? publicHost,
+  }) => throw UnsupportedError('Private R2 objects have no public URL.');
+
+  @override
+  bool get supportsObjectAcl => false;
+
+  @override
+  String get serviceName => 'Cloudflare R2';
 }

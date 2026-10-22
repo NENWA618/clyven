@@ -29,6 +29,8 @@ abstract class Video implements _i1.SerializableModel {
     _i2.VideoContentType? contentType,
     this.languageCode,
     required this.tags,
+    this.videoStorageId,
+    this.coverStorageId,
     required this.videoStorageKey,
     this.coverStorageKey,
     this.hlsManifestStorageKey,
@@ -66,6 +68,8 @@ abstract class Video implements _i1.SerializableModel {
     _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
+    String? videoStorageId,
+    String? coverStorageId,
     required String videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -102,6 +106,8 @@ abstract class Video implements _i1.SerializableModel {
             ),
       languageCode: jsonSerialization['languageCode'] as String?,
       tags: _i4.Protocol().deserialize<List<String>>(jsonSerialization['tags']),
+      videoStorageId: jsonSerialization['videoStorageId'] as String?,
+      coverStorageId: jsonSerialization['coverStorageId'] as String?,
       videoStorageKey: jsonSerialization['videoStorageKey'] as String,
       coverStorageKey: jsonSerialization['coverStorageKey'] as String?,
       hlsManifestStorageKey:
@@ -161,6 +167,10 @@ abstract class Video implements _i1.SerializableModel {
 
   List<String> tags;
 
+  String? videoStorageId;
+
+  String? coverStorageId;
+
   String videoStorageKey;
 
   String? coverStorageKey;
@@ -209,6 +219,8 @@ abstract class Video implements _i1.SerializableModel {
     _i2.VideoContentType? contentType,
     String? languageCode,
     List<String>? tags,
+    String? videoStorageId,
+    String? coverStorageId,
     String? videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -242,6 +254,8 @@ abstract class Video implements _i1.SerializableModel {
       'contentType': contentType.toJson(),
       if (languageCode != null) 'languageCode': languageCode,
       'tags': tags.toJson(),
+      if (videoStorageId != null) 'videoStorageId': videoStorageId,
+      if (coverStorageId != null) 'coverStorageId': coverStorageId,
       'videoStorageKey': videoStorageKey,
       if (coverStorageKey != null) 'coverStorageKey': coverStorageKey,
       if (hlsManifestStorageKey != null)
@@ -284,6 +298,8 @@ class _VideoImpl extends Video {
     _i2.VideoContentType? contentType,
     String? languageCode,
     required List<String> tags,
+    String? videoStorageId,
+    String? coverStorageId,
     required String videoStorageKey,
     String? coverStorageKey,
     String? hlsManifestStorageKey,
@@ -313,6 +329,8 @@ class _VideoImpl extends Video {
          contentType: contentType,
          languageCode: languageCode,
          tags: tags,
+         videoStorageId: videoStorageId,
+         coverStorageId: coverStorageId,
          videoStorageKey: videoStorageKey,
          coverStorageKey: coverStorageKey,
          hlsManifestStorageKey: hlsManifestStorageKey,
@@ -348,6 +366,8 @@ class _VideoImpl extends Video {
     _i2.VideoContentType? contentType,
     Object? languageCode = _Undefined,
     List<String>? tags,
+    Object? videoStorageId = _Undefined,
+    Object? coverStorageId = _Undefined,
     String? videoStorageKey,
     Object? coverStorageKey = _Undefined,
     Object? hlsManifestStorageKey = _Undefined,
@@ -380,6 +400,12 @@ class _VideoImpl extends Video {
       contentType: contentType ?? this.contentType,
       languageCode: languageCode is String? ? languageCode : this.languageCode,
       tags: tags ?? this.tags.map((e0) => e0).toList(),
+      videoStorageId: videoStorageId is String?
+          ? videoStorageId
+          : this.videoStorageId,
+      coverStorageId: coverStorageId is String?
+          ? coverStorageId
+          : this.coverStorageId,
       videoStorageKey: videoStorageKey ?? this.videoStorageKey,
       coverStorageKey: coverStorageKey is String?
           ? coverStorageKey

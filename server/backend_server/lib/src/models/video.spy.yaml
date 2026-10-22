@@ -27,6 +27,10 @@ fields:
 
   tags: List<String>
 
+  # Physical R2 location. Nullable for pre-migration/legacy videos.
+  # Do not infer legacy storage from isPublic: visibility can change.
+  videoStorageId: String?
+  coverStorageId: String?
   videoStorageKey: String
   coverStorageKey: String?
 

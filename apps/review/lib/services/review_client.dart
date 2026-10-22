@@ -23,7 +23,11 @@ class BrowserKeyValueStorage implements KeyValueStorage {
 // Review uses the same Glyphora Serverpod auth/session model as the other web apps.
 final reviewClient =
     Client(
-        'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        String.fromEnvironment(
+          'GLYPHORA_API_URL',
+          defaultValue:
+              'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+        ),
         connectionTimeout: const Duration(minutes: 2),
       )
       ..authSessionManager = ClientAuthSessionManager(
@@ -37,7 +41,9 @@ final reviewClient =
 /// An invalid or expired session is simply rejected by initialize/refresh and
 /// falls back to the normal login form.
 void consumeWebSession() {
-  final match = RegExp(r'(?:^#|&)sso=([^&]+)').firstMatch(html.window.location.hash);
+  final match = RegExp(
+    r'(?:^#|&)sso=([^&]+)',
+  ).firstMatch(html.window.location.hash);
   if (match == null) return;
 
   try {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:serverpod/serverpod.dart';
 
@@ -252,24 +254,97 @@ class VideoTranscodeService {
     }
   }
 
+  /// Stream ingestion ONLY. Never return this URL to Glyphora clients.
+  static Uri _signedPrivateImportUri(String objectKey) {
+    final key = Platform.environment['GLYPHORA_PRIVATE_INGEST_KEY'] ?? '';
+    final base = Platform.environment['GLYPHORA_PRIVATE_INGEST_BASE_URL'] ?? '';
+    if (key.length < 32)
+      throw StateError('Private ingest key is not configured.');
+    final origin = Uri.tryParse(base);
+    if (origin == null ||
+        origin.scheme != 'https' ||
+        origin.host.isEmpty ||
+        origin.userInfo.isNotEmpty ||
+        origin.hasQuery ||
+        origin.hasFragment ||
+        (origin.path.isNotEmpty && origin.path != '/')) {
+      throw StateError('Private ingest base URL must be an HTTPS origin.');
+    }
+    if (!RegExp(
+      r'^videos/[A-Za-z0-9_-]+/[A-Za-z0-9._-]+$',
+    ).hasMatch(objectKey)) {
+      throw StateError('Invalid private video key.');
+    }
+    final expires =
+        (DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000 + 7200)
+            .toString();
+    final encoded = base64Url
+        .encode(utf8.encode(objectKey))
+        .replaceAll('=', '');
+    final mac = Hmac(
+      sha256,
+      utf8.encode(key),
+    ).convert(utf8.encode('$expires.$encoded')).toString();
+    return origin.replace(
+      path: '/__glyphora_private_ingest/$encoded',
+      queryParameters: {'exp': expires, 'sig': mac},
+    );
+  }
+
   Future<Video> _startStream(Session session, Video video) async {
-    // This integration uses public playback URLs. Never accidentally publish
-    // private Glyphora videos through Cloudflare Stream.
-    if (!video.isPublic) {
+    if (video.id == null) throw StateError('Video ID required.');
+    // GLYPHORA_PRIVATE_STREAM_SIGNER_STAGE3C4
+    // Never infer legacy NULL provenance from isPublic.
+    final isPrivate = !video.isPublic;
+    if (isPrivate && video.videoStorageId != 'private') {
       throw StateError(
-        'Cloudflare Stream public playback is disabled for private videos. '
-        'Signed playback must be implemented before private uploads migrate.',
+        'Private Stream import requires explicit private storage provenance.',
       );
     }
-    if (video.id == null) throw StateError('Video ID required.');
-    final sourceUrl = await session.storage.getPublicUrl(
-      storageId: 'public',
-      path: video.videoStorageKey,
-    );
-    if (sourceUrl == null || sourceUrl.scheme != 'https') {
-      throw StateError(
-        'Cloudflare Stream requires an accessible HTTPS source video URL.',
+    if (!isPrivate && video.videoStorageId == 'private') {
+      throw StateError('Refusing public Stream import of private file.');
+    }
+    final Uri sourceUrl;
+    if (isPrivate) {
+      sourceUrl = _signedPrivateImportUri(video.videoStorageKey);
+    } else {
+      final publicUrl = await session.storage.getPublicUrl(
+        storageId: 'public',
+        path: video.videoStorageKey,
       );
+      if (publicUrl == null || publicUrl.scheme != 'https') {
+        throw StateError('Cloudflare Stream requires accessible HTTPS source.');
+      }
+      sourceUrl = publicUrl;
+    }
+    // GLYPHORA_PRIVATE_STREAM_IMPORT_CLAIM_V1
+    // Persist the intent BEFORE the external /copy call. An unexpected failure
+    // can leave a Stream asset whose UID was not saved. We deliberately do not
+    // automatically retry such an ambiguous request, because it could create
+    // a duplicate paid Stream asset. Reconcile the remote asset first.
+    if (isPrivate) {
+      final claimed = await session.db.unsafeQuery(
+        r'''UPDATE "video"
+            SET "transcodeState" = 'IMPORTING', "updatedAt" = NOW()
+            WHERE "id" = @videoId
+              AND "isPublic" = false
+              AND "videoStorageId" = 'private'
+              AND "videoStorageKey" = @sourceKey
+              AND "transcoderJobName" IS NULL
+              AND ("transcodeState" IS NULL OR "transcodeState" = 'FAILED')
+            RETURNING "id"''',
+        parameters: QueryParameters.named({
+          'videoId': video.id,
+          'sourceKey': video.videoStorageKey,
+        }),
+      );
+      if (claimed.length != 1) {
+        throw StateError(
+          'Private Stream import already claimed or requires manual '
+          'reconciliation. Refusing duplicate Stream /copy request.',
+        );
+      }
+      video.transcodeState = 'IMPORTING';
     }
     final result = await _streamRequest(
       'POST',
@@ -277,12 +352,47 @@ class VideoTranscodeService {
       body: {
         'url': sourceUrl.toString(),
         'meta': {'glyphoraVideoId': video.id.toString()},
-        'requireSignedURLs': false,
+        'requireSignedURLs': isPrivate,
       },
     );
     final uid = result['uid']?.toString();
     if (uid == null || uid.isEmpty) {
       throw StateError('Cloudflare Stream response missing uid.');
+    }
+    // GLYPHORA_PRIVATE_STREAM_CAS_STAGE3C7
+    // Save only the transcode fields. Never overwrite concurrent edits to the
+    // video row using an old Video instance returned before the network call.
+    if (isPrivate) {
+      final updated = await session.db.unsafeQuery(
+        r'''UPDATE "video"
+            SET "transcoderJobName" = @job,
+                "transcodeState" = 'PENDING',
+                "hlsManifestStorageKey" = NULL,
+                "updatedAt" = NOW()
+            WHERE "id" = @videoId
+              AND "isPublic" = false
+              AND "videoStorageId" = 'private'
+              AND "videoStorageKey" = @sourceKey
+              AND "transcodeState" = 'IMPORTING'
+              AND "transcoderJobName" IS NULL
+            RETURNING "id"''',
+        parameters: QueryParameters.named({
+          'videoId': video.id,
+          'job': 'cfstream:$uid',
+          'sourceKey': video.videoStorageKey,
+        }),
+      );
+      if (updated.length != 1) {
+        throw StateError(
+          'Stream accepted an import but DB claim changed. UID=$uid; '
+          'manual reconciliation required. Refusing unsafe overwrite.',
+        );
+      }
+      final fresh = await Video.db.findById(session, video.id!);
+      if (fresh == null) {
+        throw StateError('Stream UID=$uid saved but video row disappeared.');
+      }
+      return fresh;
     }
     video.transcoderJobName = 'cfstream:$uid';
     video.transcodeState = 'PENDING';
@@ -320,6 +430,35 @@ class VideoTranscodeService {
       );
     } else {
       video.transcodeState = 'PENDING';
+    }
+    if (!video.isPublic && video.videoStorageId == 'private') {
+      // Update only the matching Stream job; never overwrite concurrent edits
+      // or attach a manifest to a changed video. Failure is fail-closed.
+      final updated = await session.db.unsafeQuery(
+        r'''UPDATE "video"
+            SET "transcodeState" = @state,
+                "hlsManifestStorageKey" = @manifest,
+                "updatedAt" = NOW()
+            WHERE "id" = @videoId
+              AND "isPublic" = false
+              AND "videoStorageId" = 'private'
+              AND "videoStorageKey" = @sourceKey
+              AND "transcoderJobName" = @job
+            RETURNING "id"''',
+        parameters: QueryParameters.named({
+          'videoId': video.id,
+          'sourceKey': video.videoStorageKey,
+          'job': jobName,
+          'state': video.transcodeState,
+          'manifest': video.hlsManifestStorageKey,
+        }),
+      );
+      if (updated.length != 1) {
+        throw StateError('Stream status update refused: video changed.');
+      }
+      final fresh = await Video.db.findById(session, video.id!);
+      if (fresh == null) throw StateError('Video missing after status update.');
+      return fresh;
     }
     video.updatedAt = DateTime.now().toUtc();
     return Video.db.updateRow(session, video);

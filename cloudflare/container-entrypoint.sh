@@ -7,6 +7,8 @@ case "$host" in
     exit 1
     ;;
 esac
+sed -i 's/\r$//' config/production.yaml
+
 if [ "${GLYPHORA_STAGING:-}" = 'true' ]; then
   db_host="${GLYPHORA_STAGING_DB_HOST:-}"
   db_name="${GLYPHORA_STAGING_DB_NAME:-}"

@@ -4,7 +4,11 @@ import 'package:glyphora_backend_client/backend_client.dart';
 
 Future<void> main() async {
   final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    const String.fromEnvironment(
+      'GLYPHORA_API_URL',
+      defaultValue:
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+    ),
   );
 
   final rowsJson = [
@@ -35,8 +39,7 @@ Future<void> main() async {
     }),
   ];
 
-  final preview =
-      await client.dictionaryImport.previewRows(
+  final preview = await client.dictionaryImport.previewRows(
     profileId: 1,
     rowsJson: rowsJson,
   );
@@ -64,15 +67,11 @@ Future<void> main() async {
       print('Message: ${row.message}');
     }
 
-    final normalized = jsonDecode(
-      row.normalizedJson,
-    );
+    final normalized = jsonDecode(row.normalizedJson);
 
     const encoder = JsonEncoder.withIndent('  ');
 
-    print(
-      encoder.convert(normalized),
-    );
+    print(encoder.convert(normalized));
 
     print('--------------------');
   }

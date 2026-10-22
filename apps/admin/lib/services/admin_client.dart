@@ -20,8 +20,10 @@ class BrowserKeyValueStorage implements KeyValueStorage {
   }
 }
 
-const _serverUrl =
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/';
+const _serverUrl = String.fromEnvironment(
+  'GLYPHORA_API_URL',
+  defaultValue: 'https://glyphora-server-11129163384.asia-southeast1.run.app/',
+);
 
 final adminClient =
     Client(_serverUrl, connectionTimeout: const Duration(minutes: 2))
@@ -36,7 +38,9 @@ final adminClient =
 /// An invalid or expired session is simply rejected by initialize/refresh and
 /// falls back to the normal login form.
 void consumeWebSession() {
-  final match = RegExp(r'(?:^#|&)sso=([^&]+)').firstMatch(html.window.location.hash);
+  final match = RegExp(
+    r'(?:^#|&)sso=([^&]+)',
+  ).firstMatch(html.window.location.hash);
   if (match == null) return;
 
   try {

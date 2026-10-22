@@ -1,0 +1,35 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "glyphora-api-staging",
+  "main": "cloudflare/worker.ts",
+  "compatibility_date": "2026-10-11",
+  "containers": [
+    {
+      "class_name": "GlyphoraServerStaging",
+      "image": "./Dockerfile.cloudflare",
+      "max_instances": 1,
+      "instance_type": "standard-1"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GLYPHORA_SERVER", "class_name": "GlyphoraServerStaging" }
+    ]
+  },
+  "exports": {
+    "GlyphoraServer": { "type": "durable-object", "storage": "sqlite" },
+    "GlyphoraServerStaging": { "type": "durable-object", "storage": "sqlite" }
+  },
+  "r2_buckets": [
+    {
+      "binding": "GLYPHORA_PRIVATE_R2",
+      "bucket_name": "glyphora-staging-private"
+    }
+  ],
+  "vars": {
+
+    "CLOUDFLARE_R2_PRIVATE_BUCKET": "glyphora-staging-private",
+    "GLYPHORA_PRIVATE_INGEST_BASE_URL": "https://glyphora-api-staging.chengyang1017.workers.dev"
+  },
+  "observability": { "enabled": true }
+}

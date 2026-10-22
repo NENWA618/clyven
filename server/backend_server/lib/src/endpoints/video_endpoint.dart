@@ -4,6 +4,7 @@ import '../generated/protocol.dart';
 import '../services/asr_job_processor.dart';
 import '../services/video_transcode_service.dart';
 import '../services/video_deletion_service.dart';
+import '../services/private_stream_playback_service.dart';
 
 class VideoEndpoint extends Endpoint {
   String _requireUserId(Session session) {
@@ -163,6 +164,21 @@ class VideoEndpoint extends Endpoint {
       );
     }
 
+    final uploadStorageId = isPublic ? 'public' : 'private';
+    if (!await session.storage.verifyDirectFileUpload(
+      storageId: uploadStorageId,
+      path: videoStorageKey,
+    )) {
+      throw Exception('视频文件未上传至对应权限的存储空间');
+    }
+    if (coverStorageKey != null &&
+        !await session.storage.verifyDirectFileUpload(
+          storageId: uploadStorageId,
+          path: coverStorageKey,
+        )) {
+      throw Exception('封面文件未上传至对应权限的存储空间');
+    }
+
     final normalizedTitle = title.trim();
     if (normalizedTitle.isEmpty) {
       throw Exception('视频标题不能为空');
@@ -212,6 +228,10 @@ class VideoEndpoint extends Endpoint {
       contentType: contentType,
       languageCode: languageCode.trim().isEmpty ? 'auto' : languageCode.trim(),
       tags: tags,
+      videoStorageId: isPublic ? 'public' : 'private',
+      coverStorageId: coverStorageKey == null
+          ? null
+          : (isPublic ? 'public' : 'private'),
       videoStorageKey: videoStorageKey,
       coverStorageKey: coverStorageKey,
       durationSeconds: durationSeconds,
@@ -251,6 +271,10 @@ class VideoEndpoint extends Endpoint {
     } catch (error, stackTrace) {
       print('[Glyphora Transcoder] Failed to start job: $error');
       print(stackTrace);
+    }
+
+    if (!isPublic) {
+      return savedVideo;
     }
 
     final asrJob = await AsrJob.db.insertRow(
@@ -769,6 +793,9 @@ class VideoEndpoint extends Endpoint {
     required bool isPublic,
   }) async {
     final video = await _requireOwnedVideo(session, videoId);
+    if (video.isPublic != isPublic) {
+      throw StateError('请使用安全的公开视频状态迁移流程');
+    }
 
     final normalizedTitle = title.trim();
     if (normalizedTitle.isEmpty) {
@@ -821,15 +848,9 @@ class VideoEndpoint extends Endpoint {
       return video;
     }
 
-    final now = DateTime.now();
-    video.isPublic = isPublic;
-    video.updatedAt = now;
-
-    if (isPublic && video.publishedAt == null) {
-      video.publishedAt = now;
-    }
-
-    return Video.db.updateRow(session, video);
+    throw StateError(
+      '切换公开状态前必须完成媒体文件迁移和授权撤销',
+    );
   }
 
   Future<void> deleteVideo(
@@ -859,12 +880,13 @@ class VideoEndpoint extends Endpoint {
     Session session, {
     required String path,
     required int fileSize,
+    bool isPublic = true,
   }) async {
     final userId = _requireUserId(session);
     _requireOwnedUploadPath(userId: userId, path: path);
 
     return session.storage.createDirectFileUploadDescription(
-      storageId: 'public',
+      storageId: isPublic ? 'public' : 'private',
       path: path,
       maxFileSize: 1024 * 1024 * 1024,
       contentLength: fileSize,
@@ -875,12 +897,13 @@ class VideoEndpoint extends Endpoint {
   Future<bool> verifyUpload(
     Session session, {
     required String path,
+    bool isPublic = true,
   }) async {
     final userId = _requireUserId(session);
     _requireOwnedUploadPath(userId: userId, path: path);
 
     return session.storage.verifyDirectFileUpload(
-      storageId: 'public',
+      storageId: isPublic ? 'public' : 'private',
       path: path,
     );
   }
@@ -899,11 +922,10 @@ class VideoEndpoint extends Endpoint {
       where: (table) => table.coverStorageKey.equals(path),
     );
 
-    if (video != null && !video.isPublic) {
-      final currentUserId = session.authenticated?.userIdentifier.toString();
-      if (currentUserId != video.authorId) {
-        return null;
-      }
+    // Private objects must never receive a public URL. Authorized private
+    // retrieval will use a separate short-lived signed URL endpoint.
+    if (video == null || !video.isPublic) {
+      return null;
     }
 
     final uri = await session.storage.getPublicUrl(
@@ -930,13 +952,39 @@ class VideoEndpoint extends Endpoint {
     // This endpoint is callable without authentication. Do not expose
     // playback manifests for a private video to unrelated callers.
     if (!video.isPublic) {
+      // Authentication and storage provenance must be validated before any
+      // transcode API request or Cloudflare Stream access.
       final viewerId = session.authenticated?.userIdentifier.toString();
-      if (viewerId != video.authorId) {
-        return null;
-      }
-      // Existing Stream imports currently use publicly accessible manifests.
-      // A video made private after import must not keep exposing that URL.
-      if (video.transcoderJobName?.startsWith('cfstream:') == true) {
+      if (viewerId == null || viewerId != video.authorId) return null;
+      if (video.videoStorageId != 'private') return null;
+
+      // An interrupted import is ambiguous: never start another /copy.
+      if (video.transcodeState == 'IMPORTING') return null;
+
+      try {
+        final updated = await const VideoTranscodeService().ensure(
+          session,
+          video,
+        );
+        if (updated.transcodeState != 'SUCCEEDED' ||
+            updated.isPublic ||
+            updated.videoStorageId != 'private') {
+          return null;
+        }
+        final job = updated.transcoderJobName?.trim() ?? '';
+        if (!job.startsWith('cfstream:')) return null;
+        final uid = job.substring('cfstream:'.length);
+        if (uid.isEmpty) return null;
+        return await const PrivateStreamPlaybackService().signedManifestUrl(
+          uid,
+        );
+      } catch (error) {
+        // Fail closed. In particular, a failed/ambiguous /copy must not be
+        // retried from here and no public manifest is returned.
+        session.log(
+          'Private playback unavailable videoId=$videoId: $error',
+          level: LogLevel.warning,
+        );
         return null;
       }
     }

@@ -27,11 +27,9 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final email =
-      Platform.environment['GLYPHORA_TEST_EMAIL'];
+  final email = Platform.environment['GLYPHORA_TEST_EMAIL'];
 
-  final password =
-      Platform.environment['GLYPHORA_TEST_PASSWORD'];
+  final password = Platform.environment['GLYPHORA_TEST_PASSWORD'];
 
   if (email == null || email.trim().isEmpty) {
     print('缺少环境变量 GLYPHORA_TEST_EMAIL');
@@ -51,42 +49,34 @@ Future<void> main(List<String> args) async {
   }
 
   final client = Client(
-    'https://glyphora-server-11129163384.asia-southeast1.run.app/',
-    connectionTimeout: const Duration(
-      minutes: 2,
+    const String.fromEnvironment(
+      'GLYPHORA_API_URL',
+      defaultValue:
+          'https://glyphora-server-11129163384.asia-southeast1.run.app/',
     ),
+    connectionTimeout: const Duration(minutes: 2),
   );
 
-  client.authSessionManager =
-      ClientAuthSessionManager(
+  client.authSessionManager = ClientAuthSessionManager(
     storage: _MemoryAuthStorage(),
   );
 
   print('正在登录...');
 
-  final authSuccess =
-      await client.emailIdp.login(
+  final authSuccess = await client.emailIdp.login(
     email: email.trim().toLowerCase(),
     password: password,
   );
 
-  await client.auth.updateSignedInUser(
-    authSuccess,
-  );
+  await client.auth.updateSignedInUser(authSuccess);
 
-  print(
-    '登录成功: ${authSuccess.authUserId}',
-  );
+  print('登录成功: ${authSuccess.authUserId}');
 
   final bytes = await file.readAsBytes();
 
-  print(
-    '读取测试 Excel: ${file.path}',
-  );
+  print('读取测试 Excel: ${file.path}');
 
-  final result =
-      await client.dictionaryImport
-          .commitExcelBase64(
+  final result = await client.dictionaryImport.commitExcelBase64(
     profileId: 1,
     excelBase64: base64Encode(bytes),
   );
@@ -94,18 +84,10 @@ Future<void> main(List<String> args) async {
   print('');
   print('=== Import Result ===');
   print('Total: ${result.totalRows}');
-  print(
-    'Inserted: ${result.insertedEntries}',
-  );
-  print(
-    'Merged: ${result.mergedEntries}',
-  );
-  print(
-    'Skipped: ${result.skippedRows}',
-  );
-  print(
-    'Failed: ${result.failedRows}',
-  );
+  print('Inserted: ${result.insertedEntries}');
+  print('Merged: ${result.mergedEntries}');
+  print('Skipped: ${result.skippedRows}');
+  print('Failed: ${result.failedRows}');
 
   if (result.messages.isNotEmpty) {
     print('');

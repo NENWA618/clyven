@@ -1,12 +1,13 @@
-{
-  "name": "glyphora-cloudflare-deployment",
-  "private": true,
-  "scripts": {
-    "cf:dev": "wrangler dev",
-    "cf:deploy": "wrangler deploy"
-  },
-  "devDependencies": {
-    "@cloudflare/containers": "^0.1.0",
-    "wrangler": "^4.136.0"
-  }
+﻿{
+    "name":  "glyphora-cloudflare-deployment",
+    "private":  true,
+    "scripts":  {
+                    "cf:dev":  "wrangler dev",
+                    "cf:deploy":  "node tool/confirm-production-deploy.cjs",
+                    "cf:deploy:staging":  "wrangler deploy --config wrangler.staging.jsonc"
+                },
+    "devDependencies":  {
+                            "@cloudflare/containers":  "^0.1.0",
+                            "wrangler":  "^4.136.0"
+                        }
 }
